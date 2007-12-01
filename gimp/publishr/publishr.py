@@ -427,18 +427,26 @@ class UploadGUI:
                 </entry>'''
             #result = img.updatePhoto(tagmetadata)
             
+    def serviceChoiceChanged(self,widget,data=None):
+        if widget.get_active():
+            if widget == self.flickrRadio:
+                print 'Flickr chosen'
+            elif widget == self.picwebRadio:
+                print 'Picasaweb chosen'
 
     def __init__(self,type=None,webservice=None):
         global window
         self.window = window
         self.type = type
         self.webservice = webservice
-
+        
+        # Service choice widgets
+        self.flickrRadio = gtk.RadioButton(None,'Flickr')
+        self.picwebRadio = gtk.RadioButton(self.flickrRadio,'Picasaweb')
+        
         # Define UI widgets
         titleLabel = gtk.Label('Title')
         self.titleEntry = gtk.Entry()
-        titleLabel.show()
-        self.titleEntry.show()
 
         descLabel = gtk.Label('Description')
         dsw = gtk.ScrolledWindow()
@@ -447,14 +455,9 @@ class UploadGUI:
         self.descView.set_wrap_mode(gtk.WRAP_WORD)
         self.descView.set_accepts_tab(False)
         dsw.add(self.descView)
-        descLabel.show()
-        dsw.show()
-        self.descView.show()
 
         tagLabel = gtk.Label('Tags')
         self.tagEntry = gtk.Entry()
-        tagLabel.show()
-        self.tagEntry.show()
 
         licenseLabel = gtk.Label('License')
         self.licenseCombo = gtk.combo_box_entry_new_text()
@@ -469,9 +472,7 @@ class UploadGUI:
         ]
         for lic in licenses:
             self.licenseCombo.append_text(lic)
-        licenseLabel.show()
         self.licenseCombo.set_active(0)
-        self.licenseCombo.show()
 
         okButton = gtk.Button('Upload')
         okButton.connect("clicked",self.upload)
@@ -479,57 +480,51 @@ class UploadGUI:
         cancelButton.connect("clicked",destroy)
         signoutButton = gtk.Button('Sign out')
         signoutButton.connect("clicked",signout)
-        okButton.show()
-        cancelButton.show()
-        signoutButton.show()
 
         # Pack all widgets
+        serviceBox = gtk.HBox()
+        serviceBox.pack_start(self.flickrRadio)
+        serviceBox.pack_start(self.picwebRadio)
+
         titleBox = gtk.HBox()
         titleBox.pack_start(titleLabel)
         titleBox.pack_start(self.titleEntry)
-        titleBox.show()
         titleBox.set_border_width(4)
 
         descBox = gtk.VBox()
         descLabelBox = gtk.HBox()
         descLabelBox.pack_start(descLabel,expand=False,fill=False)
-        descLabelBox.show()
         descBox.pack_start(descLabelBox)
         descBox.pack_start(dsw)
-        descBox.show()
         descBox.set_border_width(4)
 
         tagBox = gtk.HBox()
         tagBox.pack_start(tagLabel)
         tagBox.pack_start(self.tagEntry)
-        tagBox.show()
         tagBox.set_border_width(4)
 
         licenseBox = gtk.HBox()
         licenseBox.pack_start(licenseLabel)
         licenseBox.pack_start(self.licenseCombo)
-        licenseBox.show()
 
         inputBox = gtk.VBox()
         inputBox.pack_start(titleBox)
         inputBox.pack_start(descBox)
         inputBox.pack_start(tagBox)
         inputBox.pack_start(licenseBox)
-        inputBox.show()
         inputBox.set_border_width(4)
 
         buttonBox = gtk.HBox()
         buttonBox.pack_start(okButton)
         buttonBox.pack_start(cancelButton)
         buttonBox.pack_start(signoutButton)
-        buttonBox.show()
         buttonBox.set_border_width(4)
 
         windowBox = gtk.VBox()
+        windowBox.pack_start(serviceBox)
         windowBox.pack_start(inputBox)
         windowBox.pack_start(buttonBox)
         windowBox.set_border_width(6)
-        windowBox.show()
         
         if self.type == 'PICASAWEB':
             signoutButton.hide()
@@ -543,6 +538,7 @@ class UploadGUI:
         
         empty_window()
 
+        windowBox.show_all()
         self.window.add(windowBox)
         
 class PicasawebObject:
@@ -808,12 +804,11 @@ def publishr(image,drawable):
     window.show()
     gtk.main()
     
-''' 
 if __name__ == '__main__':
     publishr(None,None)
-'''    
     
 
+''' 
 register(
     "python_fu_publish",
     "Image publishing plugin",
@@ -828,3 +823,4 @@ register(
     publishr)
 
 main()
+'''    
