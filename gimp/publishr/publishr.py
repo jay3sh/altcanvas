@@ -430,19 +430,69 @@ class UploadGUI:
     def serviceChoiceChanged(self,widget,data=None):
         if widget.get_active():
             if widget == self.flickrRadio:
-                print 'Flickr chosen'
+                self.type = 'FLICKR'
+                if not self.flickrObject.has_auth():
+                    self.displayFlickrLogin()
             elif widget == self.picwebRadio:
-                print 'Picasaweb chosen'
+                self.type = 'PICASAWEB'
+                self.displayPicwebLogin()
 
-    def __init__(self,type=None,webservice=None):
+    
+    def displayPicwebLogin(self):
+        try:
+            empty_window()
+            self.picwebRegBox = PicasawebRegisterBox(self)
+            self.window.add(self.picwebRegBox)
+        except Exception, e:
+            alert("Picasaweb GUI: %s"%e)
+            destroy()
+        
+    def displayFlickrLogin(self):
+        try:
+            empty_window()
+            self.flickrRegBox = FlickrRegisterBox(self)
+            self.flickrRegBox.setup()
+            self.window.add(self.flickrRegBox)
+        except Exception, e:
+            alert("Flickr GUI: %s"%e)
+            destroy()
+            
+    def picweb_login_handler(self,widget,data=None):
+        username = self.picwebRegBox.usernameEntry.get_text()
+        password = self.picwebRegBox.passwordEntry.get_text()
+        try:
+            self.picwebObject.login(username,password)
+        except Exception, e:
+            alert('Login error: %s'%e)
+            
+    def flickr_login_handler(self,widget,data=None):
+        try:
+            authtoken = self.flickrObject.get_authtoken()
+            if authtoken != None:
+                save_authtoken(authtoken)
+            else:
+                alert("There was error retrieving Flickr Authentication token.\n"+
+                      "Are you sure, you have authorized this application?\n"+
+                      "Try again!")
+        except Exception, e:
+            alert("Network error while retrieving Auth Token: %s"%e)
+     
+        
+    def __init__(self):
         global window
         self.window = window
-        self.type = type
-        self.webservice = webservice
+        self.type = None
+        self.webservice = None
+        
+        self.flickrObject = FlickrObject()
+    	self.picwebObject = PicasawebObject()
         
         # Service choice widgets
         self.flickrRadio = gtk.RadioButton(None,'Flickr')
         self.picwebRadio = gtk.RadioButton(self.flickrRadio,'Picasaweb')
+        
+        self.flickrRadio.connect("toggled",self.serviceChoiceChanged)
+        self.picwebRadio.connect("toggled",self.serviceChoiceChanged)
         
         # Define UI widgets
         titleLabel = gtk.Label('Title')
@@ -520,11 +570,11 @@ class UploadGUI:
         buttonBox.pack_start(signoutButton)
         buttonBox.set_border_width(4)
 
-        windowBox = gtk.VBox()
-        windowBox.pack_start(serviceBox)
-        windowBox.pack_start(inputBox)
-        windowBox.pack_start(buttonBox)
-        windowBox.set_border_width(6)
+        self.uploadBox = gtk.VBox()
+        self.uploadBox.pack_start(serviceBox)
+        self.uploadBox.pack_start(inputBox)
+        self.uploadBox.pack_start(buttonBox)
+        self.uploadBox.set_border_width(6)
         
         if self.type == 'PICASAWEB':
             signoutButton.hide()
@@ -538,18 +588,21 @@ class UploadGUI:
         
         empty_window()
 
-        windowBox.show_all()
-        self.window.add(windowBox)
+        self.uploadBox.show_all()
+        self.window.add(self.uploadBox)
         
 class PicasawebObject:
     picweb=None
     def __init__(self):
         pass
     
+    def login(self,username,password):
+        self.picweb = PicasaWeb(username,password)
+    
 class PicasawebRegisterBox(gtk.VBox):
-    def __init__(self,picwebObject):
+    def __init__(self,parent):
         gtk.VBox.__init__(self)
-        self.picwebObject = picwebObject
+        self.picwebObject = parent.picwebObject
         # Picasaweb Login widgets
         self.loginTitle = gtk.Label('Login to your Picasaweb (Google) account')
         self.usernameTitle = gtk.Label('Username')
@@ -566,7 +619,7 @@ class PicasawebRegisterBox(gtk.VBox):
         self.passwordExplainLabel.set_width_chars(52)
         self.passwordExplainLabel.set_line_wrap(True)
         self.loginButton = gtk.Button('Login')
-        self.loginButton.connect("clicked",self.login_handler)
+        self.loginButton.connect("clicked",parent.picweb_login_handler)
         self.cancelButton = gtk.Button('Cancel')
         self.cancelButton.connect("clicked",destroy)
         
@@ -592,16 +645,6 @@ class PicasawebRegisterBox(gtk.VBox):
         
         self.show_all()
         
-    def login_handler(self,widget,data=None):
-        self.login(self.usernameEntry.get_text(), self.passwordEntry.get_text())
-        
-    def login(self,username,password):
-        try:
-            self.picwebObject.picweb = PicasaWeb(username,password)
-        except Exception, e:
-            alert('Login error: %s'%e)
-        else:
-            UploadGUI(type='PICASAWEB',webservice=self.picwebObject)
             
 class FlickrObject:
     keyserver = None
@@ -649,9 +692,9 @@ class FlickrObject:
         return self.authtoken
     
 class FlickrRegisterBox(gtk.VBox):
-    def __init__(self,flickrObject):
+    def __init__(self,parent):
         gtk.VBox.__init__(self)
-        self.flickrObject = flickrObject
+        self.flickrObject = parent.flickrObject
         self.explainLabel = gtk.Label(
         'Please copy the following link and open it using your web browser.'+
         'Flickr will ask you to authorize AltCanvas to upload photos to your account.'+
@@ -662,7 +705,7 @@ class FlickrRegisterBox(gtk.VBox):
         self.urlText.set_width_chars(45)
         self.doneButton = gtk.Button('Press when you have granted authorization to AltCanvas!')
         self.doneButton.set_border_width(5)
-        self.doneButton.connect("clicked",self.getauthtoken)
+        self.doneButton.connect("clicked",parent.flickr_login_handler)
         
         self.set_spacing(15)
         self.pack_start(self.explainLabel)
@@ -683,74 +726,14 @@ class FlickrRegisterBox(gtk.VBox):
             authtoken = self.flickrObject.get_authtoken()
             if authtoken != None:
                 save_authtoken(authtoken)
-                UploadGUI(type='FLICKR',webservice=self.flickrObject)
+                parent.authenticate(authtoken)
             else:
                 alert("There was error retrieving Flickr Authentication token.\n"+
                       "Are you sure, you have authorized this application?\n"+
                       "Try again!")
         except Exception, e:
             alert("Network error while retrieving Auth Token: %s"%e)
-        
-    
-class EntryGUI:
-    frob = None
-    openingBox = None
-    flickrRegBox = None
-    picwebRegBox = None
-    def __init__(self,flickrObject,picwebObject):
-        global window
-        self.window = window
-        
-        # First screen widgets
-        if flickrObject.has_auth():
-            self.regFlickrButton = gtk.Button('Publish to Flickr!')
-            self.regFlickrButton.connect("clicked",self.displayFlickr,flickrObject)
-        else:
-            self.regFlickrButton = gtk.Button('Sign into Flickr!')
-            self.regFlickrButton.connect("clicked",self.displayFlickr,flickrObject)
-        
-        self.regPicwebButton = gtk.Button('Sign into Picasaweb!')
-        self.regPicwebButton.connect("clicked",self.displayPicweb,picwebObject)
-        
-        self.cancelButton = gtk.Button('Later...')
-        self.cancelButton.connect("clicked",destroy)
-        
-        # Container widgets
-        self.openingBox = gtk.VBox()
-        self.openingBox.set_spacing(15)
-        self.openingBox.pack_start(self.regFlickrButton)
-        self.openingBox.pack_start(self.regPicwebButton)
-        self.openingBox.pack_start(self.cancelButton)
-        self.openingBox.set_border_width(30)
-        self.openingBox.show_all()
-        
-        self.window.add(self.openingBox)
-                        
-                        
-    def displayFlickr(self,widget,data=None):
-        try:
-            empty_window()
-            flickrObject = data
-            if flickrObject.has_auth():
-                uploadGUI = UploadGUI(type='FLICKR',webservice=flickrObject)
-            else:
-                self.flickrRegBox = FlickrRegisterBox(flickrObject)
-                self.flickrRegBox.setup()
-            	self.window.add(self.flickrRegBox)
-        except Exception, e:
-            alert("Flickr GUI: %s"%e)
-            destroy()
-        
-    def displayPicweb(self,widget,data=None):
-        try:
-            empty_window()
-            picwebObject = data
-            self.picwebRegBox = PicasawebRegisterBox(picwebObject)
-            self.window.add(self.picwebRegBox)
-        except Exception, e:
-            alert("Picasaweb GUI: %s"%e)
-            destroy()
-        
+     
 
 def delete_event(widget,event,data=None):
     return False
@@ -799,7 +782,8 @@ def publishr(image,drawable):
     flickrObject = FlickrObject()
     picwebObject = PicasawebObject()
     
-    entryGUI = EntryGUI(flickrObject,picwebObject)
+    #entryGUI = EntryGUI(flickrObject,picwebObject)
+    gui = UploadGUI()
 
     window.show()
     gtk.main()
