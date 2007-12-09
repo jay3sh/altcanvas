@@ -69,7 +69,6 @@ def publishr(image,drawable):
             tb += line+'\n'
         libpub.alert(tb)
     
-'''    
 if __name__ == '__main__':
     publishr(None,None)
 ''' 
@@ -88,3 +87,4 @@ register(
     publishr)
 
 main()
+'''    

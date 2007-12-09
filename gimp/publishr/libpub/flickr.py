@@ -23,8 +23,8 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import gtk
-
 import libpub
+import xmlrpclib
 
 ##############################################
 # XML parsing 
@@ -180,11 +180,13 @@ class FlickrObject:
     isConnected = False
     authtoken = None
     frob = None
+    flickr = None
     
     def connect(self):
         if not self.isConnected:
             self.keyserver = xmlrpclib.Server(SERVER)
             self.isConnected = True
+            self.flickr = Flickr(self.keyserver)
         
     def __init__(self):
         authtoken = load_authtoken()
@@ -217,7 +219,28 @@ class FlickrObject:
     
     def get_authtoken(self):
         self.authtoken = self.keyserver.altcanvas.getAuthToken(self.frob)
-        return self.authtoken
+        if self.authtoken:
+            libpub.save_authtoken(self.authtoken)
+            return True
+        else:
+            libpub.alert("There was error retrieving Flickr Authentication token.\n"+
+                  "Are you sure, you have authorized this application?\n"+
+                  "Try again!")
+            return False
+    
+    def upload(self,filename,title,auth_token,is_public,tags,description):
+        imageID = self.flickr.upload(filename=filename,
+                           title=title,
+                           auth_token=auth_token,
+                           is_public=is_public,
+                           tags=tags,
+                           description=description)
+        
+        if imageID:
+            url = self.keyserver.altcanvas.getImageUrl(imageID)
+            return url
+    
+        return None
     
 class FlickrRegisterBox(gtk.VBox):
     def __init__(self,parent):
@@ -249,6 +272,7 @@ class FlickrRegisterBox(gtk.VBox):
         self.urlText.select_region(0,-1)
         self.urlText.set_editable(False)
         
+    '''
     def getauthtoken(self,widget,data=None):
         try:
             authtoken = self.flickrObject.get_authtoken()
@@ -261,6 +285,7 @@ class FlickrRegisterBox(gtk.VBox):
                       "Try again!")
         except Exception, e:
             libpub.alert("Network error while retrieving Auth Token: %s"%e)
+    '''
      
 
     

@@ -1,5 +1,6 @@
 '''publishr plugin library '''
 
+import os
 import gtk
 
 window = None

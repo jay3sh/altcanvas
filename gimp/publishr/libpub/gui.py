@@ -1,3 +1,4 @@
+import os
 import gtk
 
 import libpub
@@ -146,6 +147,7 @@ class UploadGUI:
         uploadBox.pack_start(buttonBox)
         uploadBox.set_border_width(6)
         
+        uploadBox.show_all()
         empty_window()
         self.window.add(uploadBox)
         
@@ -165,22 +167,18 @@ class UploadGUI:
             
         # Upload to Flickr
         if self.type == 'FLICKR':
-            flickrObject = self.webservice
-            flickrObject.connect()
-            flickr = Flickr(flickrObject.keyserver)
-            imageID = flickr.upload(
+            self.flickrObject.connect()
+            url = self.flickrObject.upload(
                     filename=libpub.filename,
                     title=title,
-                    auth_token=flickrObject.authtoken,
+                    auth_token=self.flickrObject.authtoken,
                     is_public='1',    # TODO programmable
                     tags=tags,
                     description=desc)
         
-            if imageID != None:
-                url = flickrObject.keyserver.altcanvas.getImageUrl(imageID)
-                libpub.alert("Image upload was successful.\n(Flickr URL: %s)"%url,
-                      gtk.MESSAGE_INFO)
-                destroy()
+            libpub.alert("Image upload was successful.\n(Flickr URL: %s)"%url,
+                         gtk.MESSAGE_INFO)
+            libpub.destroy()
                 
         # Upload to Picasaweb
         elif self.type == 'PICASAWEB':
@@ -191,8 +189,7 @@ class UploadGUI:
                     <category scheme="http://schemas.google.com/g/2005#kind"
                         term="http://schemas.google.com/photos/2007#photo"/>
                 </entry>'''%(libpub.filename.rpartition(os.sep)[2],desc)
-            picwebObject = self.webservice
-            pw = picwebObject.picweb
+            pw = self.picwebObject.picweb
             albumlist = pw.getAlbums()
             img = None
             for a in albumlist:
@@ -214,7 +211,7 @@ class UploadGUI:
                     libpub.alert('Upload to Picasaweb failed')
                     return
                 
-            destroy()
+            libpub.destroy()
             tagmetadata = '''
                 <entry xmlns='http://www.w3.org/2005/Atom'>
                     <title>altcanvas</title>
@@ -225,7 +222,9 @@ class UploadGUI:
             
     def loadFlickr(self,widget,data=None):
         self.type = 'FLICKR'
-        if not self.flickrObject.has_auth():
+        if self.flickrObject.has_auth():
+            self.upload_dialog()
+        else:
             self.displayFlickrLogin()
             
     def loadPicasaweb(self,widget,data=None):
@@ -240,7 +239,7 @@ class UploadGUI:
             self.window.add(self.picwebRegBox)
         except Exception, e:
             libpub.alert("Picasaweb GUI: %s"%e)
-            destroy()
+            libpub.destroy()
         
     def displayFlickrLogin(self):
         try:
@@ -250,27 +249,23 @@ class UploadGUI:
             self.window.add(self.flickrRegBox)
         except Exception, e:
             libpub.alert("Flickr GUI: %s"%e)
-            destroy()
+            libpub.destroy()
             
     def picweb_login_handler(self,widget,data=None):
         username = self.picwebRegBox.usernameEntry.get_text()
         password = self.picwebRegBox.passwordEntry.get_text()
         try:
             self.picwebObject.login(username,password)
+            self.upload_dialog()
         except Exception, e:
             libpub.alert('Login error: %s'%e)
             
     def flickr_login_handler(self,widget,data=None):
         try:
-            authtoken = self.flickrObject.get_authtoken()
-            if authtoken != None:
-                save_authtoken(authtoken)
-            else:
-                libpub.alert("There was error retrieving Flickr Authentication token.\n"+
-                      "Are you sure, you have authorized this application?\n"+
-                      "Try again!")
+            if self.flickrObject.get_authtoken():
+                self.upload_dialog()
         except Exception, e:
-            libpub.alert("Network error while retrieving Auth Token: %s"%e)
+            libpub.alert("Unhandled exception while Flickr login: %s"%e)
      
         
         

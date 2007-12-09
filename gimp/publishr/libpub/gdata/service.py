@@ -524,11 +524,11 @@ class GDataService(atom.service.AtomService):
         return converter(result_body)
       # There was no ResultsTransformer specified, so try to convert the
       # server's response into a GDataFeed.
-      feed = gdata.GDataFeedFromString(result_body)
+      feed = libpub.gdata.GDataFeedFromString(result_body)
       if not feed:
         # If conversion to a GDataFeed failed, try to convert the server's
         # response to a GDataEntry.
-        entry = gdata.GDataEntryFromString(result_body)
+        entry = libpub.gdata.GDataEntryFromString(result_body)
         if not entry:
           # The server's response wasn't a feed, or an entry, so return the
           # response body as a string.
@@ -563,7 +563,7 @@ class GDataService(atom.service.AtomService):
     connection = atom.service.AtomService._CreateConnection(self, uri, 'GET',
         extra_headers)
     response_handle = connection.getresponse()
-    return gdata.MediaSource(response_handle, response_handle.getheader('Content-Type'),
+    return libpub.gdata.MediaSource(response_handle, response_handle.getheader('Content-Type'),
         response_handle.getheader('Content-Length'))
 
   def GetEntry(self, uri, extra_headers=None):
@@ -727,9 +727,9 @@ class GDataService(atom.service.AtomService):
     if server_response.status == 201 or server_response.status == 200:
       if converter:
         return converter(result_body)
-      feed = gdata.GDataFeedFromString(result_body)
+      feed = libpub.gdata.GDataFeedFromString(result_body)
       if not feed:
-        entry = gdata.GDataEntryFromString(result_body)
+        entry = libpub.gdata.GDataEntryFromString(result_body)
         if not entry:
           return result_body
         return entry
@@ -863,9 +863,9 @@ class GDataService(atom.service.AtomService):
     if server_response.status == 200:
       if converter:
         return converter(result_body)
-      feed = gdata.GDataFeedFromString(result_body)
+      feed = libpub.gdata.GDataFeedFromString(result_body)
       if not feed:
-        entry = gdata.GDataEntryFromString(result_body)
+        entry = libpub.gdata.GDataEntryFromString(result_body)
         if not entry:
           return result_body
         return entry
