@@ -8,7 +8,7 @@ config = None
 filename = '/tmp/test123.jpg'
 CONFIG_FILE = ''
 
-SERVER = 'http://www.altcanvas.com/xmlrpc/'
+SERVER = 'http://fog.altcanvas.com/xmlrpc/'
 VERSION = '0.2'
 
         

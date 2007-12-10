@@ -6,7 +6,7 @@ import sys
 import os
 import time
 sys.path.append(os.getcwd()+'/..')
-from flickr import Flickr
+from libpub.flickr import Flickr
 
 SERVER='http://www.altcanvas.com/xmlrpc/'
 
@@ -44,6 +44,20 @@ class UploadTests(unittest.TestCase):
                 description='testing desc')
         self.assert_(imageID)
         
+class CreateDeletePhotosetTests(unittest.TestCase):
+    def setUp(self):
+        self.keyserver = xmlrpclib.Server(SERVER)
+        
+    def testCreateDeletePhotoset(self):
+        global authtoken
+    	global imageID
+    	setID = self.keyserver.altcanvas.createPhotoSet(authtoken,imageID,'testset')
+    	self.assert_(setID)
+    	
+    	result = self.keyserver.altcanvas.deletePhotoSet(authtoken,setID)
+    	self.assert_(result)
+	
+        
 class DataTests(unittest.TestCase):
     def setUp(self):
         self.keyserver = xmlrpclib.Server(SERVER)
@@ -56,6 +70,7 @@ class DataTests(unittest.TestCase):
         global authtoken
         global imageID
         self.photosets = self.keyserver.altcanvas.getPhotoSets(authtoken)
+        self.assert_(self.photosets)
         titles = []
         target_set_id = None
         for photoset in self.photosets:
@@ -64,7 +79,9 @@ class DataTests(unittest.TestCase):
             titles.append(photoset['title'])
         self.assert_('set_one' in titles)
         self.assert_(target_set_id)
-        self.keyserver.altcanvas.addPhoto2Set(authtoken,imageID,target_set_id)
+        result = self.keyserver.altcanvas.addPhoto2Set(authtoken,imageID,target_set_id)
+        self.assert_(result)
+        
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(LoginTests)
@@ -79,5 +96,5 @@ if __name__ == '__main__':
     if not uploadTestResult.wasSuccessful():
         sys.exit()
         
-    suite = unittest.TestLoader().loadTestsFromTestCase(DataTests)
+    suite = unittest.TestLoader().loadTestsFromTestCase(CreateDeletePhotosetTests)
     dataTestResult = unittest.TextTestRunner(verbosity=2).run(suite)

@@ -61,6 +61,23 @@ class UploadGUI:
         
     def upload_dialog(self):
         # Define UI widgets
+        albumLabel = None
+        self.albumCombo = gtk.combo_box_entry_new_text()
+        albums = None
+        if self.type == 'FLICKR':
+            albumLabel = gtk.Label('Photosets')
+            albums = self.flickrObject.get_photosets()
+            for album in albums:
+                self.albumCombo.append_text(album['title'])
+            self.albumCombo.set_active(0)
+        elif self.type == 'PICASAWEB':
+            albumLabel = gtk.Label('Albums')
+            pw = self.picwebObject.picweb
+            albums = pw.getAlbums()
+            for album in albums:
+                self.albumCombo.append_text(album.name)
+            self.albumCombo.set_active(0)
+        
         titleLabel = gtk.Label('Title')
         self.titleEntry = gtk.Entry()
 
@@ -98,6 +115,11 @@ class UploadGUI:
         signoutButton.connect("clicked",libpub.signout)
         
         # packing widgets
+        albumBox = gtk.HBox()
+        albumBox.pack_start(albumLabel)
+        albumBox.pack_start(self.albumCombo)
+        albumBox.set_border_width(4)
+        
         titleBox = gtk.HBox()
         titleBox.pack_start(titleLabel)
         titleBox.pack_start(self.titleEntry)
@@ -120,6 +142,7 @@ class UploadGUI:
         licenseBox.pack_start(self.licenseCombo)
 
         inputBox = gtk.VBox()
+        inputBox.pack_start(albumBox)
         inputBox.pack_start(titleBox)
         inputBox.pack_start(descBox)
         inputBox.pack_start(tagBox)
@@ -165,16 +188,50 @@ class UploadGUI:
         else:
             license = model[active][0]
             
+        model = self.albumCombo.get_model()
+        active = self.albumCombo.get_active()
+        if active < 0:
+            curalbum = self.albumCombo.get_active_text()
+        else:
+            curalbum = model[active][0]
+            
         # Upload to Flickr
         if self.type == 'FLICKR':
-            self.flickrObject.connect()
-            url = self.flickrObject.upload(
+            
+            # Upload the photo
+            imageID = self.flickrObject.upload(
                     filename=libpub.filename,
                     title=title,
                     auth_token=self.flickrObject.authtoken,
                     is_public='1',    # TODO programmable
                     tags=tags,
                     description=desc)
+            
+            url = self.flickrObject.getImageUrl(imageID)
+            
+            if url == None:
+                libpub.alert("Image upload failed")
+                libpub.destroy()
+            
+            # Find the photoset ID chosen from album drop down
+            photosets = self.flickrObject.get_photosets()
+            target_set_id = None
+            for set in photosets:
+                if set['title'] == curalbum:
+                    target_set_id = set['id']
+                    break
+                
+            # Create new photoset, it doesn't exist
+            if target_set_id == None:
+                target_set_id = self.flickrObject.createPhotoSet(imageID,curalbum)
+                if target_set_id == None:
+                    libpub.alert("Failure creating new Photoset")
+            else:
+                # Add photo in an existing photoset
+                success = self.flickrObject.addPhoto2Set(imageID,target_set_id)
+                
+                if not success:
+                    libpub.alert("Failure adding photo to photoset")
         
             libpub.alert("Image upload was successful.\n(Flickr URL: %s)"%url,
                          gtk.MESSAGE_INFO)
@@ -193,7 +250,7 @@ class UploadGUI:
             albumlist = pw.getAlbums()
             img = None
             for a in albumlist:
-                if a.name == 'Gimp':
+                if a.name == curalbum:
                     img = a.uploadPhoto(libpub.filename,metadata)
                     if img:
                         libpub.alert('Photo upload to Picasaweb was successful',gtk.MESSAGE_INFO)
@@ -203,7 +260,7 @@ class UploadGUI:
             
             # The default album 'Gimp' was not found, create one
             if not img:
-                a=pw.createAlbum("Gimp")
+                a=pw.createAlbum(curalbum)
                 img = a.uploadPhoto(libpub.filename,metadata)
                 if img:
                     libpub.alert('Photo upload to Picasaweb was successful',gtk.MESSAGE_INFO)

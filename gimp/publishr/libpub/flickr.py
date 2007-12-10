@@ -227,20 +227,34 @@ class FlickrObject:
                   "Are you sure, you have authorized this application?\n"+
                   "Try again!")
             return False
+        
+    def get_photosets(self):
+        self.connect()
+        self.photosets = self.keyserver.altcanvas.getPhotoSets(self.authtoken)
+        return self.photosets
+    
+    def createPhotoSet(self,imageID,curalbum):
+        self.connect()
+        return self.keyserver.altcanvas.createPhotoSet(
+                                        self.authtoken,imageID,curalbum)
+        
+    def addPhoto2Set(self,imageID,setID):
+        self.connect()
+        return self.keyserver.altcanvas.addPhoto2Set(self.authtoken,imageID,setID)
     
     def upload(self,filename,title,auth_token,is_public,tags,description):
+        self.connect()
         imageID = self.flickr.upload(filename=filename,
                            title=title,
                            auth_token=auth_token,
                            is_public=is_public,
                            tags=tags,
                            description=description)
-        
-        if imageID:
-            url = self.keyserver.altcanvas.getImageUrl(imageID)
-            return url
-    
-        return None
+        return imageID
+       
+    def getImageUrl(self,imageID): 
+        url = self.keyserver.altcanvas.getImageUrl(imageID)
+        return url
     
 class FlickrRegisterBox(gtk.VBox):
     def __init__(self,parent):
