@@ -32,12 +32,8 @@ import libpub
 
 from libpub.gui import UploadGUI
 
+libpub.config = libpub.Config()
 
-if sys.platform.find('win32') >= 0:
-    libpub.CONFIG_FILE=os.getenv('USERPROFILE')+'\\.publishr'
-else:
-    libpub.CONFIG_FILE=os.getenv('HOME')+'/.publishr'
-    
 
 def publishr(image,drawable):
     try:
