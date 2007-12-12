@@ -30,65 +30,13 @@ import xmlrpclib
 # XML parsing 
 ##############################################
 
-import xml.dom.minidom
 import mimetools
 import md5
 import urllib
 import urllib2
 
-class XMLNode:
-    def __init__(self):
-        """Construct an empty XML node."""
-        self.elementName = ""
-        self.elementText = ""
-        self.attrib = {}
-        self.xml = ""
+from libpub import XMLNode
 
-    def __setitem__(self, key, item):
-        """Store a node's attribute in the attrib hash."""
-        self.attrib[key] = item
-
-    def __getitem__(self, key):
-        """Retrieve a node's attribute from the attrib hash."""
-        return self.attrib[key]
-
-    @classmethod
-    def parseXML(cls, xml_str, store_xml=False):
-        def __parseXMLElement(element, thisNode):
-            """Recursive call to process this XMLNode."""
-            thisNode.elementName = element.nodeName
-
-            # add element attributes as attributes to this node
-            for i in range(element.attributes.length):
-                an = element.attributes.item(i)
-                thisNode[an.name] = an.nodeValue
-
-            for a in element.childNodes:
-                if a.nodeType == xml.dom.Node.ELEMENT_NODE:
-                    child = XMLNode()
-                    try:
-                        list = getattr(thisNode, a.nodeName)
-                    except AttributeError:
-                        setattr(thisNode, a.nodeName, [])
-
-                    # add the child node as an attrib to this node
-                    list = getattr(thisNode, a.nodeName)
-                    list.append(child)
-
-                    __parseXMLElement(a, child)
-
-                elif a.nodeType == xml.dom.Node.TEXT_NODE:
-                    thisNode.elementText += a.nodeValue
-            
-            return thisNode
-
-        dom = xml.dom.minidom.parseString(xml_str)
-
-        # get the root
-        rootNode = XMLNode()
-        if store_xml: rootNode.xml = xml_str
-
-        return __parseXMLElement(dom.firstChild, rootNode)
 
 ##############################################
 # Flickr API 
@@ -172,7 +120,8 @@ class Flickr:
         else:
             return None
         
-from libpub import SERVER,load_authtoken,save_authtoken
+from libpub import SERVER
+import libpub
 
             
 class FlickrObject:
@@ -189,7 +138,7 @@ class FlickrObject:
             self.flickr = Flickr(self.keyserver)
         
     def __init__(self):
-        authtoken = load_authtoken()
+        authtoken = libpub.config.get('FLICKR_TOKEN')
         if authtoken != None:
             self.authtoken = authtoken
             
@@ -220,7 +169,7 @@ class FlickrObject:
     def get_authtoken(self):
         self.authtoken = self.keyserver.altcanvas.getAuthToken(self.frob)
         if self.authtoken:
-            libpub.save_authtoken(self.authtoken)
+            libpub.config.set('FLICKR_TOKEN',self.authtoken)
             return True
         else:
             libpub.alert("There was error retrieving Flickr Authentication token.\n"+
