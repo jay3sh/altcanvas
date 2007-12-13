@@ -61,26 +61,57 @@ class UploadGUI:
         
     def upload_dialog(self):
         # Define UI widgets
+        
         albumLabel = None
-        self.albumCombo = gtk.combo_box_entry_new_text()
         albums = None
+        i = 0
+        select_album = 0
+        self.albumCombo = gtk.combo_box_entry_new_text()
+        
         if self.type == 'FLICKR':
             albumLabel = gtk.Label('Photosets')
             albums = self.flickrObject.get_photosets()
+            last_album = libpub.config.get('FLICKR_LAST_PHOTOSET')
             for album in albums:
                 self.albumCombo.append_text(album['title'])
-            self.albumCombo.set_active(0)
+                if album['title'] == last_album:
+                    select_album = i
+                i += 1
+            self.albumCombo.set_active(select_album)
+            
+            #if last_album == None:
+            #   self.albumCombo.prepend_text('<new-photoset>')
+            #   self.albumCombo.set_active(0)
+            
         elif self.type == 'PICASAWEB':
             albumLabel = gtk.Label('Albums')
             pw = self.picwebObject.picweb
             albums = pw.getAlbums()
+            last_album = libpub.config.get('PICASA_LAST_ALBUM')
             for album in albums:
                 self.albumCombo.append_text(album.name)
-            self.albumCombo.set_active(0)
+                if album.name == last_album:
+                    select_album = i
+                i += 1
+            self.albumCombo.set_active(select_album)
+            
+            #f last_album == None:
+            #   self.albumCombo.prepend_text('<new-album>')
+            #   self.albumCombo.set_active(0)
+        
+        '''
+        albumtip = gtk.Tooltips()
+        albumtip.set_tip(self.titleEntry,'Create new album or choose from list')
+        albumtip.enable()
+        albumtip.force_window()
+        '''
+        
+        self.albumCombo.grab_focus()
+        
         
         titleLabel = gtk.Label('Title')
         self.titleEntry = gtk.Entry()
-
+        
         descLabel = gtk.Label('Description')
         dsw = gtk.ScrolledWindow()
         dsw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -232,6 +263,9 @@ class UploadGUI:
                 
                 if not success:
                     libpub.alert("Failure adding photo to photoset")
+                    
+            # save the current album into config file
+            libpub.config.set('FLICKR_LAST_PHOTOSET',curalbum)
         
             libpub.alert("Image upload was successful.\n(Flickr URL: %s)"%url,
                          gtk.MESSAGE_INFO)
@@ -268,7 +302,12 @@ class UploadGUI:
                     libpub.alert('Upload to Picasaweb failed')
                     return
                 
+            # save the current album into config file
+            libpub.config.set('PICASA_LAST_ALBUM',curalbum)
+            
             libpub.destroy()
+            
+            #broken
             tagmetadata = '''
                 <entry xmlns='http://www.w3.org/2005/Atom'>
                     <title>altcanvas</title>
