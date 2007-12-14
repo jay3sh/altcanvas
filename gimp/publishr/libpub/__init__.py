@@ -128,16 +128,21 @@ def handle_crash():
     tb = ''
     for line in traceback.format_exc().split('\n'):
         tb += line+'\n'
-    cb = CrashReportDialog(tb)
-    cb.run()
+    crb = CrashReportDialog(tb)
+    response = crb.run()
+    
+    if response == gtk.RESPONSE_YES:
+        # report
+        pass
             
 class CrashReportDialog(gtk.MessageDialog):
     def __init__(self,trace):
         msg = '\
-<span weight="bold">The publishr plugin has hit a previously unknown exception.\
+<b><big>Sorry!!!</big></b>\n\n\
+The publishr plugin has hit a previously <b><i>Unknown Exception</i></b>. \
 Following is the traceback of the exception. You can help improve this \
 plugin by reporting this exception.\n\n\
-All you have to do is press "Yes" to report the exception</span>\n\n'
+<b>All you have to do is press <i>"Yes"</i> to report the exception</b>\n\n'
                
         trace = trace.replace('&','&amp;')
         trace = trace.replace('<','&lt;')

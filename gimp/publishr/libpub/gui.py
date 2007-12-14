@@ -106,8 +106,6 @@ class UploadGUI:
         albumtip.force_window()
         '''
         
-        self.albumCombo.grab_focus()
-        
         
         titleLabel = gtk.Label('Title')
         self.titleEntry = gtk.Entry()
@@ -137,6 +135,8 @@ class UploadGUI:
         for lic in licenses:
             self.licenseCombo.append_text(lic)
         self.licenseCombo.set_active(0)
+        
+        self.privacyCheck = gtk.CheckButton(label='Public')
 
         okButton = gtk.Button('Upload')
         okButton.connect("clicked",self.upload)
@@ -166,6 +166,7 @@ class UploadGUI:
         tagBox = gtk.HBox()
         tagBox.pack_start(tagLabel)
         tagBox.pack_start(self.tagEntry)
+        tagBox.pack_start(self.privacyCheck)
         tagBox.set_border_width(4)
 
         licenseBox = gtk.HBox()
@@ -173,9 +174,9 @@ class UploadGUI:
         licenseBox.pack_start(self.licenseCombo)
 
         inputBox = gtk.VBox()
-        inputBox.pack_start(albumBox)
         inputBox.pack_start(titleBox)
         inputBox.pack_start(descBox)
+        inputBox.pack_start(albumBox)
         inputBox.pack_start(tagBox)
         inputBox.pack_start(licenseBox)
         inputBox.set_border_width(4)
@@ -353,8 +354,10 @@ class UploadGUI:
         try:
             self.picwebObject.login(username,password)
             self.upload_dialog()
+            libpub.config.set('PICASA_LAST_USERNAME',username)
         except Exception, e:
             libpub.alert('Login error: %s'%e)
+            
             
     def flickr_login_handler(self,widget,data=None):
         try:

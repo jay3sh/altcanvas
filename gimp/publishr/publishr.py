@@ -64,7 +64,6 @@ try:
         publishr(None,None)
         
     ''' 
-
 	register(
 	    "python_fu_publish",
 	    "Image publishing plugin",

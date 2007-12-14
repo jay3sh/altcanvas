@@ -152,5 +152,11 @@ class PicasawebRegisterBox(gtk.VBox):
         self.pack_start(self.buttonBox)
         self.set_border_width(30)
         
+        # Recall last settings, if available
+        last_username = libpub.config.get('PICASA_LAST_USERNAME')
+        if last_username:
+            self.usernameEntry.set_text(last_username)
+            self.usernameEntry.grab_focus()
+        
         self.show_all()
         
