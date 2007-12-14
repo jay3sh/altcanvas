@@ -2,6 +2,7 @@
 
 import os
 import sys
+import traceback
 import gtk
 
 window = None
@@ -123,6 +124,33 @@ class Config:
             
         configf.close()
             
+def handle_crash():
+    tb = ''
+    for line in traceback.format_exc().split('\n'):
+        tb += line+'\n'
+    cb = CrashReportDialog(tb)
+    cb.run()
+            
+class CrashReportDialog(gtk.MessageDialog):
+    def __init__(self,trace):
+        msg = '\
+<span weight="bold">The publishr plugin has hit a previously unknown exception.\
+Following is the traceback of the exception. You can help improve this \
+plugin by reporting this exception.\n\n\
+All you have to do is press "Yes" to report the exception</span>\n\n'
+               
+        trace = trace.replace('&','&amp;')
+        trace = trace.replace('<','&lt;')
+        trace = trace.replace('>','&gt;')
+        msg += '<span font_family="monospace">'+trace+'</span>'
+        gtk.MessageDialog.__init__(self,
+                            window,
+                            gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
+                            gtk.MESSAGE_ERROR,
+                            gtk.BUTTONS_YES_NO,
+                            '')
+        self.set_markup(msg) 
+        
         
 def alert(msg,type=gtk.MESSAGE_ERROR):
     msgDlg = gtk.MessageDialog(window,
@@ -132,8 +160,6 @@ def alert(msg,type=gtk.MESSAGE_ERROR):
                     msg)
     msgDlg.connect("response", lambda dlg, resp: dlg.destroy())
     responseId = msgDlg.run()
-    
-    
 
 def delete_event(widget,event,data=None):
     return False
