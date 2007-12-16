@@ -11,8 +11,7 @@ filename = '/tmp/test123.jpg'
 CONFIG_FILE = ''
 
 SERVER = 'http://fog.altcanvas.com/xmlrpc/'
-VERSION = '0.2'
-
+VERSION = '0.3'
     
 import xml.dom.minidom
 class XMLNode:
@@ -185,3 +184,6 @@ def signout(widget=None,data=None):
         alert('Error deleting flickr token. Check permissions on %s'%CONFIG_FILE)
     # Quit the GUI
     destroy()
+    
+    
+    

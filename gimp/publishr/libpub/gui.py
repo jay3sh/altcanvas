@@ -1,5 +1,6 @@
 import os
 import gtk
+import pango
 
 import libpub
 
@@ -29,6 +30,7 @@ class UploadGUI:
         self.picwebButton.connect("clicked",self.loadPicasaweb)
         
         
+        '''
         from libpub.imagic import ImageMagick
         thumbnail = None
         im = ImageMagick()
@@ -38,15 +40,38 @@ class UploadGUI:
                 thumbgeo = im.getThumbnailGeometry(thumbname)
                 thumbnail = gtk.Image()
                 thumbnail.set_from_file(thumbname)
+        '''
+        
+        self.introLabel = gtk.Label()
+        self.introLabel.set_markup('\
+<span font_family="sans" size="large" weight="heavy" >\
+<span foreground="#000015">P</span>\
+<span foreground="#00002A">u</span>\
+<span foreground="#00003F">b</span>\
+<span foreground="#000054">l</span>\
+<span foreground="#000069">i</span>\
+<span foreground="#00007E">s</span>\
+<span foreground="#000093">h</span>\
+<span foreground="#000000"> </span>\
+<span foreground="#0000A8">o</span>\
+<span foreground="#0000BD">n</span>\
+<span foreground="#000000"> </span>\
+<span foreground="#0000D2">w</span>\
+<span foreground="#0000E7">e</span>\
+<span foreground="#0000FC">b</span>\
+<span foreground="#0000FF">!</span>\
+</span>')
 
         # Pack all widgets
         serviceBox = gtk.VBox()
+        serviceBox.pack_start(self.introLabel,expand=False)
         serviceBox.pack_start(self.flickrButton,expand=False)
         serviceBox.pack_start(self.picwebButton,expand=False)
-        serviceBox.set_spacing(5)
+        serviceBox.set_spacing(10)
 
         empty_window()
         
+        '''
         outerBox = gtk.VBox()
         if thumbnail:
             imageBox = gtk.VBox()
@@ -55,9 +80,13 @@ class UploadGUI:
             outerBox.pack_start(imageBox)
         serviceBox.set_border_width(5)
         outerBox.pack_start(serviceBox)
-            
         outerBox.show_all()
         self.window.add(outerBox)
+        '''
+            
+        serviceBox.set_border_width(15)
+        serviceBox.show_all()
+        self.window.add(serviceBox)
         
     def upload_dialog(self):
         # Define UI widgets
@@ -187,15 +216,6 @@ class UploadGUI:
         buttonBox.pack_start(signoutButton)
         buttonBox.set_border_width(4)
         
-        if self.type == 'PICASAWEB':
-            signoutButton.hide()
-            titleBox.hide()
-            self.tagEntry.set_text('not supported yet')
-            self.tagEntry.set_state(gtk.STATE_INSENSITIVE)
-            self.licenseCombo.append_text('not supported yet')
-            model = self.licenseCombo.get_model()
-            self.licenseCombo.set_active(len(model)-1)
-            self.licenseCombo.set_state(gtk.STATE_INSENSITIVE)
 
         uploadBox = gtk.VBox()
         uploadBox.pack_start(inputBox)
@@ -203,6 +223,18 @@ class UploadGUI:
         uploadBox.set_border_width(6)
         
         uploadBox.show_all()
+        
+        if self.type == 'PICASAWEB':
+            signoutButton.hide()
+            titleBox.hide()
+            self.tagEntry.set_text('not supported yet')
+            self.tagEntry.set_state(gtk.STATE_INSENSITIVE)
+            self.licenseCombo.append_text('not supported yet')
+            self.privacyCheck.hide()
+            model = self.licenseCombo.get_model()
+            self.licenseCombo.set_active(len(model)-1)
+            self.licenseCombo.set_state(gtk.STATE_INSENSITIVE)
+            
         empty_window()
         self.window.add(uploadBox)
         
