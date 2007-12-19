@@ -31,7 +31,7 @@ import libpub.gui
 libpub.config = libpub.Config()
 
 
-def publishr(image,drawable):
+def publishr_func(image,drawable):
     try:
         if image != None:
 	        # Check if file is dirty
@@ -52,7 +52,7 @@ def publishr(image,drawable):
         libpub.window.connect("destroy",libpub.destroy)
         
         gui = libpub.gui.UploadGUI()
-    
+        
         libpub.window.show()
         gtk.main()
     except:
@@ -61,7 +61,7 @@ def publishr(image,drawable):
         
 try:
     if __name__ == '__main__':
-        publishr(None,None)
+        publishr_func(None,None)
         
     ''' 
 	register(
@@ -75,7 +75,7 @@ try:
 	    "RGB*, GRAY*, INDEXED*",
 	    [],
 	    [],
-	    publishr)
+	    publishr_func)
 
 	main()
 	'''    

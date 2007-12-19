@@ -4,6 +4,7 @@ import os
 import sys
 import traceback
 import gtk
+import xmlrpclib
 
 window = None
 config = None
@@ -131,8 +132,8 @@ def handle_crash():
     response = crb.run()
     
     if response == gtk.RESPONSE_YES:
-        # report
-        pass
+        keyserver = xmlrpclib.Server(SERVER)
+        keyserver.altcanvas.reportPublishrCrash(tb)
             
 class CrashReportDialog(gtk.MessageDialog):
     def __init__(self,trace):

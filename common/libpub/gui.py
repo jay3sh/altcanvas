@@ -29,19 +29,6 @@ class UploadGUI:
         self.flickrButton.connect("clicked",self.loadFlickr)
         self.picwebButton.connect("clicked",self.loadPicasaweb)
         
-        
-        '''
-        from libpub.imagic import ImageMagick
-        thumbnail = None
-        im = ImageMagick()
-        if im.present():
-            thumbname = im.makeThumbnail(libpub.filename)
-            if thumbname:
-                thumbgeo = im.getThumbnailGeometry(thumbname)
-                thumbnail = gtk.Image()
-                thumbnail.set_from_file(thumbname)
-        '''
-        
         self.introLabel = gtk.Label()
         self.introLabel.set_markup('\
 <span font_family="sans" size="large" weight="heavy" >\
@@ -71,19 +58,6 @@ class UploadGUI:
 
         empty_window()
         
-        '''
-        outerBox = gtk.VBox()
-        if thumbnail:
-            imageBox = gtk.VBox()
-            imageBox.pack_start(thumbnail)
-            imageBox.set_border_width(10)
-            outerBox.pack_start(imageBox)
-        serviceBox.set_border_width(5)
-        outerBox.pack_start(serviceBox)
-        outerBox.show_all()
-        self.window.add(outerBox)
-        '''
-            
         serviceBox.set_border_width(15)
         serviceBox.show_all()
         self.window.add(serviceBox)
@@ -114,26 +88,19 @@ class UploadGUI:
             
         elif self.type == 'PICASAWEB':
             albumLabel = gtk.Label('Albums')
-            pw = self.picwebObject.picweb
-            albums = pw.getAlbums()
+            pws = self.picwebObject.picweb
+            albumFeed = pws.GetAlbumFeed()
             last_album = libpub.config.get('PICASA_LAST_ALBUM')
-            for album in albums:
-                self.albumCombo.append_text(album.name)
-                if album.name == last_album:
+            for album in albumFeed.entry:
+                self.albumCombo.append_text(album.name.text)
+                if album.name.text == last_album:
                     select_album = i
                 i += 1
             self.albumCombo.set_active(select_album)
             
-            #f last_album == None:
+            #if last_album == None:
             #   self.albumCombo.prepend_text('<new-album>')
             #   self.albumCombo.set_active(0)
-        
-        '''
-        albumtip = gtk.Tooltips()
-        albumtip.set_tip(self.titleEntry,'Create new album or choose from list')
-        albumtip.enable()
-        albumtip.force_window()
-        '''
         
         
         titleLabel = gtk.Label('Title')
@@ -227,8 +194,6 @@ class UploadGUI:
         if self.type == 'PICASAWEB':
             signoutButton.hide()
             titleBox.hide()
-            self.tagEntry.set_text('not supported yet')
-            self.tagEntry.set_state(gtk.STATE_INSENSITIVE)
             self.licenseCombo.append_text('not supported yet')
             self.privacyCheck.hide()
             model = self.licenseCombo.get_model()
@@ -306,48 +271,51 @@ class UploadGUI:
                 
         # Upload to Picasaweb
         elif self.type == 'PICASAWEB':
-            metadata = '''
-                <entry xmlns='http://www.w3.org/2005/Atom'>
-                    <title>%s</title>
-                    <summary>%s</summary>
-                    <category scheme="http://schemas.google.com/g/2005#kind"
-                        term="http://schemas.google.com/photos/2007#photo"/>
-                </entry>'''%(libpub.filename.rpartition(os.sep)[2],desc)
-            pw = self.picwebObject.picweb
-            albumlist = pw.getAlbums()
+            title = libpub.filename.rpartition(os.sep)[2]
+            pws = self.picwebObject.picweb
+            albumFeed = pws.GetAlbumFeed()
             img = None
-            for a in albumlist:
-                if a.name == curalbum:
-                    img = a.uploadPhoto(libpub.filename,metadata)
+            for a in albumFeed.entry:
+                if a.name.text == curalbum:
+                    uri = a.GetFeedLink().href
+                    try:
+                        img = pws.InsertPhoto(title=title,summary=desc,album_uri=uri,
+                            filename_or_handle=libpub.filename)
+                    except Exception, e:
+                        libpub.alert('Upload to Picasaweb failed: %s'%e)
+                        libpub.destroy()
+                        
                     if img:
                         libpub.alert('Photo upload to Picasaweb was successful',gtk.MESSAGE_INFO)
-                    else:
-                        libpub.alert('Upload to Picasaweb failed')
-                        return
             
-            # The default album 'Gimp' was not found, create one
+            # The selected album was not found, create one
             if not img:
-                a=pw.createAlbum(curalbum)
-                img = a.uploadPhoto(libpub.filename,metadata)
+                try:
+                    a = pws.InsertAlbum(title=curalbum,summary=None)
+                    uri = a.GetFeedLink().href
+                    img = pws.InsertPhoto(title=title,summary=desc,album_uri=uri,
+                        filename_or_handle=libpub.filename)
+                except Exception, e:
+                    libpub.alert('Upload Failure: %s'%e)
+                    libpub.destroy()
+                    
                 if img:
                     libpub.alert('Photo upload to Picasaweb was successful',gtk.MESSAGE_INFO)
-                else:
-                    libpub.alert('Upload to Picasaweb failed')
-                    return
+                
+                
+            # Insert tag
+            try:
+                for tag in tags.split():
+                    pws.InsertTag(img,tag)
+            except Exception, e:
+                libpub.alert('Failed to add tag to image: %s'%e)
+                libpub.destroy()
                 
             # save the current album into config file
             libpub.config.set('PICASA_LAST_ALBUM',curalbum)
             
             libpub.destroy()
             
-            #broken
-            tagmetadata = '''
-                <entry xmlns='http://www.w3.org/2005/Atom'>
-                    <title>altcanvas</title>
-                    <category scheme="http://schemas.google.com/g/2005#kind"
-                        term="http://schemas.google.com/photos/2007#tag"/>
-                </entry>'''
-            #result = img.updatePhoto(tagmetadata)
             
     def loadFlickr(self,widget,data=None):
         self.type = 'FLICKR'
@@ -359,7 +327,6 @@ class UploadGUI:
     def loadPicasaweb(self,widget,data=None):
         self.type = 'PICASAWEB'
         self.displayPicwebLogin()
-
     
     def displayPicwebLogin(self):
         try:
@@ -381,15 +348,14 @@ class UploadGUI:
             libpub.destroy()
             
     def picweb_login_handler(self,widget,data=None):
-        username = self.picwebRegBox.usernameEntry.get_text()
+        self.username = self.picwebRegBox.usernameEntry.get_text()
         password = self.picwebRegBox.passwordEntry.get_text()
         try:
-            self.picwebObject.login(username,password)
+            self.picwebObject.login(self.username,password)
             self.upload_dialog()
-            libpub.config.set('PICASA_LAST_USERNAME',username)
+            libpub.config.set('PICASA_LAST_USERNAME',self.username)
         except Exception, e:
             libpub.alert('Login error: %s'%e)
-            
             
     def flickr_login_handler(self,widget,data=None):
         try:

@@ -18,6 +18,8 @@ import libpub.gdata.service
 import libpub.gdata as gdata
 import libpub.gdata.base
 
+import libpub.gdata.photos.service
+
 class PicasaWeb(libpub.gdata.service.GDataService):
     def __init__(self,username,password):
         gdata.service.GDataService.__init__(self)
@@ -103,10 +105,10 @@ class PicasaImage(object):
 class PicasawebObject:
     picweb=None
     def __init__(self):
-        pass
+        self.picweb = libpub.gdata.photos.service.PhotosService()
     
     def login(self,username,password):
-        self.picweb = PicasaWeb(username,password)
+        self.picweb.ClientLogin(username,password)
     
 class PicasawebRegisterBox(gtk.VBox):
     def __init__(self,parent):
