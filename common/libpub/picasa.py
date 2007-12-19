@@ -1,9 +1,4 @@
 #
-# Acknowledgement for Picasaweb code:
-#    The Picasaweb code that uses Google's gdata library to access Picasaweb Album
-#    is derived from manatlan's code. 
-#    It can be found at:
-#    http://jbrout.python-hosting.com/file/trunk/plugins/multiexport/libs/picasaweb/__init__.py?rev=193
 #
 
 import gtk
@@ -17,91 +12,8 @@ import libpub.atom as atom
 import libpub.gdata.service
 import libpub.gdata as gdata
 import libpub.gdata.base
-
 import libpub.gdata.photos.service
 
-class PicasaWeb(libpub.gdata.service.GDataService):
-    def __init__(self,username,password):
-        gdata.service.GDataService.__init__(self)
-        self.email = username
-        self.password = password
-        self.service = 'lh2'
-        self.source = 'GDataService upload script'
-
-        try:
-            self.ProgrammaticLogin()
-        except gdata.service.CaptchaRequired:
-            raise Exception('Required Captcha')
-        except gdata.service.BadAuthentication:
-            raise Exception('Bad Authentication')
-        except gdata.service.Error:
-            raise Exception('Unknown Login Error')
-
-    def getAlbums(self):
-        try:
-            albums = self.GetFeed(
-                    'http://picasaweb.google.com/data/feed/api/user/'
-                    + self.email
-                    + '?kind=album&access=all'
-                    )
-            return [PicasaAlbum(self,a) for a in albums.entry]
-        except:
-            raise "GetAlbums() error ?!"
-
-
-    def createAlbum(self,folderName,public=True):
-        gd_entry = gdata.GDataEntry()
-        gd_entry.title = atom.Title(text=folderName)
-        gd_entry.category.append(atom.Category(
-            scheme='http://schemas.google.com/g/2005#kind',
-            term='http://schemas.google.com/photos/2007#album'))
-
-        rights = public and "public" or "private"
-        gd_entry.rights = atom.Rights(text=rights)
-
-        ext_rights = atom.ExtensionElement( tag='access',
-            namespace='http://schemas.google.com/photos/2007')
-        ext_rights.text = rights
-        gd_entry.extension_elements.append(ext_rights)
-
-        album_entry = self.Post(gd_entry,
-            'http://picasaweb.google.com/data/feed/api/user/' + self.email)
-
-        return PicasaAlbum(self,album_entry)
-
-class PicasaAlbum(object):
-    name = property(lambda self:self.__ae.title.text)
-
-    def __init__(self,gd,album_entry):
-        self.__gd=gd
-        self.__ae=album_entry
-
-    def uploadPhoto(self,file,metadata=None):
-        ms = gdata.MediaSource()
-        try:
-            ms.setFile(file, 'image/jpeg')
-            link = self.__ae.link[0].href # self.__ae.GetFeedLink().href on created album
-            media_entry = self.__gd.Post(metadata,link, media_source = ms)
-            return PicasaImage(self.__gd,media_entry)
-        except gdata.service.RequestError:
-            return None 
-        
-class PicasaImage(object):
-    def __init__(self,gd,photo_entry):
-        self.__gd = gd
-        self.__pe = photo_entry
-        
-    # broken
-    def updatePhoto(self,metadata):
-        try:
-            photoid = self.__pe.id.text.rpartition('/')[2]
-            media_entry = self.__gd.Post(metadata,photoid)
-            return media_entry
-        except gdata.service.RequestError,re:
-            alert('Request error %s'%re)
-            return None 
-        
-        
 class PicasawebObject:
     picweb=None
     def __init__(self):
