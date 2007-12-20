@@ -116,7 +116,8 @@ class UploadGUI:
 
         tagLabel = gtk.Label('Tags')
         self.tagEntry = gtk.Entry()
-
+        
+        # Setup all the licenses
         licenseLabel = gtk.Label('License')
         self.licenseCombo = gtk.combo_box_entry_new_text()
         licenses = [
@@ -132,7 +133,19 @@ class UploadGUI:
             self.licenseCombo.append_text(lic)
         self.licenseCombo.set_active(0)
         
+        # Should the photo be public or private
+        def privacy_toggled(togglebutton,param=None):
+            if self.privacyCheck.get_active():
+                self.is_public = '1'
+            else:
+                self.is_public = '0'
+        
         self.privacyCheck = gtk.CheckButton(label='Public')
+        self.privacyCheck.connect('toggled',privacy_toggled)
+        
+        # Recall what was the setting last time
+        self.is_public =  libpub.config.get('LAST_PRIVACY_CHOICE') or '1'
+        self.privacyCheck.set_active(self.is_public == '1')
 
         okButton = gtk.Button('Upload')
         okButton.connect("clicked",self.upload)
@@ -231,8 +244,7 @@ class UploadGUI:
             imageID = self.flickrObject.upload(
                     filename=libpub.filename,
                     title=title,
-                    auth_token=self.flickrObject.authtoken,
-                    is_public='1',    # TODO programmable
+                    is_public=self.is_public,   
                     tags=tags,
                     description=desc)
             
@@ -241,6 +253,7 @@ class UploadGUI:
             if url == None:
                 libpub.alert("Image upload failed")
                 libpub.destroy()
+                return
             
             # Find the photoset ID chosen from album drop down
             photosets = self.flickrObject.get_photosets()
@@ -264,6 +277,7 @@ class UploadGUI:
                     
             # save the current album into config file
             libpub.config.set('FLICKR_LAST_PHOTOSET',curalbum)
+            libpub.config.set('LAST_PRIVACY_CHOICE',self.is_public)
         
             libpub.alert("Image upload was successful.\n(Flickr URL: %s)"%url,
                          gtk.MESSAGE_INFO)
