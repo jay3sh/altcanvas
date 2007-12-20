@@ -122,7 +122,16 @@ class UploadGUI:
         self.licenseCombo = gtk.combo_box_entry_new_text()
         for lic in libpub.LicenseList:
             self.licenseCombo.append_text(lic[1])
-        self.licenseCombo.set_active(0)
+        last_license = libpub.config.get('LAST_LICENSE_USED')
+        
+        if last_license:
+            last_license_index = int(last_license) 
+            if last_license_index >= 0 and  last_license_index < len(libpub.LicenseList)-1:
+                self.licenseCombo.set_active(int(last_license))
+            else:
+                self.licenseCombo.set_active(0)
+        else:
+            self.licenseCombo.set_active(0)
         
         # Should the photo be public or private
         def privacy_toggled(togglebutton,param=None):
@@ -207,7 +216,13 @@ class UploadGUI:
             # into appending nothing to the summary field about license info
             self.licenseCombo.append_text('Don\'t mention licensing info')
             model = self.licenseCombo.get_model()
-            self.licenseCombo.set_active(len(model)-1)
+            # Try to recall previous license choice
+            last_license = libpub.config.get('LAST_LICENSE_USED')
+            if last_license:
+                self.licenseCombo.set_active(int(last_license))
+            else:
+                # choose blank-license option
+                self.licenseCombo.set_active(len(model)-1)
             
         empty_window()
         self.window.add(uploadBox)
@@ -279,6 +294,7 @@ class UploadGUI:
             # save the current album into config file
             libpub.config.set('FLICKR_LAST_PHOTOSET',curalbum)
             libpub.config.set('LAST_PRIVACY_CHOICE',self.is_public)
+            libpub.config.set('LAST_LICENSE_USED',license_index)
         
             libpub.alert("Image upload was successful.\n(Flickr URL: %s)"%url,
                          gtk.MESSAGE_INFO)
@@ -296,6 +312,14 @@ class UploadGUI:
                 license_text = libpub.LicenseList[license_index][1]
                 license_url = libpub.LicenseList[license_index][2]
                 desc += '  [%s]'%(license_text)
+                
+            # this is the blank-index choice, preserve it
+            elif license_index == len(libpub.LicenseList):
+                pass
+            
+            # correct invalid values, it is possible for user entered text
+            else:
+                license_index = 0
                 
             pws = self.picwebObject.picweb
             
@@ -341,6 +365,7 @@ class UploadGUI:
                 
             # save the current album into config file
             libpub.config.set('PICASA_LAST_ALBUM',curalbum)
+            libpub.config.set('LAST_LICENSE_USED',license_index)
             
             libpub.destroy()
             
