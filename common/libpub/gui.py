@@ -120,17 +120,8 @@ class UploadGUI:
         # Setup all the licenses
         licenseLabel = gtk.Label('License')
         self.licenseCombo = gtk.combo_box_entry_new_text()
-        licenses = [
-            "All rights reserved",
-            "Attribution-NonCommercial-ShareAlike License",
-            "Attribution-NonCommercial License",
-            "Attribution-NonCommercial-NoDerivs License",
-            "Attribution License",
-            "Attribution-ShareAlike License",
-            "Attribution-NoDerivs License"
-        ]
-        for lic in licenses:
-            self.licenseCombo.append_text(lic)
+        for lic in libpub.LicenseList:
+            self.licenseCombo.append_text(lic[1])
         self.licenseCombo.set_active(0)
         
         # Should the photo be public or private
@@ -206,30 +197,33 @@ class UploadGUI:
         
         if self.type == 'PICASAWEB':
             signoutButton.hide()
-            titleBox.hide()
-            self.licenseCombo.append_text('not supported yet')
             self.privacyCheck.hide()
+            
+            # Set the title to be the filename
+            self.title = libpub.filename.rpartition(os.sep)[2]
+            self.titleEntry.set_text(self.title)
+            
+            # Add a blank-license option to license choices. This will result
+            # into appending nothing to the summary field about license info
+            self.licenseCombo.append_text('Don\'t mention licensing info')
             model = self.licenseCombo.get_model()
             self.licenseCombo.set_active(len(model)-1)
-            self.licenseCombo.set_state(gtk.STATE_INSENSITIVE)
             
         empty_window()
         self.window.add(uploadBox)
         
         
     def upload(self,widget,data=None):
-        title = self.titleEntry.get_text()
+        self.title = self.titleEntry.get_text()
         buffer = self.descView.get_buffer()
         startiter,enditer = buffer.get_bounds()
         desc = buffer.get_text(startiter,enditer)
         tags = self.tagEntry.get_text()
-        model = self.licenseCombo.get_model()
-        active = self.licenseCombo.get_active()
-        if active < 0:
-            license = None
-        else:
-            license = model[active][0]
+        
+        # Get the index of chosen license 
+        license_index = self.licenseCombo.get_active()
             
+        # Get the chosen album name
         model = self.albumCombo.get_model()
         active = self.albumCombo.get_active()
         if active < 0:
@@ -240,13 +234,20 @@ class UploadGUI:
         # Upload to Flickr
         if self.type == 'FLICKR':
             
+            # Get license ID for chosen license
+            if license_index > 0 and license_index < len(libpub.LicenseList):
+                license_id = libpub.LicenseList[license_index][0]
+            else:
+                license_id = 0
+            
             # Upload the photo
             imageID = self.flickrObject.upload(
                     filename=libpub.filename,
-                    title=title,
+                    title=self.title,
                     is_public=self.is_public,   
                     tags=tags,
-                    description=desc)
+                    description=desc,
+                    license_id=str(license_id))
             
             url = self.flickrObject.getImageUrl(imageID)
             
@@ -285,15 +286,28 @@ class UploadGUI:
                 
         # Upload to Picasaweb
         elif self.type == 'PICASAWEB':
-            title = libpub.filename.rpartition(os.sep)[2]
+                
+            # extract the titlename as a filename of file being uploaded
+            self.title = libpub.filename.rpartition(os.sep)[2]
+            
+            # Determine the license text
+            # Ignore the blank-license index 
+            if license_index > 0 and license_index < len(libpub.LicenseList)-1:
+                license_text = libpub.LicenseList[license_index][1]
+                license_url = libpub.LicenseList[license_index][2]
+                desc += '  [%s]'%(license_text)
+                
             pws = self.picwebObject.picweb
+            
+            # Get album feed
             albumFeed = pws.GetAlbumFeed()
+            
             img = None
             for a in albumFeed.entry:
                 if a.name.text == curalbum:
                     uri = a.GetFeedLink().href
                     try:
-                        img = pws.InsertPhoto(title=title,summary=desc,album_uri=uri,
+                        img = pws.InsertPhoto(title=self.title,summary=desc,album_uri=uri,
                             filename_or_handle=libpub.filename)
                     except Exception, e:
                         libpub.alert('Upload to Picasaweb failed: %s'%e)
@@ -307,7 +321,7 @@ class UploadGUI:
                 try:
                     a = pws.InsertAlbum(title=curalbum,summary=None)
                     uri = a.GetFeedLink().href
-                    img = pws.InsertPhoto(title=title,summary=desc,album_uri=uri,
+                    img = pws.InsertPhoto(title=self.title,summary=desc,album_uri=uri,
                         filename_or_handle=libpub.filename)
                 except Exception, e:
                     libpub.alert('Upload Failure: %s'%e)

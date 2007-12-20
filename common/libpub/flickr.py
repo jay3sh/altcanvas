@@ -191,7 +191,7 @@ class FlickrObject:
         self.connect()
         return self.keyserver.altcanvas.addPhoto2Set(self.authtoken,imageID,setID)
     
-    def upload(self,filename,title,is_public,tags,description):
+    def upload(self,filename,title,is_public,tags,description,license_id='0'):
         self.connect()
         imageID = self.flickr.upload(filename=filename,
                            title=title,
@@ -199,6 +199,9 @@ class FlickrObject:
                            is_public=is_public,
                            tags=tags,
                            description=description)
+        
+        self.keyserver.altcanvas.setLicense(self.authtoken,imageID,license_id)
+        
         return imageID
        
     def getImageUrl(self,imageID): 

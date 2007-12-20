@@ -157,6 +157,23 @@ plugin by reporting this exception.\n\n\
         self.set_markup(msg) 
         
         
+LicenseList = [
+    (0,"All rights reserved",
+         None),
+    (4,"Attribution License",
+         "http://creativecommons.org/licenses/by/2.0/"),
+    (6,"Attribution-NoDerivs License",
+         "http://creativecommons.org/licenses/by-nd/2.0/"),
+    (3,"Attribution-NonCommercial-NoDerivs License",
+         "http://creativecommons.org/licenses/by-nc-nd/2.0/"),
+    (2,"Attribution-NonCommercial License",
+         "http://creativecommons.org/licenses/by-nc/2.0/"),
+    (1,"Attribution-NonCommercial-ShareAlike License",
+         "http://creativecommons.org/licenses/by-nc-sa/2.0/"),
+    (5,"Attribution-ShareAlike License",
+         "http://creativecommons.org/licenses/by-sa/2.0/")
+]
+        
 def alert(msg,type=gtk.MESSAGE_ERROR):
     msgDlg = gtk.MessageDialog(window,
                     gtk.DIALOG_DESTROY_WITH_PARENT|gtk.DIALOG_MODAL,
