@@ -25,7 +25,8 @@ class PicasawebObject:
 class PicasawebRegisterBox(gtk.VBox):
     def __init__(self,parent):
         gtk.VBox.__init__(self)
-        self.picwebObject = parent.picwebObject
+        self.parentgui = parent
+        self.picwebObject = self.parentgui.picwebObject
         # Picasaweb Login widgets
         self.loginTitle = gtk.Label('Login to your Picasaweb (Google) account')
         self.usernameTitle = gtk.Label('Username')
@@ -42,9 +43,14 @@ class PicasawebRegisterBox(gtk.VBox):
         self.passwordExplainLabel.set_width_chars(52)
         self.passwordExplainLabel.set_line_wrap(True)
         self.loginButton = gtk.Button('Login')
-        self.loginButton.connect("clicked",parent.picweb_login_handler)
+        self.loginButton.connect("clicked",self.login_handler)
         self.cancelButton = gtk.Button('Cancel')
         self.cancelButton.connect("clicked",libpub.destroy)
+        
+        #self.cancelButton.add_accelerator("clicked",None,66, \
+        #                None,gtk.ACCEL_VISIBLE|gtk.ACCEL_LOCKED)
+        
+        self.remember_check = gtk.CheckButton('Remember me')
         
         self.usernameBox = gtk.HBox()
         self.usernameBox.pack_start(self.usernameTitle,expand=False)
@@ -54,6 +60,10 @@ class PicasawebRegisterBox(gtk.VBox):
         self.passwordBox.pack_start(self.passwordTitle,expand=False)
         self.passwordBox.pack_start(self.passwordEntry,expand=False)
         self.passwordBox.set_homogeneous(True)
+        self.rememberBox = gtk.HBox()
+        self.rememberBox.pack_start(gtk.Label('   '))
+        self.rememberBox.pack_start(self.remember_check,expand=True)
+        self.passwordBox.set_homogeneous(True)
         self.buttonBox = gtk.HBox()
         self.buttonBox.pack_start(self.loginButton)
         self.buttonBox.pack_start(self.cancelButton)
@@ -62,6 +72,7 @@ class PicasawebRegisterBox(gtk.VBox):
         self.pack_start(self.loginTitle)
         self.pack_start(self.usernameBox)
         self.pack_start(self.passwordBox)
+        self.pack_start(self.rememberBox)
         self.pack_start(self.passwordExplainLabel)
         self.pack_start(self.buttonBox)
         self.set_border_width(30)
@@ -69,8 +80,31 @@ class PicasawebRegisterBox(gtk.VBox):
         # Recall last settings, if available
         last_username = libpub.config.get('PICASA_LAST_USERNAME')
         if last_username:
+            # Load the remembered username
             self.usernameEntry.set_text(last_username)
+            # Now the focus must go to password to start with
+            self.passwordBox.grab_focus()
+            self.passwordEntry.grab_focus()
+            # Safe to assume user wants to remember the username again
+            self.remember_check.set_active(True)
+        else:
+            # Let us not assume user wants us to remember username
+            self.remember_check.set_active(False)
+            # No username available, so focus should go to username entry
+            self.usernameBox.grab_focus()
             self.usernameEntry.grab_focus()
         
         self.show_all()
         
+    def login_handler(self,widget,data=None):
+        username = self.usernameEntry.get_text()
+        password = self.passwordEntry.get_text()
+        try:
+            self.parentgui.picwebObject.login(username,password)
+            self.parentgui.upload_dialog()
+            if self.remember_check.get_active():
+                libpub.config.set('PICASA_LAST_USERNAME',username)
+            else:
+                libpub.config.set('PICASA_LAST_USERNAME',None)
+        except Exception, e:
+            libpub.alert('Login error: %s'%e)

@@ -107,7 +107,14 @@ class Config:
     def set(self,key,value):
         if not self.map:
             self.map = {}
-        self.map[key] = value
+            
+        if value:
+            self.map[key] = value
+        else:
+            # if the new value of key is None, then remove the key from map
+            # this can be used to delete some properties from config file 
+            if key in self.map.keys():
+                del self.map[key]
         
         self.flush()
         

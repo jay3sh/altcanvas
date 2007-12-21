@@ -55,6 +55,11 @@ class UploadGUI:
         serviceBox.pack_start(self.flickrButton,expand=False)
         serviceBox.pack_start(self.picwebButton,expand=False)
         serviceBox.set_spacing(10)
+        
+        #Install accelerator
+        #acclGroup = gtk.AccelGroup()
+        #acclGroup.connect_group(66,gtk.gdk.SHIFT_MASK,gtk.ACCEL_VISIBLE,libpub.destroy)
+        #libpub.window.add_accel_group(acclGroup)
 
         empty_window()
         
@@ -400,22 +405,5 @@ class UploadGUI:
             libpub.alert("Flickr GUI: %s"%e)
             libpub.destroy()
             
-    def picweb_login_handler(self,widget,data=None):
-        self.username = self.picwebRegBox.usernameEntry.get_text()
-        password = self.picwebRegBox.passwordEntry.get_text()
-        try:
-            self.picwebObject.login(self.username,password)
-            self.upload_dialog()
-            libpub.config.set('PICASA_LAST_USERNAME',self.username)
-        except Exception, e:
-            libpub.alert('Login error: %s'%e)
-            
-    def flickr_login_handler(self,widget,data=None):
-        try:
-            if self.flickrObject.get_authtoken():
-                self.upload_dialog()
-        except Exception, e:
-            libpub.alert("Unhandled exception while Flickr login: %s"%e)
-     
         
         

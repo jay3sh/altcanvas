@@ -211,7 +211,8 @@ class FlickrObject:
 class FlickrRegisterBox(gtk.VBox):
     def __init__(self,parent):
         gtk.VBox.__init__(self)
-        self.flickrObject = parent.flickrObject
+        self.parentgui = parent
+        self.flickrObject = self.parentgui.flickrObject
         self.explainLabel = gtk.Label(
         'Please copy the following link and open it using your web browser.'+
         'Flickr will ask you to authorize AltCanvas to upload photos to your account.'+
@@ -222,7 +223,7 @@ class FlickrRegisterBox(gtk.VBox):
         self.urlText.set_width_chars(45)
         self.doneButton = gtk.Button('Press when you have granted authorization to AltCanvas!')
         self.doneButton.set_border_width(5)
-        self.doneButton.connect("clicked",parent.flickr_login_handler)
+        self.doneButton.connect("clicked",self.login_handler)
         
         self.set_spacing(15)
         self.pack_start(self.explainLabel)
@@ -238,20 +239,12 @@ class FlickrRegisterBox(gtk.VBox):
         self.urlText.select_region(0,-1)
         self.urlText.set_editable(False)
         
-    '''
-    def getauthtoken(self,widget,data=None):
+    def login_handler(self,widget,data=None):
         try:
-            authtoken = self.flickrObject.get_authtoken()
-            if authtoken != None:
-                save_authtoken(authtoken)
-                parent.authenticate(authtoken)
-            else:
-                libpub.alert("There was error retrieving Flickr Authentication token.\n"+
-                      "Are you sure, you have authorized this application?\n"+
-                      "Try again!")
+            if self.flickrObject.get_authtoken():
+                self.parentgui.upload_dialog()
         except Exception, e:
-            libpub.alert("Network error while retrieving Auth Token: %s"%e)
-    '''
+            libpub.alert("Unhandled exception while Flickr login: %s"%e)
      
 
     
