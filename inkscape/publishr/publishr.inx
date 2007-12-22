@@ -1,0 +1,17 @@
+<inkscape-extension>
+    <name>Publishr</name>
+    <id>org.inkscape.output.publishr</id>
+	<dependency type="extension">org.inkscape.output.svg.inkscape</dependency>
+	<dependency type="executable" location="extensions">publishr.py</dependency>
+    <output>
+		<extension>.web</extension>
+		<mimetype>image/jpeg</mimetype>
+		<filetypename>JPEG for web publishing (*.jpeg)</filetypename>
+		<filetypetooltip>Publish on web</filetypetooltip>
+		<dataloss>FALSE</dataloss>
+	</output>
+    <script>
+        <command reldir="extensions" interpreter="python">publishr.py</command>
+		<helper_extension>org.inkscape.output.svg.inkscape</helper_extension>
+	</script>
+</inkscape-extension>
