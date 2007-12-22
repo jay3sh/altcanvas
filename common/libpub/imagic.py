@@ -23,14 +23,14 @@ import os
 import sys
 import random
 
+import libpub
+
 class ImageMagick:
 	imagicdir = None
 	convert_bin = None
 	temp_dir = None
+	
 	def __init__(self):
-		pass
-
-	def present(self):
 		if sys.platform.find('win32') >= 0:
 			# WINDOWS
 			programdirs = os.listdir("C:\\Program Files\\")
@@ -49,45 +49,61 @@ class ImageMagick:
 			self.convert_bin = '/usr/bin/convert'
 			self.identify_bin = '/usr/bin/identify'
 			self.temp_dir = '/tmp'
+
+	def present(self):
 			
 		# Generic code
-		(sin,souterr) = os.popen4('%s --version'%self.convert_bin)
-		for line in souterr:
+		(sin,sout,serr) = os.popen3('%s --version'%self.convert_bin)
+		for line in sout:
 			if line.find('ImageMagick') >= 0:
 				return True
 		return False
 	
-	def makeThumbnail(self,filename,geometry="150x150"):
-		try:
-			randomstr = str(random.randint(1,999999))
-			thumbname = self.temp_dir+os.sep+"publishr-thumb-"+randomstr+"-"+filename.rpartition(os.sep)[2]
-			geometry = "-geometry %s"%geometry
-			(sin,souterr) = os.popen4('%s %s %s %s'%
-								  (self.convert_bin,filename,geometry,thumbname))
-			for line in souterr:
-				if line != None:
-					print "Error creating thumbnail: %s"%line
-					return None
-			return thumbname
-		except Exception, e:
-			return None
-		
-	def deleteThumbnail(self,thumbname):
-		try:
-			os.remove(thumbname)
-		except Exception, e:
-			return None
+	def img2thumb(self,orig_filepath,geometry="150x150"):
+		randomstr = str(random.randint(1,999999))
+		thumb_filepath = self.temp_dir+os.sep+"publishr-thumb-"+\
+				randomstr+"."+orig_filepath.rpartition(os.sep)[2]
+					
+		if self.convert(orig_filepath, thumb_filepath, geometry):
+			return thumb_filepath
 			
 		
-	def getThumbnailGeometry(self,thumbname):
-		try:
-			(sin,souterr) = os.popen4('%s %s'%(self.identify_bin,thumbname))
-			for line in souterr:
-				propstring = line
-			geometry = propstring.split()[2]
-			return geometry
-		except Exception, e:
-			return None
+	def svg2jpeg(self,svg_filepath,jpeg_filepath=None):
+		# If target jpeg filename not given create a random temp name
+		if jpeg_filepath == None:
+			randomstr = str(random.randint(1,999999))
+			jpeg_filepath = self.temp_dir+os.sep+"publishr-"+randomstr+".jpg"
+				
+		if self.convert(svg_filepath, jpeg_filepath):
+			return jpeg_filepath
+		
+		
+	def convert(self,source_filepath,target_filepath,geometry=None):
+		if geometry:
+			geometry_arg = "-geometry %s"%geometry
+		else:
+			geometry_arg = " "
+				
+		command = '%s %s %s %s'% \
+				  (self.convert_bin,source_filepath,geometry_arg,target_filepath)
+		
+		(sin,sout,serr) = os.popen3(command)
+			
+		# "convert" won't put anything on stderr if it's successful
+		for line in serr:
+			if line != None:
+				raise Exception("ImageMagick convert failure: %s"%line)
+				
+		return True
+		
+		
+	def getImageGeometry(self,imagename):
+		(sin,sout,serr) = os.popen3('%s %s'%(self.identify_bin,imagename))
+		for line in sout:
+			propstring = line
+		geometry = propstring.split()[2]
+		return geometry
+		
 		
 if __name__ == "__main__":
 	im = ImageMagick()
