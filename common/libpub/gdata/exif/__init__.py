@@ -44,7 +44,7 @@ exif:time
 """
 
 
-__author__ = u'havard@gulldahl.no'# (Håvard Gulldahl)' #BUG: api chokes on non-ascii chars in __author__
+__author__ = u'havard@gulldahl.no'# (Håvard Gulldahl)' #BUG: pydoc chokes on non-ascii chars in __author__
 __license__ = 'Apache License v2'
 
 try:
@@ -90,7 +90,15 @@ def ExposureFromString(xml_string):
   return atom.CreateClassFromXMLString(Exposure, xml_string)
   
 class Flash(ExifBaseElement):
-  "(string) Boolean value indicating whether the flash was used. `true' or `false'"
+  """(string) Boolean value indicating whether the flash was used.
+  The .text attribute will either be `true' or `false'
+
+  As a convenience, this object's .bool method will return what you want,
+  so you can say:
+
+  flash_used = bool(Flash)
+
+  """
   
   _tag = 'flash'
   def __bool__(self):
@@ -142,18 +150,45 @@ def ModelFromString(xml_string):
   return atom.CreateClassFromXMLString(Model, xml_string)
   
 class Time(ExifBaseElement):
-  """(int) The date/time the photo was taken, represented as the number of milliseconds since January 1st, 1970, e.g. 1180294337000
+  """(int) The date/time the photo was taken, e.g. 1180294337000.
+  Represented as the number of milliseconds since January 1st, 1970.
   
-  The value of this element will always be identical to the value of the <gphoto:timestamp>.
+  The value of this element will always be identical to the value
+  of the <gphoto:timestamp>.
+
+  Look at this object's .isoformat() for a human friendly datetime string:
+
+  photo_epoch = Time.text # 1180294337000
+  photo_isostring = Time.isoformat() # '2007-05-27T19:32:17.000Z'
+
+  Alternatively: 
+  photo_datetime = Time.datetime() # (requires python >= 2.3)
   """
   
   _tag = 'time'
+  def isoformat(self):
+    """(string) Return the timestamp as a ISO 8601 formatted string,
+    e.g. '2007-05-27T19:32:17.000Z'
+    """
+    import time
+    epoch = float(self.text)/1000
+    return time.strftime('%Y-%m-%dT%H:%M:%S.000Z', time.gmtime(epoch))
+  
+  def datetime(self):
+    """(datetime.datetime) Return the timestamp as a datetime.datetime object
+
+    Requires python 2.3
+    """
+    import datetime
+    epoch = float(self.text)/1000
+    return datetime.datetime.fromtimestamp(epoch)
+  
 def TimeFromString(xml_string):
   return atom.CreateClassFromXMLString(Time, xml_string)
   
 class Tags(ExifBaseElement):
   """The container for all exif elements.
-The <exif:tags> element can appear as a child of a photo entry.
+  The <exif:tags> element can appear as a child of a photo entry.
   """
   
   _tag = 'tags'

@@ -57,7 +57,10 @@ GML_NAMESPACE = 'http://www.opengis.net/gml'
 GEORSS_NAMESPACE = 'http://www.georss.org/georss'
 
 class GeoBaseElement(atom.AtomBase):
-  """Base class for elements. To add new elements, you only need to add the element tag name to self._tag and the namespace to self._namespace
+  """Base class for elements.
+
+  To add new elements, you only need to add the element tag name to self._tag
+  and the namespace to self._namespace
   """
   
   _tag = ''
@@ -73,14 +76,16 @@ class GeoBaseElement(atom.AtomBase):
     self.extension_attributes = extension_attributes or {}
 
 class Pos(GeoBaseElement):
-  "(string) Specifies a latitude and longitude, separated by a space, e.g. `35.669998 139.770004'"
+  """(string) Specifies a latitude and longitude, separated by a space,
+  e.g. `35.669998 139.770004'"""
   
   _tag = 'pos'
 def PosFromString(xml_string):
   return atom.CreateClassFromXMLString(Pos, xml_string)
 
 class Point(GeoBaseElement):
-  "(container)  Specifies a particular geographical point, by means of a <gml:pos> element."
+  """(container)  Specifies a particular geographical point, by means of
+  a <gml:pos> element."""
   
   _tag = 'Point'
   _children = atom.AtomBase._children.copy()
@@ -96,12 +101,18 @@ def PointFromString(xml_string):
   return atom.CreateClassFromXMLString(Point, xml_string)
 
 class Where(GeoBaseElement):
-  """(container) Specifies a geographical location or region. (Not to be confused with <gd:where>.) A container element, containing a single <gml:Point> element.
+  """(container) Specifies a geographical location or region.
+  A container element, containing a single <gml:Point> element.
+  (Not to be confused with <gd:where>.) 
   
-  Note that the (only) child element, gml:Point, is title-cased. This is to keep the casing from the xml stream (principle of least surprise).
+  Note that the (only) child attribute, .Point, is title-cased.
+  This reflects the names of elements in the xml stream
+  (principle of least surprise).
   
   As a convenience, you can get a tuple of (lat, lon) with Where.location(),
-  and set the same data with Where.setLocation( (lat, lon) )
+  and set the same data with Where.setLocation( (lat, lon) ).
+
+  Similarly, there are methods to set and get only latitude and longtitude.
   """
   
   _tag = 'where'
@@ -116,33 +127,61 @@ class Where(GeoBaseElement):
       point = Point()
     self.Point=point
   def location(self):
-    "(float, float) Convenience method to return the contents of Where.Point.pos.text as a (lat,lon) tuple"
+    "(float, float) Return Where.Point.pos.text as a (lat,lon) tuple"
     try:
       return tuple(float(z) for z in self.Point.pos.text.split(' '))
     except AttributeError:
       return tuple()
   def set_location(self, latlon):
-    """(bool) Convenience method to set the contents of Where.Point.pos.text as 
-    a (lat,lon) tuple. Returns True on success.
-lat - The latitude in degrees, from -90 to 90.
-lon - The longitude in degrees, from -180 to 180.
+    """(bool) Set Where.Point.pos.text from a (lat,lon) tuple.
+
+    Arguments:
+    lat (float): The latitude in degrees, from -90.0 to 90.0
+    lon (float): The longitude in degrees, from -180.0 to 180.0
+    
+    Returns True on success.
+
     """
     
+    assert(isinstance(latlon[0], float))
+    assert(isinstance(latlon[1], float))
     try:
       self.Point.pos.text = "%s %s" % (latlon[0], latlon[1])
       return True
     except AttributeError:
       return False
-  def W3C_point(self):
-    "Convenience method to return the contents of Where.Point.pos.text as a W3C(lat,lon) tuple"
+  def latitude(self):
+    "(float) Get the latitude value of the geo-tag. See also .location()"
+    lat, lon = self.location()
+    return lat
+  
+  def longtitude(self):
+    "(float) Get the longtitude value of the geo-tag. See also .location()"
+    lat, lon = self.location()
+    return lon
+
+  def set_latitude(self, lat):
+    """(bool) Set the latitude value of the geo-tag.
+
+    Args:
+    lat (float): The new latitude value
+
+    See also .set_location()
+    """
+    _lat, lon = self.location()
+    return self.set_location(lat, lon)
+  
+  def set_longtitude(self, lon):
+    """(bool) Set the longtitude value of the geo-tag.
     
-    #http://code.google.com/apis/gdata/javadoc/com/google/gdata/data/geo/impl/W3CPoint.html
-    return tuple() ## FIXME: implement routine
-  def set_W3C_point(self, point):
-    "Convenience method to set the contents of Where.Point.pos.text as a W3C(lat,lon) tuple"
-    
-    #http://code.google.com/apis/gdata/javadoc/com/google/gdata/data/geo/impl/W3CPoint.html
-    return False ## FIXME: implement routine
+    Args:
+    lat (float): The new latitude value
+
+    See also .set_location()
+    """
+    lat, _lon = self.location()
+    return self.set_location(lat, lon)
+
 def WhereFromString(xml_string):
   return atom.CreateClassFromXMLString(Where, xml_string)
   

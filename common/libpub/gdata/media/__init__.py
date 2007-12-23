@@ -108,23 +108,27 @@ class Content(MediaBaseElement):
   _attributes['type'] = 'type'
   _attributes['fileSize'] = 'fileSize'
   def __init__(self, url=None, width=None, height=None,
-      medium=None, type=None, fileSize=None,
+      medium=None, content_type=None, fileSize=None,
       extension_elements=None, extension_attributes=None, text=None):
+    MediaBaseElement.__init__(self, extension_elements=extension_elements,
+                            extension_attributes=extension_attributes,
+                            text=text)
     self.url = url
     self.width = width
     self.height = height
     self.medium = medium
-    self.type = type
+    self.type = content_type
     self.fileSize = fileSize
-    self.extension_elements = extension_elements or []
-    self.extension_attributes = extension_attributes or {}
 def ContentFromString(xml_string):
   return atom.CreateClassFromXMLString(Content, xml_string)
 
 class Credit(MediaBaseElement):
-  """(string) Contains the nickname of the user who created the content, e.g. `Liz Bennet'.
+  """(string) Contains the nickname of the user who created the content,
+  e.g. `Liz Bennet'.
   
-  This is a user-specified value that should be used when referring to the user by name.
+  This is a user-specified value that should be used when referring to
+  the user by name.
+
   Note that none of the attributes from the MediaRSS spec are supported.
   """
   
@@ -133,10 +137,14 @@ def CreditFromString(xml_string):
   return atom.CreateClassFromXMLString(Credit, xml_string)
 
 class Description(MediaBaseElement):
-  """(string) A description of the media object. Either plain unicode text, or entity-encoded html (look at the `type' attribute). E.g `A set of photographs I took while
-  vacationing in Italy.  Florence is beautiful!' 
+  """(string) A description of the media object.
+  Either plain unicode text, or entity-encoded html (look at the `type'
+  attribute).
+
+  E.g `A set of photographs I took while vacationing in Italy.'
   
-  For `api' projections, the description is in plain text; for `base' projections, the description is in HTML.
+  For `api' projections, the description is in plain text;
+  for `base' projections, the description is in HTML.
   
   Attributes:
   type: either `text' or `html'. 
@@ -145,18 +153,21 @@ class Description(MediaBaseElement):
   _tag = 'description'
   _attributes = atom.AtomBase._attributes.copy()
   _attributes['type'] = 'type'
-  def __init__(self, type=None, 
+  def __init__(self, description_type=None, 
       extension_elements=None, extension_attributes=None, text=None):
-    self.type = type
-    self.extension_elements = extension_elements or []
-    self.extension_attributes = extension_attributes or {}
+    MediaBaseElement.__init__(self, extension_elements=extension_elements,
+                            extension_attributes=extension_attributes,
+                            text=text)
+    
+    self.type = description_type
 def DescriptionFromString(xml_string):
   return atom.CreateClassFromXMLString(Description, xml_string)
 
 class Keywords(MediaBaseElement):
-  """(string) Lists the tags associated with the entry, e.g `italy, vacation, sunset'.
+  """(string) Lists the tags associated with the entry,
+  e.g `italy, vacation, sunset'.
   
-  Contains a comma-separated list of tags that have been added to the photo, or 
+  Contains a comma-separated list of tags that have been added to the photo, or
   all tags that have been added to photos in the album.
   """
   
@@ -165,7 +176,7 @@ def KeywordsFromString(xml_string):
   return atom.CreateClassFromXMLString(Keywords, xml_string)
 
 class Thumbnail(MediaBaseElement):
-  """(attribute container) Contains the URL of a thumbnail of a photo or album cover. 
+  """(attributes) Contains the URL of a thumbnail of a photo or album cover.
   
   There can be multiple <media:thumbnail> elements for a given <media:group>; 
   for example, a given item may have multiple thumbnails at different sizes. 
@@ -191,11 +202,12 @@ class Thumbnail(MediaBaseElement):
   _attributes['height'] = 'height'
   def __init__(self, url=None, width=None, height=None,
       extension_attributes=None, text=None, extension_elements=None):
+    MediaBaseElement.__init__(self, extension_elements=extension_elements,
+                            extension_attributes=extension_attributes,
+                            text=text)
     self.url = url
     self.width = width
     self.height = height
-    self.extension_elements = extension_elements or []
-    self.extension_attributes = extension_attributes or {}
 def ThumbnailFromString(xml_string):
   return atom.CreateClassFromXMLString(Thumbnail, xml_string)
 
@@ -209,17 +221,18 @@ class Title(MediaBaseElement):
   _tag = 'title'
   _attributes = atom.AtomBase._attributes.copy()
   _attributes['type'] = 'type'
-  def __init__(self, type=None, 
+  def __init__(self, title_type=None, 
       extension_attributes=None, text=None, extension_elements=None):
-    self.type = type
-    self.extension_elements = extension_elements or []
-    self.extension_attributes = extension_attributes or {}
+    MediaBaseElement.__init__(self, extension_elements=extension_elements,
+                            extension_attributes=extension_attributes,
+                            text=text)
+    self.type = title_type
 def TitleFromString(xml_string):
   return atom.CreateClassFromXMLString(Title, xml_string)
 
 class Group(MediaBaseElement):
   """Container element for all media elements.
-The <media:group> element can appear as a child of an album or photo entry."""
+  The <media:group> element can appear as a child of an album or photo entry."""
 
   _tag = 'group'
   _children = atom.AtomBase._children.copy()
@@ -230,15 +243,17 @@ The <media:group> element can appear as a child of an album or photo entry."""
   _children['{%s}thumbnail' % MEDIA_NAMESPACE] = ('thumbnail', [Thumbnail,])
   _children['{%s}title' % MEDIA_NAMESPACE] = ('title', Title) 
 
-  def __init__(self, extension_elements=None, extension_attributes=None, text=None):
+  def __init__(self, content=None, credit=None, description=None, keywords=None,
+      thumbnail=None, title=None,
+      extension_elements=None, extension_attributes=None, text=None):
     MediaBaseElement.__init__(self, extension_elements=extension_elements,
                             extension_attributes=extension_attributes,
                             text=text)
-    self.content=None
-    self.credit=None
-    self.description=None
-    self.keywords=None
-    self.thumbnail=[]
-    self.title=None
+    self.content=content
+    self.credit=credit
+    self.description=description
+    self.keywords=keywords
+    self.thumbnail=thumbnail or []
+    self.title=title
 def GroupFromString(xml_string):
   return atom.CreateClassFromXMLString(Group, xml_string)

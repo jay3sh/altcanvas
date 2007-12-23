@@ -34,11 +34,11 @@ except ImportError:
     import cElementTree as ElementTree
   except ImportError:
     from elementtree import ElementTree
-import gdata
-import atom.service
-import gdata.service
-import gdata.base
-import atom
+import libpub.gdata
+import libpub.atom.service
+import libpub.gdata.service
+import libpub.gdata.base
+import libpub.atom
 
 
 # URL to which all batch requests are sent.
@@ -53,13 +53,13 @@ class RequestError(Error):
   pass
 
 
-class GBaseService(gdata.service.GDataService):
+class GBaseService(libpub.gdata.service.GDataService):
   """Client for the Google Base service."""
 
   def __init__(self, email=None, password=None, source=None, 
                server='base.google.com', api_key=None, 
                additional_headers=None):
-    gdata.service.GDataService.__init__(self, email=email, password=password,
+    libpub.gdata.service.GDataService.__init__(self, email=email, password=password,
                                         service='gbase', source=source, 
                                         server=server, 
                                         additional_headers=additional_headers)
@@ -107,39 +107,39 @@ class GBaseService(gdata.service.GDataService):
     result = self.Get(uri, converter=converter)
     if converter:
       return result
-    elif isinstance(result, atom.Entry):
-      return gdata.base.GBaseItemFromString(result.ToString())
+    elif isinstance(result, libpub.atom.Entry):
+      return libpub.gdata.base.GBaseItemFromString(result.ToString())
     return result
 
   def QuerySnippetsFeed(self, uri):
-    return self.Get(uri, converter=gdata.base.GBaseSnippetFeedFromString)
+    return self.Get(uri, converter=libpub.gdata.base.GBaseSnippetFeedFromString)
 
   def QueryItemsFeed(self, uri):
-    return self.Get(uri, converter=gdata.base.GBaseItemFeedFromString)
+    return self.Get(uri, converter=libpub.gdata.base.GBaseItemFeedFromString)
 
   def QueryAttributesFeed(self, uri):
-    return self.Get(uri, converter=gdata.base.GBaseAttributesFeedFromString)
+    return self.Get(uri, converter=libpub.gdata.base.GBaseAttributesFeedFromString)
 
   def QueryItemTypesFeed(self, uri):
-    return self.Get(uri, converter=gdata.base.GBaseItemTypesFeedFromString)
+    return self.Get(uri, converter=libpub.gdata.base.GBaseItemTypesFeedFromString)
 
   def QueryLocalesFeed(self, uri):
-    return self.Get(uri, converter=gdata.base.GBaseLocalesFeedFromString)
+    return self.Get(uri, converter=libpub.gdata.base.GBaseLocalesFeedFromString)
 
   def GetItem(self, uri):
-    return self.Get(uri, converter=gdata.base.GBaseItemFromString)
+    return self.Get(uri, converter=libpub.gdata.base.GBaseItemFromString)
 
   def GetSnippet(self, uri):
-    return self.Get(uri, converter=gdata.base.GBaseSnippetFromString)
+    return self.Get(uri, converter=libpub.gdata.base.GBaseSnippetFromString)
 
   def GetAttribute(self, uri):
-    return self.Get(uri, converter=gdata.base.GBaseAttributeEntryFromString)
+    return self.Get(uri, converter=libpub.gdata.base.GBaseAttributeEntryFromString)
 
   def GetItemType(self, uri):
-    return self.Get(uri, converter=gdata.base.GBaseItemTypeEntryFromString)
+    return self.Get(uri, converter=libpub.gdata.base.GBaseItemTypeEntryFromString)
 
   def GetLocale(self, uri):
-    return self.Get(uri, converter=gdata.base.GDataEntryFromString)
+    return self.Get(uri, converter=libpub.gdata.base.GDataEntryFromString)
 
   def InsertItem(self, new_item, url_params=None, escape_params=True, 
       converter=None):
@@ -165,8 +165,8 @@ class GBaseService(gdata.service.GDataService):
     response = self.Post(new_item, '/base/feeds/items', url_params=url_params,
                          escape_params=escape_params, converter=converter)
 
-    if not converter and isinstance(response, atom.Entry):
-      return gdata.base.GBaseItemFromString(response.ToString())
+    if not converter and isinstance(response, libpub.atom.Entry):
+      return libpub.gdata.base.GBaseItemFromString(response.ToString())
     return response
 
   def DeleteItem(self, item_id, url_params=None, escape_params=True):
@@ -189,7 +189,7 @@ class GBaseService(gdata.service.GDataService):
                            
   def UpdateItem(self, item_id, updated_item, url_params=None, 
                  escape_params=True, 
-                 converter=gdata.base.GBaseItemFromString):
+                 converter=libpub.gdata.base.GBaseItemFromString):
     """Updates an existing item.
 
     Args:
@@ -215,12 +215,12 @@ class GBaseService(gdata.service.GDataService):
     response = self.Put(updated_item, 
         item_id, url_params=url_params, escape_params=escape_params, 
         converter=converter)
-    if not converter and isinstance(response, atom.Entry):
-      return gdata.base.GBaseItemFromString(response.ToString())
+    if not converter and isinstance(response, libpub.atom.Entry):
+      return libpub.gdata.base.GBaseItemFromString(response.ToString())
     return response
 
   def ExecuteBatch(self, batch_feed, 
-                   converter=gdata.base.GBaseItemFeedFromString):
+                   converter=libpub.gdata.base.GBaseItemFeedFromString):
     """Sends a batch request feed to the server.
     
     Args: 
@@ -238,7 +238,7 @@ class GBaseService(gdata.service.GDataService):
     return self.Post(batch_feed, BASE_BATCH_URL, converter=converter) 
 
 
-class BaseQuery(gdata.service.Query):
+class BaseQuery(libpub.gdata.service.Query):
 
   def _GetBaseQuery(self):
     return self['bq']

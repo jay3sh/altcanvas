@@ -68,7 +68,8 @@ except ImportError:
     from elementtree import ElementTree
 import libpub.atom.service
 import libpub.gdata
-import libpub.atom as atom
+import libpub.atom
+import libpub.gdata.auth
 
 
 PROGRAMMATIC_AUTH_LABEL = 'GoogleLogin auth'
@@ -104,7 +105,7 @@ class UnexpectedReturnType(Error):
   pass
 
 
-class GDataService(atom.service.AtomService):
+class GDataService(libpub.atom.service.AtomService):
   """Contains elements needed for GData login and CRUD request headers.
 
   Maintains additional headers (tokens for example) needed for the GData 
@@ -142,7 +143,6 @@ class GDataService(atom.service.AtomService):
     self.additional_headers = additional_headers or {}
     self.__SetSource(source)
     self.__auth_token = None
-    self.__auth_type = None
     self.__captcha_token = None
     self.__captcha_url = None
     self.__gsessionid = None
@@ -160,10 +160,9 @@ class GDataService(atom.service.AtomService):
       auth_token: string The token returned by the AuthSub service.
     """
 
-    self.__auth_token = auth_token
+    self.__auth_token = '%s=%s' % (AUTHSUB_AUTH_LABEL, auth_token)
     # The auth token is only set externally when using AuthSub authentication,
     # so set the auth_type to indicate AuthSub.
-    self.__auth_type = AUTHSUB_AUTH_LABEL
 
   def __SetAuthSubToken(self, auth_token):
     self._SetAuthSubToken(auth_token)
@@ -220,24 +219,22 @@ class GDataService(atom.service.AtomService):
       doc="""Get the captcha URL for a login request.""")
 
   def GetAuthSubToken(self):
-    if self.__auth_type == AUTHSUB_AUTH_LABEL:
-      return self.__auth_token
+    if self.__auth_token.startswith(AUTHSUB_AUTH_LABEL):
+      return self.__auth_token.lstrip(AUTHSUB_AUTH_LABEL + '=')
     else:
       return None
 
   def SetAuthSubToken(self, token):
-    self.__auth_token = token
-    self.__auth_type = AUTHSUB_AUTH_LABEL
+    self.__auth_token = '%s=%s' % (AUTHSUB_AUTH_LABEL, token)
 
   def GetClientLoginToken(self):
-    if self.__auth_type == PROGRAMMATIC_AUTH_LABEL:
-      return self.__auth_token
+    if self.__auth_token.startswith(PROGRAMMATIC_AUTH_LABEL):
+      return self.__auth_token.lstrip(PROGRAMMATIC_AUTH_LABEL + '=')
     else:
       return None
 
   def SetClientLoginToken(self, token):
-    self.__auth_token = token
-    self.__auth_type = PROGRAMMATIC_AUTH_LABEL
+    self.__auth_token = '%s=%s' % (PROGRAMMATIC_AUTH_LABEL, token)
 
   # Private methods to create the source property.
   def __GetSource(self):
@@ -276,24 +273,9 @@ class GDataService(atom.service.AtomService):
       BadAuthentication if the login service rejected the username or password
       Error if the login service responded with a 403 different from the above
     """
-
-    # Create a POST body containing the user's credentials.
-    if captcha_token and captcha_response:
-      # Send the captcha token and response as part of the POST body if the
-      # user is responding to a captch challenge.
-      request_body = urllib.urlencode({'Email': self.email,
-                                       'Passwd': self.password,
-                                       'accountType': self.account_type,
-                                       'service': self.service,
-                                       'source': self.source,
-                                       'logintoken': captcha_token,
-                                       'logincaptcha': captcha_response})
-    else:
-      request_body = urllib.urlencode({'Email': self.email,
-                                       'Passwd': self.password,
-                                       'accountType': self.account_type,
-                                       'service': self.service,
-                                       'source': self.source})
+    request_body = libpub.gdata.auth.GenerateClientLoginRequestBody(self.email, 
+        self.password, self.service, self.source, self.account_type, 
+        captcha_token, captcha_response)
 
     # Open a connection to the authentication server.
     (auth_connection, uri) = self._PrepareConnection(AUTH_SERVER_HOST)
@@ -311,38 +293,26 @@ class GDataService(atom.service.AtomService):
     # Process the response and throw exceptions if the login request did not
     # succeed.
     auth_response = auth_connection.getresponse()
+    response_body = auth_response.read()
 
     if auth_response.status == 200:
-      response_body = auth_response.read()
-      for response_line in response_body.splitlines():
-        if response_line.startswith('Auth='):
-          self.__auth_token = response_line.lstrip('Auth=')
-          self.__auth_type = PROGRAMMATIC_AUTH_LABEL
-          # Get rid of any residual captcha information because the request
-          # succeeded.
-          self.__captcha_token = None
-          self.__captcha_url = None
+      
+      self.__auth_token = libpub.gdata.auth.GenerateClientLoginAuthToken(
+           response_body)
+      self.__captcha_token = None
+      self.__captcha_url = None
 
     elif auth_response.status == 403:
-      response_body = auth_response.read()
+
       # Examine each line to find the error type and the captcha token and
       # captch URL if they are present.
-      for response_line in response_body.splitlines():
-        if response_line.startswith('Error='):
-          error_line = response_line
-        elif response_line.startswith('CaptchaToken='):
-          self.__captcha_token = response_line.lstrip('CaptchaToken=')
-        elif response_line.startswith('CaptchaUrl='):
-          self.__captcha_url = '%saccounts/Captcha%s' % (AUTH_SERVER_HOST,
-                               response_line.lstrip('CaptchaUrl='))
-      
-
-      # Raise an exception based on the error type in the 403 response.
-      # In cases where there was no captcha challenge, remove any previous
-      # captcha values.
-      if error_line == 'Error=CaptchaRequired':
+      captcha_parameters = libpub.gdata.auth.GetCaptchChallenge(response_body, 
+          captcha_base_url='%saccounts/' % AUTH_SERVER_HOST)
+      if captcha_parameters:
+        self.__captcha_token = captcha_parameters['token']
+        self.__captcha_url = captcha_parameters['url']
         raise CaptchaRequired, 'Captcha Required'
-      elif error_line == 'Error=BadAuthentication':
+      elif response_body.splitlines()[0] == 'Error=BadAuthentication':
         self.__captcha_token = None
         self.__captcha_url = None
         raise BadAuthentication, 'Incorrect username or password'
@@ -415,8 +385,8 @@ class GDataService(atom.service.AtomService):
     Raises:
       NonAuthSubToken if the user's auth token is not an AuthSub token
     """
-    
-    if self.__auth_type != AUTHSUB_AUTH_LABEL: 
+   
+    if not self.__auth_token.startswith(AUTHSUB_AUTH_LABEL):
       raise NonAuthSubToken
 
     (upgrade_connection, uri) = self._PrepareConnection(
@@ -425,8 +395,7 @@ class GDataService(atom.service.AtomService):
     
     upgrade_connection.putheader('Content-Type',
                                  'application/x-www-form-urlencoded')
-    upgrade_connection.putheader('Authorization', '%s=%s' %
-        (self.__auth_type, self.__auth_token))
+    upgrade_connection.putheader('Authorization', self.__auth_token)
     upgrade_connection.endheaders()
 
     response = upgrade_connection.getresponse()
@@ -444,7 +413,7 @@ class GDataService(atom.service.AtomService):
       NonAuthSubToken if the user's auth token is not an AuthSub token
     """
 
-    if self.__auth_type != AUTHSUB_AUTH_LABEL:
+    if not self.__auth_token.startswith(AUTHSUB_AUTH_LABEL):
       raise NonAuthSubToken
     
     (revoke_connection, uri) = self._PrepareConnection(
@@ -453,13 +422,11 @@ class GDataService(atom.service.AtomService):
     
     revoke_connection.putheader('Content-Type', 
                                 'application/x-www-form-urlencoded')
-    revoke_connection.putheader('Authorization', '%s=%s' %
-            (self.__auth_type, self.__auth_token))
+    revoke_connection.putheader('Authorization', self.__auth_token)
     revoke_connection.endheaders()
 
     response = revoke_connection.getresponse()
     if response.status == 200:
-      self.__auth_type = None
       self.__auth_token = None
 
   # CRUD operations
@@ -506,8 +473,7 @@ class GDataService(atom.service.AtomService):
 
     # Add the authentication header to the Get request
     if self.__auth_token:
-      extra_headers['Authorization'] = '%s=%s' % (self.__auth_type, 
-                                                  self.__auth_token)
+      extra_headers['Authorization'] = self.__auth_token
 
     if self.__gsessionid is not None:
       if uri.find('gsessionid=') < 0:
@@ -516,7 +482,7 @@ class GDataService(atom.service.AtomService):
         else:
           uri += '?gsessionid=%s' % (self.__gsessionid,)
 
-    server_response = atom.service.AtomService.Get(self, uri, extra_headers)
+    server_response = libpub.atom.service.AtomService.Get(self, uri, extra_headers)
     result_body = server_response.read()
 
     if server_response.status == 200:
@@ -560,7 +526,7 @@ class GDataService(atom.service.AtomService):
     """Returns a MediaSource containing media and its metadata from the given
     URI string.
     """
-    connection = atom.service.AtomService._CreateConnection(self, uri, 'GET',
+    connection = libpub.atom.service.AtomService._CreateConnection(self, uri, 'GET',
         extra_headers)
     response_handle = connection.getresponse()
     return libpub.gdata.MediaSource(response_handle, response_handle.getheader('Content-Type'),
@@ -584,13 +550,14 @@ class GDataService(atom.service.AtomService):
       A GDataEntry built from the XML in the server's response.
     """
 
-    result = self.Get(uri, extra_headers, converter=atom.EntryFromString)
-    if isinstance(result, atom.Entry):
+    result = self.Get(uri, extra_headers, converter=libpub.atom.EntryFromString)
+    if isinstance(result, libpub.atom.Entry):
       return result
     else:
       raise UnexpectedReturnType, 'Server did not send an entry' 
 
-  def GetFeed(self, uri, extra_headers=None):
+  def GetFeed(self, uri, extra_headers=None, 
+              converter=libpub.gdata.GDataFeedFromString):
     """Query the GData API with the given URI and receive a Feed.
 
     See also documentation for gdata.service.Get
@@ -608,11 +575,39 @@ class GDataService(atom.service.AtomService):
       A GDataFeed built from the XML in the server's response.
     """
 
-    result = self.Get(uri, extra_headers, converter=atom.FeedFromString)
-    if isinstance(result, atom.Feed):
+    result = self.Get(uri, extra_headers, converter=converter)
+    if isinstance(result, libpub.atom.Feed):
       return result
     else:
       raise UnexpectedReturnType, 'Server did not send a feed'  
+
+  def GetNext(self, feed):
+    """Requests the next 'page' of results in the feed.
+    
+    This method uses the feed's next link to request an additional feed
+    and uses the class of the feed to convert the results of the GET request.
+
+    Args:
+      feed: atom.Feed or a subclass. The feed should contain a next link and
+          the type of the feed will be applied to the results from the 
+          server. The new feed which is returned will be of the same class
+          as this feed which was passed in.
+
+    Returns:
+      A new feed representing the next set of results in the server's feed.
+      The type of this feed will match that of the feed argument.
+    """
+    next_link = feed.GetNextLink()
+    # Create a closure which will convert an XML string to the class of
+    # the feed object passed in.
+    def ConvertToFeedClass(xml_string):
+      return libpub.atom.CreateClassFromXMLString(feed.__class__, xml_string)
+    # Make a GET request on the next link and use the above closure for the
+    # converted which processes the XML string from the server.
+    if next_link and next_link.href:
+      return self.Get(next_link.href, converter=ConvertToFeedClass)
+    else:
+      return None
 
   def Post(self, data, uri, extra_headers=None, url_params=None, 
            escape_params=True, redirects_remaining=4, media_source=None, 
@@ -653,8 +648,7 @@ class GDataService(atom.service.AtomService):
 
     # Add the authentication header to the Get request
     if self.__auth_token:
-      extra_headers['Authorization'] = '%s=%s' % (self.__auth_type, 
-                                                  self.__auth_token)
+      extra_headers['Authorization'] = self.__auth_token
 
     if self.__gsessionid is not None:
       if uri.find('gsessionid=') < 0:
@@ -682,7 +676,7 @@ class GDataService(atom.service.AtomService):
           len(multipart[1]) + len(multipart[2]) +
           len(data_str) + media_source.content_length)
           
-      insert_connection = atom.service.AtomService._CreateConnection(self,
+      insert_connection = libpub.atom.service.AtomService._CreateConnection(self,
           uri, 'POST', extra_headers, url_params, escape_params)
 
       insert_connection.send(multipart[0])
@@ -702,7 +696,7 @@ class GDataService(atom.service.AtomService):
     elif media_source:
       extra_headers['Content-Type'] = media_source.content_type
       extra_headers['Content-Length'] = media_source.content_length
-      insert_connection = atom.service.AtomService._CreateConnection(self, uri,
+      insert_connection = libpub.atom.service.AtomService._CreateConnection(self, uri,
           'POST', extra_headers, url_params, escape_params)
 
       while 1:
@@ -717,7 +711,7 @@ class GDataService(atom.service.AtomService):
       http_data = data
       content_type = 'application/atom+xml'
 
-      server_response = atom.service.AtomService.Post(self, http_data, uri,
+      server_response = libpub.atom.service.AtomService.Post(self, http_data, uri,
           extra_headers, url_params, escape_params, content_type)
       result_body = server_response.read()
 
@@ -793,8 +787,7 @@ class GDataService(atom.service.AtomService):
 
     # Add the authentication header to the Get request
     if self.__auth_token:
-      extra_headers['Authorization'] = '%s=%s' % (self.__auth_type, 
-                                                  self.__auth_token)
+      extra_headers['Authorization'] = self.__auth_token
 
     if self.__gsessionid is not None:
       if uri.find('gsessionid=') < 0:
@@ -822,7 +815,7 @@ class GDataService(atom.service.AtomService):
           len(multipart[1]) + len(multipart[2]) +
           len(data_str) + media_source.content_length)
           
-      insert_connection = atom.service.AtomService._CreateConnection(self, uri,
+      insert_connection = libpub.atom.service.AtomService._CreateConnection(self, uri,
           'PUT', extra_headers, url_params, escape_params)
 
       insert_connection.send(multipart[0])
@@ -842,7 +835,7 @@ class GDataService(atom.service.AtomService):
     elif media_source:
       extra_headers['Content-Type'] = media_source.content_type
       extra_headers['Content-Length'] = media_source.content_length
-      insert_connection = atom.service.AtomService._CreateConnection(self, uri,
+      insert_connection = libpub.atom.service.AtomService._CreateConnection(self, uri,
           'PUT', extra_headers, url_params, escape_params)
 
       while 1:
@@ -856,7 +849,7 @@ class GDataService(atom.service.AtomService):
       http_data = data
       content_type = 'application/atom+xml'
 
-      server_response = atom.service.AtomService.Put(self, http_data, uri,
+      server_response = libpub.atom.service.AtomService.Put(self, http_data, uri,
           extra_headers, url_params, escape_params, content_type)
       result_body = server_response.read()
 
@@ -920,8 +913,7 @@ class GDataService(atom.service.AtomService):
 
     # Add the authentication header to the Get request
     if self.__auth_token:
-      extra_headers['Authorization'] = '%s=%s' % (self.__auth_type, 
-                                                  self.__auth_token)
+      extra_headers['Authorization'] = self.__auth_token
 
     if self.__gsessionid is not None:
       if uri.find('gsessionid=') < 0:
@@ -930,7 +922,7 @@ class GDataService(atom.service.AtomService):
         else:
           uri += '?gsessionid=%s' % (self.__gsessionid,)
                                                   
-    server_response = atom.service.AtomService.Delete(self, uri,
+    server_response = libpub.atom.service.AtomService.Delete(self, uri,
         extra_headers, url_params, escape_params)
     result_body = server_response.read()
 
@@ -1095,6 +1087,8 @@ class Query(dict):
       return None
 
   def _SetStartIndex(self, query):
+    if not isinstance(query, str):
+      query = str(query)
     self['start-index'] = query
 
   start_index = property(_GetStartIndex, _SetStartIndex,
@@ -1107,6 +1101,8 @@ class Query(dict):
       return None
 
   def _SetMaxResults(self, query):
+    if not isinstance(query, str):
+      query = str(query)
     self['max-results'] = query
 
   max_results = property(_GetMaxResults, _SetMaxResults,
@@ -1120,6 +1116,6 @@ class Query(dict):
     # Add categories to the feed if there are any.
     if len(self.categories) > 0:
       q_feed = q_feed + '/-/' + category_string
-    return atom.service.BuildUri(q_feed, self)
+    return libpub.atom.service.BuildUri(q_feed, self)
 
   

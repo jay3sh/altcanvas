@@ -4,7 +4,7 @@
 # This is the service file for the Google Photo python client.
 # It is used for higher level operations.
 #
-# $Id: service.py 107 2007-10-18 20:08:35Z havard.gulldahl $
+# $Id: service.py 144 2007-10-25 21:03:34Z havard.gulldahl $
 #
 # Copyright 2007 Håvard Gulldahl 
 #
@@ -34,18 +34,18 @@ Example:
   pws = gdata.photos.service.PhotosService()
   pws.ClientLogin(username, password)
   #Get all albums
-  albums = pws.GetAlbumFeed() 
+  albums = pws.GetUserFeed().entry
   # Get all photos in second album
-  photos = pws.GetPhotoFeed(albums.entry[1].GetPhotoFeedLink())
+  photos = pws.GetFeed(albums[1].GetPhotosUri()).entry
   # Get all tags for photos in second album and print them
-  tags = pws.GetTagFeed(albums.entry[1].GetTagFeedLink())
-  print [ tag.summary.text for tag in tags.entry ]
+  tags = pws.GetFeed(albums[1].GetTagsUri()).entry
+  print [ tag.summary.text for tag in tags ]
   # Get all comments for the first photos in list and print them
-  comments = pws.GetCommentFeed(photos.entry[0].GetCommentFeedLink())
-  print [ c.summary.text for c in comments.entry ]
+  comments = pws.GetCommentFeed(photos[0].GetCommentsUri()).entry
+  print [ c.summary.text for c in comments ]
 
   # Get a photo to work with
-  photo = photos.entry[0]
+  photo = photos[0]
   # Update metadata
 
   # Attributes from the <gphoto:*> namespace
@@ -56,13 +56,15 @@ Example:
   photo.media.keywords.text = u'Home, Long-exposure, Sunset' # Comma-separated
 
   # Adding attributes to media object
-  photo.rotation = gdata.photos.Rotation(text='90') # Rotate 90 degrees clockwise
+
+  # Rotate 90 degrees clockwise
+  photo.rotation = gdata.photos.Rotation(text='90') 
 
   # Submit modified photo object
   photo = pws.UpdatePhotoMetadata(photo)
   
-  # Make sure you only modify the newly returned object, else you'll get versioning
-  # errors. See Optimistic-concurrency
+  # Make sure you only modify the newly returned object, else you'll get
+  # versioning errors. See Optimistic-concurrency
 
   # Add comment to a picture
   comment = pws.InsertComment(photo, u'I wish the water always was this warm')
@@ -71,42 +73,68 @@ Example:
   print "*blush*"
   pws.Delete(comment.GetEditLink().href)
 
-  pws.Logout()
-
 """
 
-__author__ = u'havard@gulldahl.no'# (Håvard Gulldahl)' #BUG: api chokes on non-ascii chars in __author__
+__author__ = u'havard@gulldahl.no'# (Håvard Gulldahl)' #BUG: pydoc chokes on non-ascii chars in __author__
 __license__ = 'Apache License v2'
-__version__ = '0.5'
+__version__ = '$Revision: 176 $'[11:-2] 
 
 
-import sys, types, os.path
-import libpub.gdata.service 
-import libpub.gdata 
-import libpub.atom.service 
-import libpub.atom 
+import sys, os.path, StringIO
 import time
 try:
-  from xml.etree import ElementTree
+  from xml.etree import cElementTree as ElementTree
 except ImportError:
-  from elementtree import ElementTree
+  try:
+    import cElementTree as ElementTree
+  except ImportError:
+    from elementtree import ElementTree
 
-import libpub.gdata.photos 
+import libpub.gdata.service
+import libpub.gdata
+import libpub.atom.service
+import libpub.atom
+import libpub.gdata.photos
+
+SUPPORTED_UPLOAD_TYPES = ('bmp', 'jpeg', 'jpg', 'gif', 'png')
 
 UNKOWN_ERROR=1000
+GPHOTOS_BAD_REQUEST=400
+GPHOTOS_CONFLICT=409
+GPHOTOS_INTERNAL_SERVER_ERROR=500
+GPHOTOS_INVALID_ARGUMENT=601
+GPHOTOS_INVALID_CONTENT_TYPE=602
+GPHOTOS_NOT_AN_IMAGE=603
+GPHOTOS_INVALID_KIND=604
 
 class GooglePhotosException(Exception):
   def __init__(self, response):
 
-    self.args = response
-    try:
-      self.element_tree = ElementTree.fromstring(response['body'])
-      self.error_code = int(self.element_tree[0].attrib['errorCode'])
-      self.reason = self.element_tree[0].attrib['reason']
-      self.invalidInput = self.element_tree[0].attrib['invalidInput']
-    except:
-      self.error_code = UNKOWN_ERROR
+    self.error_code = response['status']
+    self.reason = response['reason'].strip()
+    if '<html>' in str(response['body']): #general html message, discard it
+      response['body'] = ""
+    self.body = response['body'].strip()
+    self.message = "(%(status)s) %(body)s -- %(reason)s" % response
 
+    #return explicit error codes
+    error_map = { '(12) Not an image':GPHOTOS_NOT_AN_IMAGE,
+                  'kind: That is not one of the acceptable values':
+                      GPHOTOS_INVALID_KIND,
+                  
+                }
+    for msg, code in error_map.iteritems():
+      if self.body == msg:
+        self.error_code = code
+        break
+    self.args = [self.error_code, self.reason, self.body]
+    #try:
+      #self.element_tree = ElementTree.fromstring(response['body'])
+      #self.error_code = int(self.element_tree[0].attrib['errorCode'])
+      #self.reason = self.element_tree[0].attrib['reason']
+      #self.invalidInput = self.element_tree[0].attrib['invalidInput']
+    #except:
+      #self.error_code = UNKOWN_ERROR
 
 class PhotosService(libpub.gdata.service.GDataService):
   userUri = '/data/feed/api/user/%s'
@@ -136,57 +164,134 @@ class PhotosService(libpub.gdata.service.GDataService):
                                         service='lh2', source=source,
                                         server=server,
                                         additional_headers=additional_headers)
-    
-  def GetAlbumFeed(self, uri='/data/feed/api/user/default?kind=album'):
-    """Get all albums for the given uri, defaults to all albums for the given user.
 
-     The albums are ordered by the values of their `updated' elements,
+  def GetFeed(self, uri, limit=None, start_index=None):
+    """Get a feed.
+
+     The results are ordered by the values of their `updated' elements,
      with the most recently updated entry appearing first in the feed.
     
     Arguments:
-    uri: the uri to the album feed, e.g. `/data/feed/api/user/default?kind=album'
+    uri: the uri to fetch
+    limit (optional): the maximum number of entries to return. Defaults to what
+      the server returns.
      
     Returns:
-    libpub.gdata.photos.AlbumFeed
+    one of gdata.photos.AlbumFeed,
+           gdata.photos.UserFeed,
+           gdata.photos.PhotoFeed,
+           gdata.photos.CommentFeed,
+           gdata.photos.TagFeed,
+      depending on the results of the query.
+    Raises:
+    GooglePhotosException
 
     See:
-    http://code.google.com/apis/picasaweb/libpub.gdata.html#Get_Album_Feed_Manual
+    http://code.google.com/apis/picasaweb/gdata.html#Get_Album_Feed_Manual
     """
-    return libpub.gdata.photos.AlbumFeedFromString(str(self.Get(uri)))
-              
-  def GetPhotoFeed(self, uri):
-    """Get all photos for the given uri.
+    if limit is not None:
+      uri += '&max-results=%s' % limit
+    if start_index is not None:
+      uri += '&start-index=%s' % start_index
+    try:
+      return self.Get(uri, converter=libpub.gdata.photos.AnyFeedFromString)
+    except libpub.gdata.service.RequestError, e:
+      raise GooglePhotosException(e.args[0])
 
-    The photos are ordered by the values of their `updated' elements,
-    with the most recently updated photo appearing first in the feed.
+  def GetEntry(self, uri, limit=None, start_index=None):
+    """Get an Entry.
 
     Arguments:
-    uri: the uri to the photo feed, e.g.
-    `/data/feed/api/user/liz/album/NetherfieldPark?kind=photo'
-    
+    uri: the uri to the entry
+    limit (optional): the maximum number of entries to return. Defaults to what
+      the server returns.
+     
     Returns:
-    libpub.gdata.photos.PhotoFeed
-    
-    See:
-    http://code.google.com/apis/picasaweb/libpub.gdata.html#Get_Photo_Feed_Manual
+    one of gdata.photos.AlbumEntry,
+           gdata.photos.UserEntry,
+           gdata.photos.PhotoEntry,
+           gdata.photos.CommentEntry,
+           gdata.photos.TagEntry,
+      depending on the results of the query.
+    Raises:
+    GooglePhotosException
     """
-    return libpub.gdata.photos.PhotoFeedFromString(str(self.Get(uri)))
+    if limit is not None:
+      uri += '&max-results=%s' % limit
+    if start_index is not None:
+      uri += '&start-index=%s' % start_index
+    try:
+      return self.Get(uri, converter=libpub.gdata.photos.AnyEntryFromString)
+    except libpub.gdata.service.RequestError, e:
+      raise GooglePhotosException(e.args[0])
+      
+  def GetUserFeed(self, kind='album', user='default', limit=None):
+    """Get user-based feed, containing albums, photos, comments or tags;
+      defaults to albums.
 
-  def GetTaggedPhotoFeed(self, tag, user='default'):
-    """Get all photos belonging to a specific user that have a special tag (a.k.a. keyword)
+    The entries are ordered by the values of their `updated' elements,
+    with the most recently updated entry appearing first in the feed.
+    
+    Arguments:
+    kind: the kind of entries to get, either `album', `photo',
+      `comment' or `tag', or a python list of these. Defaults to `album'.
+    user (optional): whose albums we're querying. Defaults to current user.
+    limit (optional): the maximum number of entries to return.
+      Defaults to everything the server returns.
+
+     
+    Returns:
+    gdata.photos.UserFeed, containing appropriate Entry elements
+
+    See:
+    http://code.google.com/apis/picasaweb/gdata.html#Get_Album_Feed_Manual
+    http://googledataapis.blogspot.com/2007/07/picasa-web-albums-adds-new-api-features.html
+    """
+    if isinstance(kind, (list, tuple) ):
+      kind = ",".join(kind)
+    
+    uri = '/data/feed/api/user/%s?kind=%s' % (user, kind)
+    return self.GetFeed(uri, limit=limit)
+  
+  def GetTaggedPhotos(self, tag, user='default', limit=None):
+    """Get all photos belonging to a specific user, tagged by the given keyword
 
     Arguments:
     tag: The tag you're looking for, e.g. `dog'
-    user (optional): Whose images/videos you want to search, defaults to current user
+    user (optional): Whose images/videos you want to search, defaults
+      to current user
+    limit (optional): the maximum number of entries to return.
+      Defaults to everything the server returns.
 
     Returns:
-    libpub.gdata.photos.PhotoFeed
+    gdata.photos.UserFeed containing PhotoEntry elements
     """
-    uri = '/data/feed/api/user/default?kind=photo&tag=%s' % tag
-    return self.GetPhotoFeed(uri)
+    # Lower-casing because of
+    #   http://code.google.com/p/gdata-issues/issues/detail?id=194
+    uri = '/data/feed/api/user/%s?kind=photo&tag=%s' % (user, tag.lower())
+    return self.GetFeed(uri, limit)
 
-  def GetCommunityPhotoFeed(self, query, limit=100):
-    """Search through all public photos.
+  def SearchUserPhotos(self, query, user='default', limit=100):
+    """Search through all photos for a specific user and return a feed.
+    This will look for matches in file names and image tags (a.k.a. keywords)
+
+    Arguments:
+    query: The string you're looking for, e.g. `vacation'
+    user (optional): The username of whose photos you want to search, defaults
+      to current user.
+    limit (optional): Don't return more than `limit' hits, defaults to 100
+
+    Only public photos are searched, unless you are authenticated and
+    searching through your own photos.
+
+    Returns:
+    gdata.photos.UserFeed with PhotoEntry elements
+    """
+    uri = '/data/feed/api/user/%s?kind=photo&q=%s' % (user, query)
+    return self.GetFeed(uri, limit=limit)
+
+  def SearchCommunityPhotos(self, query, limit=100):
+    """Search through all public photos and return a feed.
     This will look for matches in file names and image tags (a.k.a. keywords)
 
     Arguments:
@@ -194,38 +299,45 @@ class PhotosService(libpub.gdata.service.GDataService):
     limit (optional): Don't return more than `limit' hits, defaults to 100
 
     Returns:
-    libpub.gdata.photos.PhotoFeed
+    gdata.GDataFeed with PhotoEntry elements
     """
-    uri='/data/feed/api/all?q=%s&max-results=%s' % (query, limit)
-    return self.GetPhotoFeed(uri)
+    uri='/data/feed/api/all?q=%s' % query
+    return self.GetFeed(uri, limit=limit)
 
-  def GetTagFeed(self, uri='/data/feed/api/user/default/?kind=tag'):
-    """Get a feed of tags for a given uri.
-    Returns a TagFeed for the current user by default.
+  def GetContacts(self, user='default', limit=None):
+    """Retrieve a feed that contains a list of your contacts
 
     Arguments:
-    uri: the uri to the tag feed, e.g. `/data/feed/api/user/liz/?kind=tag'
+    user: Username of the user whose contacts you want
 
-    Returns:
-    libpub.gdata.photos.TagFeed
+    Returns
+    gdata.photos.UserFeed, with UserEntry entries
+
+    See:
+    http://groups.google.com/group/Google-Picasa-Data-API/msg/819b0025b5ff5e38
     """
-    #uri='http://picasaweb.google.com/data/feed/api/user/default/?kind=tag'):
-    #http://picasaweb.google.com/data/feed/projection/user/userID/?kind=kinds
-    return libpub.gdata.photos.TagFeedFromString(str(self.Get(uri)))
+    uri = '/data/feed/api/user/%s/contacts?kind=user' % user
+    return self.GetFeed(uri, limit=limit)
 
-  def GetCommentFeed(self, uri):
-    """Get a feed of comments for a given uri.
-    Returns a CommentFeed for the current user by default.
+  def SearchContactsPhotos(self, user='default', search=None, limit=None):
+    """Search over your contacts' photos and return a feed
 
     Arguments:
-    uri: the uri to the comment feed, e.g. `/data/feed/api/user/liz/?kind=comment'
+    user: Username of the user whose contacts you want
+    search (optional): What to search for (photo title, description and keywords)
 
-    Returns:
-    libpub.gdata.photos.CommentFeed
+    Returns
+    gdata.photos.UserFeed, with PhotoEntry elements
+
+    See:
+    http://groups.google.com/group/Google-Picasa-Data-API/msg/819b0025b5ff5e38
     """
-    return libpub.gdata.photos.CommentFeedFromString(str(self.Get(uri)))
 
-  def InsertAlbum(self, title, summary, location=None, access='public', commenting_enabled='true', timestamp=None):
+    uri = '/data/feed/api/user/%s/contacts?kind=photo&q=%s' % (user, search)
+    return self.GetFeed(uri, limit=limit)
+
+  def InsertAlbum(self, title, summary, location=None, access='public',
+    commenting_enabled='true', timestamp=None):
     """Add an album.
 
     Needs authentication, see self.ClientLogin()
@@ -240,15 +352,14 @@ class PhotosService(libpub.gdata.service.GDataService):
       Unix epoch[1] UTC. Defaults to now.
 
     Returns:
-    The newly created libpub.gdata.photos.AlbumEntry
+    The newly created gdata.photos.AlbumEntry
 
     See:
     http://code.google.com/apis/picasaweb/gdata.html#Add_Album_Manual_Installed
+
     [1]: http://en.wikipedia.org/wiki/Unix_epoch
     """
     album = libpub.gdata.photos.AlbumEntry()
-    album.category.append(libpub.atom.Category(term='http://schemas.google.com/photos/2007#album',
-                                        scheme='http://schemas.google.com/g/2005#kind'))
     album.title = libpub.atom.Title(text=title, title_type='text')
     album.summary = libpub.atom.Summary(text=summary, summary_type='text')
     if location is not None:
@@ -259,19 +370,21 @@ class PhotosService(libpub.gdata.service.GDataService):
     if timestamp is None:
       timestamp = '%i' % int(time.time() * 1000)
     album.timestamp = libpub.gdata.photos.Timestamp(text=timestamp)
-    newAlbum = self.Post(album, self.userUri % self.email)
-    return newAlbum
+    try:
+      return self.Post(album, uri=self.userUri % self.email,
+      converter=libpub.gdata.photos.AlbumEntryFromString)
+    except libpub.gdata.service.RequestError, e:
+      raise GooglePhotosException(e.args[0])
 
-  def InsertPhoto(self, title, summary, album_uri, filename_or_handle,
-      content_type='image/jpeg', keywords=None, client=None):
-    """Add a photo.
+  def InsertPhoto(self, album_or_uri, photo, filename_or_handle,
+    content_type='image/jpeg'):
+    """Add a PhotoEntry
 
     Needs authentication, see self.ClientLogin()
 
     Arguments:
-    title: Photo title
-    summary: Photo summary / description
-    album_uri: Uri of the album where the photo should go
+    album_or_uri: AlbumFeed or uri of the album where the photo should go
+    photo: PhotoEntry to add
     filename_or_handle: A file-like object or file name where the image/video
       will be read from
     content_type (optional): Internet media type (a.k.a. mime type) of
@@ -282,38 +395,98 @@ class PhotosService(libpub.gdata.service.GDataService):
        o image/png
        
       Images will be converted to jpeg on upload. Defaults to `image/jpeg'
-    keywords (optional): a comma separated string of keywords (a.k.a. tags)
-      to add to the image, e.g. `dog, vacation, happy'
-    client (optional): Name of uploading client, if any
+
+    """
+
+    try:
+      assert(isinstance(photo, libpub.gdata.photos.PhotoEntry))
+    except AssertionError:
+      raise GooglePhotosException({'status':GPHOTOS_INVALID_ARGUMENT,
+        'body':'`photo` must be a gdata.photos.PhotoEntry instance',
+        'reason':'Found %s, not PhotoEntry' % type(photo)
+        })
+    try:
+      majtype, mintype = content_type.split('/')
+      assert(mintype in SUPPORTED_UPLOAD_TYPES)
+    except (ValueError, AssertionError):
+      raise GooglePhotosException({'status':GPHOTOS_INVALID_CONTENT_TYPE,
+        'body':'This is not a valid content type: %s' % content_type,
+        'reason':'Accepted content types: %s' % \
+          ['image/'+t for t in SUPPORTED_UPLOAD_TYPES]
+        })
+    if isinstance(filename_or_handle, (str, unicode)) and \
+      os.path.exists(filename_or_handle): # it's a file name
+      mediasource = libpub.gdata.MediaSource()
+      mediasource.setFile(filename_or_handle, content_type)
+    elif hasattr(filename_or_handle, 'read'):# it's a file-like resource
+      if hasattr(filename_or_handle, 'seek'):
+        filename_or_handle.seek(0) # rewind pointer to the start of the file
+      # gdata.MediaSource needs the content length, so read the whole image 
+      file_handle = StringIO.StringIO(filename_or_handle.read()) 
+      name = 'image'
+      if hasattr(filename_or_handle, 'name'):
+        name = filename_or_handle.name
+      mediasource = libpub.gdata.MediaSource(file_handle, content_type,
+        content_length=file_handle.len, file_name=name)
+    else: #filename_or_handle is not valid
+      raise GooglePhotosException({'status':GPHOTOS_INVALID_ARGUMENT,
+        'body':'`filename_or_handle` must be a path name or a file-like object',
+        'reason':'Found %s, not path name or object with a .read() method' % \
+          type(filename_or_handle)
+        })
+    
+    if isinstance(album_or_uri, (str, unicode)): # it's a uri
+      feed_uri = album_or_uri
+    elif hasattr(album_or_uri, 'GetFeedLink'): # it's a AlbumFeed object
+      feed_uri = album_or_uri.GetFeedLink().href
+  
+    try:
+      return self.Post(photo, uri=feed_uri, media_source=mediasource,
+        converter=libpub.gdata.photos.PhotoEntryFromString)
+    except libpub.gdata.service.RequestError, e:
+      raise GooglePhotosException(e.args[0])
+  
+  def InsertPhotoSimple(self, album_or_uri, title, summary, filename_or_handle,
+      content_type='image/jpeg', keywords=None):
+    """Add a photo without constructing a PhotoEntry.
+
+    Needs authentication, see self.ClientLogin()
+
+    Arguments:
+    album_or_uri: AlbumFeed or uri of the album where the photo should go
+    title: Photo title
+    summary: Photo summary / description
+    filename_or_handle: A file-like object or file name where the image/video
+      will be read from
+    content_type (optional): Internet media type (a.k.a. mime type) of
+      media object. Currently Google Photos supports these types:
+       o image/bmp
+       o image/gif
+       o image/jpeg
+       o image/png
+       
+      Images will be converted to jpeg on upload. Defaults to `image/jpeg'
+    keywords (optional): a 1) comma separated string or 2) a python list() of
+      keywords (a.k.a. tags) to add to the image.
+      E.g. 1) `dog, vacation, happy' 2) ['dog', 'happy', 'vacation']
     
     Returns:
-    The newly created gdata.photos.AlbumEntry
+    The newly created gdata.photos.PhotoEntry or GooglePhotosException on errors
 
     See:
     http://code.google.com/apis/picasaweb/gdata.html#Add_Album_Manual_Installed
     [1]: http://en.wikipedia.org/wiki/Unix_epoch
     """
-    ## TODO: Duck type the file object detection
-    if type(filename_or_handle) in types.StringTypes: # it's a file name
-      file_handle = file(filename_or_handle, 'r')
-      size = os.path.getsize(filename_or_handle)
-    else: 
-      file_handle = filename_or_handle # it's a file-like resource 
-      file_handle.seek(0) # rewind pointer to the start of the file
-      size = file_handle.len
-    photo = libpub.gdata.MediaSource(file_handle, content_type, size)
+    
     metadata = libpub.gdata.photos.PhotoEntry()
     metadata.title=libpub.atom.Title(text=title)
     metadata.summary = libpub.atom.Summary(text=summary, summary_type='text')
     if keywords is not None:
-      metadata.keywords = libpub.gdata.photos.media.Keywords(text=keywords)
-    if client is None and self.client is not None:
-      client = self.client
-    metadata.client = libpub.gdata.photos.Client(text=client)
-    metadata.category.append(libpub.atom.Category(scheme='http://schemas.google.com/g/2005#kind', 
-                                    term = 'http://schemas.google.com/photos/2007#photo'))
-    media = self.Post(metadata, album_uri, media_source=photo)
-    return media
+      if isinstance(keywords, list):
+        keywords = ','.join(keywords)
+      metadata.media.keywords = libpub.gdata.photos.media.Keywords(text=keywords)
+    return self.InsertPhoto(album_or_uri, metadata, filename_or_handle,
+      content_type)
 
   def UpdatePhotoMetadata(self, photo):
     """Update a photo's metadata. 
@@ -322,7 +495,7 @@ class PhotosService(libpub.gdata.service.GDataService):
 
      You can update any or all of the following metadata properties:
       * <title>
-      * <description>
+      * <media:description>
       * <gphoto:checksum>
       * <gphoto:client>
       * <gphoto:rotation>
@@ -333,10 +506,10 @@ class PhotosService(libpub.gdata.service.GDataService):
       photo: a gdata.photos.PhotoEntry object with updated elements
 
       Returns:
-      The modified libpub.gdata.photos.PhotoEntry
+      The modified gdata.photos.PhotoEntry
 
       Example:
-      p = GetPhotoFeed(uri)
+      p = GetFeed(uri).entry[0]
       p.title.text = u'My new text'
       p.commentingEnabled.text = 'false'
       p = UpdatePhotoMetadata(p)
@@ -345,16 +518,22 @@ class PhotosService(libpub.gdata.service.GDataService):
       it has been updated. See
       http://code.google.com/apis/gdata/reference.html#Optimistic-concurrency
       """
-    media = self.Put(photo, photo.GetEditLink().href)
-    return media
+    try:
+      return self.Put(data=photo, uri=photo.GetEditLink().href,
+      converter=libpub.gdata.photos.PhotoEntryFromString)
+    except libpub.gdata.service.RequestError, e:
+      raise GooglePhotosException(e.args[0])
+
   
-  def UpdatePhotoBlob(self, photo, filename_or_handle, content_type = 'image/jpeg'):
+  def UpdatePhotoBlob(self, photo_or_uri, filename_or_handle,
+                      content_type = 'image/jpeg'):
     """Update a photo's binary data.
 
     Needs authentication, see self.ClientLogin()
 
     Arguments:
-    photo: a libpub.gdata.photos.PhotoEntry that will be updated
+    photo_or_uri: a gdata.photos.PhotoEntry that will be updated, or a
+      `edit-media' uri pointing to it
     filename_or_handle:  A file-like object or file name where the image/video
       will be read from
     content_type (optional): Internet media type (a.k.a. mime type) of
@@ -366,78 +545,150 @@ class PhotosService(libpub.gdata.service.GDataService):
     Images will be converted to jpeg on upload. Defaults to `image/jpeg'
 
     Returns:
-    The modified libpub.gdata.photos.PhotoEntry
+    The modified gdata.photos.PhotoEntry
 
     Example:
-    p = GetPhotoFeed(uri)
+    p = GetFeed(PhotoUri)
     p = UpdatePhotoBlob(p, '/tmp/newPic.jpg')
 
     It is important that you don't keep the old object around, once
     it has been updated. See
     http://code.google.com/apis/gdata/reference.html#Optimistic-concurrency
     """
-    ## TODO: Duck type this (see InsertPhoto)
-    if type(filename_or_handle) in types.StringTypes: # it's a file name
-      file_handle = file(filename_or_handle, 'r')
-      size = os.path.getsize(filename_or_handle)
-    else: 
-      file_handle = filename_or_handle # it's a file-like resource 
-      file_handle.seek(0) # rewind pointer to the start of the file
-      size = file_handle.len
-    photoblob = libpub.gdata.MediaSource(file_handle, content_type, size)
-    media = self.Put(photoblob, photo.GetEditMediaLink().href)
-    return media
 
-  def InsertTag(self, photo, tag):
+    try:  
+      majtype, mintype = content_type.split('/')
+      assert(mintype in SUPPORTED_UPLOAD_TYPES)
+    except (ValueError, AssertionError):
+      raise GooglePhotosException({'status':GPHOTOS_INVALID_CONTENT_TYPE,
+        'body':'This is not a valid content type: %s' % content_type,
+        'reason':'Accepted content types: %s' % \
+          ['image/'+t for t in SUPPORTED_UPLOAD_TYPES]
+        })
+    
+    if isinstance(filename_or_handle, (str, unicode)) and \
+      os.path.exists(filename_or_handle): # it's a file name
+      photoblob = libpub.gdata.MediaSource()
+      photoblob.setFile(filename_or_handle, content_type)
+    elif hasattr(filename_or_handle, 'read'):# it's a file-like resource
+      if hasattr(filename_or_handle, 'seek'):
+        filename_or_handle.seek(0) # rewind pointer to the start of the file
+      # gdata.MediaSource needs the content length, so read the whole image 
+      file_handle = StringIO.StringIO(filename_or_handle.read()) 
+      name = 'image'
+      if hasattr(filename_or_handle, 'name'):
+        name = filename_or_handle.name
+      mediasource = libpub.gdata.MediaSource(file_handle, content_type,
+        content_length=file_handle.len, file_name=name)
+    else: #filename_or_handle is not valid
+      raise GooglePhotosException({'status':GPHOTOS_INVALID_ARGUMENT,
+        'body':'`filename_or_handle` must be a path name or a file-like object',
+        'reason':'Found %s, not path name or an object with .read() method' % \
+          type(filename_or_handle)
+        })
+    
+    if isinstance(photo_or_uri, (str, unicode)):
+      entry_uri = photo_or_uri # it's a uri
+    elif hasattr(photo_or_uri, 'GetEditMediaLink'):
+      entry_uri = photo_or_uri.GetEditMediaLink().href
+    try:
+      return self.Put(photoblob, entry_uri,
+      converter=libpub.gdata.photos.PhotoEntryFromString)
+    except libpub.gdata.service.RequestError, e:
+      raise GooglePhotosException(e.args[0])
+
+  def InsertTag(self, photo_or_uri, tag):
     """Add a tag (a.k.a. keyword) to a photo.
 
     Needs authentication, see self.ClientLogin()
 
     Arguments:
-    photo: The libpub.gdata.photos.PhotoEntry that is about to be tagged
-    tag: The tag/keyword
+    photo_or_uri: a gdata.photos.PhotoEntry that will be tagged, or a
+      `post' uri pointing to it
+    (string) tag: The tag/keyword
 
     Returns:
-    The new libpub.gdata.photos.TagEntry
+    The new gdata.photos.TagEntry
 
     Example:
-    p = GetPhotoFeed(uri)
+    p = GetFeed(PhotoUri)
     tag = InsertTag(p, 'Beautiful sunsets')
 
     """
     tag = libpub.gdata.photos.TagEntry(title=libpub.atom.Title(text=tag))
-    res = self.Post(tag, photo.GetFeedLink().href)
-    return res
+    if isinstance(photo_or_uri, (str, unicode)):
+      post_uri = photo_or_uri # it's a uri
+    elif hasattr(photo_or_uri, 'GetEditMediaLink'):
+      post_uri = photo_or_uri.GetPostLink().href
+    try:
+      return self.Post(data=tag, uri=post_uri,
+      converter=libpub.gdata.photos.TagEntryFromString)
+    except libpub.gdata.service.RequestError, e:
+      raise GooglePhotosException(e.args[0])
+
                   
-  def InsertComment(self, photo, comment):
+  def InsertComment(self, photo_or_uri, comment):
     """Add a comment to a photo.
 
     Needs authentication, see self.ClientLogin()
 
     Arguments:
-    photo: The libpub.gdata.photos.PhotoEntry that is about to be commented
-    comment: The actual comment
+    photo_or_uri: a gdata.photos.PhotoEntry that is about to be commented
+      , or a `post' uri pointing to it
+    (string) comment: The actual comment
 
     Returns:
-    The new libpub.gdata.photos.CommentEntry
+    The new gdata.photos.CommentEntry
 
     Example:
-    p = GetPhotoFeed(uri)
-    tag = InsertComment(p, 'OOOH! I would have loved to be there. Who's that in the back?')
+    p = GetFeed(PhotoUri)
+    tag = InsertComment(p, 'OOOH! I would have loved to be there.
+      Who's that in the back?')
 
     """
     comment = libpub.gdata.photos.CommentEntry(content=libpub.atom.Content(text=comment))
-    res = self.Post(comment, photo.GetPostLink().href)
-    return res
+    if isinstance(photo_or_uri, (str, unicode)):
+      post_uri = photo_or_uri # it's a uri
+    elif hasattr(photo_or_uri, 'GetEditMediaLink'):
+      post_uri = photo_or_uri.GetPostLink().href
+    try:
+      return self.Post(data=comment, uri=post_uri,
+        converter=libpub.gdata.photos.CommentEntryFromString)
+    except libpub.gdata.service.RequestError, e:
+      raise GooglePhotosException(e.args[0])
+
+  def Delete(self, object_or_uri, *args, **kwargs):
+    """Delete an object.
+
+    Re-implementing the GDataService.Delete method, to add some
+    convenience.
+
+    Arguments:
+    object_or_uri: Any object that has a GetEditLink() method that
+      returns a link, or a uri to that object.
+
+    Returns:
+    ? or GooglePhotosException on errors
+    """
+    try:
+      uri = object_or_uri.GetEditLink().href
+    except AttributeError:
+      uri = object_or_uri
+    try:
+      return libpub.gdata.service.GDataService.Delete(self, uri, *args, **kwargs)
+    except libpub.gdata.service.RequestError, e:
+      raise GooglePhotosException(e.args[0])
 
 def GetSmallestThumbnail(media_thumbnail_list):
   """Helper function to get the smallest thumbnail of a list of
-    libpub.gdata.photos.media.Thumbnail.
-  Returns libpub.gdata.photos.media.Thumbnail """
+    gdata.photos.media.Thumbnail.
+  Returns gdata.photos.media.Thumbnail """
   r = {}
   for thumb in media_thumbnail_list:
       r[int(thumb.width)*int(thumb.height)] = thumb
-  return r[r.keys()[0]]
+  keys = r.keys()
+  keys.sort()
+  return r[keys[0]]
 
 def ConvertAtomTimestampToEpoch(timestamp):
   """Helper function to convert a timestamp string, for instance
@@ -445,4 +696,5 @@ def ConvertAtomTimestampToEpoch(timestamp):
     (a.k.a. POSIX time).
 
     `2007-07-22T00:45:10.000Z' -> """
-  return time.mktime(time.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.000Z')) ## TODO: Timezone aware
+  return time.mktime(time.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.000Z'))
+  ## TODO: Timezone aware

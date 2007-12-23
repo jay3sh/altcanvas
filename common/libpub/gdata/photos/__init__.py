@@ -3,7 +3,7 @@
 # This is the base file for the PicasaWeb python client.
 # It is used for lower level operations.
 #
-# $Id: __init__.py 104 2007-10-18 19:23:59Z havard.gulldahl $
+# $Id: __init__.py 148 2007-10-28 15:09:19Z havard.gulldahl $
 #
 # Copyright 2007 Håvard Gulldahl 
 # Portions (C) 2006 Google Inc.
@@ -33,9 +33,11 @@ documentation or live help() system for available methods.
 
   """
 
-__author__ = u'havard@gulldahl.no'# (Håvard Gulldahl)' #BUG: api chokes on non-ascii chars in __author__
+__author__ = u'havard@gulldahl.no'# (Håvard Gulldahl)' #BUG: pydoc chokes on non-ascii chars in __author__
 __license__ = 'Apache License v2'
+__version__ = '$Revision: 164 $'[11:-2]
 
+import re
 
 try:
   from xml.etree import cElementTree as ElementTree
@@ -47,13 +49,12 @@ except ImportError:
 import libpub.atom as atom
 import libpub.gdata as gdata
 
-import media,exif, geo # importing google photo submodules
+# importing google photo submodules
+import libpub.gdata.media as Media, libpub.gdata.exif as Exif, libpub.gdata.geo as Geo
 
 # XML namespaces which are often used in Google Photo elements
 PHOTOS_NAMESPACE = 'http://schemas.google.com/photos/2007'
-PHOTOS_TEMPLATE = '{http://schemas.google.com/photos/2007}%s'
 MEDIA_NAMESPACE = 'http://search.yahoo.com/mrss/'
-MEDIA_TEMPLATE = '{http://search.yahoo.com/mrss/}%s'
 EXIF_NAMESPACE = 'http://schemas.google.com/photos/exif/2007'
 OPENSEARCH_NAMESPACE = 'http://a9.com/-/spec/opensearchrss/1.0/'
 GEO_NAMESPACE = 'http://www.w3.org/2003/01/geo/wgs84_pos#'
@@ -88,11 +89,14 @@ class PhotosBaseElement(atom.AtomBase):
   def bool(self):
     return self.text == 'true'
 
-class PhotosBaseFeed(gdata.GDataFeed, gdata.LinkFinder):
+class GPhotosBaseFeed(gdata.GDataFeed, gdata.LinkFinder):
+  "Base class for all Feeds in gdata.photos"
   _tag = 'feed'
   _namespace = atom.ATOM_NAMESPACE
-  _children = gdata.GDataFeed._children.copy()
   _attributes = gdata.GDataFeed._attributes.copy()
+  _children = gdata.GDataFeed._children.copy()
+  # We deal with Entry elements ourselves
+  _children.pop('{%s}entry' % atom.ATOM_NAMESPACE) 
     
   def __init__(self, author=None, category=None, contributor=None,
                generator=None, icon=None, atom_id=None, link=None, logo=None,
@@ -112,9 +116,97 @@ class PhotosBaseFeed(gdata.GDataFeed, gdata.LinkFinder):
                              extension_attributes=extension_attributes,
                              text=text)
 
+  def kind(self):
+    "(string) Returns the kind"
+    try:
+      return self.category[0].term.split('#')[1]
+    except IndexError:
+      return None
+  
+  def _feedUri(self, kind):
+    "Convenience method to return a uri to a feed of a special kind"
+    assert(kind in ('album', 'tag', 'photo', 'comment', 'user'))
+    here_href = self.GetSelfLink().href
+    if 'kind=%s' % kind in here_href:
+      return here_href
+    if not 'kind=' in here_href:
+      sep = '?'
+      if '?' in here_href: sep = '&'
+      return here_href + "%skind=%s" % (sep, kind)
+    rx = re.match('.*(kind=)(album|tag|photo|comment)', here_href)
+    return here_href[:rx.end(1)] + kind + here_href[rx.end(2):]
+  
+  def _ConvertElementTreeToMember(self, child_tree):
+    """Re-implementing the method from AtomBase, since we deal with
+      Entry elements specially"""
+    category = child_tree.find('{%s}category' % atom.ATOM_NAMESPACE)
+    if category is None:
+      return atom.AtomBase._ConvertElementTreeToMember(self, child_tree)
+    namespace, kind = category.get('term').split('#')
+    if namespace != PHOTOS_NAMESPACE:
+      return atom.AtomBase._ConvertElementTreeToMember(self, child_tree)
+    ## TODO: is it safe to use getattr on gdata.photos?
+    entry_class = getattr(gdata.photos, '%sEntry' % kind.title())
+    if not hasattr(self, 'entry') or self.entry is None:
+      self.entry = []
+    self.entry.append(atom._CreateClassFromElementTree(
+        entry_class, child_tree))
+
+class GPhotosBaseEntry(gdata.GDataEntry, gdata.LinkFinder):
+  "Base class for all Entry elements in gdata.photos"
+  _tag = 'entry'
+  _kind = ''
+  _namespace = atom.ATOM_NAMESPACE
+  _children = gdata.GDataEntry._children.copy()
+  _attributes = gdata.GDataEntry._attributes.copy()
+    
+  def __init__(self, author=None, category=None, content=None,
+      atom_id=None, link=None, published=None,
+      title=None, updated=None,
+      extended_property=None,
+      extension_elements=None, extension_attributes=None, text=None):
+    gdata.GDataEntry.__init__(self, author=author, category=category,
+                        content=content, atom_id=atom_id, link=link,
+                        published=published, title=title,
+                        updated=updated, text=text,
+                        extension_elements=extension_elements,
+                        extension_attributes=extension_attributes)
+    self.category.append(
+      atom.Category(scheme='http://schemas.google.com/g/2005#kind', 
+              term = 'http://schemas.google.com/photos/2007#%s' % self._kind))
+
+  def kind(self):
+    "(string) Returns the kind"
+    try:
+      return self.category[0].term.split('#')[1]
+    except IndexError:
+      return None
+  
+  def _feedUri(self, kind):
+    "Convenience method to get the uri to this entry's feed of the some kind"
+    try:
+      href = self.GetFeedLink().href
+    except AttributeError:
+      return None
+    sep = '?'
+    if '?' in href: sep = '&'
+    return '%s%skind=%s' % (href, sep, kind)
+
+
+class PhotosBaseEntry(GPhotosBaseEntry):
+  pass
+
+class PhotosBaseFeed(GPhotosBaseFeed):
+  pass
+
+class GPhotosBaseData(object):
+  pass
 
 class Access(PhotosBaseElement):
-  "The Google Photo `Access' element"
+  """The Google Photo `Access' element.
+
+  The album's access level. Valid values are `public' or `private'.
+  In documentation, access level is also referred to as `visibility.'"""
   
   _tag = 'access'
 def AccessFromString(xml_string):
@@ -261,16 +353,48 @@ def SizeFromString(xml_string):
   return atom.CreateClassFromXMLString(Size, xml_string)
 
 class Thumbnail(PhotosBaseElement):
-  "The Google Photo `Thumbnail' element (Not to be confused with the <media:thumbnail> element."
+  """The Google Photo `Thumbnail' element
+
+  Used to display user's photo thumbnail (hackergotchi).
+  
+  (Not to be confused with the <media:thumbnail> element, which gives you
+  small versions of the photo object.)"""
   
   _tag = 'thumbnail'
 def ThumbnailFromString(xml_string):
   return atom.CreateClassFromXMLString(Thumbnail, xml_string)
 
 class Timestamp(PhotosBaseElement):
-  "The Google Photo `Timestamp' element"
+  """The Google Photo `Timestamp' element
+  Represented as the number of milliseconds since January 1st, 1970.
+  
+  
+  Take a look at the convenience methods .isoformat() and .datetime():
+
+  photo_epoch     = Time.text        # 1180294337000
+  photo_isostring = Time.isoformat() # '2007-05-27T19:32:17.000Z'
+
+  Alternatively: 
+  photo_datetime  = Time.datetime()  # (requires python >= 2.3)
+  """
   
   _tag = 'timestamp'
+  def isoformat(self):
+    """(string) Return the timestamp as a ISO 8601 formatted string,
+    e.g. '2007-05-27T19:32:17.000Z'
+    """
+    import time
+    epoch = float(self.text)/1000
+    return time.strftime('%Y-%m-%dT%H:%M:%S.000Z', time.gmtime(epoch))
+  
+  def datetime(self):
+    """(datetime.datetime) Return the timestamp as a datetime.datetime object
+
+    Requires python 2.3
+    """
+    import datetime
+    epoch = float(self.text)/1000
+    return datetime.datetime.fromtimestamp(epoch)
 def TimestampFromString(xml_string):
   return atom.CreateClassFromXMLString(Timestamp, xml_string)
 
@@ -296,14 +420,65 @@ def WidthFromString(xml_string):
   return atom.CreateClassFromXMLString(Width, xml_string)
 
 class Weight(PhotosBaseElement):
-  "The Google Photo `Weight' element"
-  
+  """The Google Photo `Weight' element.
+
+  The weight of the tag is the number of times the tag
+  appears in the collection of tags currently being viewed.
+  The default weight is 1, in which case this tags is omitted."""
   _tag = 'weight'
 def WeightFromString(xml_string):
   return atom.CreateClassFromXMLString(Weight, xml_string)
 
-class AlbumEntry(gdata.GDataEntry):
-  """A Google Photo Album meta Entry flavor of an Atom Entry
+class CommentAuthor(atom.Author):
+  """The Atom `Author' element in CommentEntry entries is augmented to
+  contain elements from the PHOTOS_NAMESPACE
+
+  http://groups.google.com/group/Google-Picasa-Data-API/msg/819b0025b5ff5e38
+  """
+  _children = atom.Author._children.copy()
+  _children['{%s}user' % PHOTOS_NAMESPACE] = ('user', User)
+  _children['{%s}nickname' % PHOTOS_NAMESPACE] = ('nickname', Nickname)
+  _children['{%s}thumbnail' % PHOTOS_NAMESPACE] = ('thumbnail', Thumbnail)
+def CommentAuthorFromString(xml_string):
+  return atom.CreateClassFromXMLString(CommentAuthor, xml_string)
+
+########################## ################################
+
+class AlbumData(object):
+  _children = {}
+  _children['{%s}id' % PHOTOS_NAMESPACE] = ('gphoto_id', Id) 
+  _children['{%s}name' % PHOTOS_NAMESPACE] = ('name', Name)
+  _children['{%s}location' % PHOTOS_NAMESPACE] = ('location', Location)
+  _children['{%s}access' % PHOTOS_NAMESPACE] = ('access', Access)
+  _children['{%s}bytesUsed' % PHOTOS_NAMESPACE] = ('bytesUsed', BytesUsed)
+  _children['{%s}timestamp' % PHOTOS_NAMESPACE] = ('timestamp', Timestamp)
+  _children['{%s}numphotos' % PHOTOS_NAMESPACE] = ('numphotos', Numphotos)
+  _children['{%s}numphotosremaining' % PHOTOS_NAMESPACE] = \
+    ('numphotosremaining', Numphotosremaining)
+  _children['{%s}user' % PHOTOS_NAMESPACE] = ('user', User)
+  _children['{%s}nickname' % PHOTOS_NAMESPACE] = ('nickname', Nickname)
+  _children['{%s}commentingEnabled' % PHOTOS_NAMESPACE] = \
+    ('commentingEnabled', CommentingEnabled)
+  _children['{%s}commentCount' % PHOTOS_NAMESPACE] = \
+    ('commentCount', CommentCount)
+  ## NOTE: storing media:group as self.media, to create a self-explaining api
+  gphoto_id = None
+  name = None
+  location = None
+  access = None
+  bytesUsed = None
+  timestamp = None
+  numphotos = None
+  numphotosremaining = None
+  user = None
+  nickname = None
+  commentingEnabled = None
+  commentCount = None
+
+class AlbumEntry(GPhotosBaseEntry, AlbumData):
+  """All metadata for a Google Photos Album
+
+  Take a look at AlbumData for metadata accessible as attributes to this object.
 
   Notes:
     To avoid name clashes, and to create a more sensible api, some
@@ -314,26 +489,15 @@ class AlbumEntry(gdata.GDataEntry):
     o photo:id -> self.gphoto_id
   """
   
-  _tag = 'entry'
-  _namespace = atom.ATOM_NAMESPACE
-  _children = gdata.GDataEntry._children.copy()
-  _attributes = gdata.GDataEntry._attributes.copy()
-  ## NOTE: storing photo:id as self.gphoto_id, to avoid name clash with atom:id
-  _children['{%s}id' % PHOTOS_NAMESPACE] = ('gphoto_id', Id) 
-  _children['{%s}name' % PHOTOS_NAMESPACE] = ('name', Name)
-  _children['{%s}location' % PHOTOS_NAMESPACE] = ('location', Location)
-  _children['{%s}access' % PHOTOS_NAMESPACE] = ('access', Access)
-  _children['{%s}timestamp' % PHOTOS_NAMESPACE] = ('timestamp', Timestamp)
-  _children['{%s}numphotos' % PHOTOS_NAMESPACE] = ('numphotos', Numphotos)
-  _children['{%s}user' % PHOTOS_NAMESPACE] = ('user', User)
-  _children['{%s}nickname' % PHOTOS_NAMESPACE] = ('nickname', Nickname)
-  _children['{%s}commentingEnabled' % PHOTOS_NAMESPACE] = ('commentingEnabled', CommentingEnabled)
-  _children['{%s}commentCount' % PHOTOS_NAMESPACE] = ('commentCount', CommentCount)
-  _children['{%s}thumbnail' % MEDIA_NAMESPACE] = ('thumbnail', Thumbnail) 
-  ## NOTE: storing media:group as self.media, to create a self-explaining api
-  _children['{%s}group' % MEDIA_NAMESPACE] = ('media', media.Group)
-  ## NOTE: storing geo:where as self.geo, to create a self-explaining api
-  _children['{%s}where' % GEORSS_NAMESPACE] = ('geo', geo.Where) 
+  _kind = 'album'
+  _children = GPhotosBaseEntry._children.copy()
+  _children.update(AlbumData._children.copy())
+  # child tags only for Album entries, not feeds
+  _children['{%s}where' % GEORSS_NAMESPACE] = ('geo', Geo.Where)
+  _children['{%s}group' % MEDIA_NAMESPACE] = ('media', Media.Group)
+  media = Media.Group()
+  geo = Geo.Where()
+  
   def __init__(self, author=None, category=None, content=None,
       atom_id=None, link=None, published=None,
       title=None, updated=None,
@@ -342,15 +506,17 @@ class AlbumEntry(gdata.GDataEntry):
       timestamp=None, numphotos=None, user=None, nickname=None,
       commentingEnabled=None, commentCount=None, thumbnail=None,
       # MEDIA NAMESPACE:
-      mediagroup=None, 
+      media=None,
       # GEORSS NAMESPACE:
       geo=None,
       extended_property=None,
       extension_elements=None, extension_attributes=None, text=None):
-    gdata.GDataEntry.__init__(self, author=author, category=category,
+    GPhotosBaseEntry.__init__(self, author=author, category=category,
                         content=content, atom_id=atom_id, link=link,
                         published=published, title=title,
-                        updated=updated, text=text)
+                        updated=updated, text=text,
+                        extension_elements=extension_elements,
+                        extension_attributes=extension_attributes)
 
     ## NOTE: storing photo:id as self.gphoto_id, to avoid name clash with atom:id
     self.gphoto_id = gphoto_id 
@@ -366,64 +532,68 @@ class AlbumEntry(gdata.GDataEntry):
     self.thumbnail = thumbnail
     self.extended_property = extended_property or []
     self.text = text
-    self.extension_elements = extension_elements or []
-    self.extension_attributes = extension_attributes or {}
     ## NOTE: storing media:group as self.media, and geo:where as geo,
     ## to create a self-explaining api
-    self.media = mediagroup 
-    self.geo = geo
+    self.media = media or Media.Group()
+    self.geo = geo or Geo.Where()
 
   def GetAlbumId(self):
     "Return the id of this album"
     
     return self.GetFeedLink().href.split('/')[-1]
           
-  def GetPhotoFeedLink(self):
-    "Return the uri to this album's PhotoFeed"
-    
-    href = self.GetFeedLink().href
-    sep = '?'
-    if '?' in href: sep = '&'
-    return '%s%skind=photo' % (href, sep)
-         
-  def GetTagFeedLink(self):
-    "Return the uri to this album's TagFeed"
-    
-    href = self.GetFeedLink().href
-    sep = '?'
-    if '?' in href: sep = '&'
-    return '%s%skind=tag' % (href, sep)
+  def GetPhotosUri(self):
+    "(string) Return the uri to this albums feed of the PhotoEntry kind"
+    return self._feedUri('photo')
   
+  def GetCommentsUri(self):
+    "(string) Return the uri to this albums feed of the CommentEntry kind"
+    return self._feedUri('comment')
+  
+  def GetTagsUri(self):
+    "(string) Return the uri to this albums feed of the TagEntry kind"
+    return self._feedUri('tag')
+
 def AlbumEntryFromString(xml_string):
   return atom.CreateClassFromXMLString(AlbumEntry, xml_string)
   
-class AlbumFeed(PhotosBaseFeed):
-  """A Google Photo Album meta feed flavor of an Atom Feed"""
+class AlbumFeed(GPhotosBaseFeed, AlbumData):
+  """All metadata for a Google Photos Album, including its sub-elements
   
-  _children = gdata.GDataEntry._children.copy()
-  _children['{%s}entry' % atom.ATOM_NAMESPACE] = ('entry', [AlbumEntry])
+  This feed represents an album as the container for other objects.
 
+  A Album feed contains entries of
+  PhotoEntry, CommentEntry or TagEntry,
+  depending on the `kind' parameter in the original query.
+
+  Take a look at AlbumData for accessible attributes.
+  
+  """
+  
+  _children = GPhotosBaseFeed._children.copy()
+  _children.update(AlbumData._children.copy())
+
+  def GetPhotosUri(self):
+    "(string) Return the uri to the same feed, but of the PhotoEntry kind"
+    
+    return self._feedUri('photo')
+         
+  def GetTagsUri(self):
+    "(string) Return the uri to the same feed, but of the TagEntry kind"
+
+    return self._feedUri('tag')
+    
+  def GetCommentsUri(self):
+    "(string) Return the uri to the same feed, but of the CommentEntry kind"
+
+    return self._feedUri('comment')
+  
 def AlbumFeedFromString(xml_string):
   return atom.CreateClassFromXMLString(AlbumFeed, xml_string)
 
 
-class PhotoEntry(gdata.GDataEntry, gdata.LinkFinder):
-  """A Google Photo meta Entry flavor of an Atom Entry
-
-  Notes:
-    To avoid name clashes, and to create a more sensible api, some
-    objects have names that differ from the original elements:
-  
-    o media:group -> self.media,
-    o exif:tags -> self.exif,
-    o geo:where -> self.geo,
-    o photo:id -> self.gphoto_id
-  """
-  
-  _tag = 'entry'
-  _namespace = atom.ATOM_NAMESPACE
-  _children = gdata.GDataEntry._children.copy()
-  _attributes = gdata.GDataEntry._attributes.copy()
+class PhotoData(object):
+  _children = {}
   ## NOTE: storing photo:id as self.gphoto_id, to avoid name clash with atom:id
   _children['{%s}id' % PHOTOS_NAMESPACE] = ('gphoto_id', Id) 
   _children['{%s}albumid' % PHOTOS_NAMESPACE] = ('albumid', Albumid)
@@ -436,32 +606,72 @@ class PhotoEntry(gdata.GDataEntry, gdata.LinkFinder):
   _children['{%s}timestamp' % PHOTOS_NAMESPACE] = ('timestamp', Timestamp)
   _children['{%s}version' % PHOTOS_NAMESPACE] = ('version', Version)
   _children['{%s}width' % PHOTOS_NAMESPACE] = ('width', Width)
-  _children['{%s}commentingEnabled' % PHOTOS_NAMESPACE] = ('commentingEnabled', CommentingEnabled)
-  _children['{%s}commentCount' % PHOTOS_NAMESPACE] = ('commentCount', CommentCount)
+  _children['{%s}commentingEnabled' % PHOTOS_NAMESPACE] = \
+    ('commentingEnabled', CommentingEnabled)
+  _children['{%s}commentCount' % PHOTOS_NAMESPACE] = \
+    ('commentCount', CommentCount)
   ## NOTE: storing media:group as self.media, exif:tags as self.exif, and
   ## geo:where as self.geo, to create a self-explaining api
-  _children['{%s}group' % MEDIA_NAMESPACE] = ('media', media.Group) 
-  _children['{%s}tags' % EXIF_NAMESPACE] = ('exif', exif.Tags) 
-  _children['{%s}where' % GEORSS_NAMESPACE] = ('geo', geo.Where)
-        
+  _children['{%s}tags' % EXIF_NAMESPACE] = ('exif', Exif.Tags)
+  _children['{%s}where' % GEORSS_NAMESPACE] = ('geo', Geo.Where)
+  _children['{%s}group' % MEDIA_NAMESPACE] = ('media', Media.Group)
+  gphoto_id = None
+  albumid = None
+  checksum = None
+  client = None
+  height = None
+  position = None
+  rotation = None
+  size = None
+  timestamp = None
+  version = None
+  width = None
+  commentingEnabled = None
+  commentCount = None
+  media = Media.Group()
+  geo = Geo.Where()
+  tags = Exif.Tags()
+
+class PhotoEntry(GPhotosBaseEntry, PhotoData):
+  """All metadata for a Google Photos Photo
+
+  Take a look at PhotoData for metadata accessible as attributes to this object.
+
+  Notes:
+    To avoid name clashes, and to create a more sensible api, some
+    objects have names that differ from the original elements:
+  
+    o media:group -> self.media,
+    o exif:tags -> self.exif,
+    o geo:where -> self.geo,
+    o photo:id -> self.gphoto_id
+  """
+
+  _kind = 'photo'
+  _children = GPhotosBaseEntry._children.copy()
+  _children.update(PhotoData._children.copy())
+  
   def __init__(self, author=None, category=None, content=None,
-      atom_id=None, link=None, published=None, summary=None,
+      atom_id=None, link=None, published=None, 
       title=None, updated=None, text=None,
       # GPHOTO NAMESPACE:
-      gphoto_id=None, albumid=None, checksum=None, client=None, height=None, position=None,
-      rotation=None, size=None, timestamp=None, version=None, width=None,
-      commentCount=None, commentingEnabled=None,
+      gphoto_id=None, albumid=None, checksum=None, client=None, height=None,
+      position=None, rotation=None, size=None, timestamp=None, version=None,
+      width=None, commentCount=None, commentingEnabled=None,
       # MEDIARSS NAMESPACE:
-      mediagroup=None, 
+      media=None,
       # EXIF_NAMESPACE:
       exif=None,
       # GEORSS NAMESPACE:
       geo=None,
       extension_elements=None, extension_attributes=None):
-    gdata.GDataEntry.__init__(self, author=author, category=category,
-                        content=content, atom_id=atom_id, link=link,
-                        published=published, title=title, summary=summary,
-                        updated=updated, text=text)
+    GPhotosBaseEntry.__init__(self, author=author, category=category,
+                              content=content,
+                              atom_id=atom_id, link=link, published=published,
+                              title=title, updated=updated, text=text,
+                              extension_elements=extension_elements,
+                              extension_attributes=extension_attributes)
+                              
 
     ## NOTE: storing photo:id as self.gphoto_id, to avoid name clash with atom:id
     self.gphoto_id = gphoto_id
@@ -478,51 +688,75 @@ class PhotoEntry(gdata.GDataEntry, gdata.LinkFinder):
     self.commentingEnabled = commentingEnabled
     self.commentCount = commentCount
     ## NOTE: storing media:group as self.media, to create a self-explaining api
-    self.media = mediagroup 
-    self.exif = exif
-    self.geo = geo
+    self.media = media or Media.Group()
+    self.exif = exif or Exif.Tags()
+    self.geo = geo or Geo.Where()
 
   def GetPostLink(self):
     "Return the uri to this photo's `POST' link (use it for updates of the object)"
 
     return self.GetFeedLink()
 
-  def GetCommentFeedLink(self):
-    "Return the uri to this photo's CommentFeed"
-    
-    href = self.GetFeedLink().href
-    sep = '?'
-    if '?' in href: sep = '&'
-    return '%s%skind=comment' % (href, sep)
+  def GetCommentsUri(self):
+    "Return the uri to this photo's feed of CommentEntry comments"
+    return self._feedUri('comment')    
 
-  def GetTagFeedLink(self):
-    "Return the uri to this photo's TagFeed"
-    
-    href = self.GetFeedLink().href
-    sep = '?'
-    if '?' in href: sep = '&'
-    return '%s%skind=tag' % (href, sep)
+  def GetTagsUri(self):
+    "Return the uri to this photo's feed of TagEntry tags"
+    return self._feedUri('tag')    
+
+  def GetAlbumUri(self):
+    """Return the uri to the AlbumEntry containing this photo"""
+
+    href = self.GetSelfLink().href
+    return href[:href.find('/photoid')]
 
 def PhotoEntryFromString(xml_string):
   return atom.CreateClassFromXMLString(PhotoEntry, xml_string)
 
-class PhotoFeed(PhotosBaseFeed):
-  """A Google Photo meta feed flavor of an Atom Feed"""
+class PhotoFeed(GPhotosBaseFeed, PhotoData):
+  """All metadata for a Google Photos Photo, including its sub-elements
   
-  _children = gdata.GDataEntry._children.copy()
-  _children['{%s}entry' % atom.ATOM_NAMESPACE] = ('entry', [PhotoEntry])
+  This feed represents a photo as the container for other objects.
+
+  A Photo feed contains entries of
+  CommentEntry or TagEntry,
+  depending on the `kind' parameter in the original query.
+
+  Take a look at PhotoData for metadata accessible as attributes to this object.
+  
+  """
+  _children = GPhotosBaseFeed._children.copy()
+  _children.update(PhotoData._children.copy())
+
+  def GetTagsUri(self):
+    "(string) Return the uri to the same feed, but of the TagEntry kind"
+    
+    return self._feedUri('tag')
+  
+  def GetCommentsUri(self):
+    "(string) Return the uri to the same feed, but of the CommentEntry kind"
+    
+    return self._feedUri('comment')
 
 def PhotoFeedFromString(xml_string):
   return atom.CreateClassFromXMLString(PhotoFeed, xml_string)
 
-class TagEntry(gdata.GDataEntry, gdata.LinkFinder):
-  """A Google Photo meta Entry flavor of an Atom Entry """
-  
-  _tag = 'entry'
-  _namespace = atom.ATOM_NAMESPACE
-  _children = gdata.GDataEntry._children.copy()
-  _attributes = gdata.GDataEntry._attributes.copy()
+class TagData(GPhotosBaseData):
+  _children = {}
   _children['{%s}weight' % PHOTOS_NAMESPACE] = ('weight', Weight)
+  weight=None
+
+class TagEntry(GPhotosBaseEntry, TagData):
+  """All metadata for a Google Photos Tag
+
+  The actual tag is stored in the .title.text attribute
+
+  """
+
+  _kind = 'tag'
+  _children = GPhotosBaseEntry._children.copy()
+  _children.update(TagData._children.copy())
 
   def __init__(self, author=None, category=None, content=None,
                atom_id=None, link=None, published=None,
@@ -531,60 +765,281 @@ class TagEntry(gdata.GDataEntry, gdata.LinkFinder):
                weight=None,
                extended_property=None,
                extension_elements=None, extension_attributes=None, text=None):
-    gdata.GDataEntry.__init__(self, author=author, category=category,
+    GPhotosBaseEntry.__init__(self, author=author, category=category,
                               content=content,
                               atom_id=atom_id, link=link, published=published,
-                              title=title, updated=updated)
+                              title=title, updated=updated, text=text,
+                              extension_elements=extension_elements,
+                              extension_attributes=extension_attributes)
     
     self.weight = weight
-    self.category.append(atom.Category(scheme='http://schemas.google.com/g/2005#kind', 
-                                        term = 'http://schemas.google.com/photos/2007#tag'))
+
+  def GetAlbumUri(self):
+    """Return the uri to the AlbumEntry containing this tag"""
+
+    href = self.GetSelfLink().href
+    pos = href.find('/photoid')
+    if pos == -1:
+      return None
+    return href[:pos]
+
+  def GetPhotoUri(self):
+    """Return the uri to the PhotoEntry containing this tag"""
+
+    href = self.GetSelfLink().href
+    pos = href.find('/tag')
+    if pos == -1:
+      return None
+    return href[:pos]
 
 def TagEntryFromString(xml_string):
   return atom.CreateClassFromXMLString(TagEntry, xml_string)
 
 
-class TagFeed(PhotosBaseFeed):
-  """A Google Photo tag feed flavor of an Atom Feed"""
+class TagFeed(GPhotosBaseFeed, TagData):
+  """All metadata for a Google Photos Tag, including its sub-elements"""
   
-  _children = gdata.GDataEntry._children.copy()
-  _children['{%s}entry' % atom.ATOM_NAMESPACE] = ('entry', [TagEntry])
-
+  _children = GPhotosBaseFeed._children.copy()
+  _children.update(TagData._children.copy())
+  
 def TagFeedFromString(xml_string):
   return atom.CreateClassFromXMLString(TagFeed, xml_string)
 
-class CommentEntry(gdata.GDataEntry, gdata.LinkFinder):
-  """A Google Photo comment Entry flavor of an Atom Entry """
+class CommentData(GPhotosBaseData):
+  _children = {}
+  ## NOTE: storing photo:id as self.gphoto_id, to avoid name clash with atom:id
+  _children['{%s}id' % PHOTOS_NAMESPACE] = ('gphoto_id', Id)
+  _children['{%s}albumid' % PHOTOS_NAMESPACE] = ('albumid', Albumid)
+  _children['{%s}photoid' % PHOTOS_NAMESPACE] = ('photoid', Photoid)
+  _children['{%s}author' % atom.ATOM_NAMESPACE] = ('author', [CommentAuthor,])
+  gphoto_id=None
+  albumid=None
+  photoid=None
+  author=None
+
+class CommentEntry(GPhotosBaseEntry, CommentData):
+  """All metadata for a Google Photos Comment
+   
+  The comment is stored in the .content.text attribute,
+  with a content type in .content.type.
+
+
+  """
+  
+  _kind = 'comment'
+  _children = GPhotosBaseEntry._children.copy()
+  _children.update(CommentData._children.copy())
+  def __init__(self, author=None, category=None, content=None,
+               atom_id=None, link=None, published=None,
+               title=None, updated=None,
+               # GPHOTO NAMESPACE:
+               gphoto_id=None, albumid=None, photoid=None,
+               extended_property=None,
+               extension_elements=None, extension_attributes=None, text=None):
+    
+    GPhotosBaseEntry.__init__(self, author=author, category=category,
+                              content=content,
+                              atom_id=atom_id, link=link, published=published,
+                              title=title, updated=updated,
+                              extension_elements=extension_elements,
+                              extension_attributes=extension_attributes,
+                              text=text)
+    
+    self.gphoto_id = gphoto_id
+    self.albumid = albumid
+    self.photoid = photoid
+
+  def GetCommentId(self):
+    """Return the globally unique id of this comment"""
+    return self.GetSelfLink().href.split('/')[-1]
+
+  def GetAlbumUri(self):
+    """Return the uri to the AlbumEntry containing this comment"""
+
+    href = self.GetSelfLink().href
+    return href[:href.find('/photoid')]
+
+  def GetPhotoUri(self):
+    """Return the uri to the PhotoEntry containing this comment"""
+
+    href = self.GetSelfLink().href
+    return href[:href.find('/commentid')]
+
+def CommentEntryFromString(xml_string):
+  return atom.CreateClassFromXMLString(CommentEntry, xml_string)
+
+class CommentFeed(GPhotosBaseFeed, CommentData):
+  """All metadata for a Google Photos Comment, including its sub-elements"""
+  
+  _children = GPhotosBaseFeed._children.copy()
+  _children.update(CommentData._children.copy())
+
+def CommentFeedFromString(xml_string):
+  return atom.CreateClassFromXMLString(CommentFeed, xml_string)
+
+class UserData(GPhotosBaseData):
+  _children = {}
+  _children['{%s}maxPhotosPerAlbum' % PHOTOS_NAMESPACE] = ('maxPhotosPerAlbum', MaxPhotosPerAlbum)
+  _children['{%s}nickname' % PHOTOS_NAMESPACE] = ('nickname', Nickname)
+  _children['{%s}quotalimit' % PHOTOS_NAMESPACE] = ('quotalimit', Quotalimit)
+  _children['{%s}quotacurrent' % PHOTOS_NAMESPACE] = ('quotacurrent', Quotacurrent)
+  _children['{%s}thumbnail' % PHOTOS_NAMESPACE] = ('thumbnail', Thumbnail)
+  _children['{%s}user' % PHOTOS_NAMESPACE] = ('user', User)
+  _children['{%s}id' % PHOTOS_NAMESPACE] = ('gphoto_id', Id)   
+
+  maxPhotosPerAlbum=None
+  nickname=None
+  quotalimit=None
+  quotacurrent=None
+  thumbnail=None
+  user=None
+  gphoto_id=None
+  
+
+class UserEntry(GPhotosBaseEntry, UserData):
+  """All metadata for a Google Photos User
+
+  This entry represents an album owner and all appropriate metadata.
+
+  Take a look at at the attributes of the UserData for metadata available.
+  """
+  _children = GPhotosBaseEntry._children.copy()
+  _children.update(UserData._children.copy())
+  _kind = 'user'
   
   def __init__(self, author=None, category=None, content=None,
                atom_id=None, link=None, published=None,
                title=None, updated=None,
                # GPHOTO NAMESPACE:
-               photoid=None,
+               gphoto_id=None, maxPhotosPerAlbum=None, nickname=None, quotalimit=None,
+               quotacurrent=None, thumbnail=None, user=None,
                extended_property=None,
                extension_elements=None, extension_attributes=None, text=None):
     
-    gdata.GDataEntry.__init__(self, author=author, category=category,
+    GPhotosBaseEntry.__init__(self, author=author, category=category,
                               content=content,
                               atom_id=atom_id, link=link, published=published,
-                              title=title, updated=updated)
+                              title=title, updated=updated,
+                              extension_elements=extension_elements,
+                              extension_attributes=extension_attributes,
+                              text=text)
+                              
     
-    self.photoid = photoid
-    self.category.append(atom.Category(scheme='http://schemas.google.com/g/2005#kind', 
-                                        term = 'http://schemas.google.com/photos/2007#comment'))
+    self.gphoto_id=gphoto_id
+    self.maxPhotosPerAlbum=maxPhotosPerAlbum
+    self.nickname=nickname
+    self.quotalimit=quotalimit
+    self.quotacurrent=quotacurrent
+    self.thumbnail=thumbnail
+    self.user=user
 
-  def GetCommentId(self):
-      return self.GetSelfLink().href.split('/')[-1]
-
-def CommentEntryFromString(xml_string):
-  return atom.CreateClassFromXMLString(CommentEntry, xml_string)
-
-class CommentFeed(PhotosBaseFeed):
-  """A Google Photo comment feed flavor of an Atom Feed"""
+  def GetAlbumsUri(self):
+    "(string) Return the uri to this user's feed of the AlbumEntry kind"
+    return self._feedUri('album')
   
-  _children = gdata.GDataEntry._children.copy()
-  _children['{%s}entry' % atom.ATOM_NAMESPACE] = ('entry', [CommentEntry])
-
-def CommentFeedFromString(xml_string):
-  return atom.CreateClassFromXMLString(CommentFeed, xml_string)
+  def GetPhotosUri(self):
+    "(string) Return the uri to this user's feed of the PhotoEntry kind"
+    return self._feedUri('photo')
   
+  def GetCommentsUri(self):
+    "(string) Return the uri to this user's feed of the CommentEntry kind"
+    return self._feedUri('comment')
+  
+  def GetTagsUri(self):
+    "(string) Return the uri to this user's feed of the TagEntry kind"
+    return self._feedUri('tag')
+
+def UserEntryFromString(xml_string):
+  return atom.CreateClassFromXMLString(UserEntry, xml_string)
+    
+class UserFeed(GPhotosBaseFeed, UserData):
+  """Feed for a User in the google photos api.
+
+  This feed represents a user as the container for other objects.
+
+  A User feed contains entries of
+  AlbumEntry, PhotoEntry, CommentEntry, UserEntry or TagEntry,
+  depending on the `kind' parameter in the original query.
+
+  The user feed itself also contains all of the metadata available
+  as part of a UserData object."""
+  _children = GPhotosBaseFeed._children.copy()
+  _children.update(UserData._children.copy())
+
+  def GetAlbumsUri(self):
+    """Get the uri to this feed, but with entries of the AlbumEntry kind."""
+    return self._feedUri('album')
+
+  def GetTagsUri(self):
+    """Get the uri to this feed, but with entries of the TagEntry kind."""
+    return self._feedUri('tag')
+
+  def GetPhotosUri(self):
+    """Get the uri to this feed, but with entries of the PhotosEntry kind."""
+    return self._feedUri('photo')
+
+  def GetCommentsUri(self):
+    """Get the uri to this feed, but with entries of the CommentsEntry kind."""
+    return self._feedUri('comment')
+
+def UserFeedFromString(xml_string):
+  return atom.CreateClassFromXMLString(UserFeed, xml_string)
+  
+
+  
+def AnyFeedFromString(xml_string):
+  """Creates an instance of the appropriate feed class from the
+    xml string contents.
+
+  Args:
+    xml_string: str A string which contains valid XML. The root element
+        of the XML string should match the tag and namespace of the desired
+        class.
+
+  Returns:
+    An instance of the target class with members assigned according to the
+    contents of the XML - or a basic gdata.GDataFeed instance if it is
+    impossible to determine the appropriate class (look for extra elements
+    in GDataFeed's .FindExtensions() and extension_elements[] ).
+  """
+  tree = ElementTree.fromstring(xml_string)
+  category = tree.find('{%s}category' % atom.ATOM_NAMESPACE)
+  if category is None:
+    # TODO: is this the best way to handle this?
+    return atom._CreateClassFromElementTree(GPhotosBaseFeed, tree)
+  namespace, kind = category.get('term').split('#')
+  if namespace != PHOTOS_NAMESPACE:
+    # TODO: is this the best way to handle this?
+    return atom._CreateClassFromElementTree(GPhotosBaseFeed, tree)
+  ## TODO: is getattr safe this way?
+  feed_class = getattr(gdata.photos, '%sFeed' % kind.title())
+  return atom._CreateClassFromElementTree(feed_class, tree)
+
+def AnyEntryFromString(xml_string):
+  """Creates an instance of the appropriate entry class from the
+    xml string contents.
+
+  Args:
+    xml_string: str A string which contains valid XML. The root element
+        of the XML string should match the tag and namespace of the desired
+        class.
+
+  Returns:
+    An instance of the target class with members assigned according to the
+    contents of the XML - or a basic gdata.GDataEndry instance if it is
+    impossible to determine the appropriate class (look for extra elements
+    in GDataEntry's .FindExtensions() and extension_elements[] ).
+  """
+  tree = ElementTree.fromstring(xml_string)
+  category = tree.find('{%s}category' % atom.ATOM_NAMESPACE)
+  if category is None:
+    # TODO: is this the best way to handle this?
+    return atom._CreateClassFromElementTree(GPhotosBaseEntry, tree)
+  namespace, kind = category.get('term').split('#')
+  if namespace != PHOTOS_NAMESPACE:
+    # TODO: is this the best way to handle this?
+    return atom._CreateClassFromElementTree(GPhotosBaseEntry, tree)
+  ## TODO: is getattr safe this way?
+  feed_class = getattr(gdata.photos, '%sEntry' % kind.title())
+  return atom._CreateClassFromElementTree(feed_class, tree)
+
