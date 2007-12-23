@@ -7,9 +7,6 @@ import getpass
 
 import libpub.gdata.photos.service
 
-username='jayeshsalvi@gmail.com'
-password=''
-
 
 class PicasaTest(unittest.TestCase):
     def setUp(self):
