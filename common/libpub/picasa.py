@@ -37,6 +37,7 @@ class PicasawebObject:
     picweb=None
     def __init__(self):
         self.picweb = libpub.gdata.photos.service.PhotosService()
+        self.picweb.source = 'Publishr'
     
     def login(self,username,password):
         self.picweb.ClientLogin(username,password)
@@ -66,7 +67,7 @@ class PicasawebRegisterBox(gtk.VBox):
         self.cancelButton = gtk.Button('Cancel')
         self.cancelButton.connect("clicked",libpub.destroy)
         
-        self.remember_check = gtk.CheckButton('Remember me')
+        self.remember_check = gtk.CheckButton('Remember username')
         
         self.usernameBox = gtk.HBox()
         self.usernameBox.pack_start(self.usernameTitle,expand=False)
