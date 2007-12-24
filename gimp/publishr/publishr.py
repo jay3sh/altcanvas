@@ -25,27 +25,30 @@ import gtk
 import xmlrpclib
 from gimpfu import *
 
-import libpub
-import libpub.gui
+try:
+    import libpub
+    import libpub.gui
 
-libpub.config = libpub.Config()
+    libpub.config = libpub.Config()
+except:
+    libpub.handle_crash()    
 
 
 def publishr_func(image,drawable):
     try:
         if image != None:
-	        # Check if file is dirty
-	        if pdb.gimp_image_is_dirty(image):
-	            libpub.alert("Please save the image before publishing.")
-	            libpub.destroy()
+            # Check if file is dirty
+            if pdb.gimp_image_is_dirty(image):
+                libpub.alert("Please save the image before publishing.")
+                return
 
-	     	libpub.filename = pdb.gimp_image_get_filename(image)
+            libpub.filename = pdb.gimp_image_get_filename(image)
         
-	    	if(not (libpub.filename.lower().endswith('jpg') or 
-	            libpub.filename.lower().endswith('jpeg') or 
-	            libpub.filename.lower().endswith('gif'))):
-	         libpub.alert("You have to save the file in jpeg or gif format before publishing") 
-	         libpub.destroy()
+            if(not (libpub.filename.lower().endswith('jpg') or 
+                libpub.filename.lower().endswith('jpeg') or 
+                libpub.filename.lower().endswith('gif'))):
+             libpub.alert("You have to save the file in jpeg or gif format before publishing") 
+             return
     
         libpub.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         libpub.window.connect("delete_event",libpub.delete_event)
@@ -60,25 +63,25 @@ def publishr_func(image,drawable):
         
         
 try:
+    '''    
     if __name__ == '__main__':
         publishr_func(None,None)
-        
     ''' 
-	register(
-	    "python_fu_publish",
-	    "Image publishing plugin",
-	    "Image publishing plugin",
-	    "Jayesh Salvi",
-	    "Jayesh Salvi",
-	    "2007",
-	    "<Image>/File/_Publish on Web",
-	    "RGB*, GRAY*, INDEXED*",
-	    [],
-	    [],
-	    publishr_func)
+    
+    register(
+        "python_fu_publish",
+        "Image publishing plugin",
+        "Image publishing plugin",
+        "Jayesh Salvi",
+        "Jayesh Salvi",
+        "2007",
+        "<Image>/File/_Publish on Web",
+        "RGB*, GRAY*, INDEXED*",
+        [],
+        [],
+        publishr_func)
 
-	main()
-	'''    
+    main()
 
 except:
     libpub.handle_crash()
