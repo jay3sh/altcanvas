@@ -109,26 +109,19 @@ class UploadGUI:
                 i += 1
             self.albumCombo.set_active(select_album)
             
-            #if last_album == None:
-            #   self.albumCombo.prepend_text('<new-photoset>')
-            #   self.albumCombo.set_active(0)
             
         elif self.type == 'PICASAWEB':
             albumLabel = gtk.Label('Albums')
             pws = self.picwebObject.picweb
-            albumFeed = pws.GetAlbumFeed()
+            albums = pws.GetUserFeed().entry
             last_album = libpub.config.get('PICASA_LAST_ALBUM')
-            for album in albumFeed.entry:
-                self.albumCombo.append_text(album.name.text)
+            for album in albums:
+                self.albumCombo.append_text(album.title.text)
                 if album.name.text == last_album:
                     select_album = i
                 i += 1
             self.albumCombo.set_active(select_album)
             
-            #if last_album == None:
-            #   self.albumCombo.prepend_text('<new-album>')
-            #   self.albumCombo.set_active(0)
-        
         
         titleLabel = gtk.Label('Title')
         self.titleEntry = gtk.Entry()
@@ -330,9 +323,6 @@ class UploadGUI:
         # Upload to Picasaweb
         elif self.type == 'PICASAWEB':
                 
-            # extract the titlename as a filename of file being uploaded
-            self.title = libpub.filename.rpartition(os.sep)[2]
-            
             # Determine the license text
             # Ignore the blank-license index 
             if license_index > 0 and license_index < len(libpub.LicenseList)-1:
@@ -351,32 +341,40 @@ class UploadGUI:
             pws = self.picwebObject.picweb
             
             # Get album feed
-            albumFeed = pws.GetAlbumFeed()
+            albums = pws.GetUserFeed().entry
             
             img = None
-            for a in albumFeed.entry:
-                if a.name.text == curalbum:
+            for a in albums:
+                if a.title.text == curalbum:
                     uri = a.GetFeedLink().href
                     try:
-                        img = pws.InsertPhoto(title=self.title,summary=desc,album_uri=uri,
-                            filename_or_handle=libpub.filename)
+                        img = pws.InsertPhotoSimple(
+                                            album_or_uri=a,
+                   	                        title=self.title, 
+                                            summary=desc, 
+                                            filename_or_handle=libpub.filename)
+                        
                     except Exception, e:
                         libpub.alert('Upload to Picasaweb failed: %s'%e)
                         libpub.destroy()
+                        return
                         
                     if img:
                         libpub.alert('Photo upload to Picasaweb was successful',gtk.MESSAGE_INFO)
             
-            # The selected album was not found, create one
+            # The selected album was not found, create new one
             if not img:
                 try:
-                    a = pws.InsertAlbum(title=curalbum,summary=None)
-                    uri = a.GetFeedLink().href
-                    img = pws.InsertPhoto(title=self.title,summary=desc,album_uri=uri,
-                        filename_or_handle=libpub.filename)
+                    a = pws.InsertAlbum(title=curalbum,summary=curalbum)
+                    img = pws.InsertPhotoSimple(
+                                        album_or_uri=a,
+               	                        title=self.title, 
+                                        summary=desc, 
+                                        filename_or_handle=libpub.filename)
                 except Exception, e:
                     libpub.alert('Upload Failure: %s'%e)
                     libpub.destroy()
+                    return
                     
                 if img:
                     libpub.alert('Photo upload to Picasaweb was successful',gtk.MESSAGE_INFO)
@@ -389,6 +387,7 @@ class UploadGUI:
             except Exception, e:
                 libpub.alert('Failed to add tag to image: %s'%e)
                 libpub.destroy()
+                return
                 
             # save the current album into config file
             libpub.config.set('PICASA_LAST_ALBUM',curalbum)
