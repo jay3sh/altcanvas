@@ -31,7 +31,7 @@ config = None
 filename = '/tmp/test123.jpg'
 CONFIG_FILE = ''
 
-SERVER = 'http://fog.altcanvas.com/xmlrpc/'
+SERVER = 'http://www.altcanvas.com/xmlrpc/'
 VERSION = '0.3'
     
 import xml.dom.minidom
@@ -110,7 +110,12 @@ class Config:
         xml = ''
         for line in configf:
             xml += line
-        xmlresult = XMLNode.parseXML(xml)
+        try:
+            xmlresult = XMLNode.parseXML(xml)
+        except:
+            self.map = None
+            return
+        
         self.map = {}
         for param in xmlresult.param:
             key = param['name']
@@ -161,12 +166,14 @@ def handle_crash():
     if response == gtk.RESPONSE_YES:
         keyserver = xmlrpclib.Server(SERVER)
         keyserver.altcanvas.reportPublishrCrash(tb)
+    # Good to quit the whole plugin app after crash    
+    sys.exit()
             
 class CrashReportDialog(gtk.MessageDialog):
     def __init__(self,trace):
         msg = '\
 <b><big>Sorry!!!</big></b>\n\n\
-The publishr plugin has hit a previously <b><i>Unknown Exception</i></b>. \
+The publishr plugin has hit an  <b><i>Unknown Exception</i></b>. \
 Following is the traceback of the exception. You can help improve this \
 plugin by reporting this exception.\n\n\
 <b>All you have to do is press <i>"Yes"</i> to report the exception</b>\n\n'
@@ -217,16 +224,7 @@ def destroy(widget=None,data=None):
     gtk.main_quit()
 
 def signout(widget=None,data=None):
-    # Check if the file exists
-    try:
-        os.stat(CONFIG_FILE)
-    except OSError, oe:
-        return
-    # Yes, it exists, delete it now
-    try:
-        os.remove(CONFIG_FILE)
-    except IOError, ioe:
-        alert('Error deleting flickr token. Check permissions on %s'%CONFIG_FILE)
+    config.set('FLICKR_TOKEN',None)
     # Quit the GUI
     destroy()
     
