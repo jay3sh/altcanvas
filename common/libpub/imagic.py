@@ -36,12 +36,12 @@ class ImageMagick:
 			programdirs = os.listdir("C:\\Program Files\\")
 			for programdir in programdirs:
 				if programdir.find('ImageMagick') >= 0:
-					self.imagicdir = "C:\\Program Files\\"+programdir
+					self.imagicdir = '"C:\\Program Files\\'+programdir
 					break
 			if self.imagicdir:
-				self.convert_bin = '"'+self.imagicdir+"\\convert"+'"'
+				self.convert_bin = self.imagicdir+'\\convert"'
 			else:
-				return False
+				raise Exception('ImageMagick wasn\'t found')
 			
 			self.temp_dir = os.getenv('USERPROFILE')+'\\'
 		else:
@@ -53,7 +53,9 @@ class ImageMagick:
 	def present(self):
 			
 		# Generic code
-		(sin,sout,serr) = os.popen3('%s --version'%self.convert_bin)
+		command = '%s --version'%self.convert_bin
+		print command
+		(sin,sout,serr) = os.popen3(command)
 		for line in sout:
 			if line.find('ImageMagick') >= 0:
 				return True
@@ -84,7 +86,7 @@ class ImageMagick:
 		else:
 			geometry_arg = " "
 				
-		command = '%s %s %s %s'% \
+		command = '%s "%s" %s "%s"'% \
 				  (self.convert_bin,source_filepath,geometry_arg,target_filepath)
 		
 		(sin,sout,serr) = os.popen3(command)
