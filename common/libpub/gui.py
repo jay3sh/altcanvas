@@ -229,7 +229,8 @@ class UploadGUI:
             self.privacyCheck.hide()
             
             # Set the title to be the filename
-            self.title = libpub.filename.rpartition(os.sep)[2]
+            path_segments = libpub.filename.split(os.sep)
+            self.title = path_segments[len(path_segments)-1]
             self.titleEntry.set_text(self.title)
             
             # Add a blank-license option to license choices. This will result
