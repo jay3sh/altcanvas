@@ -199,6 +199,8 @@ class FlickrObject:
     def get_photosets(self):
         self.connect()
         self.photosets = self.keyserver.altcanvas.getPhotoSets(self.authtoken)
+        if self.photosets == None:
+            self.photosets = []
         return self.photosets
     
     def createPhotoSet(self,imageID,curalbum):
