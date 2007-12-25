@@ -32,7 +32,8 @@ filename = '/tmp/test123.jpg'
 CONFIG_FILE = ''
 
 SERVER = 'http://www.altcanvas.com/xmlrpc/'
-VERSION = '0.3'
+VERSION = '0.3.2'
+HOSTAPP = '_'
     
 import xml.dom.minidom
 class XMLNode:
@@ -160,17 +161,19 @@ def handle_crash():
     tb = ''
     for line in traceback.format_exc().split('\n'):
         tb += line+'\n'
-    crb = CrashReportDialog(tb)
+        
+    envinfo = 'sys.version = <b>%s</b>\n'%sys.version
+    envinfo += 'Publishr version = <b>%s</b>'%(HOSTAPP+' '+VERSION)
+    crb = CrashReportDialog(envinfo,tb)
     response = crb.run()
     
     if response == gtk.RESPONSE_YES:
         keyserver = xmlrpclib.Server(SERVER)
-        keyserver.altcanvas.reportPublishrCrash(tb)
+        keyserver.altcanvas.reportPublishrCrash(envinfo+'\n'+tb)
     # Good to quit the whole plugin app after crash    
-    sys.exit()
             
 class CrashReportDialog(gtk.MessageDialog):
-    def __init__(self,trace):
+    def __init__(self,envinfo,trace):
         msg = '\
 <b><big>Sorry!!!</big></b>\n\n\
 The publishr plugin has hit an  <b><i>Unknown Exception</i></b>. \
@@ -178,6 +181,8 @@ Following is the traceback of the exception. You can help improve this \
 plugin by reporting this exception.\n\n\
 <b>All you have to do is press <i>"Yes"</i> to report the exception</b>\n\n'
                
+        msg += envinfo+'\n\n'
+        
         trace = trace.replace('&','&amp;')
         trace = trace.replace('<','&lt;')
         trace = trace.replace('>','&gt;')
