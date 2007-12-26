@@ -30,6 +30,7 @@ try:
     import libpub.gui
 
     libpub.config = libpub.Config()
+    libpub.HOSTAPP = 'Gimp'
 except:
     libpub.handle_crash()    
 
@@ -60,6 +61,7 @@ def publishr_func(image,drawable):
         gtk.main()
     except:
         libpub.handle_crash()    
+        return
         
         
 try:
