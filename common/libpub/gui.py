@@ -270,56 +270,61 @@ class UploadGUI:
         # Upload to Flickr
         if self.type == 'FLICKR':
             
-            # Get license ID for chosen license
-            if license_index > 0 and license_index < len(libpub.LicenseList):
-                license_id = libpub.LicenseList[license_index][0]
-            else:
-                license_id = 0
-            
-            # Upload the photo
-            imageID = self.flickrObject.upload(
-                    filename=libpub.filename,
-                    title=self.title,
-                    is_public=self.is_public,   
-                    tags=tags,
-                    description=desc,
-                    license_id=str(license_id))
-            
-            url = self.flickrObject.getImageUrl(imageID)
-            
-            if url == None:
-                libpub.alert("Image upload failed")
-                libpub.destroy()
-                return
-            
-            # Find the photoset ID chosen from album drop down
-            photosets = self.flickrObject.get_photosets()
-            target_set_id = None
-            for set in photosets:
-                if set['title'] == curalbum:
-                    target_set_id = set['id']
-                    break
+            try:
+                # Get license ID for chosen license
+                if license_index > 0 and license_index < len(libpub.LicenseList):
+                    license_id = libpub.LicenseList[license_index][0]
+                else:
+                    license_id = 0
                 
-            # Create new photoset, it doesn't exist
-            if target_set_id == None:
-                target_set_id = self.flickrObject.createPhotoSet(imageID,curalbum)
-                if target_set_id == None:
-                    libpub.alert("Failure creating new Photoset")
-            else:
-                # Add photo in an existing photoset
-                success = self.flickrObject.addPhoto2Set(imageID,target_set_id)
+                # Upload the photo
+                imageID = self.flickrObject.upload(
+                        filename=libpub.filename,
+                        title=self.title,
+                        is_public=self.is_public,   
+                        tags=tags,
+                        description=desc)
                 
-                if not success:
-                    libpub.alert("Failure adding photo to photoset")
+                self.flickrObject.setLicense(imageID,str(license_id))
+                
+                url = self.flickrObject.getImageUrl(imageID)
+                
+                if url == None:
+                    libpub.alert("Image upload failed")
+                    libpub.destroy()
+                    return
+                
+                # Find the photoset ID chosen from album drop down
+                photosets = self.flickrObject.get_photosets()
+                target_set_id = None
+                for set in photosets:
+                    if set['title'] == curalbum:
+                        target_set_id = set['id']
+                        break
                     
-            # save the current album into config file
-            libpub.config.set('FLICKR_LAST_PHOTOSET',curalbum)
-            libpub.config.set('LAST_PRIVACY_CHOICE',self.is_public)
-            libpub.config.set('LAST_LICENSE_USED',license_index)
-        
-            libpub.alert("Image upload was successful.\n(Flickr URL: %s)"%url,
-                         gtk.MESSAGE_INFO)
-            libpub.destroy()
+                # Create new photoset, it doesn't exist
+                if target_set_id == None:
+                    target_set_id = self.flickrObject.createPhotoSet(imageID,curalbum)
+                    if target_set_id == None:
+                        libpub.alert("Failure creating new Photoset")
+                else:
+                    # Add photo in an existing photoset
+                    success = self.flickrObject.addPhoto2Set(imageID,target_set_id)
+                    
+                    if not success:
+                        libpub.alert("Failure adding photo to photoset")
+                        
+                # save the current album into config file
+                libpub.config.set('FLICKR_LAST_PHOTOSET',curalbum)
+                libpub.config.set('LAST_PRIVACY_CHOICE',self.is_public)
+                libpub.config.set('LAST_LICENSE_USED',license_index)
+            
+                libpub.alert("Image upload was successful.\n(Flickr URL: %s)"%url,
+                             gtk.MESSAGE_INFO)
+                libpub.destroy()
+                
+            except Exception, e:
+                libpub.alert("Flickr Exception: %s"%e)
                 
         # Upload to Picasaweb
         elif self.type == 'PICASAWEB':

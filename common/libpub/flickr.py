@@ -76,8 +76,7 @@ class Flickr:
             return None
 
         if result['stat'] != 'ok':
-            libpub.alert('Flickr call failed: %s'%data)
-            return None
+            raise Exception('Flickr call failed: %s'%data)
         else:
             return result
 
@@ -212,20 +211,22 @@ class FlickrObject:
         self.connect()
         return self.keyserver.altcanvas.addPhoto2Set(self.authtoken,imageID,setID)
     
-    def upload(self,filename,title,is_public,tags,description,license_id='0'):
+    def upload(self,filename,title,is_public,tags,description):
         self.connect()
-        imageID = self.flickr.upload(filename=filename,
+        return self.flickr.upload(filename=filename,
                            title=title,
                            auth_token=self.authtoken,
                            is_public=is_public,
                            tags=tags,
                            description=description)
-        
+    
+    def setLicense(self,imageID,license_id='0'):
+        self.connect()
         self.keyserver.altcanvas.setLicense(self.authtoken,imageID,license_id)
-        
-        return imageID
+        return
        
     def getImageUrl(self,imageID): 
+        self.connect()
         url = self.keyserver.altcanvas.getImageUrl(self.authtoken,imageID)
         return url
     
