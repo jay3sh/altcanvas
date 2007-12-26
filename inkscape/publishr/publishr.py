@@ -23,11 +23,12 @@ import sys
 
 import gtk
 
-import libpub
-import libpub.gui
-import libpub.imagic
-
 try:
+	import libpub
+	import libpub.gui
+	import libpub.imagic
+
+	libpub.HOSTAPP = 'Inkscape'
 	im = libpub.imagic.ImageMagick()
 	
 	if im.present():
