@@ -324,6 +324,12 @@ class UploadGUI:
         # Upload to Picasaweb
         elif self.type == 'PICASAWEB':
                 
+            if curalbum == None or curalbum.strip() == '':
+                libpub.alert('Picasaweb doesn\'t support uploading photos \
+without an album. If you don\'t have any album already, create one by typing \
+a new album name in the "Albums" entry.')
+                return
+                
             # Determine the license text
             # Ignore the blank-license index 
             if license_index > 0 and license_index < len(libpub.LicenseList)-1:
