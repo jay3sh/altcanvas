@@ -76,7 +76,7 @@ class Flickr:
             return None
 
         if result['stat'] != 'ok':
-            raise Exception('Flickr call failed: %s'%data)
+            raise FlickrException('%s'%result.err[0]['msg'])
         else:
             return result
 
@@ -138,6 +138,13 @@ class Flickr:
         else:
             return None
         
+##########################################
+#    Flickr Exception class
+##########################################
+class FlickrException(Exception):
+    pass
+
+
 from libpub import SERVER
 import libpub
 
@@ -211,15 +218,6 @@ class FlickrObject:
         self.connect()
         return self.keyserver.altcanvas.addPhoto2Set(self.authtoken,imageID,setID)
     
-    def upload(self,filename,title,is_public,tags,description):
-        self.connect()
-        return self.flickr.upload(filename=filename,
-                           title=title,
-                           auth_token=self.authtoken,
-                           is_public=is_public,
-                           tags=tags,
-                           description=description)
-    
     def setLicense(self,imageID,license_id='0'):
         self.connect()
         self.keyserver.altcanvas.setLicense(self.authtoken,imageID,license_id)
@@ -229,6 +227,52 @@ class FlickrObject:
         self.connect()
         url = self.keyserver.altcanvas.getImageUrl(self.authtoken,imageID)
         return url
+    
+    def upload(self,filename,title,description,is_public,tags,license_id,photoset):
+        self.connect()
+        # Upload the photo
+        imageID = self.flickr.upload(
+                auth_token  = self.authtoken,
+                filename    = filename,
+                title       = title,
+                description = description,
+                is_public   = is_public,   
+                tags        = tags)
+        
+        if imageID == None:
+            raise FlickrException('NULL imageID returned')
+        
+        self.keyserver.altcanvas.setLicense(self.authtoken,imageID,license_id)
+        
+        url = self.keyserver.altcanvas.getImageUrl(self.authtoken,imageID)
+        
+        if url == None:
+            raise FlickrException('Failed to get URL of uploaded image')
+        
+        # Find the photoset ID chosen from album drop down
+        self.photosets = self.keyserver.altcanvas.getPhotoSets(self.authtoken)
+        if self.photosets == None:
+            self.photosets = []
+            
+        target_set_id = None
+        for set in self.photosets:
+            if set['title'] == photoset:
+                target_set_id = set['id']
+                break
+            
+        # Create new photoset, it doesn't exist
+        if target_set_id == None:
+            target_set_id = self.keyserver.altcanvas.createPhotoSet(
+                                        self.authtoken,imageID,photoset)
+            if target_set_id == None:
+                raise FlickrException("Failure creating new Photoset")
+        else:
+            # Add photo in an existing photoset
+            if not self.keyserver.altcanvas.addPhoto2Set(
+                                self.authtoken,imageID,target_set_id):
+                raise FlickrException("Failure adding photo to photoset")
+                
+        return url 
     
 class FlickrRegisterBox(gtk.VBox):
     def __init__(self,parent):

@@ -33,6 +33,9 @@ import libpub.gdata as gdata
 import libpub.gdata.base
 import libpub.gdata.photos.service
 
+class PicasaException(Exception):
+    pass
+
 class PicasawebObject:
     picweb=None
     def __init__(self):
@@ -41,6 +44,37 @@ class PicasawebObject:
     
     def login(self,username,password):
         self.picweb.ClientLogin(username,password)
+        
+    def upload(self,filename,title,summary,tags,album):
+        pws = self.picweb
+        img = None
+        
+        # Get album feed
+        albums = pws.GetUserFeed().entry
+        
+        # See if the album exists
+        for a in albums:
+            if a.title.text == album:
+                img = pws.InsertPhotoSimple(
+                    album_or_uri = a,
+               	    title = title, 
+                    summary = summary, 
+                    filename_or_handle = filename)
+        
+        # The selected album was not found, create new one
+        if not img:
+            a = pws.InsertAlbum(title=album,summary=album)
+            img = pws.InsertPhotoSimple(
+                album_or_uri = a,
+                title = title, 
+                summary = summary, 
+                filename_or_handle = filename)
+            
+        # Insert tag
+        for tag in tags.split():
+            pws.InsertTag(img,tag)
+                
+        return True
     
 class PicasawebRegisterBox(gtk.VBox):
     def __init__(self,parent):

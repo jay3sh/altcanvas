@@ -26,7 +26,7 @@ import pango
 
 import libpub
 
-from libpub.flickr import FlickrObject,FlickrRegisterBox
+from libpub.flickr import FlickrObject,FlickrRegisterBox,FlickrException
 from libpub.picasa import PicasawebObject,PicasawebRegisterBox
 
 def empty_window():
@@ -78,11 +78,6 @@ class UploadGUI:
         serviceBox.pack_start(self.picwebButton,expand=False)
         serviceBox.set_spacing(10)
         
-        #Install accelerator
-        #acclGroup = gtk.AccelGroup()
-        #acclGroup.connect_group(66,gtk.gdk.SHIFT_MASK,gtk.ACCEL_VISIBLE,libpub.destroy)
-        #libpub.window.add_accel_group(acclGroup)
-
         empty_window()
         
         serviceBox.set_border_width(15)
@@ -270,62 +265,40 @@ class UploadGUI:
         # Upload to Flickr
         if self.type == 'FLICKR':
             
+            # Get license ID for chosen license
+            if license_index > 0 and license_index < len(libpub.LicenseList):
+                license_id = libpub.LicenseList[license_index][0]
+            else:
+                license_id = 0
+                
             try:
-                # Get license ID for chosen license
-                if license_index > 0 and license_index < len(libpub.LicenseList):
-                    license_id = libpub.LicenseList[license_index][0]
-                else:
-                    license_id = 0
-                
                 # Upload the photo
-                imageID = self.flickrObject.upload(
-                        filename=libpub.filename,
-                        title=self.title,
-                        is_public=self.is_public,   
-                        tags=tags,
-                        description=desc)
+                url = self.flickrObject.upload(
+                        filename = libpub.filename,
+                        title = self.title,
+                        description = desc,
+                        is_public = self.is_public,
+                        tags = tags,
+                        license_id = str(license_id),
+                        photoset = curalbum)
                 
-                self.flickrObject.setLicense(imageID,str(license_id))
-                
-                url = self.flickrObject.getImageUrl(imageID)
-                
-                if url == None:
-                    libpub.alert("Image upload failed")
-                    libpub.destroy()
-                    return
-                
-                # Find the photoset ID chosen from album drop down
-                photosets = self.flickrObject.get_photosets()
-                target_set_id = None
-                for set in photosets:
-                    if set['title'] == curalbum:
-                        target_set_id = set['id']
-                        break
-                    
-                # Create new photoset, it doesn't exist
-                if target_set_id == None:
-                    target_set_id = self.flickrObject.createPhotoSet(imageID,curalbum)
-                    if target_set_id == None:
-                        libpub.alert("Failure creating new Photoset")
-                else:
-                    # Add photo in an existing photoset
-                    success = self.flickrObject.addPhoto2Set(imageID,target_set_id)
-                    
-                    if not success:
-                        libpub.alert("Failure adding photo to photoset")
-                        
-                # save the current album into config file
-                libpub.config.set('FLICKR_LAST_PHOTOSET',curalbum)
-                libpub.config.set('LAST_PRIVACY_CHOICE',self.is_public)
-                libpub.config.set('LAST_LICENSE_USED',license_index)
+                if url:
+                    # save the current album into config file
+                    libpub.config.set('FLICKR_LAST_PHOTOSET',curalbum)
+                    libpub.config.set('LAST_PRIVACY_CHOICE',self.is_public)
+                    libpub.config.set('LAST_LICENSE_USED',license_index)
             
-                libpub.alert("Image upload was successful.\n(Flickr URL: %s)"%url,
+                    # success message
+                    libpub.alert("Image upload was successful.\n(Flickr URL: %s)"%url,
                              gtk.MESSAGE_INFO)
-                libpub.destroy()
+                
+            except FlickrException, fe:
+                libpub.alert("Flickr Exception: %s"%fe)
                 
             except Exception, e:
-                libpub.alert("Flickr Exception: %s"%e)
+                libpub.alert("Upload exception: %s"%e)
                 
+            
         # Upload to Picasaweb
         elif self.type == 'PICASAWEB':
                 
@@ -350,62 +323,28 @@ a new album name in the "Albums" entry.')
             else:
                 license_index = 0
                 
-            pws = self.picwebObject.picweb
-            
-            # Get album feed
-            albums = pws.GetUserFeed().entry
-            
-            img = None
-            for a in albums:
-                if a.title.text == curalbum:
-                    uri = a.GetFeedLink().href
-                    try:
-                        img = pws.InsertPhotoSimple(
-                                            album_or_uri=a,
-                   	                        title=self.title, 
-                                            summary=desc, 
-                                            filename_or_handle=libpub.filename)
-                        
-                    except Exception, e:
-                        libpub.alert('Upload to Picasaweb failed: %s'%e)
-                        libpub.destroy()
-                        return
-                        
-                    if img:
-                        libpub.alert('Photo upload to Picasaweb was successful',gtk.MESSAGE_INFO)
-            
-            # The selected album was not found, create new one
-            if not img:
-                try:
-                    a = pws.InsertAlbum(title=curalbum,summary=curalbum)
-                    img = pws.InsertPhotoSimple(
-                                        album_or_uri=a,
-               	                        title=self.title, 
-                                        summary=desc, 
-                                        filename_or_handle=libpub.filename)
-                except Exception, e:
-                    libpub.alert('Upload Failure: %s'%e)
-                    libpub.destroy()
-                    return
-                    
-                if img:
-                    libpub.alert('Photo upload to Picasaweb was successful',gtk.MESSAGE_INFO)
-                
-                
-            # Insert tag
             try:
-                for tag in tags.split():
-                    pws.InsertTag(img,tag)
-            except Exception, e:
-                libpub.alert('Failed to add tag to image: %s'%e)
-                libpub.destroy()
-                return
-                
-            # save the current album into config file
-            libpub.config.set('PICASA_LAST_ALBUM',curalbum)
-            libpub.config.set('LAST_LICENSE_USED',license_index)
+                success = self.picwebObject.upload(
+                        filename = libpub.filename, 
+                        title = self.title,
+                        summary = desc,
+                        tags = tags,
+                		album = curalbum)
+            except PicasaException, pe:
+                libpub.alert('Picasa Exception: %s'%pe)
             
-            libpub.destroy()
+            except Exception, e:
+                libpub.alert('Upload exception: %s'%e)
+            
+                
+            if success:
+                # save the current album into config file
+                libpub.config.set('PICASA_LAST_ALBUM',curalbum)
+            	libpub.config.set('LAST_LICENSE_USED',license_index)
+                libpub.alert('Successful upload to Picasaweb!',gtk.MESSAGE_INFO)
+            
+        # Cleanup the GUI
+        libpub.destroy()
             
             
     def loadFlickr(self,widget,data=None):
