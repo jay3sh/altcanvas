@@ -107,7 +107,7 @@ GPHOTOS_INVALID_CONTENT_TYPE=602
 GPHOTOS_NOT_AN_IMAGE=603
 GPHOTOS_INVALID_KIND=604
 
-class GooglePhotosException(Exception):
+class PicasaException(Exception):
   def __init__(self, response):
 
     self.error_code = response['status']
@@ -196,7 +196,7 @@ class PhotosService(libpub.gdata.service.GDataService):
     try:
       return self.Get(uri, converter=libpub.gdata.photos.AnyFeedFromString)
     except libpub.gdata.service.RequestError, e:
-      raise GooglePhotosException(e.args[0])
+      raise PicasaException(e.args[0])
 
   def GetEntry(self, uri, limit=None, start_index=None):
     """Get an Entry.
@@ -223,7 +223,7 @@ class PhotosService(libpub.gdata.service.GDataService):
     try:
       return self.Get(uri, converter=libpub.gdata.photos.AnyEntryFromString)
     except libpub.gdata.service.RequestError, e:
-      raise GooglePhotosException(e.args[0])
+      raise PicasaException(e.args[0])
       
   def GetUserFeed(self, kind='album', user='default', limit=None):
     """Get user-based feed, containing albums, photos, comments or tags;
@@ -374,7 +374,7 @@ class PhotosService(libpub.gdata.service.GDataService):
       return self.Post(album, uri=self.userUri % self.email,
       converter=libpub.gdata.photos.AlbumEntryFromString)
     except libpub.gdata.service.RequestError, e:
-      raise GooglePhotosException(e.args[0])
+      raise PicasaException(e.args[0])
 
   def InsertPhoto(self, album_or_uri, photo, filename_or_handle,
     content_type='image/jpeg'):
@@ -401,7 +401,7 @@ class PhotosService(libpub.gdata.service.GDataService):
     try:
       assert(isinstance(photo, libpub.gdata.photos.PhotoEntry))
     except AssertionError:
-      raise GooglePhotosException({'status':GPHOTOS_INVALID_ARGUMENT,
+      raise PicasaException({'status':GPHOTOS_INVALID_ARGUMENT,
         'body':'`photo` must be a gdata.photos.PhotoEntry instance',
         'reason':'Found %s, not PhotoEntry' % type(photo)
         })
@@ -409,7 +409,7 @@ class PhotosService(libpub.gdata.service.GDataService):
       majtype, mintype = content_type.split('/')
       assert(mintype in SUPPORTED_UPLOAD_TYPES)
     except (ValueError, AssertionError):
-      raise GooglePhotosException({'status':GPHOTOS_INVALID_CONTENT_TYPE,
+      raise PicasaException({'status':GPHOTOS_INVALID_CONTENT_TYPE,
         'body':'This is not a valid content type: %s' % content_type,
         'reason':'Accepted content types: %s' % \
           ['image/'+t for t in SUPPORTED_UPLOAD_TYPES]
@@ -429,7 +429,7 @@ class PhotosService(libpub.gdata.service.GDataService):
       mediasource = libpub.gdata.MediaSource(file_handle, content_type,
         content_length=file_handle.len, file_name=name)
     else: #filename_or_handle is not valid
-      raise GooglePhotosException({'status':GPHOTOS_INVALID_ARGUMENT,
+      raise PicasaException({'status':GPHOTOS_INVALID_ARGUMENT,
         'body':'`filename_or_handle` must be a path name or a file-like object',
         'reason':'Found %s, not path name or object with a .read() method' % \
           type(filename_or_handle)
@@ -444,7 +444,7 @@ class PhotosService(libpub.gdata.service.GDataService):
       return self.Post(photo, uri=feed_uri, media_source=mediasource,
         converter=libpub.gdata.photos.PhotoEntryFromString)
     except libpub.gdata.service.RequestError, e:
-      raise GooglePhotosException(e.args[0])
+      raise PicasaException(e.args[0])
   
   def InsertPhotoSimple(self, album_or_uri, title, summary, filename_or_handle,
       content_type='image/jpeg', keywords=None):
@@ -522,7 +522,7 @@ class PhotosService(libpub.gdata.service.GDataService):
       return self.Put(data=photo, uri=photo.GetEditLink().href,
       converter=libpub.gdata.photos.PhotoEntryFromString)
     except libpub.gdata.service.RequestError, e:
-      raise GooglePhotosException(e.args[0])
+      raise PicasaException(e.args[0])
 
   
   def UpdatePhotoBlob(self, photo_or_uri, filename_or_handle,
@@ -560,7 +560,7 @@ class PhotosService(libpub.gdata.service.GDataService):
       majtype, mintype = content_type.split('/')
       assert(mintype in SUPPORTED_UPLOAD_TYPES)
     except (ValueError, AssertionError):
-      raise GooglePhotosException({'status':GPHOTOS_INVALID_CONTENT_TYPE,
+      raise PicasaException({'status':GPHOTOS_INVALID_CONTENT_TYPE,
         'body':'This is not a valid content type: %s' % content_type,
         'reason':'Accepted content types: %s' % \
           ['image/'+t for t in SUPPORTED_UPLOAD_TYPES]
@@ -581,7 +581,7 @@ class PhotosService(libpub.gdata.service.GDataService):
       mediasource = libpub.gdata.MediaSource(file_handle, content_type,
         content_length=file_handle.len, file_name=name)
     else: #filename_or_handle is not valid
-      raise GooglePhotosException({'status':GPHOTOS_INVALID_ARGUMENT,
+      raise PicasaException({'status':GPHOTOS_INVALID_ARGUMENT,
         'body':'`filename_or_handle` must be a path name or a file-like object',
         'reason':'Found %s, not path name or an object with .read() method' % \
           type(filename_or_handle)
@@ -595,7 +595,7 @@ class PhotosService(libpub.gdata.service.GDataService):
       return self.Put(photoblob, entry_uri,
       converter=libpub.gdata.photos.PhotoEntryFromString)
     except libpub.gdata.service.RequestError, e:
-      raise GooglePhotosException(e.args[0])
+      raise PicasaException(e.args[0])
 
   def InsertTag(self, photo_or_uri, tag):
     """Add a tag (a.k.a. keyword) to a photo.
@@ -624,7 +624,7 @@ class PhotosService(libpub.gdata.service.GDataService):
       return self.Post(data=tag, uri=post_uri,
       converter=libpub.gdata.photos.TagEntryFromString)
     except libpub.gdata.service.RequestError, e:
-      raise GooglePhotosException(e.args[0])
+      raise PicasaException(e.args[0])
 
                   
   def InsertComment(self, photo_or_uri, comment):
@@ -655,7 +655,7 @@ class PhotosService(libpub.gdata.service.GDataService):
       return self.Post(data=comment, uri=post_uri,
         converter=libpub.gdata.photos.CommentEntryFromString)
     except libpub.gdata.service.RequestError, e:
-      raise GooglePhotosException(e.args[0])
+      raise PicasaException(e.args[0])
 
   def Delete(self, object_or_uri, *args, **kwargs):
     """Delete an object.
@@ -677,7 +677,7 @@ class PhotosService(libpub.gdata.service.GDataService):
     try:
       return libpub.gdata.service.GDataService.Delete(self, uri, *args, **kwargs)
     except libpub.gdata.service.RequestError, e:
-      raise GooglePhotosException(e.args[0])
+      raise PicasaException(e.args[0])
 
 def GetSmallestThumbnail(media_thumbnail_list):
   """Helper function to get the smallest thumbnail of a list of
