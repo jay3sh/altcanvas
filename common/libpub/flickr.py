@@ -274,43 +274,5 @@ class FlickrObject:
                 
         return url 
     
-class FlickrRegisterBox(gtk.VBox):
-    def __init__(self,parent):
-        gtk.VBox.__init__(self)
-        self.parentgui = parent
-        self.flickrObject = self.parentgui.flickrObject
-        self.explainLabel = gtk.Label(
-        'Please copy the following link and open it using your web browser.'+
-        'Flickr will ask you to authorize AltCanvas to upload photos to your account.'+
-        'You will have to click on "OK, I\'ll allow it" to be able to use this plugin.')
-        self.explainLabel.set_width_chars(45)
-        self.explainLabel.set_line_wrap(True)
-        self.urlText = gtk.Entry()
-        self.urlText.set_width_chars(45)
-        self.doneButton = gtk.Button('Press when you have granted authorization to AltCanvas!')
-        self.doneButton.set_border_width(5)
-        self.doneButton.connect("clicked",self.login_handler)
-        
-        self.set_spacing(15)
-        self.pack_start(self.explainLabel)
-        self.pack_start(self.urlText)
-        self.pack_start(self.doneButton)
-        self.set_border_width(30)
-        self.show_all()
-        
-    def setup(self):
-        authurl = self.flickrObject.get_authurl()
-        
-        self.urlText.set_text(authurl)
-        self.urlText.select_region(0,-1)
-        self.urlText.set_editable(False)
-        
-    def login_handler(self,widget,data=None):
-        try:
-            if self.flickrObject.get_authtoken():
-                self.parentgui.upload_dialog()
-        except Exception, e:
-            libpub.alert("Unhandled exception while Flickr login: %s"%e)
-     
 
     
