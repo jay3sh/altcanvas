@@ -54,7 +54,7 @@ import md5
 import urllib
 import urllib2
 
-from libpub import XMLNode
+from libpub.utils.xmlparser import XMLNode
 
 
 ##############################################

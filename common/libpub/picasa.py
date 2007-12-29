@@ -33,8 +33,6 @@ import libpub.gdata as gdata
 import libpub.gdata.base
 import libpub.gdata.photos.service
 
-class PicasaException(Exception):
-    pass
 
 class PicasawebObject:
     picweb=None
