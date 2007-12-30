@@ -34,23 +34,19 @@ def empty_window():
     for box in libpub.window.get_children():
         libpub.window.remove(box)
         
-
-class UploadGUI:
+class Entry(gtk.VBox):
     ''' Main GUI container '''
-    def __init__(self):
-        self.window = libpub.window
+    def __init__(self,flickr_handler=None,picasa_handler=None):
+        gtk.VBox.__init__(self)
         self.type = None
         self.webservice = None
-        
-        self.flickrObject = FlickrObject()
-        self.picwebObject = PicasawebObject()
         
         # Service choice widgets
         self.flickrButton = gtk.Button('_Flickr')
         self.picwebButton = gtk.Button('_Picasaweb')
         
-        self.flickrButton.connect("clicked",self.loadFlickr)
-        self.picwebButton.connect("clicked",self.loadPicasaweb)
+        self.flickrButton.connect("clicked",flickr_handler)
+        self.picwebButton.connect("clicked",picasa_handler)
         
         self.introLabel = gtk.Label()
         self.introLabel.set_markup('\
@@ -73,31 +69,35 @@ class UploadGUI:
 </span>')
 
         # Pack all widgets
-        serviceBox = gtk.VBox()
-        serviceBox.pack_start(self.introLabel,expand=False)
-        serviceBox.pack_start(self.flickrButton,expand=False)
-        serviceBox.pack_start(self.picwebButton,expand=False)
-        serviceBox.set_spacing(10)
+        self.pack_start(self.introLabel,expand=False)
+        self.pack_start(self.flickrButton,expand=False)
+        self.pack_start(self.picwebButton,expand=False)
+        self.set_spacing(10)
         
-        empty_window()
+        self.set_border_width(15)
+        self.show_all()
         
-        serviceBox.set_border_width(15)
-        serviceBox.show_all()
-        self.window.add(serviceBox)
+class UploadDlg(gtk.VBox):
+    def __init__(self,apptype,serviceObject,upload_handler):
+        gtk.VBox.__init__(self)
+        self.apptype = apptype 
+        if apptype == 'FLICKR':
+            self.flickr = serviceObject
+        else:
+            self.picasa = serviceObject
         
-    def upload_dialog(self):
-        # Define UI widgets
-        
+        #
+        #    Photosets/Albums
+        #
         albumLabel = None
         albums = None
         i = 0
         select_album = 0
         self.albumCombo = gtk.combo_box_entry_new_text()
-        
-        if self.type == 'FLICKR':
+        if self.apptype == 'FLICKR':
             albumLabel = gtk.Label('Photosets')
-            albums = self.flickrObject.get_photosets()
-            last_album = libpub.config.get('FLICKR_LAST_PHOTOSET')
+            albums = self.flickr.get_photosets()
+            last_album = libpub.conf.get('FLICKR_LAST_PHOTOSET')
             for album in albums:
                 self.albumCombo.append_text(album['title'])
                 if album['title'] == last_album:
@@ -106,11 +106,11 @@ class UploadGUI:
             self.albumCombo.set_active(select_album)
             
             
-        elif self.type == 'PICASAWEB':
+        elif self.apptype == 'PICASAWEB':
             albumLabel = gtk.Label('Albums')
-            pws = self.picwebObject.picweb
+            pws = self.picasa.picweb
             albums = pws.GetUserFeed().entry
-            last_album = libpub.config.get('PICASA_LAST_ALBUM')
+            last_album = libpub.conf.get('PICASA_LAST_ALBUM')
             for album in albums:
                 self.albumCombo.append_text(album.title.text)
                 if album.name.text == last_album:
@@ -118,10 +118,15 @@ class UploadGUI:
                 i += 1
             self.albumCombo.set_active(select_album)
             
-        
+        ##
+        #    Title
+        ##
         titleLabel = gtk.Label('Title')
         self.titleEntry = gtk.Entry()
         
+        ##
+        #    Description/Summary
+        ##
         descLabel = gtk.Label('Description')
         dsw = gtk.ScrolledWindow()
         dsw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -130,15 +135,20 @@ class UploadGUI:
         self.descView.set_accepts_tab(False)
         dsw.add(self.descView)
 
+        ##
+        #    Tags
+        ##
         tagLabel = gtk.Label('Tags')
         self.tagEntry = gtk.Entry()
         
-        # Setup all the licenses
+        ##
+        #    Licenses
+        ##
         licenseLabel = gtk.Label('License')
         self.licenseCombo = gtk.combo_box_entry_new_text()
         for lic in libpub.LicenseList:
             self.licenseCombo.append_text(lic[1])
-        last_license = libpub.config.get('LAST_LICENSE_USED')
+        last_license = libpub.conf.get('LAST_LICENSE_USED')
         
         if last_license:
             last_license_index = int(last_license) 
@@ -149,7 +159,9 @@ class UploadGUI:
         else:
             self.licenseCombo.set_active(0)
         
-        # Should the photo be public or private
+        ##
+        #    Public/Private
+        ##
         def privacy_toggled(togglebutton,param=None):
             if self.privacyCheck.get_active():
                 self.is_public = '1'
@@ -160,17 +172,30 @@ class UploadGUI:
         self.privacyCheck.connect('toggled',privacy_toggled)
         
         # Recall what was the setting last time
-        self.is_public =  libpub.config.get('LAST_PRIVACY_CHOICE') or '1'
+        self.is_public =  libpub.conf.get('LAST_PRIVACY_CHOICE') or '1'
         self.privacyCheck.set_active(self.is_public == '1')
 
+        ##
+        #    OK
+        ##
         okButton = gtk.Button('Upload')
-        okButton.connect("clicked",self.upload)
+        okButton.connect("clicked",upload_handler)
+        
+        ##
+        #    Cancel
+        ##
         cancelButton = gtk.Button('Quit')
         cancelButton.connect("clicked",libpub.destroy)
+        
+        ##
+        #    Signout
+        ##
         signoutButton = gtk.Button('Sign out')
         signoutButton.connect("clicked",libpub.signout)
         
-        # packing widgets
+        #####
+        # packing of widgets
+        #####
         albumBox = gtk.HBox()
         albumBox.pack_start(albumLabel)
         albumBox.pack_start(self.albumCombo)
@@ -211,16 +236,14 @@ class UploadGUI:
         buttonBox.pack_start(cancelButton)
         buttonBox.pack_start(signoutButton)
         buttonBox.set_border_width(4)
-        
 
-        uploadBox = gtk.VBox()
-        uploadBox.pack_start(inputBox)
-        uploadBox.pack_start(buttonBox)
-        uploadBox.set_border_width(6)
+        self.pack_start(inputBox)
+        self.pack_start(buttonBox)
+        self.set_border_width(6)
         
-        uploadBox.show_all()
+        self.show_all()
         
-        if self.type == 'PICASAWEB':
+        if self.apptype == 'PICASAWEB':
             signoutButton.hide()
             self.privacyCheck.hide()
             
@@ -234,16 +257,16 @@ class UploadGUI:
             self.licenseCombo.append_text('Don\'t mention licensing info')
             model = self.licenseCombo.get_model()
             # Try to recall previous license choice
-            last_license = libpub.config.get('LAST_LICENSE_USED')
+            last_license = libpub.conf.get('LAST_LICENSE_USED')
             if last_license:
                 self.licenseCombo.set_active(int(last_license))
             else:
                 # choose blank-license option
                 self.licenseCombo.set_active(len(model)-1)
-            
-        empty_window()
-        self.window.add(uploadBox)
+                
         
+class UploadGUI:
+    ''' Main GUI container '''
         
     def upload(self,widget,data=None):
         self.title = self.titleEntry.get_text()
@@ -285,9 +308,9 @@ class UploadGUI:
                 
                 if url:
                     # save the current album into config file
-                    libpub.config.set('FLICKR_LAST_PHOTOSET',curalbum)
-                    libpub.config.set('LAST_PRIVACY_CHOICE',self.is_public)
-                    libpub.config.set('LAST_LICENSE_USED',license_index)
+                    libpub.conf.set('FLICKR_LAST_PHOTOSET',curalbum)
+                    libpub.conf.set('LAST_PRIVACY_CHOICE',self.is_public)
+                    libpub.conf.set('LAST_LICENSE_USED',license_index)
             
                     # success message
                     libpub.alert("Image upload was successful.\n(Flickr URL: %s)"%url,
@@ -340,8 +363,8 @@ a new album name in the "Albums" entry.')
                 
             if success:
                 # save the current album into config file
-                libpub.config.set('PICASA_LAST_ALBUM',curalbum)
-            	libpub.config.set('LAST_LICENSE_USED',license_index)
+                libpub.conf.set('PICASA_LAST_ALBUM',curalbum)
+            	libpub.conf.set('LAST_LICENSE_USED',license_index)
                 libpub.alert('Successful upload to Picasaweb!',gtk.MESSAGE_INFO)
             
         # Cleanup the GUI
@@ -380,21 +403,38 @@ a new album name in the "Albums" entry.')
             
         
 class FlickrRegisterBox(gtk.VBox):
-    def __init__(self,parent):
+    def __init__(self,flickr,login_handler):
         gtk.VBox.__init__(self)
-        self.parentgui = parent
-        self.flickrObject = self.parentgui.flickrObject
+        self.flickr = flickr
+        
+        ##
+        #    Explanation label for password non-storage policy
+        ##
         self.explainLabel = gtk.Label(
         'Please copy the following link and open it using your web browser.'+
         'Flickr will ask you to authorize AltCanvas to upload photos to your account.'+
         'You will have to click on "OK, I\'ll allow it" to be able to use this plugin.')
         self.explainLabel.set_width_chars(45)
         self.explainLabel.set_line_wrap(True)
+        
+        ##
+        #    Authentication URL box
+        ##
         self.urlText = gtk.Entry()
         self.urlText.set_width_chars(45)
+        
+        authurl = self.flickr.get_authurl()
+        self.urlText.set_text(authurl)
+        self.urlText.select_region(0,-1)
+        self.urlText.set_editable(False)
+        
+        ##
+        #    Done granting permissions, proceed to authentication
+        ##
         self.doneButton = gtk.Button('Press when you have granted authorization to AltCanvas!')
         self.doneButton.set_border_width(5)
-        self.doneButton.connect("clicked",self.login_handler)
+        self.doneButton.connect("clicked",login_handler)
+        
         
         self.set_spacing(15)
         self.pack_start(self.explainLabel)
@@ -403,26 +443,18 @@ class FlickrRegisterBox(gtk.VBox):
         self.set_border_width(30)
         self.show_all()
         
-    def setup(self):
-        authurl = self.flickrObject.get_authurl()
         
-        self.urlText.set_text(authurl)
-        self.urlText.select_region(0,-1)
-        self.urlText.set_editable(False)
-        
-    def login_handler(self,widget,data=None):
-        try:
-            if self.flickrObject.get_authtoken():
-                self.parentgui.upload_dialog()
-        except Exception, e:
-            libpub.alert("Unhandled exception while Flickr login: %s"%e)
+#    def login_handler(self,widget,data=None):
+#        try:
+#            if self.flickrObject.get_authtoken():
+#                self.parentgui.upload_dialog()
+#        except Exception, e:
+#            libpub.alert("Unhandled exception while Flickr login: %s"%e)
      
         
 class PicasawebRegisterBox(gtk.VBox):
-    def __init__(self,parent):
+    def __init__(self,login_handler):
         gtk.VBox.__init__(self)
-        self.parentgui = parent
-        self.picwebObject = self.parentgui.picwebObject
         # Picasaweb Login widgets
         self.loginTitle = gtk.Label('Login to your Picasaweb (Google) account')
         self.usernameTitle = gtk.Label('Username')
@@ -439,7 +471,7 @@ class PicasawebRegisterBox(gtk.VBox):
         self.passwordExplainLabel.set_width_chars(52)
         self.passwordExplainLabel.set_line_wrap(True)
         self.loginButton = gtk.Button('Login')
-        self.loginButton.connect("clicked",self.login_handler)
+        self.loginButton.connect("clicked",login_handler)
         self.cancelButton = gtk.Button('Cancel')
         self.cancelButton.connect("clicked",libpub.destroy)
         
@@ -471,7 +503,7 @@ class PicasawebRegisterBox(gtk.VBox):
         self.set_border_width(30)
         
         # Recall last settings, if available
-        last_username = libpub.config.get('PICASA_LAST_USERNAME')
+        last_username = libpub.conf.get('PICASA_LAST_USERNAME')
         if last_username:
             # Load the remembered username
             self.usernameEntry.set_text(last_username)
@@ -496,8 +528,8 @@ class PicasawebRegisterBox(gtk.VBox):
             self.parentgui.picwebObject.login(username,password)
             self.parentgui.upload_dialog()
             if self.remember_check.get_active():
-                libpub.config.set('PICASA_LAST_USERNAME',username)
+                libpub.conf.set('PICASA_LAST_USERNAME',username)
             else:
-                libpub.config.set('PICASA_LAST_USERNAME',None)
+                libpub.conf.set('PICASA_LAST_USERNAME',None)
         except Exception, e:
             libpub.alert('Login error: %s'%e)

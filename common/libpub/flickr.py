@@ -163,7 +163,7 @@ class FlickrObject:
             self.flickr = Flickr(self.keyserver)
         
     def __init__(self):
-        authtoken = libpub.config.get('FLICKR_TOKEN')
+        authtoken = libpub.conf.get('FLICKR_TOKEN')
         if authtoken != None:
             self.authtoken = authtoken
             
@@ -194,7 +194,7 @@ class FlickrObject:
     def get_authtoken(self):
         self.authtoken = self.keyserver.altcanvas.getAuthToken(self.frob)
         if self.authtoken:
-            libpub.config.set('FLICKR_TOKEN',self.authtoken)
+            libpub.conf.set('FLICKR_TOKEN',self.authtoken)
             return True
         else:
             libpub.alert("There was error retrieving Flickr Authentication token.\n"+

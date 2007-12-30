@@ -22,18 +22,31 @@
 
 import os
 import sys
-import traceback
 import gtk
-import xmlrpclib
 
 window = None
-config = None
+conf = None
 filename = '/tmp/test123.jpg'
 CONFIG_FILE = ''
 
 SERVER = 'http://www.altcanvas.com/xmlrpc/'
 VERSION = '0.3.2'
 HOSTAPP = '_'
+    
+def start(hostapp='_'):
+    global conf,window
+    import utils.config
+    import control
+    HOSTAPP = hostapp
+    conf = utils.config.Config()
+    window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+    window.connect("delete_event",delete_event)
+    window.connect("destroy",destroy)
+        
+    _control = control.Control(window)
+    _control.entry()
+        
+    window.show()
     
         
 LicenseList = [
@@ -69,7 +82,7 @@ def destroy(widget=None,data=None):
     gtk.main_quit()
 
 def signout(widget=None,data=None):
-    config.set('FLICKR_TOKEN',None)
+    conf.set('FLICKR_TOKEN',None)
     # Quit the GUI
     destroy()
     
