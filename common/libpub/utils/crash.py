@@ -1,4 +1,10 @@
 
+import sys
+import traceback
+import gtk
+
+import libpub
+
     
 def handle_crash():
     tb = ''
@@ -6,7 +12,7 @@ def handle_crash():
         tb += line+'\n'
         
     envinfo = 'sys.version = <b>%s</b>\n'%sys.version
-    envinfo += 'Publishr version = <b>%s</b>'%(HOSTAPP+' '+VERSION)
+    envinfo += 'Publishr version = <b>%s</b>'%(libpub.HOSTAPP+' '+libpub.VERSION)
     crb = CrashReportDialog(envinfo,tb)
     response = crb.run()
     
@@ -31,7 +37,7 @@ plugin by reporting this exception.\n\n\
         trace = trace.replace('>','&gt;')
         msg += '<span font_family="monospace">'+trace+'</span>'
         gtk.MessageDialog.__init__(self,
-                            window,
+                            libpub.window,
                             gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
                             gtk.MESSAGE_ERROR,
                             gtk.BUTTONS_YES_NO,
