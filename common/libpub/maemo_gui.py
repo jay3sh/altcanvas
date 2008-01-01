@@ -264,132 +264,6 @@ class UploadDlg(gtk.VBox):
                 self.licenseCombo.set_active(len(model)-1)
                 
         
-class UploadGUI:
-    ''' Main GUI container '''
-        
-    def upload(self,widget,data=None):
-        self.title = self.titleEntry.get_text()
-        buffer = self.descView.get_buffer()
-        startiter,enditer = buffer.get_bounds()
-        desc = buffer.get_text(startiter,enditer)
-        tags = self.tagEntry.get_text()
-        
-        # Get the index of chosen license 
-        license_index = self.licenseCombo.get_active()
-            
-        # Get the chosen album name
-        model = self.albumCombo.get_model()
-        active = self.albumCombo.get_active()
-        if active < 0:
-            curalbum = self.albumCombo.get_active_text()
-        else:
-            curalbum = model[active][0]
-            
-        # Upload to Flickr
-        if self.type == 'FLICKR':
-            
-            # Get license ID for chosen license
-            if license_index > 0 and license_index < len(libpub.LicenseList):
-                license_id = libpub.LicenseList[license_index][0]
-            else:
-                license_id = 0
-                
-            try:
-                # Upload the photo
-                url = self.flickrObject.upload(
-                        filename = libpub.filename,
-                        title = self.title,
-                        description = desc,
-                        is_public = self.is_public,
-                        tags = tags,
-                        license_id = str(license_id),
-                        photoset = curalbum)
-                
-                if url:
-                    # save the current album into config file
-                    libpub.conf.set('FLICKR_LAST_PHOTOSET',curalbum)
-                    libpub.conf.set('LAST_PRIVACY_CHOICE',self.is_public)
-                    libpub.conf.set('LAST_LICENSE_USED',license_index)
-            
-                    # success message
-                    libpub.alert("Image upload was successful.\n(Flickr URL: %s)"%url,
-                             gtk.MESSAGE_INFO)
-                
-            except FlickrException, fe:
-                libpub.alert("Flickr Exception: %s"%fe)
-                
-            except Exception, e:
-                libpub.alert("Upload exception: %s"%e)
-                
-            
-        # Upload to Picasaweb
-        elif self.type == 'PICASAWEB':
-                
-            if curalbum == None or curalbum.strip() == '':
-                libpub.alert('Picasaweb doesn\'t support uploading photos \
-without an album. If you don\'t have any album already, create one by typing \
-a new album name in the "Albums" entry.')
-                return
-                
-            # Determine the license text
-            # Ignore the blank-license index 
-            if license_index > 0 and license_index < len(libpub.LicenseList)-1:
-                license_text = libpub.LicenseList[license_index][1]
-                license_url = libpub.LicenseList[license_index][2]
-                desc += '  [%s]'%(license_text)
-                
-            # this is the blank-index choice, preserve it
-            elif license_index == len(libpub.LicenseList):
-                pass
-            
-            # correct invalid values, it is possible for user entered text
-            else:
-                license_index = 0
-                
-            try:
-                success = self.picwebObject.upload(
-                        filename = libpub.filename, 
-                        title = self.title,
-                        summary = desc,
-                        tags = tags,
-                		album = curalbum)
-            except PicasaException, pe:
-                libpub.alert('Picasa Exception: %s'%pe)
-            
-            except Exception, e:
-                libpub.alert('Upload exception: %s'%e)
-            
-                
-            if success:
-                # save the current album into config file
-                libpub.conf.set('PICASA_LAST_ALBUM',curalbum)
-            	libpub.conf.set('LAST_LICENSE_USED',license_index)
-                libpub.alert('Successful upload to Picasaweb!',gtk.MESSAGE_INFO)
-            
-        # Cleanup the GUI
-        libpub.destroy()
-            
-            
-    def displayPicwebLogin(self):
-        try:
-            empty_window()
-            self.picwebRegBox = PicasawebRegisterBox(self)
-            self.window.add(self.picwebRegBox)
-        except Exception, e:
-            libpub.alert("Picasaweb GUI: %s"%e)
-            libpub.destroy()
-        
-    def displayFlickrLogin(self):
-        try:
-            empty_window()
-            self.flickrRegBox = FlickrRegisterBox(self)
-            self.flickrRegBox.setup()
-            self.window.add(self.flickrRegBox)
-        except Exception, e:
-            libpub.alert("Flickr GUI: %s"%e)
-            libpub.destroy()
-            
-        
 class FlickrRegisterBox(gtk.VBox):
     def __init__(self,flickr,login_handler):
         gtk.VBox.__init__(self)
@@ -416,6 +290,25 @@ class FlickrRegisterBox(gtk.VBox):
         self.urlText.select_region(0,-1)
         self.urlText.set_editable(False)
         
+        
+        def open_browser(widget,url=None):
+            import osso
+            ctx = osso.Context('publishr','0.4.0',False)
+                
+            url = url.replace('www','m')
+            print 'Opening %s'%url
+
+            osso_rpc = osso.Rpc(ctx)
+            osso_rpc.rpc_run("com.nokia.osso_browser","/com/nokia/osso_browser/request",
+               'com.nokia.osso_browser','load_url',rpc_args=(url,))
+            
+        ##
+        #    A button to open the link in browser
+        ##
+        self.browserButton = gtk.Button('Open above link in browser')
+        self.browserButton.set_border_width(5)
+        self.browserButton.connect("clicked",open_browser,authurl)
+        
         ##
         #    Done granting permissions, proceed to authentication
         ##
@@ -427,6 +320,7 @@ class FlickrRegisterBox(gtk.VBox):
         self.set_spacing(15)
         self.pack_start(self.explainLabel)
         self.pack_start(self.urlText)
+        self.pack_start(self.browserButton)
         self.pack_start(self.doneButton)
         self.set_border_width(30)
         self.show_all()

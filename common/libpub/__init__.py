@@ -33,11 +33,12 @@ SERVER = 'http://www.altcanvas.com/xmlrpc/'
 VERSION = '0.3.2'
 HOSTAPP = '_'
     
-def start(hostapp='_'):
-    global conf,window
+def start(hostapp='_',fname='/tmp/test123.jpg'):
+    global conf,window,filename,HOSTAPP
+    HOSTAPP = hostapp
+    filename = fname
     import utils.config
     import control
-    HOSTAPP = hostapp
     conf = utils.config.Config()
     window = gtk.Window(gtk.WINDOW_TOPLEVEL)
     window.connect("delete_event",delete_event)
