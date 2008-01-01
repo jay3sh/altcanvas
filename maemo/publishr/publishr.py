@@ -27,17 +27,10 @@ class PublishrApp(hildon.Program):
     #if self.bg_importer:
     #    self.bg_importer.join()
         
-    print "[PublishrApp] Loading libpub: %s"%time.asctime()
+    #print "[PublishrApp] Loading libpub: %s"%time.asctime()
     import libpub
-    import libpub.gui
-    print "[PublishrApp] Done loading libpub: %s"%time.asctime()
-    libpub.config = libpub.Config()
-    libpub.window = self.window
-    libpub.filename = filename
-    libpub.window.connect("delete_event",libpub.delete_event)
-    libpub.window.connect("destroy",libpub.destroy)
-    gui = libpub.gui.UploadGUI()
-    self.window.show_all()
+    #print "[PublishrApp] Done loading libpub: %s"%time.asctime()
+    libpub.start(hostapp='Maemo',fname=filename)
 
 
   def selectPhoto(self):
@@ -65,7 +58,7 @@ class PublishrApp(hildon.Program):
     
   def open_browser(self,url):
     import osso
-    ctx = osso.Context('publishr','0.0.1',False)
+    ctx = osso.Context('publishr','0.4.0',False)
 
     osso_rpc = osso.Rpc(ctx)
     osso_rpc.rpc_run("com.nokia.osso_browser","/com/nokia/osso_browser/request",
