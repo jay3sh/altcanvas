@@ -22,45 +22,36 @@ import os
 import sys
 import gtk
 
-import xmlrpclib
 from gimpfu import *
 
-try:
-    import libpub
-    import libpub.gui
-
-    libpub.config = libpub.Config()
-    libpub.HOSTAPP = 'Gimp'
-except:
-    libpub.handle_crash()    
+from libpub.utils.crash import handle_crash
 
 
 def publishr_func(image,drawable):
     try:
+        import libpub
+        filename = None
         if image != None:
             # Check if file is dirty
             if pdb.gimp_image_is_dirty(image):
                 libpub.alert("Please save the image before publishing.")
                 return
 
-            libpub.filename = pdb.gimp_image_get_filename(image)
+            filename = pdb.gimp_image_get_filename(image)
         
-            if(not (libpub.filename.lower().endswith('jpg') or 
-                libpub.filename.lower().endswith('jpeg') or 
-                libpub.filename.lower().endswith('gif'))):
+            if(not (filename.lower().endswith('jpg') or 
+                filename.lower().endswith('jpeg') or 
+                filename.lower().endswith('gif'))):
              libpub.alert("You have to save the file in jpeg or gif format before publishing") 
              return
     
-        libpub.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        libpub.window.connect("delete_event",libpub.delete_event)
-        libpub.window.connect("destroy",libpub.destroy)
-        
-        gui = libpub.gui.UploadGUI()
-        
-        libpub.window.show()
+        if filename:
+            libpub.start(hostapp='Gimp',fname=filename)
+        else:
+            libpub.start(hostapp='Gimp')
         gtk.main()
     except:
-        libpub.handle_crash()    
+        handle_crash()    
         return
         
         
@@ -86,4 +77,4 @@ try:
     main()
 
 except:
-    libpub.handle_crash()
+    handle_crash()
