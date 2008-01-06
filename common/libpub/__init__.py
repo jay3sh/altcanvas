@@ -33,14 +33,17 @@ SERVER = 'http://www.altcanvas.com/xmlrpc/'
 VERSION = '0.3.2'
 HOSTAPP = '_'
     
-def start(hostapp='_',fname='/tmp/test123.jpg'):
+def start(hostapp='_',fname='/tmp/test123.jpg',guiwindow=None):
     global conf,window,filename,HOSTAPP
     HOSTAPP = hostapp
     filename = fname
     import utils.config
     import control
     conf = utils.config.Config()
-    window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+    if not guiwindow:
+        window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+    else:
+        window = guiwindow
     window.connect("delete_event",delete_event)
     window.connect("destroy",destroy)
         
