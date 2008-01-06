@@ -1,79 +1,37 @@
-#!/usr/bin/env python2.5
+#!/usr/bin/python2.5
+
+import sys
 import gtk
-import hildon
 
-#from threading import Thread
-#
-#class Importer(Thread):
-#    def __init__(self):
-#        Thread.__init__(self)
-#        
-#    def run(self):
-#        import libpub
-#        import libpub.gui
-
-
-class PublishrApp(hildon.Program):
-  bg_importer = None
-  def __init__(self):
-    hildon.Program.__init__(self)
-
-    self.window = hildon.Window()
-    self.window.connect("destroy", gtk.main_quit)
-    self.add_window(self.window)
-
-
-  def loadPublishr(self,filename):
-    #if self.bg_importer:
-    #    self.bg_importer.join()
-        
-    #print "[PublishrApp] Loading libpub: %s"%time.asctime()
-    import libpub
-    #print "[PublishrApp] Done loading libpub: %s"%time.asctime()
-    libpub.start(hostapp='Maemo',fname=filename)
-
-
-  def selectPhoto(self):
-    #self.fileChooser = gtk.FileChooserDialog(
-    #    title="Choose a photo to publish",
-    #    buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, 
-    #             gtk.STOCK_OK, gtk.RESPONSE_OK))
     
-    self.fileChooser = hildon.FileChooserDialog(
-                        self.window,gtk.FILE_CHOOSER_ACTION_OPEN)
-
-    response = self.fileChooser.run()
-    
-    if response == gtk.RESPONSE_OK:
-        filename = self.fileChooser.get_filename()
-        self.fileChooser.destroy()
-        self.loadPublishr(filename)
-        return True
-    else:
-        self.fileChooser.destroy()
-        return False
-
-  def run(self):
-    gtk.main()
-    
-  def open_browser(self,url):
+#def rpc_callback(interface, method, arguments, user_data):
+def flash_msg(msg):
     import osso
-    ctx = osso.Context('publishr','0.4.0',False)
-
-    osso_rpc = osso.Rpc(ctx)
-    osso_rpc.rpc_run("com.nokia.osso_browser","/com/nokia/osso_browser/request",
-       'com.nokia.osso_browser','load_url',rpc_args=('http://www.flickr.com/',))
+    osso_c = osso.Context("publishr", "0.4.0", False)
+    osso_sysnote = osso.SystemNote(osso_c)
+    osso_sysnote.system_note_infoprint(msg)
 
     
 if __name__ == "__main__":
-    #import osso
-    #ctx = osso.Context('publishr','0.0.1',False)
-    #browserapp = osso.Application(ctx)
-    #browserapp.application_top("browser")
-    app = PublishrApp()
+    if len(sys.argv) < 2:
+        print "filename argument missing"
+        sys.exit(1)
+        
+    flash_msg("Loading publishr")
+    import libpub
+    try:
+        import hildon
+    except ImportError, ie:
+        libpub.start(hostapp='Maemo',fname=sys.argv[1])
+    else:
+        libpub.start(hostapp='Maemo',fname=sys.argv[1],guiwindow=hildon.Window())
+        
+    gtk.main()
     
-    #app.bg_importer = Importer()
-    #app.bg_importer.start()
-
-    if app.selectPhoto():
-        app.run()
+#    
+#    osso_c = osso.Context("publishr", "0.4.0", False)
+#    print "publishr started"
+#    osso_rpc = osso.Rpc(osso_c)
+#    osso_rpc.set_rpc_callback("com.altcanvas.publishr",
+#        "/com/altcanvas/publishr",
+#        "com.altcanvas.publishr", callback_func, osso_c)
