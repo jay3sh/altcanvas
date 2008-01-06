@@ -15,8 +15,13 @@ class PresenceTest(unittest.TestCase):
 class conversionTests(unittest.TestCase):
     def setUp(self):
         self.imageMagick = libpub.imagic.ImageMagick()
-        self.origsvg = '/home/jayesh/trunk/altcanvas/tests/data/test1.svg'
-        self.origimg = '/home/jayesh/trunk/altcanvas/tests/data/test2.jpg'
+        
+        if sys.platform.find('win32') >= 0:
+            self.origsvg = 'C:\\Documents and Settings\\jayesh\\Desktop\\publishr-folder\\test1.svg'
+            self.origimg = 'C:\\Documents and Settings\\jayesh\\Desktop\\publishr-folder\\test2.jpg'
+        else:
+            self.origsvg = '/home/jayesh/trunk/altcanvas/tests/data/test1.svg'
+            self.origimg = '/home/jayesh/trunk/altcanvas/tests/data/test2.jpg'
         
     def testSVG2JPG(self):
         jpegfile = self.imageMagick.svg2jpeg(self.origsvg)
@@ -34,7 +39,7 @@ class conversionTests(unittest.TestCase):
             fd = open(thumbfile)
             fd.close()
         except IOError, ioe:
-            fail('Failed to access thumbfile: %s'%ioe)
+            self.fail('Failed to access thumbfile: %s'%ioe)
             
         geometry = self.imageMagick.getImageGeometry(thumbfile)
         self.assert_(geometry.find('100') >= 0)

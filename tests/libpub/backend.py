@@ -5,7 +5,7 @@ import unittest
 import sys
 import os
 import time
-sys.path.append(os.getcwd()+'/..')
+#sys.path.append(os.getcwd()+'/..')
 from libpub.flickr import Flickr
 
 SERVER='http://www.altcanvas.com/xmlrpc/'
@@ -56,6 +56,19 @@ class CreateDeletePhotosetTests(unittest.TestCase):
     	
     	result = self.keyserver.altcanvas.deletePhotoSet(authtoken,setID)
     	self.assert_(result)
+        
+class CrashReportTests(unittest.TestCase):
+    def setUp(self):
+        self.keyserver = xmlrpclib.Server(SERVER)
+        
+    def testCrashReport(self):
+        report = '\
+Traceback (most recent call last):\
+  File "<stdin>", line 1, in <module>\
+AttributeError: \'NoneType\' object has no attribute \'x\'\
+'
+        self.keyserver.altcanvas.reportPublishrCrash(report)
+        self.assert_(True) # reaching here without exception is good enuf for test
 	
         
 class DataTests(unittest.TestCase):
@@ -97,4 +110,7 @@ if __name__ == '__main__':
         sys.exit()
         
     suite = unittest.TestLoader().loadTestsFromTestCase(CreateDeletePhotosetTests)
+    dataTestResult = unittest.TextTestRunner(verbosity=2).run(suite)
+
+    suite = unittest.TestLoader().loadTestsFromTestCase(CrashReportTests)
     dataTestResult = unittest.TextTestRunner(verbosity=2).run(suite)
