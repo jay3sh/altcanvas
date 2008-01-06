@@ -1,0 +1,6 @@
+[Desktop Entry]
+Version=0.4.0
+Encoding=UTF-8
+Name=Publishr
+Exec=/usr/bin/publishr-start.py
+Type=Application
