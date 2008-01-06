@@ -31,9 +31,9 @@ class Control:
                             upload_handler=self.upload)
             self.window.add(self.uploadDlg)
         else:
-            flickrRegBox = gui.FlickrRegisterBox(flickr = self.flickr,
+            self.flickrRegBox = gui.FlickrRegisterBox(flickr = self.flickr,
                                 login_handler = self.flickr_login_handler)
-            self.window.add(flickrRegBox)
+            self.window.add(self.flickrRegBox)
     
     def picasa_entry_handler(self,widget,data=None):
         import libpub.picasa
@@ -52,6 +52,8 @@ class Control:
                             serviceObject=self.flickr,
                             upload_handler=self.upload)
             self.window.add(self.uploadDlg)
+        else:
+            self.window.add(self.flickrRegBox)
         
     def picasa_login_handler(self,widget,data=None):
         self.empty_window()
@@ -72,6 +74,7 @@ class Control:
             
         except Exception, e:
             libpub.alert('Login error: %s'%e)
+            self.window.add(self.picwebRegBox)
     
     def upload(self,widget,data=None):
         self.title = self.uploadDlg.titleEntry.get_text()
