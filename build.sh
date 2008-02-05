@@ -19,8 +19,8 @@ while getopts "p:h" options; do
 done
 
 TMP_BLDDIR=/tmp/publishr-build
-BLDDIR=/home/jayesh/trunk/altcanvas/packages
-SRCDIR=/home/jayesh/trunk/altcanvas
+BLDDIR=$HOME/trunk/altcanvas/packages
+SRCDIR=$HOME/trunk/altcanvas
 PUB_COMMON_DIR=$SRCDIR/common/libpub
 PUB_GIMP_DIR=$SRCDIR/gimp/publishr
 PUB_INKSCAPE_DIR=$SRCDIR/inkscape/publishr
@@ -38,7 +38,7 @@ make_gimp_publishr()
 		cd $TMP_BLDDIR;
 		find . | grep '\.svn' | xargs rm -rf 
 		find . | grep '\.pyc$' | xargs rm -rf 
-		tar czf publishr-gimp-$VERSION.tar.gz *.py libpub
+		tar czfp publishr-gimp-$VERSION.tar.gz *.py libpub
 		zip -q -r publishr-gimp-$VERSION.zip *.py libpub
 	)
 	mv $TMP_BLDDIR/publishr-gimp-$VERSION.{tar.gz,zip} $BLDDIR
@@ -57,7 +57,7 @@ make_inkscape_publishr()
 		cd $TMP_BLDDIR;
 		find . | grep '\.svn' | xargs rm -rf 
 		find . | grep '\.pyc$' | xargs rm -rf 
-		tar czf publishr-inkscape-$VERSION.tar.gz *.py *.inx libpub
+		tar czfp publishr-inkscape-$VERSION.tar.gz *.py *.inx libpub
 		zip -q -r publishr-inkscape-$VERSION.zip *.py *.inx libpub
 	)
 	mv $TMP_BLDDIR/publishr-inkscape-$VERSION.{tar.gz,zip} $BLDDIR
