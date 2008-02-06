@@ -6,7 +6,7 @@
     <output>
 		<extension>.web</extension>
 		<mimetype>image/jpeg</mimetype>
-		<filetypename>JPEG for web publishing (*.jpeg)</filetypename>
+		<filetypename>Web publishing (*.web)</filetypename>
 		<filetypetooltip>Publish on web</filetypetooltip>
 		<dataloss>FALSE</dataloss>
 	</output>

@@ -22,35 +22,32 @@ import os
 import sys
 
 import gtk
+from libpub.utils.crash import handle_crash
 
 try:
 	import libpub
 	import libpub.gui
-	import libpub.imagic
+	import libpub.gdkpixbuf
 
-	libpub.HOSTAPP = 'Inkscape'
-	im = libpub.imagic.ImageMagick()
+	gp = libpub.gdkpixbuf.GdkPixbuf()
 	
-	if im.present():
-		svgfilename = sys.argv[1]
-		libpub.filename = im.svg2jpeg(svgfilename)
+	svgfilename = sys.argv[1]
+	jpegfilename = gp.svg2jpeg(svgfilename)
+
 	
-		libpub.config = libpub.Config()
-		libpub.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-		libpub.window.connect("delete_event",libpub.delete_event)
-		libpub.window.connect("destroy",libpub.destroy)
-        
-		gui = libpub.gui.UploadGUI()
-    
-		libpub.window.show()
-		gtk.main()
-	
-		os.remove(libpub.filename)
+	if jpegfilename:
+		libpub.start(hostapp='Inkscape',fname=jpegfilename)		
 	else:
-		libpub.alert("You need to install ImageMagick for this plugin to work.")
-		
+		libpub.alert("JPEG file not created")
+	
+	gtk.main()
+	
+	if svgfilename:
+		os.remove(svgfilename)
+			
 except:
-    libpub.handle_crash()    
+    handle_crash()
+        
 	
 
 
