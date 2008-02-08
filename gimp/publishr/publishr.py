@@ -50,6 +50,12 @@ def publishr_func(image,drawable):
         else:
             libpub.start(hostapp='Gimp')
         gtk.main()
+    except ImportError, impe:
+        libpub.alert("Your system seems to be missing following modules."
+                     +" Please install them before proceeding further."
+                     +"\n\n<b>"+str(impe)+"</b>")
+                     
+        return
     except:
         handle_crash()    
         return

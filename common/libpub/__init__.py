@@ -75,7 +75,8 @@ def alert(msg,type=gtk.MESSAGE_ERROR):
                     gtk.DIALOG_DESTROY_WITH_PARENT|gtk.DIALOG_MODAL,
                     type,
                     gtk.BUTTONS_CLOSE,
-                    msg)
+                    '')
+    msgDlg.set_markup(msg)
     msgDlg.connect("response", lambda dlg, resp: dlg.destroy())
     responseId = msgDlg.run()
 
