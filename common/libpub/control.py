@@ -183,8 +183,10 @@ class Control:
                     libpub.conf.set('LAST_LICENSE_USED',license_index)
             
                     # success message
-                    libpub.alert("Image upload was successful.\n(Flickr URL: %s)"%url,
-                             gtk.MESSAGE_INFO)
+                    #libpub.alert("Image upload was successful.\n(Flickr URL: %s)"%url,
+                    #         gtk.MESSAGE_INFO)
+                    successDlg = gui.SuccessDialog(url)
+                    successDlg.run()
                 
             except FlickrException, fe:
                 libpub.alert("Flickr Exception: %s"%fe)
@@ -232,7 +234,6 @@ a new album name in the "Albums" entry.')
             
             except Exception, e:
                 libpub.alert('Upload exception: %s'%e)
-            
                 
             if success:
                 # save the current album into config file

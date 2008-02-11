@@ -419,3 +419,30 @@ class PicasawebRegisterBox(gtk.VBox):
         
         self.show_all()
         
+        
+class SuccessDialog(gtk.Dialog):
+    def __init__(self,url):
+        gtk.Dialog.__init__(self,'Upload successful')
+        urlLabel = gtk.Label()
+        urlLabel.set_markup('URL to uploaded image <span foreground="blue">%s</span>'%url)
+        
+        browserButton = gtk.Button('Open in Firefox')
+        browserButton.connect("clicked",self.open_browser,url)
+        doneButton = gtk.Button('Done')
+        doneButton.connect("clicked",self.respond_done)
+        
+        buttonBox = gtk.HBox()
+        buttonBox.pack_start(browserButton)
+        buttonBox.pack_start(doneButton)
+        
+        self.vbox.pack_start(urlLabel)
+        self.vbox.pack_start(buttonBox)
+        self.vbox.set_spacing(10)
+        self.set_border_width(25)
+        self.vbox.show_all()
+        
+    def respond_done(self,widget,data=None):
+        self.response(gtk.RESPONSE_OK)
+        
+    def open_browser(self,widget,data=None):
+        os.system("%s '%s'" % ('firefox', data))
