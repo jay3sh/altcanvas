@@ -17,12 +17,12 @@ if __name__ == "__main__":
         print "filename argument missing"
         sys.exit(1)
         
-    flash_msg("Loading publishr")
+    #flash_msg("Loading publishr")
     import libpub
     try:
         import hildon
     except ImportError, ie:
-        libpub.start(hostapp='Maemo',fname=sys.argv[1])
+        libpub.start(hostapp='Desktop',fname=sys.argv[1])
     else:
         libpub.start(hostapp='Maemo',fname=sys.argv[1],guiwindow=hildon.Window())
         

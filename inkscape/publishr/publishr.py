@@ -46,7 +46,7 @@ try:
 		os.remove(svgfilename)
 
 except ImportError, impe:
-    libpub.alert("Your system seems to be missing following modules."
+    libpub.alert_markup("Your system seems to be missing following modules."
                  +" Please install them before proceeding further."
                  +"\n\n<b>"+str(impe)+"</b>")
                      

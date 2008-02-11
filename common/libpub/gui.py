@@ -32,6 +32,7 @@ from libpub.gdata.photos.service import PicasaException
 def empty_window():
     for box in libpub.window.get_children():
         libpub.window.remove(box)
+    libpub.window.resize(10,10)
         
 class Entry(gtk.VBox):
     ''' Main GUI container '''
@@ -44,8 +45,8 @@ class Entry(gtk.VBox):
         self.flickrButton = gtk.Button('_Flickr')
         self.picwebButton = gtk.Button('_Picasaweb')
         
-        self.flickrButton.connect("clicked",flickr_handler)
-        self.picwebButton.connect("clicked",picasa_handler)
+        self.flickrButton.connect("clicked",flickr_handler,self)
+        self.picwebButton.connect("clicked",picasa_handler,self)
         
         self.introLabel = gtk.Label()
         self.introLabel.set_markup('\
@@ -66,24 +67,46 @@ class Entry(gtk.VBox):
 <span foreground="#0000FC">b</span>\
 <span foreground="#0000FF">!</span>\
 </span>')
+        
+        ##
+        #    Save service (Flickr/Picasa) choice
+        ##
+        def service_memory_toggled(togglebutton,param=None):
+            if self.serviceMemory.get_active():
+                self.remember_service = True
+            else:
+                self.remember_service = False
+        
+        self.remember_service = False
+        self.serviceMemory = gtk.CheckButton(label='Remember choice')
+        self.serviceMemory.connect('toggled',service_memory_toggled)
+        
 
         # Pack all widgets
         self.pack_start(self.introLabel,expand=False)
         self.pack_start(self.flickrButton,expand=False)
         self.pack_start(self.picwebButton,expand=False)
+        self.pack_start(self.serviceMemory,expand=False)
         self.set_spacing(10)
         
         self.set_border_width(15)
         self.show_all()
         
 class UploadDlg(gtk.VBox):
-    def __init__(self,apptype,serviceObject,upload_handler):
+    '''
+        Upload dialog 
+    '''
+    def __init__(self,apptype,parent):
+        '''
+        @param apptype: photo hosting service type {FLICKR,PICASAWEB}
+        @param parent: handle to the parent control object
+        '''
         gtk.VBox.__init__(self)
         self.apptype = apptype 
         if apptype == 'FLICKR':
-            self.flickr = serviceObject
+            self.flickr = parent.flickr
         else:
-            self.picasa = serviceObject
+            self.picasa = parent.picasa
         
         #
         #    Photosets/Albums
@@ -178,7 +201,7 @@ class UploadDlg(gtk.VBox):
         #    OK
         ##
         okButton = gtk.Button('Upload')
-        okButton.connect("clicked",upload_handler)
+        okButton.connect("clicked",parent.upload)
         
         ##
         #    Cancel
@@ -191,6 +214,15 @@ class UploadDlg(gtk.VBox):
         ##
         signoutButton = gtk.Button('Sign out')
         signoutButton.connect("clicked",libpub.signout)
+        
+        ##
+        #    Home
+        ##
+        homepb = gtk.gdk.pixbuf_new_from_xpm_data(libpub.home_xpm)
+        homeButton = gtk.Button()
+        homeButton.set_image(gtk.image_new_from_pixbuf(homepb))
+        homeButton.connect("clicked",parent.display_home)
+        
         
         #####
         # packing of widgets
@@ -234,6 +266,7 @@ class UploadDlg(gtk.VBox):
         buttonBox.pack_start(okButton)
         buttonBox.pack_start(cancelButton)
         buttonBox.pack_start(signoutButton)
+        buttonBox.pack_start(homeButton)
         buttonBox.set_border_width(4)
 
         self.pack_start(inputBox)
@@ -264,136 +297,10 @@ class UploadDlg(gtk.VBox):
                 self.licenseCombo.set_active(len(model)-1)
                 
         
-class UploadGUI:
-    ''' Main GUI container '''
-        
-    def upload(self,widget,data=None):
-        self.title = self.titleEntry.get_text()
-        buffer = self.descView.get_buffer()
-        startiter,enditer = buffer.get_bounds()
-        desc = buffer.get_text(startiter,enditer)
-        tags = self.tagEntry.get_text()
-        
-        # Get the index of chosen license 
-        license_index = self.licenseCombo.get_active()
-            
-        # Get the chosen album name
-        model = self.albumCombo.get_model()
-        active = self.albumCombo.get_active()
-        if active < 0:
-            curalbum = self.albumCombo.get_active_text()
-        else:
-            curalbum = model[active][0]
-            
-        # Upload to Flickr
-        if self.type == 'FLICKR':
-            
-            # Get license ID for chosen license
-            if license_index > 0 and license_index < len(libpub.LicenseList):
-                license_id = libpub.LicenseList[license_index][0]
-            else:
-                license_id = 0
-                
-            try:
-                # Upload the photo
-                url = self.flickrObject.upload(
-                        filename = libpub.filename,
-                        title = self.title,
-                        description = desc,
-                        is_public = self.is_public,
-                        tags = tags,
-                        license_id = str(license_id),
-                        photoset = curalbum)
-                
-                if url:
-                    # save the current album into config file
-                    libpub.conf.set('FLICKR_LAST_PHOTOSET',curalbum)
-                    libpub.conf.set('LAST_PRIVACY_CHOICE',self.is_public)
-                    libpub.conf.set('LAST_LICENSE_USED',license_index)
-            
-                    # success message
-                    libpub.alert("Image upload was successful.\n(Flickr URL: %s)"%url,
-                             gtk.MESSAGE_INFO)
-                
-            except FlickrException, fe:
-                libpub.alert("Flickr Exception: %s"%fe)
-                
-            except Exception, e:
-                libpub.alert("Upload exception: %s"%e)
-                
-            
-        # Upload to Picasaweb
-        elif self.type == 'PICASAWEB':
-                
-            if curalbum == None or curalbum.strip() == '':
-                libpub.alert('Picasaweb doesn\'t support uploading photos \
-without an album. If you don\'t have any album already, create one by typing \
-a new album name in the "Albums" entry.')
-                return
-                
-            # Determine the license text
-            # Ignore the blank-license index 
-            if license_index > 0 and license_index < len(libpub.LicenseList)-1:
-                license_text = libpub.LicenseList[license_index][1]
-                license_url = libpub.LicenseList[license_index][2]
-                desc += '  [%s]'%(license_text)
-                
-            # this is the blank-index choice, preserve it
-            elif license_index == len(libpub.LicenseList):
-                pass
-            
-            # correct invalid values, it is possible for user entered text
-            else:
-                license_index = 0
-                
-            try:
-                success = self.picwebObject.upload(
-                        filename = libpub.filename, 
-                        title = self.title,
-                        summary = desc,
-                        tags = tags,
-                		album = curalbum)
-            except PicasaException, pe:
-                libpub.alert('Picasa Exception: %s'%pe)
-            
-            except Exception, e:
-                libpub.alert('Upload exception: %s'%e)
-            
-                
-            if success:
-                # save the current album into config file
-                libpub.conf.set('PICASA_LAST_ALBUM',curalbum)
-            	libpub.conf.set('LAST_LICENSE_USED',license_index)
-                libpub.alert('Successful upload to Picasaweb!',gtk.MESSAGE_INFO)
-            
-        # Cleanup the GUI
-        libpub.destroy()
-            
-            
-    def displayPicwebLogin(self):
-        try:
-            empty_window()
-            self.picwebRegBox = PicasawebRegisterBox(self)
-            self.window.add(self.picwebRegBox)
-        except Exception, e:
-            libpub.alert("Picasaweb GUI: %s"%e)
-            libpub.destroy()
-        
-    def displayFlickrLogin(self):
-        try:
-            empty_window()
-            self.flickrRegBox = FlickrRegisterBox(self)
-            self.flickrRegBox.setup()
-            self.window.add(self.flickrRegBox)
-        except Exception, e:
-            libpub.alert("Flickr GUI: %s"%e)
-            libpub.destroy()
-            
-        
 class FlickrRegisterBox(gtk.VBox):
-    def __init__(self,flickr,login_handler):
+    def __init__(self,parent):
         gtk.VBox.__init__(self)
-        self.flickr = flickr
+        self.flickr = parent.flickr
         
         ##
         #    Explanation label for password non-storage policy
@@ -411,7 +318,7 @@ class FlickrRegisterBox(gtk.VBox):
         self.urlText = gtk.Entry()
         self.urlText.set_width_chars(45)
         
-        authurl = self.flickr.get_authurl()
+        authurl = parent.flickr.get_authurl()
         self.urlText.set_text(authurl)
         self.urlText.select_region(0,-1)
         self.urlText.set_editable(False)
@@ -421,27 +328,24 @@ class FlickrRegisterBox(gtk.VBox):
         ##
         self.doneButton = gtk.Button('Press when you have granted authorization to AltCanvas!')
         self.doneButton.set_border_width(5)
-        self.doneButton.connect("clicked",login_handler)
+        self.doneButton.connect("clicked",parent.flickr_login_handler)
         
+        homepb = gtk.gdk.pixbuf_new_from_xpm_data(libpub.home_xpm)
+        self.homeButton = gtk.Button()
+        self.homeButton.set_image(gtk.image_new_from_pixbuf(homepb))
+        self.homeButton.connect("clicked",parent.display_home)
         
         self.set_spacing(15)
         self.pack_start(self.explainLabel)
         self.pack_start(self.urlText)
         self.pack_start(self.doneButton)
+        self.pack_start(self.homeButton,expand=False)
         self.set_border_width(30)
         self.show_all()
         
         
-#    def login_handler(self,widget,data=None):
-#        try:
-#            if self.flickrObject.get_authtoken():
-#                self.parentgui.upload_dialog()
-#        except Exception, e:
-#            libpub.alert("Unhandled exception while Flickr login: %s"%e)
-     
-        
 class PicasawebRegisterBox(gtk.VBox):
-    def __init__(self,login_handler):
+    def __init__(self,parent):
         gtk.VBox.__init__(self)
         # Picasaweb Login widgets
         self.loginTitle = gtk.Label('Login to your Picasaweb (Google) account')
@@ -459,9 +363,14 @@ class PicasawebRegisterBox(gtk.VBox):
         self.passwordExplainLabel.set_width_chars(52)
         self.passwordExplainLabel.set_line_wrap(True)
         self.loginButton = gtk.Button('Login')
-        self.loginButton.connect("clicked",login_handler)
+        self.loginButton.connect("clicked",parent.picasa_login_handler)
         self.cancelButton = gtk.Button('Cancel')
         self.cancelButton.connect("clicked",libpub.destroy)
+        
+        homepb = gtk.gdk.pixbuf_new_from_xpm_data(libpub.home_xpm)
+        self.homeButton = gtk.Button()
+        self.homeButton.set_image(gtk.image_new_from_pixbuf(homepb))
+        self.homeButton.connect("clicked",parent.display_home)
         
         self.remember_check = gtk.CheckButton('Remember username')
         
@@ -480,6 +389,7 @@ class PicasawebRegisterBox(gtk.VBox):
         self.buttonBox = gtk.HBox()
         self.buttonBox.pack_start(self.loginButton)
         self.buttonBox.pack_start(self.cancelButton)
+        self.buttonBox.pack_start(self.homeButton,expand=False)
             
         self.set_spacing(15)
         self.pack_start(self.loginTitle)
@@ -509,15 +419,3 @@ class PicasawebRegisterBox(gtk.VBox):
         
         self.show_all()
         
-    def login_handler(self,widget,data=None):
-        username = self.usernameEntry.get_text()
-        password = self.passwordEntry.get_text()
-        try:
-            self.parentgui.picwebObject.login(username,password)
-            self.parentgui.upload_dialog()
-            if self.remember_check.get_active():
-                libpub.conf.set('PICASA_LAST_USERNAME',username)
-            else:
-                libpub.conf.set('PICASA_LAST_USERNAME',None)
-        except Exception, e:
-            libpub.alert('Login error: %s'%e)

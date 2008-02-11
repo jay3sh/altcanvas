@@ -8,18 +8,64 @@ if libpub.HOSTAPP == 'Maemo':
 else:
     import libpub.gui as gui
 
+######################################################
+# Control
+######################################################
 class Control:
+    '''
+        This class contains the logic of high level program flow
+         - Entry point to the application
+         - Callback handlers that respond to user input events
+    '''
     def __init__(self,window):
         self.window = window
     
     def entry(self):
-        entry = gui.Entry(flickr_handler=self.flickr_entry_handler,
+        '''
+            Application's entry point
+        '''
+        #
+        # If we remember last service choice, let's skip Home screen
+        #
+        import libpub
+        service_choice = libpub.conf.get('SERVICE_CHOICE')
+        if service_choice == 'FLICKR':
+            self.flickr_entry_handler(widget=None,data=None)
+            return
+        elif service_choice == 'PICASAWEB':
+            self.picasa_entry_handler(widget=None,data=None)
+            return
+        
+        # No luck, display Home screen
+        self.display_home(widget=None,data=None)
+            
+    def display_home(self,widget,data=None):
+        '''
+            Display the home screen that gives a choice between services.
+        '''
+        gui.empty_window()
+        home = gui.Entry(flickr_handler=self.flickr_entry_handler,
               picasa_handler=self.picasa_entry_handler)
-        self.window.add(entry)
+        self.window.add(home)
         
     def flickr_entry_handler(self,widget,data=None):
+        '''
+            This is called when user chooses to use Flickr.
+            
+            If we find a saved flickr token:
+                proceed straight to upload dialog
+            else
+                prompt for flickr login information
+        '''
+        import libpub
+        entry = data
+        if entry and entry.remember_service:
+            libpub.conf.set('SERVICE_CHOICE','FLICKR')
+        else:
+            libpub.conf.set('SERVICE_CHOICE',None)
+            
         import libpub.flickr
-        self.empty_window()
+        gui.empty_window()
         
         self.flickr = libpub.flickr.FlickrObject()
         self.apptype = 'FLICKR'
@@ -27,44 +73,55 @@ class Control:
         # If authtoken is found locally, directly go to Upload dialog
         if self.flickr.has_auth():
             self.uploadDlg = gui.UploadDlg(apptype='FLICKR',
-                            serviceObject=self.flickr,
-                            upload_handler=self.upload)
+                            parent=self)
             self.window.add(self.uploadDlg)
         else:
-            self.flickrRegBox = gui.FlickrRegisterBox(flickr = self.flickr,
-                                login_handler = self.flickr_login_handler)
+            self.flickrRegBox = gui.FlickrRegisterBox(parent=self)
             self.window.add(self.flickrRegBox)
     
     def picasa_entry_handler(self,widget,data=None):
+        '''
+            This is called when user chooses to use Picasaweb
+        '''
+        import libpub
+        entry = data
+        if entry and entry.remember_service:
+            libpub.conf.set('SERVICE_CHOICE','PICASAWEB')
+        else:
+            libpub.conf.set('SERVICE_CHOICE',None)
+            
         import libpub.picasa
-        self.empty_window()
+        gui.empty_window()
         
         self.picasa = libpub.picasa.PicasawebObject()
         self.apptype = 'PICASAWEB'
-        self.picwebRegBox = gui.PicasawebRegisterBox(
-                                login_handler=self.picasa_login_handler)
+        self.picwebRegBox = gui.PicasawebRegisterBox(parent=self)
         self.window.add(self.picwebRegBox)
         
     def flickr_login_handler(self,widget,data=None):
-        self.empty_window()
+        '''
+            This is called after user has entered Flickr login info
+        '''
+        gui.empty_window()
         if self.flickr.get_authtoken():
             self.uploadDlg = gui.UploadDlg(apptype='FLICKR',
-                            serviceObject=self.flickr,
-                            upload_handler=self.upload)
+                                           parent=self)
             self.window.add(self.uploadDlg)
         else:
             self.window.add(self.flickrRegBox)
         
     def picasa_login_handler(self,widget,data=None):
-        self.empty_window()
+        '''
+            This is called after user has entered Picasaweb login info
+        '''
+        gui.empty_window()
         try:
             username = self.picwebRegBox.usernameEntry.get_text()
             password = self.picwebRegBox.passwordEntry.get_text()
             self.picasa.login(username,password)
             
             self.uploadDlg = gui.UploadDlg(apptype='PICASAWEB',
-                            serviceObject=self.picasa,
-                            upload_handler=self.upload)
+                                           parent=self)
             self.window.add(self.uploadDlg)
         
             if self.picwebRegBox.remember_check.get_active():
@@ -77,6 +134,9 @@ class Control:
             self.window.add(self.picwebRegBox)
     
     def upload(self,widget,data=None):
+        '''
+            This is final upload function
+        '''
         self.title = self.uploadDlg.titleEntry.get_text()
         buffer = self.uploadDlg.descView.get_buffer()
         startiter,enditer = buffer.get_bounds()
@@ -182,7 +242,3 @@ a new album name in the "Albums" entry.')
             
         # Cleanup the GUI
         libpub.destroy()
-
-    def empty_window(self):
-        for box in self.window.get_children():
-            self.window.remove(box)

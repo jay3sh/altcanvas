@@ -75,6 +75,15 @@ def alert(msg,type=gtk.MESSAGE_ERROR):
                     gtk.DIALOG_DESTROY_WITH_PARENT|gtk.DIALOG_MODAL,
                     type,
                     gtk.BUTTONS_CLOSE,
+                    msg)
+    msgDlg.connect("response", lambda dlg, resp: dlg.destroy())
+    responseId = msgDlg.run()
+    
+def alert_markup(msg,type=gtk.MESSAGE_ERROR):
+    msgDlg = gtk.MessageDialog(window,
+                    gtk.DIALOG_DESTROY_WITH_PARENT|gtk.DIALOG_MODAL,
+                    type,
+                    gtk.BUTTONS_CLOSE,
                     '')
     msgDlg.set_markup(msg)
     msgDlg.connect("response", lambda dlg, resp: dlg.destroy())
@@ -91,5 +100,27 @@ def signout(widget=None,data=None):
     # Quit the GUI
     destroy()
     
-    
-    
+home_xpm_1 = [
+    "16 16 4 1",
+    "# c #000000",
+    "a c #ffffff",
+    "b c #c0c0c0",
+    ". c None",
+    "........... ....",
+    "   ....##.......",
+    "..#...####......",
+    "..#..#aabb#.....",
+    "..#.#aaaabb#....",
+    "..##aaaaaabb#...",
+    "..#aaaaaaaabb#..",
+    ".#aaaaaaaaabbb#.",
+    "###aaaaaaaabb###",
+    "..#aaaaaaaabb#..",
+    "..#aaa###aabb#..",
+    "..#aaa#.#aabb#..",
+    "..#aaa#.#aabb#..",
+    "..#aaa#.#aabb#..",
+    "..#aaa#.#aabb#..",
+    "..#####.######..",
+    "................"
+    ]
