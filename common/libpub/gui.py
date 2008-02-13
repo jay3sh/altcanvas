@@ -280,9 +280,10 @@ class UploadDlg(gtk.VBox):
             self.privacyCheck.hide()
             
             # Set the title to be the filename
-            path_segments = libpub.filename.split(os.sep)
-            self.title = path_segments[len(path_segments)-1]
-            self.titleEntry.set_text(self.title)
+            if len(libpub.filename_list) == 1:
+                path_segments = libpub.filename_list[0].split(os.sep)
+            	self.title = path_segments[len(path_segments)-1]
+            	self.titleEntry.set_text(self.title)
             
             # Add a blank-license option to license choices. This will result
             # into appending nothing to the summary field about license info
@@ -426,8 +427,11 @@ class SuccessDialog(gtk.Dialog):
         urlLabel = gtk.Label()
         urlLabel.set_markup('URL to uploaded image <span foreground="blue">%s</span>'%url)
         
+        #firefox_pb = gtk.gdk.pixbuf_new_from_xpm_data(libpub.firefox_xpm)
         browserButton = gtk.Button('Open in Firefox')
+        #browserButton.set_image(gtk.image_new_from_pixbuf(firefox_pb))
         browserButton.connect("clicked",self.open_browser,url)
+        
         doneButton = gtk.Button('Done')
         doneButton.connect("clicked",self.respond_done)
         

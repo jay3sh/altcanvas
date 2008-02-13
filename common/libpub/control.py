@@ -166,27 +166,48 @@ class Control:
                 license_id = 0
                 
             try:
-                # Upload the photo
-                url = self.flickr.upload(
-                        filename = libpub.filename,
+                if len(libpub.filename_list) == 1:
+                    # Upload the photo
+                    url = self.flickr.upload(
+                        filename = libpub.filename_list[0],
                         title = self.title,
                         description = desc,
                         is_public = self.uploadDlg.is_public,
                         tags = tags,
                         license_id = str(license_id),
                         photoset = curalbum)
-                
-                if url:
-                    # save the current album into config file
-                    libpub.conf.set('FLICKR_LAST_PHOTOSET',curalbum)
-                    libpub.conf.set('LAST_PRIVACY_CHOICE',self.uploadDlg.is_public)
-                    libpub.conf.set('LAST_LICENSE_USED',license_index)
+                    if url:
+                        # save the current album into config file
+                        libpub.conf.set('FLICKR_LAST_PHOTOSET',curalbum)
+                    	libpub.conf.set('LAST_PRIVACY_CHOICE',self.uploadDlg.is_public)
+                    	libpub.conf.set('LAST_LICENSE_USED',license_index)
             
-                    # success message
-                    #libpub.alert("Image upload was successful.\n(Flickr URL: %s)"%url,
-                    #         gtk.MESSAGE_INFO)
-                    successDlg = gui.SuccessDialog(url)
-                    successDlg.run()
+                    	# success message
+                    	#libpub.alert("Image upload was successful.\n(Flickr URL: %s)"%url,
+                    	#         gtk.MESSAGE_INFO)
+                    	successDlg = gui.SuccessDialog(url)
+                    	successDlg.run()
+                else:
+                    count = 0
+                    total = len(libpub.filename_list)
+                    for filename in libpub.filename_list:
+                        url = self.flickr.upload(
+                            filename = filename,
+                            title = self.title+'(%d of %d)'%(count+1,total),
+                        	description = desc+'(%d of %d)'%(count+1,total),
+                        	is_public = self.uploadDlg.is_public,
+                        	tags = tags,
+                        	license_id = str(license_id),
+                            photoset = curalbum)
+                        count+=1
+                        
+                        if not url:
+                            raise Exception('Upload of Image %d of %d failed'%
+                                            (count,total))
+                            
+                    libpub.alert("Image upload of %d images was successful!"%total, 
+                                 gtk.MESSAGE_INFO)
+                
                 
             except FlickrException, fe:
                 libpub.alert("Flickr Exception: %s"%fe)
@@ -223,12 +244,30 @@ a new album name in the "Albums" entry.')
                 license_index = 0
                 
             try:
-                success = self.picasa.upload(
-                        filename = libpub.filename, 
+                if len(libpub.filename_list) == 1:
+                    success = self.picasa.upload(
+                        filename = libpub.filename_list[0], 
                         title = self.title,
                         summary = desc,
                         tags = tags,
                 		album = curalbum)
+                else:
+                    count = 0
+                    total = len(libpub.filename_list)
+                    for filename in libpub.filename_list:
+                        success = self.picasa.upload(
+                            filename = filename,
+                            title = self.title+'(%d of %d)'%(count+1,total), 
+                            summary = desc+'(%d of %d)'%(count+1,total), 
+                            tags = tags,
+                		    album = curalbum)
+                        count+=1
+                        
+                        if not success:
+                            raise Exception('Upload of Image %d of %d failed'%
+                                        (count,total))
+                        
+                    
             except PicasaException, pe:
                 libpub.alert('Picasa Exception: %s'%pe)
             
