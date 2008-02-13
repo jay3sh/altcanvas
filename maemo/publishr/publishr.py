@@ -22,9 +22,9 @@ if __name__ == "__main__":
     try:
         import hildon
     except ImportError, ie:
-        libpub.start(hostapp='Desktop',fname=sys.argv[1])
+        libpub.start(hostapp='Desktop',fnames=sys.argv[1:])
     else:
-        libpub.start(hostapp='Maemo',fname=sys.argv[1],guiwindow=hildon.Window())
+        libpub.start(hostapp='Maemo',fnames=sys.argv[1:],guiwindow=hildon.Window())
         
     gtk.main()
     
