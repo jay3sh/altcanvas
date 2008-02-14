@@ -374,6 +374,13 @@ class PicasawebRegisterBox(gtk.VBox):
         self.homeButton.connect("clicked",parent.display_home)
         
         self.remember_check = gtk.CheckButton('Remember username')
+        self.remember_pass_check = gtk.CheckButton('Remember password')
+        self.remember_pass_help = gtk.Button('?')
+        self.remember_pass_help.connect('clicked',
+                lambda dlg: libpub.alert('The password will not be stored in '
+                                         'plain text, however it is possible for '
+                                         'a knowledgeable person to decrypt it.',
+                                         gtk.MESSAGE_INFO))
         
         self.usernameBox = gtk.HBox()
         self.usernameBox.pack_start(self.usernameTitle,expand=False)
@@ -383,9 +390,18 @@ class PicasawebRegisterBox(gtk.VBox):
         self.passwordBox.pack_start(self.passwordTitle,expand=False)
         self.passwordBox.pack_start(self.passwordEntry,expand=False)
         self.passwordBox.set_homogeneous(True)
-        self.rememberBox = gtk.HBox()
-        self.rememberBox.pack_start(gtk.Label('   '))
-        self.rememberBox.pack_start(self.remember_check,expand=True)
+        
+        self.rememberUserBox = gtk.HBox()
+        self.rememberUserBox.pack_start(gtk.Label('   '))
+        self.rememberUserBox.pack_start(self.remember_check,expand=True)
+        self.rememberPasswordBox = gtk.HBox()
+        self.rememberPasswordBox.pack_start(gtk.Label('    '))
+        self.rememberPasswordBox.pack_start(self.remember_pass_check,expand=True)
+        self.rememberPasswordBox.pack_start(self.remember_pass_help,expand=False)
+        self.rememberBox = gtk.VBox()
+        self.rememberBox.pack_start(self.rememberUserBox)
+        self.rememberBox.pack_start(self.rememberPasswordBox)
+        
         self.passwordBox.set_homogeneous(True)
         self.buttonBox = gtk.HBox()
         self.buttonBox.pack_start(self.loginButton)
