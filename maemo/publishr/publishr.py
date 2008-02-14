@@ -1,6 +1,7 @@
 #!/usr/bin/python2.5
 
 import sys
+import os
 import gtk
 
     
@@ -17,14 +18,26 @@ if __name__ == "__main__":
         print "filename argument missing"
         sys.exit(1)
         
+    path = sys.argv[1]
+    images = []
+    if os.path.isdir(path):
+        files = os.listdir(path)
+        for f in files:
+            if f.lower().endswith('jpg') or  \
+                f.lower().endswith('jpeg') or  \
+                f.lower().endswith('gif'):
+                    images.append(path+os.sep+f)
+    else:
+        images.append(path)
+        
     #flash_msg("Loading publishr")
     import libpub
     try:
         import hildon
     except ImportError, ie:
-        libpub.start(hostapp='Desktop',fnames=sys.argv[1:])
+        libpub.start(hostapp='Desktop',fnames=images)
     else:
-        libpub.start(hostapp='Maemo',fnames=sys.argv[1:],guiwindow=hildon.Window())
+        libpub.start(hostapp='Maemo',fnames=images,guiwindow=hildon.Window())
         
     gtk.main()
     
