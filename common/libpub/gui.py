@@ -371,12 +371,6 @@ class PicasawebRegisterBox(gtk.VBox):
         self.passwordEntry = gtk.Entry()
         self.passwordEntry.set_visibility(False)
         self.passwordEntry.set_width_chars(15)
-        self.passwordExplainLabel = gtk.Label(
-            "Your password is passed to Google's GDATA library which does "+
-            "the authentication over SSL connection. It is NOT sent anywhere "+
-            "else on network or stored on disk in plaintext")
-        self.passwordExplainLabel.set_width_chars(52)
-        self.passwordExplainLabel.set_line_wrap(True)
         self.loginButton = gtk.Button('Login')
         self.loginButton.connect("clicked",parent.picasa_login_handler)
         self.cancelButton = gtk.Button('Cancel')
@@ -389,13 +383,16 @@ class PicasawebRegisterBox(gtk.VBox):
         self.homeButton.set_image(homeimg)
         self.homeButton.connect("clicked",parent.display_home)
         
-        self.remember_check = gtk.CheckButton('Remember username')
+        self.remember_user_check = gtk.CheckButton('Remember username')
+        
         self.remember_pass_check = gtk.CheckButton('Remember password')
         self.remember_pass_help = gtk.Button('?')
         self.remember_pass_help.connect('clicked',
-                lambda dlg: libpub.alert('The password will not be stored in '
-                                         'plain text, however it is possible for '
-                                         'a knowledgeable person to decrypt it.',
+                lambda dlg: libpub.alert(
+                    'The password will not be stored in plain text, '
+                    'however it is possible for a knowledgeable person to decrypt it. '
+                    'While logging in it is passed to Google\'s GDATA library which does'
+                    ' the authentication over SSL connection.',
                                          gtk.MESSAGE_INFO))
         
         self.usernameBox = gtk.HBox()
@@ -409,7 +406,7 @@ class PicasawebRegisterBox(gtk.VBox):
         
         self.rememberUserBox = gtk.HBox()
         self.rememberUserBox.pack_start(gtk.Label('   '))
-        self.rememberUserBox.pack_start(self.remember_check,expand=True)
+        self.rememberUserBox.pack_start(self.remember_user_check,expand=True)
         self.rememberPasswordBox = gtk.HBox()
         self.rememberPasswordBox.pack_start(gtk.Label('    '))
         self.rememberPasswordBox.pack_start(self.remember_pass_check,expand=True)
@@ -429,7 +426,6 @@ class PicasawebRegisterBox(gtk.VBox):
         self.pack_start(self.usernameBox)
         self.pack_start(self.passwordBox)
         self.pack_start(self.rememberBox)
-        self.pack_start(self.passwordExplainLabel)
         self.pack_start(self.buttonBox)
         self.set_border_width(30)
         
@@ -442,10 +438,10 @@ class PicasawebRegisterBox(gtk.VBox):
             self.passwordBox.grab_focus()
             self.passwordEntry.grab_focus()
             # Safe to assume user wants to remember the username again
-            self.remember_check.set_active(True)
+            self.remember_user_check.set_active(True)
         else:
             # Let us not assume user wants us to remember username
-            self.remember_check.set_active(False)
+            self.remember_user_check.set_active(False)
             # No username available, so focus should go to username entry
             self.usernameBox.grab_focus()
             self.usernameEntry.grab_focus()

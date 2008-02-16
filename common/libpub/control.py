@@ -121,7 +121,7 @@ class Control:
                                            parent=self)
             self.window.add(self.uploadDlg)
         
-            if self.picwebRegBox.remember_check.get_active():
+            if self.picwebRegBox.remember_user_check.get_active():
                 libpub.conf.set('PICASA_LAST_USERNAME',username)
             else:
                 libpub.conf.set('PICASA_LAST_USERNAME',None)
