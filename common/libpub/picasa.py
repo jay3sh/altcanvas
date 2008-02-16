@@ -36,12 +36,25 @@ import libpub.gdata.photos.service
 
 class PicasawebObject:
     picweb=None
+    _has_auth = False
     def __init__(self):
         self.picweb = libpub.gdata.photos.service.PhotosService()
         self.picweb.source = 'Publishr'
+        last_username = libpub.conf.get('PICASA_LAST_USERNAME')
+        last_password_cipher = libpub.conf.get('PICASA_LAST_PASSWORD')
+        if last_password_cipher:
+            last_password = libpub.utils.decrypt(last_password_cipher)
+            
+        if last_username and last_password:
+            self.picweb.ClientLogin(last_username, last_password) 
+            self._has_auth = True
     
     def login(self,username,password):
         self.picweb.ClientLogin(username,password)
+        self._has_auth = True
+        
+    def has_auth(self):
+        return self._has_auth
         
     def upload(self,filename,title,summary,tags,album):
         pws = self.picweb

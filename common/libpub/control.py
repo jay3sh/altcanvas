@@ -90,8 +90,33 @@ class Control:
         import libpub.picasa
         gui.empty_window()
         
-        self.picasa = libpub.picasa.PicasawebObject()
-        self.apptype = 'PICASAWEB'
+        '''
+            @note: PicasawebObject constructor checks for saved username-password
+            and tries a login.
+            If the login is successful: we will proceed directly to Upload dialog
+            
+            If it fails: then Login exception will be thrown, which will be 
+            handled by the "except" clause will silently handle it and login dialog 
+            will be loaded
+            
+            If no credentials are found in the first place: then the has_auth() will
+            return false. The login dialog will be shown after getting out of the try
+            block
+        '''
+        try:
+            self.picasa = libpub.picasa.PicasawebObject()
+            self.apptype = 'PICASAWEB'
+            # If authtoken is found locally, directly go to Upload dialog
+            if self.picasa.has_auth():
+                self.uploadDlg = gui.UploadDlg(apptype='PICASAWEB',
+                                           parent=self)
+                self.window.add(self.uploadDlg)
+                return
+        except Exception, e:
+            # Login failed, show the login dialog
+            pass
+            
+        # Either the login failed OR credentials were absent 
         self.picwebRegBox = gui.PicasawebRegisterBox(parent=self)
         self.window.add(self.picwebRegBox)
         
@@ -125,6 +150,13 @@ class Control:
                 libpub.conf.set('PICASA_LAST_USERNAME',username)
             else:
                 libpub.conf.set('PICASA_LAST_USERNAME',None)
+                
+            if self.picwebRegBox.remember_pass_check.get_active():
+                encpass = libpub.utils.encrypt(password)
+                libpub.conf.set('PICASA_LAST_PASSWORD',encpass)
+            else:
+                libpub.conf.set('PICASA_LAST_PASSWORD',None)
+                
             
         except Exception, e:
             libpub.alert('Login error: %s'%e)

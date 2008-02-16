@@ -445,6 +445,15 @@ class PicasawebRegisterBox(gtk.VBox):
             # No username available, so focus should go to username entry
             self.usernameBox.grab_focus()
             self.usernameEntry.grab_focus()
+            
+        last_password_cipher = libpub.conf.get('PICASA_LAST_PASSWORD')
+        if last_password_cipher:
+            last_password = libpub.utils.decrypt(last_password_cipher)
+            self.passwordEntry.set_text(last_password)
+            self.loginButton.grab_focus()
+            self.remember_pass_check.set_active(True)
+        else:
+            self.remember_pass_check.set_active(False)
         
         self.show_all()
         
