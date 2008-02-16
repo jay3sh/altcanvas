@@ -326,24 +326,14 @@ class FlickrRegisterBox(gtk.VBox):
         self.urlText.select_region(0,-1)
         self.urlText.set_editable(False)
         
-        if libpub.HOSTAPP == "Maemo":
-            def open_browser(widget,url=None):
-                import osso
-                ctx = osso.Context('publishr','0.5.0',False)
-                
-                url = url.replace('www','m')
-                print 'Opening %s'%url
-
-                osso_rpc = osso.Rpc(ctx)
-                osso_rpc.rpc_run("com.nokia.osso_browser","/com/nokia/osso_browser/request",
-                       'com.nokia.osso_browser','load_url',rpc_args=(url,))
-            
-            ##
-            #    A button to open the link in browser
-            ##
-            self.browserButton = gtk.Button('Open above link in browser')
-            self.browserButton.set_border_width(5)
-            self.browserButton.connect("clicked",open_browser,authurl)
+        ##
+        #    A button to open the link in browser
+        ##
+        self.browserButton = gtk.Button('Open above link in browser')
+        self.browserButton.set_border_width(5)
+        if libpub.HOSTAPP == 'Maemo':
+            authurl = authurl.replace('www','m')
+        self.browserButton.connect("clicked",open_browser,authurl)
         
         ##
         #    Done granting permissions, proceed to authentication
@@ -470,9 +460,13 @@ class SuccessDialog(gtk.Dialog):
         urlLabel.set_markup('URL to uploaded image <span foreground="blue">%s</span>'%url)
         
         #firefox_pb = gtk.gdk.pixbuf_new_from_xpm_data(libpub.firefox_xpm)
-        browserButton = gtk.Button('Open in Firefox')
+        if libpub.HOSTAPP == 'Maemo':
+            browserButton = gtk.Button('Open in Browser')
+        else:
+            browserButton = gtk.Button('Open in Firefox')
+            
         #browserButton.set_image(gtk.image_new_from_pixbuf(firefox_pb))
-        browserButton.connect("clicked",self.open_browser,url)
+        browserButton.connect("clicked",self.open_browser_and_quit,url)
         
         doneButton = gtk.Button('Done')
         doneButton.connect("clicked",self.respond_done)
@@ -487,8 +481,21 @@ class SuccessDialog(gtk.Dialog):
         self.set_border_width(25)
         self.vbox.show_all()
         
+    def open_browser_and_quit(self,widget,url=None):
+        open_browser(widget,url)
+        self.respond_done(widget)
+        
     def respond_done(self,widget,data=None):
         self.response(gtk.RESPONSE_OK)
         
-    def open_browser(self,widget,data=None):
-        os.system("%s '%s'" % ('firefox', data))
+        
+def open_browser(widget,url=None):
+    if libpub.HOSTAPP == 'Maemo':
+        import osso
+        ctx = osso.Context('publishr',libpub.VERSION,False)
+
+    	osso_rpc = osso.Rpc(ctx)
+    	osso_rpc.rpc_run("com.nokia.osso_browser","/com/nokia/osso_browser/request",
+           	'com.nokia.osso_browser','load_url',rpc_args=(url,))
+    else:
+        os.system("%s '%s'" % ('firefox', url))
