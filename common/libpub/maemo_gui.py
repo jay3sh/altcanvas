@@ -77,10 +77,10 @@ class Entry(gtk.VBox):
         self.show_all()
         
 class UploadDlg(gtk.VBox):
-    def __init__(self,apptype,serviceObject,upload_handler):
+    def __init__(self,service_choice,serviceObject,upload_handler):
         gtk.VBox.__init__(self)
-        self.apptype = apptype 
-        if apptype == 'FLICKR':
+        self.service_choice = service_choice 
+        if service_choice == 'FLICKR':
             self.flickr = serviceObject
         else:
             self.picasa = serviceObject
@@ -93,7 +93,7 @@ class UploadDlg(gtk.VBox):
         i = 0
         select_album = 0
         self.albumCombo = gtk.combo_box_entry_new_text()
-        if self.apptype == 'FLICKR':
+        if self.service_choice == 'FLICKR':
             albumLabel = gtk.Label('Photosets')
             albums = self.flickr.get_photosets()
             last_album = libpub.conf.get('FLICKR_LAST_PHOTOSET')
@@ -105,7 +105,7 @@ class UploadDlg(gtk.VBox):
             self.albumCombo.set_active(select_album)
             
             
-        elif self.apptype == 'PICASAWEB':
+        elif self.service_choice == 'PICASAWEB':
             albumLabel = gtk.Label('Albums')
             pws = self.picasa.picweb
             albums = pws.GetUserFeed().entry
@@ -242,7 +242,7 @@ class UploadDlg(gtk.VBox):
         
         self.show_all()
         
-        if self.apptype == 'PICASAWEB':
+        if self.service_choice == 'PICASAWEB':
             signoutButton.hide()
             self.privacyCheck.hide()
             

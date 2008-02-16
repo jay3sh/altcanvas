@@ -65,12 +65,11 @@ class Control:
         gui.empty_window()
         
         self.flickr = libpub.flickr.FlickrObject()
-        self.apptype = 'FLICKR'
+        libpub.SERVICE_CHOICE = 'FLICKR'
         
         # If authtoken is found locally, directly go to Upload dialog
         if self.flickr.has_auth():
-            self.uploadDlg = gui.UploadDlg(apptype='FLICKR',
-                            parent=self)
+            self.uploadDlg = gui.UploadDlg(parent=self)
             self.window.add(self.uploadDlg)
         else:
             self.flickrRegBox = gui.FlickrRegisterBox(parent=self)
@@ -105,11 +104,10 @@ class Control:
         '''
         try:
             self.picasa = libpub.picasa.PicasawebObject()
-            self.apptype = 'PICASAWEB'
+            libpub.SERVICE_CHOICE = 'PICASAWEB'
             # If authtoken is found locally, directly go to Upload dialog
             if self.picasa.has_auth():
-                self.uploadDlg = gui.UploadDlg(apptype='PICASAWEB',
-                                           parent=self)
+                self.uploadDlg = gui.UploadDlg(parent=self)
                 self.window.add(self.uploadDlg)
                 return
         except Exception, e:
@@ -126,8 +124,7 @@ class Control:
         '''
         gui.empty_window()
         if self.flickr.get_authtoken():
-            self.uploadDlg = gui.UploadDlg(apptype='FLICKR',
-                                           parent=self)
+            self.uploadDlg = gui.UploadDlg(parent=self)
             self.window.add(self.uploadDlg)
         else:
             self.window.add(self.flickrRegBox)
@@ -142,8 +139,7 @@ class Control:
             password = self.picwebRegBox.passwordEntry.get_text()
             self.picasa.login(username,password)
             
-            self.uploadDlg = gui.UploadDlg(apptype='PICASAWEB',
-                                           parent=self)
+            self.uploadDlg = gui.UploadDlg(parent=self)
             self.window.add(self.uploadDlg)
         
             if self.picwebRegBox.remember_user_check.get_active():
@@ -184,7 +180,7 @@ class Control:
             curalbum = model[active][0]
             
         # Upload to Flickr
-        if self.apptype == 'FLICKR':
+        if libpub.SERVICE_CHOICE == 'FLICKR':
             
             from libpub.flickr import FlickrException
             
@@ -246,7 +242,7 @@ class Control:
                 
             
         # Upload to Picasaweb
-        elif self.apptype == 'PICASAWEB':
+        elif libpub.SERVICE_CHOICE == 'PICASAWEB':
                 
             from libpub.gdata.photos.service import PicasaException
             success = False

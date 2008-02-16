@@ -96,14 +96,13 @@ class UploadDlg(gtk.VBox):
     '''
         Upload dialog 
     '''
-    def __init__(self,apptype,parent):
+    def __init__(self,parent):
         '''
-        @param apptype: photo hosting service type {FLICKR,PICASAWEB}
+        @param service_choice: photo hosting service type {FLICKR,PICASAWEB}
         @param parent: handle to the parent control object
         '''
         gtk.VBox.__init__(self)
-        self.apptype = apptype 
-        if apptype == 'FLICKR':
+        if libpub.SERVICE_CHOICE == 'FLICKR':
             self.flickr = parent.flickr
         else:
             self.picasa = parent.picasa
@@ -116,7 +115,7 @@ class UploadDlg(gtk.VBox):
         i = 0
         select_album = 0
         self.albumCombo = gtk.combo_box_entry_new_text()
-        if self.apptype == 'FLICKR':
+        if libpub.SERVICE_CHOICE == 'FLICKR':
             albumLabel = gtk.Label('Photosets')
             albums = self.flickr.get_photosets()
             last_album = libpub.conf.get('FLICKR_LAST_PHOTOSET')
@@ -128,7 +127,7 @@ class UploadDlg(gtk.VBox):
             self.albumCombo.set_active(select_album)
             
             
-        elif self.apptype == 'PICASAWEB':
+        elif libpub.SERVICE_CHOICE == 'PICASAWEB':
             albumLabel = gtk.Label('Albums')
             pws = self.picasa.picweb
             albums = pws.GetUserFeed().entry
@@ -277,8 +276,7 @@ class UploadDlg(gtk.VBox):
         
         self.show_all()
         
-        if self.apptype == 'PICASAWEB':
-            signoutButton.hide()
+        if libpub.SERVICE_CHOICE == 'PICASAWEB':
             self.privacyCheck.hide()
             
             # Set the title to be the filename

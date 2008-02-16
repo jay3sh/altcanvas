@@ -32,6 +32,7 @@ CONFIG_FILE = ''
 SERVER = 'http://www.altcanvas.com/xmlrpc/'
 VERSION = '0.5.0'
 HOSTAPP = '_'
+SERVICE_CHOICE = '_'
     
 def start(hostapp='_',fnames=None,guiwindow=None):
     global conf,window,filename_list,HOSTAPP
@@ -99,7 +100,11 @@ def destroy(widget=None,data=None):
     gtk.main_quit()
 
 def signout(widget=None,data=None):
-    conf.set('FLICKR_TOKEN',None)
+    if SERVICE_CHOICE == 'FLICKR':
+        conf.set('FLICKR_TOKEN',None)
+    elif SERVICE_CHOICE == 'PICASAWEB':
+        conf.set('PICASA_LAST_USERNAME',None)
+        conf.set('PICASA_LAST_PASSWORD',None)
     # Quit the GUI
     destroy()
     
