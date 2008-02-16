@@ -29,10 +29,15 @@ class Config:
             return
         
         self.map = {}
-        for param in xmlresult.param:
-            key = param['name']
-            value = param.elementText
-            self.map[key] = value
+        try:
+            for param in xmlresult.param:
+                key = param['name']
+            	value = param.elementText
+            	self.map[key] = value
+        except AttributeError, ae:
+            # when NO xml is present, the param attribute is absent,
+            # leading to this error. Ignore it.
+            pass
                 
         configf.close()
                 

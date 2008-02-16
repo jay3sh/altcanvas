@@ -8,7 +8,8 @@ import gtk
 #def rpc_callback(interface, method, arguments, user_data):
 def flash_msg(msg):
     import osso
-    osso_c = osso.Context("publishr", "0.4.0", False)
+    import libpub
+    osso_c = osso.Context("publishr", libpub.VERSION, False)
     osso_sysnote = osso.SystemNote(osso_c)
     osso_sysnote.system_note_infoprint(msg)
 
@@ -30,7 +31,10 @@ if __name__ == "__main__":
     else:
         images.append(path)
         
-    #flash_msg("Loading publishr")
+    if len(images) < 1:
+        sys.exit(0)
+        
+    flash_msg("Loading publishr")
     import libpub
     try:
         import hildon

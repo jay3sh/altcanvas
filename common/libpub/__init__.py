@@ -30,7 +30,7 @@ filename_list = None
 CONFIG_FILE = ''
 
 SERVER = 'http://www.altcanvas.com/xmlrpc/'
-VERSION = '0.3.2'
+VERSION = '0.5.0'
 HOSTAPP = '_'
     
 def start(hostapp='_',fnames=None,guiwindow=None):

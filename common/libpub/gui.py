@@ -219,8 +219,10 @@ class UploadDlg(gtk.VBox):
         #    Home
         ##
         homepb = gtk.gdk.pixbuf_new_from_xpm_data(libpub.home_xpm)
+        homeimg = gtk.Image()
+        homeimg.set_property('pixbuf',homepb)
         homeButton = gtk.Button()
-        homeButton.set_image(gtk.image_new_from_pixbuf(homepb))
+        homeButton.set_image(homeimg)
         homeButton.connect("clicked",parent.display_home)
         
         
@@ -282,8 +284,8 @@ class UploadDlg(gtk.VBox):
             # Set the title to be the filename
             if len(libpub.filename_list) == 1:
                 path_segments = libpub.filename_list[0].split(os.sep)
-            	self.title = path_segments[len(path_segments)-1]
-            	self.titleEntry.set_text(self.title)
+                self.title = path_segments[len(path_segments)-1]
+                self.titleEntry.set_text(self.title)
             
             # Add a blank-license option to license choices. This will result
             # into appending nothing to the summary field about license info
@@ -324,6 +326,25 @@ class FlickrRegisterBox(gtk.VBox):
         self.urlText.select_region(0,-1)
         self.urlText.set_editable(False)
         
+        if libpub.HOSTAPP == "Maemo":
+            def open_browser(widget,url=None):
+                import osso
+                ctx = osso.Context('publishr','0.5.0',False)
+                
+                url = url.replace('www','m')
+                print 'Opening %s'%url
+
+                osso_rpc = osso.Rpc(ctx)
+                osso_rpc.rpc_run("com.nokia.osso_browser","/com/nokia/osso_browser/request",
+                       'com.nokia.osso_browser','load_url',rpc_args=(url,))
+            
+            ##
+            #    A button to open the link in browser
+            ##
+            self.browserButton = gtk.Button('Open above link in browser')
+            self.browserButton.set_border_width(5)
+            self.browserButton.connect("clicked",open_browser,authurl)
+        
         ##
         #    Done granting permissions, proceed to authentication
         ##
@@ -332,13 +353,16 @@ class FlickrRegisterBox(gtk.VBox):
         self.doneButton.connect("clicked",parent.flickr_login_handler)
         
         homepb = gtk.gdk.pixbuf_new_from_xpm_data(libpub.home_xpm)
+        homeimg = gtk.Image()
+        homeimg.set_property('pixbuf',homepb)
         self.homeButton = gtk.Button()
-        self.homeButton.set_image(gtk.image_new_from_pixbuf(homepb))
+        self.homeButton.set_image(homeimg)
         self.homeButton.connect("clicked",parent.display_home)
         
         self.set_spacing(15)
         self.pack_start(self.explainLabel)
         self.pack_start(self.urlText)
+        self.pack_start(self.browserButton)
         self.pack_start(self.doneButton)
         self.pack_start(self.homeButton,expand=False)
         self.set_border_width(30)
@@ -369,8 +393,10 @@ class PicasawebRegisterBox(gtk.VBox):
         self.cancelButton.connect("clicked",libpub.destroy)
         
         homepb = gtk.gdk.pixbuf_new_from_xpm_data(libpub.home_xpm)
+        homeimg = gtk.Image()
+        homeimg.set_property('pixbuf',homepb)
         self.homeButton = gtk.Button()
-        self.homeButton.set_image(gtk.image_new_from_pixbuf(homepb))
+        self.homeButton.set_image(homeimg)
         self.homeButton.connect("clicked",parent.display_home)
         
         self.remember_check = gtk.CheckButton('Remember username')

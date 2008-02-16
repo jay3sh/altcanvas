@@ -2,11 +2,11 @@
 
 import os
 import gtk
-#import hildon
+import hildon
 
 def send_rpc(filename):
     import osso
-    ctx = osso.Context('publishr_launcher','0.4.0',False)
+    ctx = osso.Context('publishr_launcher','0.5.0',False)
 
     osso_rpc = osso.Rpc(ctx)
     osso_rpc.rpc_run("com.altcanvas.publishr","/com/altcanvas/publishr",
@@ -39,32 +39,35 @@ class MultiChoiceDialog(gtk.Dialog):
         
 def spawn_publishr(filename):
     os.spawnlp(os.P_NOWAIT,'python2.5','python2.5',
-               'publishr.py',filename)
+               '/usr/bin/publishr.py',filename)
 
 if __name__ == '__main__':
     
-    window = gtk.Window()
-    #window = hildon.Window()
+    #window = gtk.Window()
+    window = hildon.Window()
     
     mdlg = MultiChoiceDialog()
     resp = mdlg.run()
     
     if resp == mdlg.RESPONSE_SINGLE:
-        #fileChooserDlg = hildon.FileChooserDialog(
-        #                    window,gtk.FILE_CHOOSER_ACTION_OPEN)
-        fileChooserDlg = gtk.FileChooserDialog('Open picture to publish',window,
-                                          gtk.FILE_CHOOSER_ACTION_OPEN,
-                                          (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-                                           gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+        fileChooserDlg = hildon.FileChooserDialog(
+                            window,gtk.FILE_CHOOSER_ACTION_OPEN)
+        #fileChooserDlg = gtk.FileChooserDialog('Open picture to publish',window,
+        #                                  gtk.FILE_CHOOSER_ACTION_OPEN,
+        #                                  (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+        #                                   gtk.STOCK_OPEN, gtk.RESPONSE_OK))
         
     elif resp == mdlg.RESPONSE_MULTI:
-        #fileChooserDlg = hildon.FileChooserDialog(
-        #                    window,gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
-        fileChooserDlg = gtk.FileChooserDialog('Open picture to publish',window,
-                                          gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
-                                          (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-                                           gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+        fileChooserDlg = hildon.FileChooserDialog(
+                            window,gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
+        #fileChooserDlg = gtk.FileChooserDialog('Open picture to publish',window,
+        #                                  gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
+        #                                  (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+        #                                   gtk.STOCK_OPEN, gtk.RESPONSE_OK))
     
+    else:
+        sys.exit(0)
+        
     resp = fileChooserDlg.run()
     
     if resp == gtk.RESPONSE_OK:

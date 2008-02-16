@@ -3,10 +3,7 @@ import gtk
 
 import libpub
 
-if libpub.HOSTAPP == 'Maemo':
-    import libpub.maemo_gui as gui
-else:
-    import libpub.gui as gui
+import libpub.gui as gui
 
 ######################################################
 # Control
