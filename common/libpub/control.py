@@ -56,10 +56,11 @@ class Control:
         '''
         import libpub
         entry = data
-        if entry and entry.remember_service:
-            libpub.conf.set('SERVICE_CHOICE','FLICKR')
-        else:
-            libpub.conf.set('SERVICE_CHOICE',None)
+        if entry: 
+            if entry.remember_service:
+                libpub.conf.set('SERVICE_CHOICE','FLICKR')
+            else:
+                libpub.conf.set('SERVICE_CHOICE',None)
             
         import libpub.flickr
         gui.empty_window()
@@ -81,10 +82,11 @@ class Control:
         '''
         import libpub
         entry = data
-        if entry and entry.remember_service:
-            libpub.conf.set('SERVICE_CHOICE','PICASAWEB')
-        else:
-            libpub.conf.set('SERVICE_CHOICE',None)
+        if entry:
+            if entry.remember_service:
+                libpub.conf.set('SERVICE_CHOICE','PICASAWEB')
+            else:
+                libpub.conf.set('SERVICE_CHOICE',None)
             
         import libpub.picasa
         gui.empty_window()
