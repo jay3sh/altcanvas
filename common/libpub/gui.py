@@ -68,6 +68,12 @@ class Entry(gtk.VBox):
 <span foreground="#0000FF">!</span>\
 </span>')
         
+        import libpub.gdkpixbuf
+        thumbPreview = gtk.Image()
+        gdkpixbuf = libpub.gdkpixbuf.GdkPixbuf()
+        thumbPreview_pb = gdkpixbuf.img2thumb_pixbuf(libpub.filename_list[0])
+        thumbPreview.set_from_pixbuf(thumbPreview_pb)
+        
         ##
         #    Save service (Flickr/Picasa) choice
         ##
@@ -84,6 +90,7 @@ class Entry(gtk.VBox):
 
         # Pack all widgets
         self.pack_start(self.introLabel,expand=False)
+        self.pack_start(thumbPreview,expand=False)
         self.pack_start(self.flickrButton,expand=False)
         self.pack_start(self.picwebButton,expand=False)
         self.pack_start(self.serviceMemory,expand=False)

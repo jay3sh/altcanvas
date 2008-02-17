@@ -44,6 +44,8 @@ class PicasawebObject:
         last_password_cipher = libpub.conf.get('PICASA_LAST_PASSWORD')
         if last_password_cipher:
             last_password = libpub.utils.decrypt(last_password_cipher)
+        else:
+            last_password = None
             
         if last_username and last_password:
             self.picweb.ClientLogin(last_username, last_password) 
