@@ -260,6 +260,11 @@ class FlickrObject:
                 target_set_id = set['id']
                 break
             
+        # If user has made the photoset field blank then he doesn't want to
+        # add the photo to any photoset. That's a valid operation.
+        if not photoset or photoset.strip() == '':
+            return url
+            
         # Create new photoset, it doesn't exist
         if target_set_id == None:
             target_set_id = self.keyserver.altcanvas.createPhotoSet(

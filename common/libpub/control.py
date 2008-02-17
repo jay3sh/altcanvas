@@ -10,7 +10,7 @@ import libpub.gui as gui
 ######################################################
 class Control:
     '''
-        This class contains the logic of high level program flow
+        @summary: This class contains the logic of high level program flow
          - Entry point to the application
          - Callback handlers that respond to user input events
     '''
@@ -19,7 +19,7 @@ class Control:
     
     def entry(self):
         '''
-            Application's entry point
+            @summary: Application's entry point
         '''
         #
         # If we remember last service choice, let's skip Home screen
@@ -38,7 +38,7 @@ class Control:
             
     def display_home(self,widget,data=None):
         '''
-            Display the home screen that gives a choice between services.
+            @summary: Display the home screen that gives a choice between services.
         '''
         gui.empty_window()
         home = gui.Entry(flickr_handler=self.flickr_entry_handler,
@@ -47,7 +47,7 @@ class Control:
         
     def flickr_entry_handler(self,widget,data=None):
         '''
-            This is called when user chooses to use Flickr.
+            @summary: This is called when user chooses to use Flickr.
             
             If we find a saved flickr token:
                 proceed straight to upload dialog
@@ -78,7 +78,7 @@ class Control:
     
     def picasa_entry_handler(self,widget,data=None):
         '''
-            This is called when user chooses to use Picasaweb
+           @summary: This is called when user chooses to use Picasaweb
         '''
         import libpub
         entry = data
@@ -122,7 +122,7 @@ class Control:
         
     def flickr_login_handler(self,widget,data=None):
         '''
-            This is called after user has entered Flickr login info
+            @summary: This is called after user has entered Flickr login info
         '''
         gui.empty_window()
         if self.flickr.get_authtoken():
@@ -133,7 +133,7 @@ class Control:
         
     def picasa_login_handler(self,widget,data=None):
         '''
-            This is called after user has entered Picasaweb login info
+            @summary: This is called after user has entered Picasaweb login info
         '''
         gui.empty_window()
         try:
@@ -162,7 +162,7 @@ class Control:
     
     def upload(self,widget,data=None):
         '''
-            This is final upload function
+            @summary: This is final upload function
         '''
         self.title = self.uploadDlg.titleEntry.get_text()
         buffer = self.uploadDlg.descView.get_buffer()
@@ -253,6 +253,10 @@ class Control:
                 libpub.alert('Picasaweb doesn\'t support uploading photos \
 without an album. If you don\'t have any album already, create one by typing \
 a new album name in the "Albums" entry.')
+                return
+            
+            if self.title == None or self.title.strip() == '':
+                libpub.alert('Title cannot be empty')
                 return
                 
             # Determine the license text
