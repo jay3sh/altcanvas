@@ -46,7 +46,7 @@ def publishr_func(image,drawable):
              return
     
         if filename:
-            libpub.start(hostapp='Gimp',fname=filename)
+            libpub.start(hostapp='Gimp',fnames=(filename,))
         else:
             libpub.start(hostapp='Gimp')
         gtk.main()

@@ -36,7 +36,7 @@ try:
 
 	
 	if jpegfilename:
-		libpub.start(hostapp='Inkscape',fname=jpegfilename)		
+		libpub.start(hostapp='Inkscape',fnames=(jpegfilename,))		
 	else:
 		libpub.alert("JPEG file not created")
 	
