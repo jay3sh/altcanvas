@@ -34,13 +34,13 @@ if __name__ == "__main__":
     if len(images) < 1:
         sys.exit(0)
         
-    flash_msg("Loading publishr")
     import libpub
     try:
         import hildon
     except ImportError, ie:
         libpub.start(hostapp='Desktop',fnames=images)
     else:
+        flash_msg("Loading publishr")
         libpub.start(hostapp='Maemo',fnames=images,guiwindow=hildon.Window())
         
     gtk.main()
