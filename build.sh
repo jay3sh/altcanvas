@@ -10,20 +10,6 @@ usage()
     echo "                       publishr)"
 }
 
-if [ "$1" = "" ]; then
-	usage
-	exit 1
-fi
-
-while getopts "p:h" options; do
-	case $options in
-		p) PACKAGE=$OPTARG;;
-		h) usage;
-		   exit 1;;
-		*) usage
-		   exit 1;;
-	esac
-done
 
 TMP_BLDDIR=/tmp/publishr-build
 BLDDIR=`pwd`/packages
@@ -32,7 +18,12 @@ PUB_COMMON_DIR=$SRCDIR/common/libpub
 PUB_GIMP_DIR=$SRCDIR/gimp/publishr
 PUB_INKSCAPE_DIR=$SRCDIR/inkscape/publishr
 FILTER="--exclude '.*' --exclude '*.pyc'"
-VERSION=0.4.0
+VERSION=0.5.0
+
+clean()
+{
+    rm -rf $BLDDIR
+}
 
 make_gimp_publishr()
 {
@@ -106,6 +97,23 @@ make_maemo_publishr()
 	#rm -rf $TMP_BLDDIR
 
 }
+
+if [ "$1" = "" ]; then
+	usage
+	exit 1
+fi
+
+while getopts "p:hc" options; do
+	case $options in
+		p) PACKAGE=$OPTARG;;
+        c) clean;
+		   exit 1;;
+		h) usage;
+		   exit 1;;
+		*) usage
+		   exit 1;;
+	esac
+done
 
 case $PACKAGE in
 	"gimp-publishr")
