@@ -1,26 +1,33 @@
 #!/bin/bash
 
-
 usage()
 {
 	echo "Usage: build.sh [-p PACKAGE_NAME]"
 	echo "   -p  Package to build "
-	echo "       (valid objects: gimp-publishr,inkscape-publishr)"
+	echo "       (valid objects: gimp-publishr,"
+    echo "                       inkscape-publishr,"
+    echo "                       maemo-publishr,"
+    echo "                       publishr)"
 }
+
+if [ "$1" = "" ]; then
+	usage
+	exit 1
+fi
 
 while getopts "p:h" options; do
 	case $options in
 		p) PACKAGE=$OPTARG;;
 		h) usage;
-         exit 1;;
-		*) echo $usage
-			exit 1;;
+		   exit 1;;
+		*) usage
+		   exit 1;;
 	esac
 done
 
 TMP_BLDDIR=/tmp/publishr-build
-BLDDIR=$HOME/trunk/altcanvas/packages
-SRCDIR=$HOME/trunk/altcanvas
+BLDDIR=`pwd`/packages
+SRCDIR=`pwd`
 PUB_COMMON_DIR=$SRCDIR/common/libpub
 PUB_GIMP_DIR=$SRCDIR/gimp/publishr
 PUB_INKSCAPE_DIR=$SRCDIR/inkscape/publishr
@@ -41,6 +48,11 @@ make_gimp_publishr()
 		tar czfp publishr-gimp-$VERSION.tar.gz *.py libpub
 		zip -q -r publishr-gimp-$VERSION.zip *.py libpub
 	)
+
+	if ! [ -d $BLDDIR ]; then
+		mkdir $BLDDIR;
+	fi
+
 	mv $TMP_BLDDIR/publishr-gimp-$VERSION.{tar.gz,zip} $BLDDIR
 
 }
@@ -60,6 +72,11 @@ make_inkscape_publishr()
 		tar czfp publishr-inkscape-$VERSION.tar.gz *.py *.inx libpub
 		zip -q -r publishr-inkscape-$VERSION.zip *.py *.inx libpub
 	)
+
+	if ! [ -d $BLDDIR ]; then
+		mkdir $BLDDIR;
+	fi
+
 	mv $TMP_BLDDIR/publishr-inkscape-$VERSION.{tar.gz,zip} $BLDDIR
 }
 
@@ -78,6 +95,10 @@ make_maemo_publishr()
 		ln -s $SRCDIR/install/publishr.desktop ./publishr.desktop
 
 		python setup.py bdist_debian || exit
+
+		if ! [ -d $BLDDIR ]; then
+			mkdir $BLDDIR;
+		fi
 
 		mv dist/*.deb $BLDDIR/
 	)
@@ -99,6 +120,7 @@ case $PACKAGE in
 	"publishr")
 		make_gimp_publishr;
 		make_inkscape_publishr;
+		make_maemo_publishr;
 		;;
 esac
 
