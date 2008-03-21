@@ -41,19 +41,19 @@ def load_cairo_image(name):
     surface = cairo.ImageSurface.create_from_png(tmpfname)
     
     ctx = cairo.Context(surface)
+    pat = cairo.LinearGradient(0.0, 0.0, 80, 0.0)
+    pat.add_color_stop_rgba( 0, 0, 0, 0, 0 )
+    pat.add_color_stop_rgba( 1, 0, 0, 0, 1 )
+    ctx.set_source(pat)
+    
     ctx.move_to(0,0)
     ctx.line_to(10,10)
     ctx.stroke()
     
-    pat = cairo.LinearGradient(0.0, 0.0, 1.0, 0.0)
-    pat.add_color_stop_rgba( 0, 1, 1, 1, 0 )
-    pat.add_color_stop_rgba( 1, 1, 1, 1, 1 )
-    ctx.set_source(pat)
     ctx.fill()
     ctx.stroke()
     
     imgbuf = surface.write_to_png(tmpfname)
-    
     
     #imgsurf = pygame.image.frombuffer(imgbuf,(THUMB_W,THUMB_H),'RGBA')
     
