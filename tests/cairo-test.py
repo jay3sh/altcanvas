@@ -9,8 +9,10 @@ def cairo_test(pixmap,w,h):
     white_background(ctx,w,h)
     
     gradSurface = lingrad_surface(w-100,h-100)
+    
     #surface = solid_surface(w-100,h-100)
-    surface = image_surface('data/test3.png',w-100,h-100)
+    #surface = image_surface('data/test3.png',w-100,h-100)
+    surface = text_surface('Hello Cairo!',w-100,h-100)
     
     ctx.set_source_surface(surface,50,50)
     ctx.mask_surface(gradSurface)
@@ -40,10 +42,28 @@ def image_surface(path,w,h):
     ctx = cairo.Context(imageSurface)
     ctx2 = gtk.gdk.CairoContext(ctx)
     pixbuf = gtk.gdk.pixbuf_new_from_file(path)
-    scaled_pixbuf = pixbuf.scale_simple(w,h,gtk.gdk.INTERP_NEAREST);
+    scaled_pixbuf = pixbuf.scale_simple(w,h,gtk.gdk.INTERP_NEAREST)
     ctx2.set_source_pixbuf(scaled_pixbuf,0,0)
     ctx2.paint()
     return imageSurface
+
+def text_surface(text,w,h):
+    textSurface = cairo.ImageSurface(cairo.FORMAT_ARGB32,w,h)
+    ctx = cairo.Context(textSurface)
+    ctx.set_line_width(6)
+    ctx.set_tolerance(.1)
+    ctx.select_font_face('sans-serif')
+    ctx.set_font_size(20)
+    (x, y, width, height, dx, dy) = ctx.text_extents(text)
+    ctx.set_source_rgb(0,0,0)
+
+    x_margin = 10
+    y_margin = 10
+    ctx.translate(x_margin+x,y_margin+(-y))
+    ctx.set_source_rgb(0,0,0)
+    ctx.show_text(text)
+    return textSurface
+
     
 
 def white_background(ctx,w,h):
