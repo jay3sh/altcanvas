@@ -10,6 +10,7 @@ def lingrad_surface(w,h):
     ctx = cairo.Context(lingradSurface)
     lingrad = cairo.LinearGradient(0.0,0.0,w,h)
     lingrad.add_color_stop_rgba(1,0,0,0,1)
+    lingrad.add_color_stop_rgba(0.25,0,0,0,0.75)
     lingrad.add_color_stop_rgba(0,0,0,0,0)
     rect = ctx.rectangle(0,0,w,h)
     ctx.set_source(lingrad)
@@ -37,9 +38,9 @@ def load_images(pixmap):
     for iname in images:
         img = Image(iname,100,100)
         ctx.set_source_surface(img.surface,x,y)
-        ctx.mask_surface(gradient)
-        x = x+15
-        y = y+20
+        ctx.mask_surface(gradient,x,y)
+        x = x+75
+        y = y+40
                     
 class App(gtk.Window):
     def __init__(self):
@@ -65,7 +66,7 @@ class App(gtk.Window):
     def fill_background(self):
         w,h = self.pixmap.get_size()
         self.ctx = self.pixmap.cairo_create()
-        self.ctx.set_source_rgb(1,1,1)
+        self.ctx.set_source_rgb(0.5,0.5,0.5)
         self.ctx.rectangle(0,0,w,h)
         self.ctx.fill()
         
