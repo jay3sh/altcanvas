@@ -1,67 +1,22 @@
-import pygame
-import sys
-import os
 import gtk
+import os
 import cairo
-from pygame.locals import *
 
-#FOLDER_PATH = '/media/mmc2/bluebox/photos'
-FOLDER_PATH = '/home/jayesh/workspace/photos'
+from libpub.prime.widgets.image import Image
+FOLDER_PATH='/photos/altimages/jyro'
 
-screen = None
-
-def load_image(name, colorkey=None):
-    try:
-        image = pygame.image.load(name)
-    except pygame.error, message:
-        print 'Cannot load image:', name
-        raise SystemExit, message
-    image = image.convert()
-    if colorkey is not None:
-        if colorkey is -1:
-            colorkey = image.get_at((0,0))
-        image.set_colorkey(colorkey, RLEACCEL)
-    return image, image.get_rect()
-
-def load_cairo_image(name):
-    
-    THUMB_H = 80
-    THUMB_W = 80
-    tmpfname = '/tmp/publishr-thumb.png'
-    
-    #image = pygame.image.load(name).convert()
-    pixbuf = gtk.gdk.pixbuf_new_from_file(name)
-    pixbuf = pixbuf.scale_simple(THUMB_W,THUMB_H,gtk.gdk.INTERP_NEAREST)
-    pixbuf.save(tmpfname,'png')
-    
-        
-    #imgstr = pygame.image.tostring(img_thumb,'ARGB')
-    #pygame.image.save(img_thumb,tmpfname)
-    
-    surface = cairo.ImageSurface.create_from_png(tmpfname)
-    
-    ctx = cairo.Context(surface)
-    pat = cairo.LinearGradient(0.0, 0.0, 80, 0.0)
-    pat.add_color_stop_rgba( 0, 0, 0, 0, 0 )
-    pat.add_color_stop_rgba( 1, 0, 0, 0, 1 )
-    ctx.set_source(pat)
-    
-    ctx.move_to(0,0)
-    ctx.line_to(10,10)
-    ctx.stroke()
-    
+def lingrad_surface(w,h):
+    lingradSurface = cairo.ImageSurface(cairo.FORMAT_ARGB32,w,h)
+    ctx = cairo.Context(lingradSurface)
+    lingrad = cairo.LinearGradient(0.0,0.0,w,h)
+    lingrad.add_color_stop_rgba(1,0,0,0,1)
+    lingrad.add_color_stop_rgba(0,0,0,0,0)
+    rect = ctx.rectangle(0,0,w,h)
+    ctx.set_source(lingrad)
     ctx.fill()
-    ctx.stroke()
-    
-    imgbuf = surface.write_to_png(tmpfname)
-    
-    #imgsurf = pygame.image.frombuffer(imgbuf,(THUMB_W,THUMB_H),'RGBA')
-    
-    return pygame.image.load(tmpfname).convert()
-    #return imgsurf
+    return lingradSurface
 
-def load_images():
-    global screen
+def load_images(pixmap):
     images = []
     if os.path.isdir(FOLDER_PATH):
         files = os.listdir(FOLDER_PATH)
@@ -72,56 +27,71 @@ def load_images():
                 f.lower().endswith('gif'):
                     images.append(FOLDER_PATH+os.sep+f)
     
+    w,h = pixmap.get_size()
+    ctx = pixmap.cairo_create()
     x=20
     y=20
     max_x = 800
     max_y = 480
+    gradient = lingrad_surface(100,100)
     for iname in images:
-        #img,irect = load_image(iname)
-        #img = load_cairo_image(iname)
-        #img_thumb = pygame.transform.scale(img,(80,80))
-        #img_thumb.set_alpha(100)
-        
-        img_thumb = load_cairo_image(iname)
-        
-        screen.blit(img_thumb,(x,y))
-        
-        pygame.display.flip()
+        img = Image(iname,100,100)
+        ctx.set_source_surface(img.surface,x,y)
+        ctx.mask_surface(gradient)
         x = x+15
         y = y+20
-        '''
-        x = x + 100
-        if x >= max_x-100:
-            y = y+100
-            x = 0
-        '''
-        
-        
                     
-                    
-def main():
-    global screen
-    pygame.init()
-    screen = pygame.display.set_mode((800, 480))
-    pygame.display.set_caption('Publishr')
-    
-    ##
-    # Setup the white background
-    
-    background = pygame.Surface(screen.get_size()).convert()
-    background.fill((250,250,250))
-    screen.blit(background,(0,0))
-    pygame.display.flip()
-    
-    load_images()
-    
-    while 1:
-        event = pygame.event.wait()
-        if event.type == QUIT:
-            pygame.display.quit()
-            sys.exit()
+class App(gtk.Window):
+    def __init__(self):
+        gtk.Window.__init__(self)
+        self.connect("destroy", gtk.main_quit)
+        self.connect('key-press-event',self.key_handler)
+        self.set_default_size(800,480)
         
+        da = gtk.DrawingArea()
+        
+        da.connect('expose_event',self.expose)
+    
+        da.set_events(gtk.gdk.EXPOSURE_MASK
+                       | gtk.gdk.LEAVE_NOTIFY_MASK
+                       | gtk.gdk.BUTTON_PRESS_MASK
+                       | gtk.gdk.BUTTON_RELEASE_MASK
+                       | gtk.gdk.POINTER_MOTION_MASK
+                       | gtk.gdk.POINTER_MOTION_HINT_MASK)
+    
+        self.add(da)
+        self.show_all()
+        
+    def fill_background(self):
+        w,h = self.pixmap.get_size()
+        self.ctx = self.pixmap.cairo_create()
+        self.ctx.set_source_rgb(1,1,1)
+        self.ctx.rectangle(0,0,w,h)
+        self.ctx.fill()
+        
+    def draw_objects(self):
+        load_images(self.pixmap)
+        
+    def expose(self,widget,event):
+        _,_,w,h = widget.allocation
+        self.pixmap = gtk.gdk.Pixmap(widget.window,w,h)
+        
+        self.fill_background()
+        self.draw_objects()
+        
+        gc = gtk.gdk.GC(widget.window)
+        widget.window.draw_drawable(gc, self.pixmap, 0,0, 0,0, -1,-1)
+        
+    def key_handler(self,window,event):
+        keyval = event.keyval
+        state = event.state & gtk.accelerator_get_default_mod_mask()
+        
+        if keyval == keysyms.A:
+            print keysyms.A
+
+    def run(self):
+        gtk.main()
 
 
 if __name__ == '__main__':
-    main()
+    App().run()
