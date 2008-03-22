@@ -4,11 +4,23 @@ import os
 import cairo
 
 from libpub.prime.widgets.image import Image
-from libpub.prime.utils import get_image_locations,LAYOUT_STEP,LAYOUT_UNIFORM_SPREAD
+from libpub.prime.widgets.label import Label 
+
 import libpub.prime.mask as mask
+
+from libpub.prime.utils import get_image_locations,LAYOUT_STEP,LAYOUT_UNIFORM_SPREAD
 
 FOLDER_PATH='/photos/altimages/jyro'
 
+def load_widgets(pixmap):
+    w,h = pixmap.get_size()
+    ctx = pixmap.cairo_create()
+    
+    x = 0
+    y = 0
+    lbl = Label('Brewing cup of coffee...')
+    ctx.set_source_surface(lbl.surface,x,y)
+    ctx.paint()
 
 def load_images(pixmap):
     images = []
@@ -63,7 +75,8 @@ class App(gtk.Window):
         self.ctx.fill()
         
     def draw_objects(self):
-        load_images(self.pixmap)
+        #load_images(self.pixmap)
+        load_widgets(self.pixmap)
         
     def expose(self,widget,event):
         _,_,w,h = widget.allocation

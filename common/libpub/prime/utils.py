@@ -11,6 +11,8 @@ def get_image_locations(count,layout=LAYOUT_UNIFORM_SPREAD,
         @param layout: One of the predefined layouts 
         @param oheight: Hint in terms of Object height that will be placed
             at the returned position. (Optional param)
+        @param owidth: Hint in terms of Object width that will be placed
+            at the returned position. (Optional param)
     '''
     
     max_x = 800
