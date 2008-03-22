@@ -1,21 +1,14 @@
 import gtk
+from gtk import keysyms
 import os
 import cairo
 
 from libpub.prime.widgets.image import Image
+from libpub.prime.utils import get_image_locations,LAYOUT_STEP,LAYOUT_UNIFORM_SPREAD
+import libpub.prime.mask as mask
+
 FOLDER_PATH='/photos/altimages/jyro'
 
-def lingrad_surface(w,h):
-    lingradSurface = cairo.ImageSurface(cairo.FORMAT_ARGB32,w,h)
-    ctx = cairo.Context(lingradSurface)
-    lingrad = cairo.LinearGradient(0.0,0.0,w,h)
-    lingrad.add_color_stop_rgba(1,0,0,0,1)
-    lingrad.add_color_stop_rgba(0.25,0,0,0,0.75)
-    lingrad.add_color_stop_rgba(0,0,0,0,0)
-    rect = ctx.rectangle(0,0,w,h)
-    ctx.set_source(lingrad)
-    ctx.fill()
-    return lingradSurface
 
 def load_images(pixmap):
     images = []
@@ -30,17 +23,15 @@ def load_images(pixmap):
     
     w,h = pixmap.get_size()
     ctx = pixmap.cairo_create()
-    x=20
-    y=20
-    max_x = 800
-    max_y = 480
-    gradient = lingrad_surface(100,100)
-    for iname in images:
-        img = Image(iname,100,100)
+    gradient = mask.Linear(100,100).surface
+    
+    i = 0
+    for (x,y) in get_image_locations(
+            len(images),layout=LAYOUT_UNIFORM_SPREAD):
+        img = Image(images[i],100,100)
         ctx.set_source_surface(img.surface,x,y)
         ctx.mask_surface(gradient,x,y)
-        x = x+75
-        y = y+40
+        i = i+1
                     
 class App(gtk.Window):
     def __init__(self):
