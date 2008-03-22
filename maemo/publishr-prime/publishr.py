@@ -5,6 +5,7 @@ import cairo
 
 from libpub.prime.widgets.image import Image
 from libpub.prime.widgets.label import Label 
+from libpub.prime.widgets.entry import Entry 
 
 import libpub.prime.mask as mask
 
@@ -12,7 +13,7 @@ from libpub.prime.utils import get_image_locations,LAYOUT_STEP,LAYOUT_UNIFORM_SP
 
 FOLDER_PATH='/photos/altimages/jyro'
 
-def load_widgets(pixmap):
+def load_widgets(pixmap,app):
     w,h = pixmap.get_size()
     ctx = pixmap.cairo_create()
     
@@ -20,6 +21,13 @@ def load_widgets(pixmap):
     y = 0
     lbl = Label('Brewing cup of coffee...')
     ctx.set_source_surface(lbl.surface,x,y)
+    ctx.paint()
+    
+    x = 0
+    y = 100
+    entry = Entry(size=15)
+    app.register_keylistener(entry)
+    ctx.set_source_surface(entry.surface,x,y)
     ctx.paint()
 
 def load_images(pixmap):
@@ -47,6 +55,8 @@ def load_images(pixmap):
         i = i+1
                     
 class App(gtk.Window):
+    key_listeners = []
+    
     def __init__(self):
         gtk.Window.__init__(self)
         self.connect("destroy", gtk.main_quit)
@@ -76,7 +86,7 @@ class App(gtk.Window):
         
     def draw_objects(self):
         #load_images(self.pixmap)
-        load_widgets(self.pixmap)
+        load_widgets(self.pixmap,self)
         
     def expose(self,widget,event):
         _,_,w,h = widget.allocation
@@ -92,8 +102,14 @@ class App(gtk.Window):
         keyval = event.keyval
         state = event.state & gtk.accelerator_get_default_mod_mask()
         
-        if keyval == keysyms.A:
-            print keysyms.A
+        for keyl in self.key_listeners:
+            keyl(keyval,state)
+            
+    def register_keylistener(self,key_listener_obj):
+        if not hasattr(key_listener_obj,'key_listener'):
+            raise Exception('Invalid key listener')
+        
+        self.key_listeners.append(key_listener_obj.key_listener)
 
     def run(self):
         gtk.main()
