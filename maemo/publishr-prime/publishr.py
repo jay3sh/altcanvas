@@ -23,7 +23,8 @@ def load_images(pixmap):
     
     w,h = pixmap.get_size()
     ctx = pixmap.cairo_create()
-    gradient = mask.Linear(100,100).surface
+    #gradient = mask.Linear(100,100).surface
+    gradient = mask.Radial(100,100).surface
     
     i = 0
     for (x,y) in get_image_locations(
@@ -57,7 +58,7 @@ class App(gtk.Window):
     def fill_background(self):
         w,h = self.pixmap.get_size()
         self.ctx = self.pixmap.cairo_create()
-        self.ctx.set_source_rgb(0.5,0.5,0.5)
+        self.ctx.set_source_rgb(1,1,1)
         self.ctx.rectangle(0,0,w,h)
         self.ctx.fill()
         

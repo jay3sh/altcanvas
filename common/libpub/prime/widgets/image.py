@@ -11,8 +11,12 @@ class Image:
         ctx.rectangle(0,0,w,h)
         ctx.fill()
         
+        X_MARGIN = 0
+        Y_MARGIN = 0
+        
         ctx2 = gtk.gdk.CairoContext(ctx)
         pixbuf = gtk.gdk.pixbuf_new_from_file(path)
-        scaled_pixbuf = pixbuf.scale_simple(w-20,h-20,gtk.gdk.INTERP_NEAREST)
-        ctx2.set_source_pixbuf(scaled_pixbuf,10,10)
+        scaled_pixbuf = pixbuf.scale_simple(
+                            w-2*X_MARGIN,h-2*Y_MARGIN,gtk.gdk.INTERP_NEAREST)
+        ctx2.set_source_pixbuf(scaled_pixbuf,X_MARGIN,Y_MARGIN)
         ctx2.paint()
