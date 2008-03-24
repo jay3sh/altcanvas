@@ -59,6 +59,10 @@ class App(gtk.Window):
     key_listeners = []
     widgetQ = []
     da = None
+    lastx = 0
+    lasty = 0
+    curx = 0
+    cury = 0
     
     def __init__(self):
         gtk.Window.__init__(self)
@@ -70,6 +74,10 @@ class App(gtk.Window):
         
         self.da.connect('expose_event',self.expose)
         self.da.connect('configure_event',self.configure)
+        self.da.connect('button_press_event',self.button_press)
+        self.da.connect('button_release_event',self.button_release)
+        self.da.connect('motion_notify_event',self.motion_notify)
+
     
         self.da.set_events(gtk.gdk.EXPOSURE_MASK
                        | gtk.gdk.LEAVE_NOTIFY_MASK
@@ -124,6 +132,30 @@ class App(gtk.Window):
         
         for keyl in self.key_listeners:
             keyl(keyval,state)
+            
+    def button_press(self,widget,event):
+        self.pressed = True
+
+    def button_release(self,widget,event):
+        self.pressed = False
+
+    def motion_notify(self,widget,event):
+        if event.is_hint:
+            x,y,state = event.window.get_pointer()
+        else:
+            x = event.x
+            y = event.y
+            state = event.state
+        # Save current x,y info into last x,y info and
+        # update the current x,y info with incoming pointer location
+        # Finally trigger expose event for refresh
+        self.lastx = self.curx
+        self.lasty = self.cury
+        self.curx = x
+        self.cury = y
+        print "%d, %d --> %d, %d"%(self.lastx,self.lasty,self.curx,self.cury)
+        widget.queue_draw()
+
             
     def register_keylistener(self,key_listener_obj):
         if not hasattr(key_listener_obj,'key_listener'):
