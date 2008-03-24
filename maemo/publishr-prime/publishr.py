@@ -13,6 +13,7 @@ from libpub.prime.utils import get_image_locations,LAYOUT_STEP,LAYOUT_UNIFORM_SP
 
 FOLDER_PATH='/photos/altimages/jyro'
 
+    
 def load_widgets(pixmap,app):
     w,h = pixmap.get_size()
     ctx = pixmap.cairo_create()
@@ -25,9 +26,9 @@ def load_widgets(pixmap,app):
     
     x = 0
     y = 100
-    entry = Entry(size=15)
+    entry = Entry(parent=app,size=15)
     app.register_keylistener(entry)
-    ctx.set_source_surface(entry.surface,x,y)
+    ctx.set_source_surface(entry.get_surface(),x,y)
     ctx.paint()
 
 def load_images(pixmap):
@@ -56,6 +57,8 @@ def load_images(pixmap):
                     
 class App(gtk.Window):
     key_listeners = []
+    widgetQ = []
+    da = None
     
     def __init__(self):
         gtk.Window.__init__(self)
@@ -63,37 +66,54 @@ class App(gtk.Window):
         self.connect('key-press-event',self.key_handler)
         self.set_default_size(800,480)
         
-        da = gtk.DrawingArea()
+        self.da = gtk.DrawingArea()
         
-        da.connect('expose_event',self.expose)
+        self.da.connect('expose_event',self.expose)
+        self.da.connect('configure_event',self.configure)
     
-        da.set_events(gtk.gdk.EXPOSURE_MASK
+        self.da.set_events(gtk.gdk.EXPOSURE_MASK
                        | gtk.gdk.LEAVE_NOTIFY_MASK
                        | gtk.gdk.BUTTON_PRESS_MASK
                        | gtk.gdk.BUTTON_RELEASE_MASK
                        | gtk.gdk.POINTER_MOTION_MASK
                        | gtk.gdk.POINTER_MOTION_HINT_MASK)
     
-        self.add(da)
+        self.add(self.da)
         self.show_all()
         
-    def fill_background(self):
+    def load(self):
+        entry1 = Entry(parent=self.da,x=100,y=100,size=10)
+        self.widgetQ.append(entry1)
+        self.register_keylistener(entry1)
+        entry2 = Entry(parent=self.da,x=100,y=200,size=10)
+        self.widgetQ.append(entry2)
+        self.register_keylistener(entry2)
+        
+        
+    def redraw(self):
+        for widget in self.widgetQ:
+            self.ctx.set_source_surface(widget.get_surface(),widget.x,widget.y)
+            self.ctx.paint()
+        
+    def configure(self,widget,event):
+        _,_,w,h = widget.allocation
+        self.pixmap = gtk.gdk.Pixmap(widget.window,w,h)
         w,h = self.pixmap.get_size()
         self.ctx = self.pixmap.cairo_create()
         self.ctx.set_source_rgb(1,1,1)
         self.ctx.rectangle(0,0,w,h)
         self.ctx.fill()
         
-    def draw_objects(self):
-        #load_images(self.pixmap)
-        load_widgets(self.pixmap,self)
+        # Load initial set of widgets
+        self.load()
         
+        # triggers expose event
+        widget.queue_draw()
+    
     def expose(self,widget,event):
-        _,_,w,h = widget.allocation
-        self.pixmap = gtk.gdk.Pixmap(widget.window,w,h)
         
-        self.fill_background()
-        self.draw_objects()
+        # redraw the drawing area
+        self.redraw()
         
         gc = gtk.gdk.GC(widget.window)
         widget.window.draw_drawable(gc, self.pixmap, 0,0, 0,0, -1,-1)
