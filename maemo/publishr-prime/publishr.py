@@ -1,3 +1,5 @@
+
+import sys
 import gtk
 from gtk import keysyms
 import os
@@ -28,6 +30,7 @@ def load_widgets(pixmap,app):
     y = 100
     entry = Entry(parent=app,size=15)
     app.register_keylistener(entry)
+    app.register_pointerlistener(entry)
     ctx.set_source_surface(entry.get_surface(),x,y)
     ctx.paint()
 
@@ -57,12 +60,14 @@ def load_images(pixmap):
                     
 class App(gtk.Window):
     key_listeners = []
+    pointer_listeners = []
     widgetQ = []
     da = None
     lastx = 0
     lasty = 0
     curx = 0
     cury = 0
+    pressed = False
     
     def __init__(self):
         gtk.Window.__init__(self)
@@ -90,13 +95,14 @@ class App(gtk.Window):
         self.show_all()
         
     def load(self):
-        entry1 = Entry(parent=self.da,x=100,y=100,size=10)
+        entry1 = Entry(parent=self.da,x=100,y=100,size=10,fontsize=40)
         self.widgetQ.append(entry1)
         self.register_keylistener(entry1)
+        self.register_pointerlistener(entry1)
         entry2 = Entry(parent=self.da,x=100,y=200,size=10)
         self.widgetQ.append(entry2)
         self.register_keylistener(entry2)
-        
+        self.register_pointerlistener(entry2)
         
     def redraw(self):
         for widget in self.widgetQ:
@@ -129,14 +135,22 @@ class App(gtk.Window):
     def key_handler(self,window,event):
         keyval = event.keyval
         state = event.state & gtk.accelerator_get_default_mod_mask()
+        self.dispatch_key_event(keyval, state)
         
+    def dispatch_key_event(self,keyval,state):
         for keyl in self.key_listeners:
             keyl(keyval,state)
             
+    def dispatch_pointer_event(self,x,y):
+        for pointerl in self.pointer_listeners:
+            pointerl(x,y,self.pressed)
+            
     def button_press(self,widget,event):
+        print 'pressed'
         self.pressed = True
 
     def button_release(self,widget,event):
+        print 'released'
         self.pressed = False
 
     def motion_notify(self,widget,event):
@@ -149,23 +163,49 @@ class App(gtk.Window):
         # Save current x,y info into last x,y info and
         # update the current x,y info with incoming pointer location
         # Finally trigger expose event for refresh
+        self.update_pointer(x,y)
+        widget.queue_draw()
+
+    def update_pointer(self,x,y):
         self.lastx = self.curx
         self.lasty = self.cury
         self.curx = x
         self.cury = y
-        print "%d, %d --> %d, %d"%(self.lastx,self.lasty,self.curx,self.cury)
-        widget.queue_draw()
-
+        self.dispatch_pointer_event(x,y)
             
     def register_keylistener(self,key_listener_obj):
         if not hasattr(key_listener_obj,'key_listener'):
             raise Exception('Invalid key listener')
         
         self.key_listeners.append(key_listener_obj.key_listener)
+        
+    def register_pointerlistener(self,pointer_listener_obj):
+        if not hasattr(pointer_listener_obj,'pointer_listener'):
+            raise Exception('Invalid pointer listener')
+        
+        self.pointer_listeners.append(pointer_listener_obj.pointer_listener)
 
     def run(self):
         gtk.main()
 
 
+
+def test_thread(app):
+    for c in 'This is a test string':
+        print 'testing '+c
+        app.dispatch_key_event(ord(c),0)
+    
+    for m in ((100,23),(50,234),(44,35)):
+        print 'pointing (%d,%d)'%m
+        app.update_pointer(m[0],m[1])
+        
+    app.redraw()
+
 if __name__ == '__main__':
-    App().run()
+    app = App()
+    
+    if len(sys.argv) > 1 and sys.argv[1] == '--test':
+        import thread
+        thread.start_new_thread(test_thread, (app,))
+    
+    app.run()
