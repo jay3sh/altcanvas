@@ -3,6 +3,7 @@
 import cairo
 from libpub.prime.widget import Widget
 
+
 class FancyEntry(Widget):
     surface = None
     text = ''
@@ -10,6 +11,10 @@ class FancyEntry(Widget):
     ctx = None
     text_ctx = None
     text_surface = None
+    maxx = 0
+    size = 0
+    inner_margin_ratio = 1.2
+    outer_margin_ratio = 1.4
     
     def get_font_extents(self,fontface,fontsize):
         self.surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,400,200)
@@ -33,13 +38,13 @@ class FancyEntry(Widget):
         self.maxx = maxx
         self.size = size
         
-        self.w = int(1.2*maxx*size)
-        self.h = int(1.2*(hgt+des))
+        self.w = int(self.inner_margin_ratio*maxx*size)
+        self.h = int(self.inner_margin_ratio*(hgt+des))
         
         #self.wo = self.w + 20
         #self.ho = self.h + 20
-        self.wo = self.w + int(((1.4-1.0))*self.maxx)
-        self.ho = int(1.4*self.h)
+        self.wo = self.w + int(((self.outer_margin_ratio-1.0))*self.maxx)
+        self.ho = int(self.outer_margin_ratio*self.h)
         self.xo = 0
         self.yo = 0
         
@@ -55,6 +60,7 @@ class FancyEntry(Widget):
         
     def get_surface(self):
         
+        # Outer rectangle - fill and border
         self.ctx.rectangle(0,0,self.wo,self.ho)
         self.ctx.set_source_rgba(1,1,1,1)
         self.ctx.fill()
@@ -63,6 +69,7 @@ class FancyEntry(Widget):
         self.ctx.set_source_rgba(0,0,0,1)
         self.ctx.stroke()
         
+        # Inner rectangle - fill and border
         self.text_ctx.rectangle(0,0,self.w,self.h)
         self.text_ctx.set_source_rgba(1,1,1,1)
         self.text_ctx.fill()
@@ -71,8 +78,9 @@ class FancyEntry(Widget):
         self.text_ctx.set_source_rgba(0,0,0,1)
         self.text_ctx.stroke()
         
+        # Draw the text on its surface
         (x, y, width, height, dx, dy) = self.text_ctx.text_extents(self.text)
-        xoff = int(((1.2-1.0)/2)*self.maxx)
+        xoff = int(((self.inner_margin_ratio-1.0)/2)*self.maxx)
         yoff = int(0.3*self.h) 
         self.text_ctx.save()
         self.text_ctx.translate(xoff+x,yoff+(-y))
@@ -80,8 +88,8 @@ class FancyEntry(Widget):
         self.text_ctx.show_text(self.text)        
         self.text_ctx.restore()
         
-        xborder = int(((1.4-1.0)/2)*self.maxx)
-        yborder = int(((1.4-1.0)/2)*self.h)
+        xborder = int(((self.outer_margin_ratio-1.0)/2)*self.maxx)
+        yborder = int(((self.outer_margin_ratio-1.0)/2)*self.h)
         self.ctx.set_source_surface(self.text_surface,xborder,yborder)
         self.ctx.paint()
             
