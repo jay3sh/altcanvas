@@ -8,6 +8,7 @@ import cairo
 from libpub.prime.widgets.image import Image
 from libpub.prime.widgets.label import Label 
 from libpub.prime.widgets.entry import Entry 
+from libpub.prime.widgets.fancyentry import FancyEntry 
 
 import libpub.prime.mask as mask
 
@@ -99,7 +100,7 @@ class App(gtk.Window):
         self.widgetQ.append(entry1)
         self.register_keylistener(entry1)
         self.register_pointerlistener(entry1)
-        entry2 = Entry(parent=self.da,x=100,y=200,size=10)
+        entry2 = FancyEntry(parent=self.da,x=100,y=200,size=10)
         self.widgetQ.append(entry2)
         self.register_keylistener(entry2)
         self.register_pointerlistener(entry2)
