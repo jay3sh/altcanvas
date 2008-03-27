@@ -38,7 +38,7 @@ class FancyEntry(Widget):
         
         #self.wo = self.w + 20
         #self.ho = self.h + 20
-        self.wo = int(1.4*self.w)
+        self.wo = self.w + int(((1.4-1.0))*self.maxx)
         self.ho = int(1.4*self.h)
         self.xo = 0
         self.yo = 0
@@ -64,19 +64,23 @@ class FancyEntry(Widget):
         self.ctx.stroke()
         
         self.text_ctx.rectangle(0,0,self.w,self.h)
+        self.text_ctx.set_source_rgba(1,1,1,1)
+        self.text_ctx.fill()
+        
+        self.text_ctx.rectangle(0,0,self.w,self.h)
         self.text_ctx.set_source_rgba(0,0,0,1)
         self.text_ctx.stroke()
         
-        (x, y, width, height, dx, dy) = self.ctx.text_extents(self.text)
-        xoff = int(((1.2-1.0)/2)*self.maxx*self.size)
-        yoff = int(self.h/2) 
+        (x, y, width, height, dx, dy) = self.text_ctx.text_extents(self.text)
+        xoff = int(((1.2-1.0)/2)*self.maxx)
+        yoff = int(0.3*self.h) 
         self.text_ctx.save()
         self.text_ctx.translate(xoff+x,yoff+(-y))
         self.text_ctx.set_source_rgb(0,0,0)
         self.text_ctx.show_text(self.text)        
         self.text_ctx.restore()
         
-        xborder = int(((1.4-1.0)/2)*self.w)
+        xborder = int(((1.4-1.0)/2)*self.maxx)
         yborder = int(((1.4-1.0)/2)*self.h)
         self.ctx.set_source_surface(self.text_surface,xborder,yborder)
         self.ctx.paint()

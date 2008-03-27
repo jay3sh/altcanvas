@@ -126,7 +126,6 @@ class App(gtk.Window):
         widget.queue_draw()
     
     def expose(self,widget,event):
-        
         # redraw the drawing area
         self.redraw()
         
