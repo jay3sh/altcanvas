@@ -41,8 +41,6 @@ class FancyEntry(Widget):
         self.w = int(self.inner_margin_ratio*maxx*size)
         self.h = int(self.inner_margin_ratio*(hgt+des))
         
-        #self.wo = self.w + 20
-        #self.ho = self.h + 20
         self.wo = self.w + int(((self.outer_margin_ratio-1.0))*self.maxx)
         self.ho = int(self.outer_margin_ratio*self.h)
         self.xo = 0
@@ -65,9 +63,9 @@ class FancyEntry(Widget):
         self.ctx.set_source_rgba(1,1,1,1)
         self.ctx.fill()
         
-        self.ctx.rectangle(0,0,self.wo,self.ho)
-        self.ctx.set_source_rgba(0,0,0,1)
-        self.ctx.stroke()
+        #self.ctx.rectangle(0,0,self.wo,self.ho)
+        #self.ctx.set_source_rgba(0,0,0,1)
+        #self.ctx.stroke()
         
         # Inner rectangle - fill and border
         self.text_ctx.rectangle(0,0,self.w,self.h)
@@ -92,6 +90,60 @@ class FancyEntry(Widget):
         yborder = int(((self.outer_margin_ratio-1.0)/2)*self.h)
         self.ctx.set_source_surface(self.text_surface,xborder,yborder)
         self.ctx.paint()
+        
+        # Draw gradients
+        # top
+        lingrad = cairo.LinearGradient(xborder,yborder,xborder,0)
+        lingrad.add_color_stop_rgba(1,0,0,0,0)
+        lingrad.add_color_stop_rgba(0.3,0,0,0,0.2)
+        lingrad.add_color_stop_rgba(0,0,0,0,1)
+        self.ctx.move_to(0,0)
+        self.ctx.line_to(xborder,yborder)
+        self.ctx.line_to(self.wo-xborder,yborder)
+        self.ctx.line_to(self.wo,0)
+        self.ctx.line_to(0,0)
+        self.ctx.set_source(lingrad)
+        self.ctx.fill()
+        
+        # right
+        lingrad = cairo.LinearGradient(self.wo-xborder,yborder,self.wo,yborder)
+        lingrad.add_color_stop_rgba(1,0,0,0,0)
+        lingrad.add_color_stop_rgba(0.3,0,0,0,0.2)
+        lingrad.add_color_stop_rgba(0,0,0,0,1)
+        self.ctx.move_to(self.wo,0)
+        self.ctx.line_to(self.wo,self.ho)
+        self.ctx.line_to(self.wo-xborder,self.ho-yborder)
+        self.ctx.line_to(self.wo-xborder,yborder)
+        self.ctx.line_to(self.wo,0)
+        self.ctx.set_source(lingrad)
+        self.ctx.fill()
+        
+        # bottom
+        lingrad = cairo.LinearGradient(self.wo-xborder,self.ho-yborder,
+                                           self.wo-xborder,self.ho)
+        lingrad.add_color_stop_rgba(1,0,0,0,0)
+        lingrad.add_color_stop_rgba(0.3,0,0,0,0.2)
+        lingrad.add_color_stop_rgba(0,0,0,0,1)
+        self.ctx.move_to(self.wo,self.ho)
+        self.ctx.line_to(0,self.ho)
+        self.ctx.line_to(xborder,self.ho-yborder)
+        self.ctx.line_to(self.wo-xborder,self.ho-yborder)
+        self.ctx.line_to(self.wo,self.ho)
+        self.ctx.set_source(lingrad)
+        self.ctx.fill()
+        
+        # left
+        lingrad = cairo.LinearGradient(xborder,yborder,0,yborder)
+        lingrad.add_color_stop_rgba(1,0,0,0,0)
+        lingrad.add_color_stop_rgba(0.3,0,0,0,0.2)
+        lingrad.add_color_stop_rgba(0,0,0,0,1)
+        self.ctx.move_to(0,self.ho)
+        self.ctx.line_to(0,0)
+        self.ctx.line_to(xborder,yborder)
+        self.ctx.line_to(xborder,self.ho-yborder)
+        self.ctx.line_to(0,self.ho)
+        self.ctx.set_source(lingrad)
+        self.ctx.fill()
             
         return self.surface
         
