@@ -18,10 +18,6 @@ class App:
     images = []
     
     def __init__(self):                    
-        '''
-            @param x: X coordinate of App's upper left corner on canvas 
-            @param y: Y coordinate of App's upper left corner on canvas
-        '''
         
         # Setup cairo surface and context
         self.surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,800,480)
@@ -45,7 +41,7 @@ class App:
         gradient = mask.Linear(imgw,imgh).surface
         i = 0
         for (x,y) in get_image_locations(
-                len(self.images),layout=LAYOUT_UNIFORM_OVERLAP):
+                len(self.images),layout=LAYOUT_UNIFORM_OVERLAP,owidth=imgw,oheight=imgh):
             img = Image(self.images[i],imgw,imgh,X_MARGIN=20,Y_MARGIN=20)
             self.ctx.set_source_surface(img.surface,x,y)
             self.ctx.mask_surface(gradient,x,y)

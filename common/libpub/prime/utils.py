@@ -1,5 +1,6 @@
 
 from math import sqrt
+import random
 
 (LAYOUT_STEP,LAYOUT_UNIFORM_SPREAD,LAYOUT_UNIFORM_OVERLAP)  = range(3)
 
@@ -72,16 +73,33 @@ def get_image_locations(count,layout=LAYOUT_UNIFORM_SPREAD,
         cx1 = max_x - (x_margin+owidth/2)
         cy1 = max_y - (y_margin+oheight/2)
         
+        print 'owidth = %d, oheight = %d'%(owidth,oheight)
+        print 'cx0 = %d, cy0 = %d, cx1 = %d, cy1 = %d'%(cx0,cy0,cx1,cy1) 
+        
         aspect_ratio = max_x*1.0/max_y
         x_count = int(sqrt(count * aspect_ratio))
-        y_count = int(count / x_count)
+        y_count = int(count / x_count)+1
         
-        for i in range(count):
-            xc = i % x_count
-            yc = i / x_count
+        print 'x_count = %d, y_count = %d'%(x_count,y_count)
+        
+        x_num_gaps = x_count - 1
+        y_num_gaps = y_count - 1
             
-            x = cx0 + int(xc*((cx1-cx0)/x_count) - owidth/2)
-            y = cy0 + int(yc*((cy1-cy0)/y_count) - oheight/2)
+        for i in range(count):
+            xc = i % x_count 
+            yc = i / x_count 
+            
+            x = cx0 + int(xc*((cx1-cx0)/x_num_gaps)) - owidth/2
+            y = cy0 + int(yc*((cy1-cy0)/y_num_gaps)) - oheight/2
+            
+            RANDOM_POS_FACTOR = 15
+            dx = random.randint(-RANDOM_POS_FACTOR,+RANDOM_POS_FACTOR)
+            dy = random.randint(-RANDOM_POS_FACTOR,+RANDOM_POS_FACTOR)
+            
+            x = x+dx
+            y = y+dy
+            
+            print 'xc = %d, yc = %d, x= %d, y = %d, dx = %d, dy = %d'%(xc,yc,x,y,dx,dy) 
             #x = left_margin + xc * (max_x/x_count)-owidth
             #y = top_margin + yc * (max_y/y_count)-oheight
             #x = xc*ow+int((ow-owidth)/2)
