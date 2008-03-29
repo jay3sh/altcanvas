@@ -114,7 +114,7 @@ class Canvas(gtk.Window):
         
     def redraw(self):
         self.ctx.rectangle(0,0,self.CANVAS_WIDTH,self.CANVAS_HEIGHT)
-        self.ctx.set_source_rgba(1,1,1,1)
+        self.ctx.set_source_rgba(0,0,0,1)
         self.ctx.fill()
         for app in self.appQ:
             app_surface = app[0].get_surface()

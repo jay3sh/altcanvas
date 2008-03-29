@@ -3,7 +3,8 @@ import os
 import cairo
 from libpub.prime.widgets.image import Image
 import libpub.prime.mask as mask
-from libpub.prime.utils import get_image_locations,LAYOUT_STEP,LAYOUT_UNIFORM_SPREAD
+from libpub.prime.utils import get_image_locations,get_uniform_fit, \
+    LAYOUT_STEP, LAYOUT_UNIFORM_OVERLAP,LAYOUT_UNIFORM_SPREAD
 
 FOLDER_PATH='/photos/altimages/jyro'
 
@@ -40,11 +41,12 @@ class App:
 
     def __update_surface(self):
         # Create Image widgets for images and lay them out on the surface
-        gradient = mask.Linear(150,150).surface
+        imgw,imgh = get_uniform_fit(len(self.images),max_x=800,max_y=480)
+        gradient = mask.Linear(imgw,imgh).surface
         i = 0
         for (x,y) in get_image_locations(
-                len(self.images),layout=LAYOUT_UNIFORM_SPREAD):
-            img = Image(self.images[i],150,150)
+                len(self.images),layout=LAYOUT_UNIFORM_OVERLAP):
+            img = Image(self.images[i],imgw,imgh,X_MARGIN=20,Y_MARGIN=20)
             self.ctx.set_source_surface(img.surface,x,y)
             self.ctx.mask_surface(gradient,x,y)
             i = i+1
