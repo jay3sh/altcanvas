@@ -12,9 +12,10 @@ from libpub.prime.widgets.fancyentry import FancyEntry
 
 import libpub.prime.mask as mask
 
+from libpub.prime.app import App as PublishrApp
+
 from libpub.prime.utils import get_image_locations,LAYOUT_STEP,LAYOUT_UNIFORM_SPREAD
 
-FOLDER_PATH='/photos/altimages/jyro'
 
     
 def load_widgets(pixmap,app):
@@ -58,11 +59,11 @@ def load_images(pixmap):
         ctx.set_source_surface(img.surface,x,y)
         ctx.mask_surface(gradient,x,y)
         i = i+1
-                    
-class App(gtk.Window):
+
+class Canvas(gtk.Window):
     key_listeners = []
     pointer_listeners = []
-    widgetQ = []
+    appQ = []
     da = None
     lastx = 0
     lasty = 0
@@ -70,11 +71,14 @@ class App(gtk.Window):
     cury = 0
     pressed = False
     
+    CANVAS_WIDTH = 800
+    CANVAS_HEIGHT = 480
+    
     def __init__(self):
         gtk.Window.__init__(self)
         self.connect("destroy", gtk.main_quit)
         self.connect('key-press-event',self.key_handler)
-        self.set_default_size(800,480)
+        self.set_default_size(self.CANVAS_WIDTH,self.CANVAS_HEIGHT)
         
         self.da = gtk.DrawingArea()
         
@@ -96,6 +100,8 @@ class App(gtk.Window):
         self.show_all()
         
     def load(self):
+        self.appQ.append((PublishrApp(),0,0))
+        '''
         entry1 = Entry(parent=self.da,x=100,y=100,size=10,fontsize=40)
         self.widgetQ.append(entry1)
         self.register_keylistener(entry1)
@@ -104,10 +110,15 @@ class App(gtk.Window):
         self.widgetQ.append(entry2)
         self.register_keylistener(entry2)
         self.register_pointerlistener(entry2)
+        '''
         
     def redraw(self):
-        for widget in self.widgetQ:
-            self.ctx.set_source_surface(widget.get_surface(),widget.x,widget.y)
+        self.ctx.rectangle(0,0,self.CANVAS_WIDTH,self.CANVAS_HEIGHT)
+        self.ctx.set_source_rgba(1,1,1,1)
+        self.ctx.fill()
+        for app in self.appQ:
+            app_surface = app[0].get_surface()
+            self.ctx.set_source_surface(app_surface,app[1],app[2])
             self.ctx.paint()
         
     def configure(self,widget,event):
@@ -146,11 +157,9 @@ class App(gtk.Window):
             pointerl(x,y,self.pressed)
             
     def button_press(self,widget,event):
-        print 'pressed'
         self.pressed = True
 
     def button_release(self,widget,event):
-        print 'released'
         self.pressed = False
 
     def motion_notify(self,widget,event):
@@ -202,10 +211,10 @@ def test_thread(app):
     app.redraw()
 
 if __name__ == '__main__':
-    app = App()
+    canvas = Canvas()
     
     if len(sys.argv) > 1 and sys.argv[1] == '--test':
         import thread
-        thread.start_new_thread(test_thread, (app,))
+        thread.start_new_thread(test_thread, (canvas,))
     
-    app.run()
+    canvas.run()
