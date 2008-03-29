@@ -17,7 +17,7 @@ class Linear:
         ctx.set_source(lingrad)
         ctx.fill()
         
-class LinearExplosion:
+class MoonRise:
     surface = None
     
     def __init__(self,w,h):

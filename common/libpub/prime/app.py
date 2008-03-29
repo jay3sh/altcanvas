@@ -42,7 +42,7 @@ class App:
     def __update_surface(self):
         # Create Image widgets for images and lay them out on the surface
         imgw,imgh = get_uniform_fit(len(self.images),max_x=800,max_y=480)
-        gradient = mask.LinearExplosion(imgw,imgh).surface
+        gradient = mask.MoonRise(imgw,imgh).surface
         i = 0
         for (x,y) in get_image_locations(
                 len(self.images),layout=LAYOUT_UNIFORM_OVERLAP,owidth=imgw,oheight=imgh):
