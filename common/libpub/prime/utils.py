@@ -4,7 +4,7 @@ import random
 
 (LAYOUT_STEP,LAYOUT_UNIFORM_SPREAD,LAYOUT_UNIFORM_OVERLAP)  = range(3)
 
-def get_uniform_fit(count,max_x,max_y,OVERLAP_FACTOR = 1.3):
+def get_uniform_fit(count,max_x,max_y,OVERLAP_FACTOR = 0.9):
     total_area = max_x*max_y
     image_area = total_area/count
     image_area = OVERLAP_FACTOR * image_area
@@ -92,7 +92,7 @@ def get_image_locations(count,layout=LAYOUT_UNIFORM_SPREAD,
             x = cx0 + int(xc*((cx1-cx0)/x_num_gaps)) - owidth/2
             y = cy0 + int(yc*((cy1-cy0)/y_num_gaps)) - oheight/2
             
-            RANDOM_POS_FACTOR = 15
+            RANDOM_POS_FACTOR = int(0.2*oheight)
             dx = random.randint(-RANDOM_POS_FACTOR,+RANDOM_POS_FACTOR)
             dy = random.randint(-RANDOM_POS_FACTOR,+RANDOM_POS_FACTOR)
             
