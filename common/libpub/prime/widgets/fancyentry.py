@@ -26,10 +26,10 @@ class FancyEntry(Widget):
         
         return ctx.font_extents()
     
-    def __init__(self,parent=0,x=0,y=0,w=0,h=0,size=10,
+    def __init__(self,parent=0,w=0,h=0,size=10,
                  fontface='sans-serif',fontsize=20):
         
-        Widget.__init__(self,x,y,w,h)
+        Widget.__init__(self,w,h)
         self.parent = parent
         
         
@@ -86,8 +86,10 @@ class FancyEntry(Widget):
         self.text_ctx.show_text(self.text)        
         self.text_ctx.restore()
         
-        xborder = int(((self.outer_margin_ratio-1.0)/2)*self.maxx)
-        yborder = int(((self.outer_margin_ratio-1.0)/2)*self.h)
+        #xborder = int(((self.outer_margin_ratio-1.0)/2)*self.maxx)
+        #yborder = int(((self.outer_margin_ratio-1.0)/2)*self.h)
+        xborder = int((self.wo - self.w)/2)
+        yborder = int((self.ho - self.h)/2)
         self.ctx.set_source_surface(self.text_surface,xborder,yborder)
         self.ctx.paint()
         

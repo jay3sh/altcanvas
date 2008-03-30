@@ -5,6 +5,8 @@ import random
 (LAYOUT_STEP,LAYOUT_UNIFORM_SPREAD,LAYOUT_UNIFORM_OVERLAP)  = range(3)
 
 def get_uniform_fit(count,max_x,max_y,OVERLAP_FACTOR = 0.9):
+    if count == 0:
+        return (0,0)
     total_area = max_x*max_y
     image_area = total_area/count
     image_area = OVERLAP_FACTOR * image_area
@@ -21,6 +23,9 @@ def get_image_locations(count,layout=LAYOUT_UNIFORM_SPREAD,
         @param owidth: Hint in terms of Object width that will be placed
             at the returned position. (Optional param)
     '''
+    
+    if count == 0:
+        raise Exception('Need non-zero number of images')
     
     LEFT_MARGIN_RATIO = 0.1
     TOP_MARGIN_RATIO = 0.1
@@ -73,14 +78,9 @@ def get_image_locations(count,layout=LAYOUT_UNIFORM_SPREAD,
         cx1 = max_x - (x_margin+owidth/2)
         cy1 = max_y - (y_margin+oheight/2)
         
-        print 'owidth = %d, oheight = %d'%(owidth,oheight)
-        print 'cx0 = %d, cy0 = %d, cx1 = %d, cy1 = %d'%(cx0,cy0,cx1,cy1) 
-        
         aspect_ratio = max_x*1.0/max_y
         x_count = int(sqrt(count * aspect_ratio))
         y_count = int(count / x_count)+1
-        
-        print 'x_count = %d, y_count = %d'%(x_count,y_count)
         
         x_num_gaps = x_count - 1
         y_num_gaps = y_count - 1
@@ -99,11 +99,6 @@ def get_image_locations(count,layout=LAYOUT_UNIFORM_SPREAD,
             x = x+dx
             y = y+dy
             
-            print 'xc = %d, yc = %d, x= %d, y = %d, dx = %d, dy = %d'%(xc,yc,x,y,dx,dy) 
-            #x = left_margin + xc * (max_x/x_count)-owidth
-            #y = top_margin + yc * (max_y/y_count)-oheight
-            #x = xc*ow+int((ow-owidth)/2)
-            #y = yc*oh+int((oh-oheight)/2)
             yield(x,y)
         
         
