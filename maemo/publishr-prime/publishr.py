@@ -16,50 +16,7 @@ from libpub.prime.app import App as PublishrApp
 
 from libpub.prime.utils import get_image_locations,LAYOUT_STEP,LAYOUT_UNIFORM_SPREAD
 
-
     
-def load_widgets(pixmap,app):
-    w,h = pixmap.get_size()
-    ctx = pixmap.cairo_create()
-    
-    x = 0
-    y = 0
-    lbl = Label('Brewing cup of coffee...')
-    ctx.set_source_surface(lbl.surface,x,y)
-    ctx.paint()
-    
-    x = 0
-    y = 100
-    entry = Entry(parent=app,size=15)
-    app.register_keylistener(entry)
-    app.register_pointerlistener(entry)
-    ctx.set_source_surface(entry.get_surface(),x,y)
-    ctx.paint()
-
-def load_images(pixmap):
-    images = []
-    if os.path.isdir(FOLDER_PATH):
-        files = os.listdir(FOLDER_PATH)
-        for f in files:
-            if f.lower().endswith('jpg') or  \
-                f.lower().endswith('jpeg') or  \
-                f.lower().endswith('xcf') or  \
-                f.lower().endswith('gif'):
-                    images.append(FOLDER_PATH+os.sep+f)
-    
-    w,h = pixmap.get_size()
-    ctx = pixmap.cairo_create()
-    #gradient = mask.Linear(100,100).surface
-    gradient = mask.Radial(100,100).surface
-    
-    i = 0
-    for (x,y) in get_image_locations(
-            len(images),layout=LAYOUT_UNIFORM_SPREAD):
-        img = Image(images[i],100,100)
-        ctx.set_source_surface(img.surface,x,y)
-        ctx.mask_surface(gradient,x,y)
-        i = i+1
-
 class Canvas(gtk.Window):
     key_listeners = []
     pointer_listeners = []
@@ -70,6 +27,7 @@ class Canvas(gtk.Window):
     curx = 0
     cury = 0
     pressed = False
+    isLoaded = False
     
     CANVAS_WIDTH = 800
     CANVAS_HEIGHT = 480
@@ -101,16 +59,8 @@ class Canvas(gtk.Window):
         
     def load(self):
         self.appQ.append((PublishrApp(),0,0))
-        '''
-        entry1 = Entry(parent=self.da,x=100,y=100,size=10,fontsize=40)
-        self.widgetQ.append(entry1)
-        self.register_keylistener(entry1)
-        self.register_pointerlistener(entry1)
-        entry2 = FancyEntry(parent=self.da,x=100,y=200,size=10)
-        self.widgetQ.append(entry2)
-        self.register_keylistener(entry2)
-        self.register_pointerlistener(entry2)
-        '''
+        self.isLoaded = True
+        
         
     def redraw(self):
         self.ctx.rectangle(0,0,self.CANVAS_WIDTH,self.CANVAS_HEIGHT)
@@ -131,7 +81,8 @@ class Canvas(gtk.Window):
         self.ctx.fill()
         
         # Load initial set of widgets
-        self.load()
+        if not self.isLoaded:
+            self.load()
         
         # triggers expose event
         widget.queue_draw()
@@ -146,16 +97,9 @@ class Canvas(gtk.Window):
     def key_handler(self,window,event):
         keyval = event.keyval
         state = event.state & gtk.accelerator_get_default_mod_mask()
-        self.dispatch_key_event(keyval, state)
+        for app in self.appQ:
+            app[0].dispatch_key_event(keyval,state)
         
-    def dispatch_key_event(self,keyval,state):
-        for keyl in self.key_listeners:
-            keyl(keyval,state)
-            
-    def dispatch_pointer_event(self,x,y):
-        for pointerl in self.pointer_listeners:
-            pointerl(x,y,self.pressed)
-            
     def button_press(self,widget,event):
         self.pressed = True
 
@@ -169,30 +113,12 @@ class Canvas(gtk.Window):
             x = event.x
             y = event.y
             state = event.state
-        # Save current x,y info into last x,y info and
-        # update the current x,y info with incoming pointer location
-        # Finally trigger expose event for refresh
-        self.update_pointer(x,y)
+        
+        for app in self.appQ:
+            app[0].dispatch_pointer_event(x,y,self.pressed)
+        
         widget.queue_draw()
 
-    def update_pointer(self,x,y):
-        self.lastx = self.curx
-        self.lasty = self.cury
-        self.curx = x
-        self.cury = y
-        self.dispatch_pointer_event(x,y)
-            
-    def register_keylistener(self,key_listener_obj):
-        if not hasattr(key_listener_obj,'key_listener'):
-            raise Exception('Invalid key listener')
-        
-        self.key_listeners.append(key_listener_obj.key_listener)
-        
-    def register_pointerlistener(self,pointer_listener_obj):
-        if not hasattr(pointer_listener_obj,'pointer_listener'):
-            raise Exception('Invalid pointer listener')
-        
-        self.pointer_listeners.append(pointer_listener_obj.pointer_listener)
 
     def run(self):
         gtk.main()
