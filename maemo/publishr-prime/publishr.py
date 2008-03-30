@@ -58,9 +58,16 @@ class Canvas(gtk.Window):
         self.show_all()
         
     def load(self):
-        self.appQ.append((PublishrApp(),0,0))
+        app = PublishrApp()
+        app.register_change_listener(self.on_app_change)
+        self.appQ.append((app,0,0))
         self.isLoaded = True
         
+    def on_app_change(self,app):
+        # In future we will use app's params to decide if we want
+        # to update or not
+        print "on_app_change"
+        self.redraw()
         
     def redraw(self):
         self.ctx.rectangle(0,0,self.CANVAS_WIDTH,self.CANVAS_HEIGHT)

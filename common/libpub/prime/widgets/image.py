@@ -5,6 +5,7 @@ from libpub.prime.widget import Widget
 class Image(Widget):
     surface = None
     path = None
+    click_listener = None
     
     def __init__(self,path,w,h,X_MARGIN=0,Y_MARGIN=0):
         Widget.__init__(self, w, h)
@@ -22,6 +23,9 @@ class Image(Widget):
         ctx2.set_source_pixbuf(scaled_pixbuf,X_MARGIN,Y_MARGIN)
         ctx2.paint()
         
+    def register_click_listener(self,click_listener):
+        self.click_listener = click_listener
+        
     def pointer_listener(self,x,y,pressed=False):
         oldFocus = self.hasFocus
         if x > 0 and x < self.w and y > 0 and y < 2*self.h/3:
@@ -29,8 +33,6 @@ class Image(Widget):
         else:
             self.hasFocus = False
             
-        if oldFocus and not self.hasFocus:
-            print self.path + " lost focus"
-        
         if not oldFocus and self.hasFocus:
-            print self.path + " gained focus"
+            if self.click_listener:
+                self.click_listener(self)
