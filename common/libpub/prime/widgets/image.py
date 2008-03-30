@@ -34,5 +34,6 @@ class Image(Widget):
             self.hasFocus = False
             
         if not oldFocus and self.hasFocus:
+            print self.path + ' gained focus'
             if self.click_listener:
                 self.click_listener(self)

@@ -77,6 +77,7 @@ class WidgetQueue:
            ww.isPointerActive = False
     
     def enqueue(self,widgetWrapper):
+        self.__recalculate_focus(widgetWrapper)
         self.widgetQ.append(widgetWrapper)
 
     def next(self):
@@ -163,7 +164,7 @@ class App:
                 
     def dispatch_pointer_event(self,x,y,pressed):
         for ww in self.widgetQ.next():
-            if hasattr(ww.widget,'pointer_listener'):
+            if ww.isPointerActive and hasattr(ww.widget,'pointer_listener'):
                 ww.widget.pointer_listener(x-ww.x,y-ww.y,pressed)
                 
     def on_image_click(self,image):
