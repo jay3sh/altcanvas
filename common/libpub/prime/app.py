@@ -50,6 +50,7 @@ class WidgetQueue:
 					           | |                    |
 					          nh |     newWidget      |
 					           | |                    |
+					           | |                    |
 					           v ---------------------- (nx1,ny1)
         '''
         
@@ -166,10 +167,11 @@ class App:
 
     def __update_surface(self):
         # Create Image widgets for images and lay them out on the surface
-        #gradient = mask.MoonRise(imgw,imgh).surface
+        self.ctx.rectangle(0,0,self.app_width,self.app_height)
+        self.ctx.set_source_rgba(0,0,0,1)
+        self.ctx.fill()
         for ww in self.widgetQ.next():
             self.ctx.set_source_surface(ww.widget.surface,ww.x,ww.y)
-            #self.ctx.mask_surface(gradient,x,y)
             self.ctx.paint()
             
         self.hasChanged = True
