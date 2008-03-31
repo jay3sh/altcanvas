@@ -26,7 +26,7 @@ class WidgetQueue:
     def __init__(self):
         pass
     
-    def __recalculate_focus(self,newWidget):
+    def __recalculate_clouds(self):
         '''
             @summary: This method compares surface extents of all existing widgets
                 with the new widget and determines if the new widget will
@@ -52,49 +52,55 @@ class WidgetQueue:
 					           | |                    |
 					           v ---------------------- (nx1,ny1)
         '''
+        
+        # Cleanup all the clouds before recalculating
         for ww in self.widgetQ:
-           ox0 = ww.x
-           oy0 = ww.y
-           ox1 = ox0 + ww.widget.w
-           oy1 = oy0 + ww.widget.h
-           
-           nx0 = newWidget.x
-           ny0 = newWidget.y
-           nx1 = nx0 + newWidget.widget.w
-           ny1 = ny0 + newWidget.widget.h
+            ww.widget.clouds = []
             
-           if (ox0 < nx0 and ox1 < nx0) or (ox0 > nx1 and ox1 > nx1) or \
-               (oy0 < ny0 and oy1 < ny0) or (oy0 > ny1 and  oy1 > ny1):
-               # There is no overlap
-               continue
-           else:
-               '''
-                There is an overlap
-                Calculate the intersection of two widgets' extents
-                and add it to the cloud list of the old widget
-                Also translate them into widget's coordinate system
+        for top in range(len(self.widgetQ)):
+        
+            newWidget = self.widgetQ[top]
+            
+            for i in range(top):
+                ww = self.widgetQ[i]
+                ox0 = ww.x
+                oy0 = ww.y
+                ox1 = ox0 + ww.widget.w
+                oy1 = oy0 + ww.widget.h
+               
+                nx0 = newWidget.x
+                ny0 = newWidget.y
+                nx1 = nx0 + newWidget.widget.w
+                ny1 = ny0 + newWidget.widget.h
                 
-                These are top-left and bottom-right vertices of the rectangular
-                intersection of two widgets.
-                
-                   cx0 = max(ox0,nx0) - ox0
-                   cy0 = max(oy0,ny0) - oy0
-                   cx1 = min(ox1,nx1) - ox0
-                   cy1 = min(oy1,ny1) - oy0
-               '''
-               ww.widget.clouds.append((max(ox0,nx0)-ox0,
-                                        max(oy0,ny0)-oy0,
-	                                    min(ox1,nx1)-ox0,
-	                                    min(oy1,ny1)-oy0))
+                if (ox0 < nx0 and ox1 < nx0) or (ox0 > nx1 and ox1 > nx1) or \
+                    (oy0 < ny0 and oy1 < ny0) or (oy0 > ny1 and  oy1 > ny1):
+                    # There is no overlap
+                    continue
+                else:
+                    '''
+                    There is an overlap
+                    Calculate the intersection of two widgets' extents
+                    and add it to the cloud list of the old widget
+                    Also translate them into widget's coordinate system
+                    
+                    These are top-left and bottom-right vertices of the rectangular
+                    intersection of two widgets.
+                    '''
+                    ww.widget.clouds.append((max(ox0,nx0)-ox0,
+                                            max(oy0,ny0)-oy0,
+                                            min(ox1,nx1)-ox0,
+                                            min(oy1,ny1)-oy0))
     
     def append(self,widgetWrapper):
-        self.__recalculate_focus(widgetWrapper)
         self.widgetQ.append(widgetWrapper)
+        self.__recalculate_clouds()
         
     def remove(self,widget): 
         for ww in self.widgetQ:
             if ww.widget.id == widget.id:
                 self.widgetQ.remove(ww)
+                self.__recalculate_clouds()
                 return True
             
         raise Exception('Widget not found in Queue')
