@@ -28,12 +28,18 @@ class Image(Widget):
         
     def pointer_listener(self,x,y,pressed=False):
         oldFocus = self.hasFocus
-        if x > 0 and x < self.w and y > 0 and y < 2*self.h/3:
+        
+        if x > 0 and x < self.w and y > 0 and y < self.h:
+            # Check if we are under any cloud
+            for cloud in self.clouds:
+            	if x > cloud[0] and x < cloud[2] and y > cloud[1] and y < cloud[3]:
+                    self.hasFocus = False
+            	    return
+            # We are not under any cloud
             self.hasFocus = True
         else:
             self.hasFocus = False
             
         if not oldFocus and self.hasFocus:
-            print self.path + ' gained focus'
             if self.click_listener:
                 self.click_listener(self)

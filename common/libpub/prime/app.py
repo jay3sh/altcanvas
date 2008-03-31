@@ -16,14 +16,12 @@ class WidgetWrapper:
     x = -1
     y = -1
     isKeyActive = True
-    isPointerActive = True
     
-    def __init__(self,widget,x,y,isKeyActive=True,isPointerActive=True):
+    def __init__(self,widget,x,y,isKeyActive=True):
         self.widget = widget
         self.x = x
         self.y = y
         self.isKeyActive = isKeyActive
-        self.isPointerActive = isPointerActive
 
 class WidgetQueue:
     widgetQ = []
@@ -72,9 +70,25 @@ class WidgetQueue:
                (oy0 < ny0 and oy1 < ny0) or (oy0 > ny1 and  oy1 > ny1):
                # There is no overlap
                continue
-           
-           ww.isKeyActive = False
-           ww.isPointerActive = False
+           else:
+               '''
+                This is an overlap
+                Calculate the intersection of two widgets' extents
+                and add it to the cloud list of the old widget
+                Also translate them into widget's coordinate system
+                
+                These are top-left and bottom-right vertices of the rectangular
+                intersection of two widgets.
+                
+                   cx0 = max(ox0,nx0) - ox0
+                   cy0 = max(oy0,ny0) - oy0
+                   cx1 = min(ox1,nx1) - ox0
+                   cy1 = min(oy1,ny1) - oy0
+               '''
+               ww.widget.clouds.append((max(ox0,nx0)-ox0,
+                                        max(oy0,ny0)-oy0,
+	                                    min(ox1,nx1)-ox0,
+	                                    min(oy1,ny1)-oy0))
     
     def enqueue(self,widgetWrapper):
         self.__recalculate_focus(widgetWrapper)
@@ -164,7 +178,7 @@ class App:
                 
     def dispatch_pointer_event(self,x,y,pressed):
         for ww in self.widgetQ.next():
-            if ww.isPointerActive and hasattr(ww.widget,'pointer_listener'):
+            if hasattr(ww.widget,'pointer_listener'):
                 ww.widget.pointer_listener(x-ww.x,y-ww.y,pressed)
                 
     def on_image_click(self,image):
