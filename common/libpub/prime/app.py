@@ -7,9 +7,6 @@ import libpub.prime.mask as mask
 from libpub.prime.utils import get_image_locations,get_uniform_fit, \
     LAYOUT_STEP, LAYOUT_UNIFORM_OVERLAP,LAYOUT_UNIFORM_SPREAD
 
-#FOLDER_PATH='/photos/altimages/jyro'
-#FOLDER_PATH='/mnt/bluebox/photos'
-
 
 class WidgetWrapper:
     widget = None
@@ -72,7 +69,7 @@ class WidgetQueue:
                continue
            else:
                '''
-                This is an overlap
+                There is an overlap
                 Calculate the intersection of two widgets' extents
                 and add it to the cloud list of the old widget
                 Also translate them into widget's coordinate system
@@ -90,9 +87,17 @@ class WidgetQueue:
 	                                    min(ox1,nx1)-ox0,
 	                                    min(oy1,ny1)-oy0))
     
-    def enqueue(self,widgetWrapper):
+    def append(self,widgetWrapper):
         self.__recalculate_focus(widgetWrapper)
         self.widgetQ.append(widgetWrapper)
+        
+    def remove(self,widget): 
+        for ww in self.widgetQ:
+            if ww.widget.id == widget.id:
+                self.widgetQ.remove(ww)
+                return True
+            
+        raise Exception('Widget not found in Queue')
 
     def next(self):
         for widget in self.widgetQ:
@@ -150,7 +155,7 @@ class App:
             img = Image(self.images[i],imgw,imgh, 
                         X_MARGIN=int(0.1*imgw),Y_MARGIN=int(0.1*imgh))
             img.register_click_listener(self.on_image_click)
-            self.widgetQ.enqueue(WidgetWrapper(img,x,y))
+            self.widgetQ.append(WidgetWrapper(img,x,y))
             i = i+1
 
     def __update_surface(self):
@@ -186,6 +191,10 @@ class App:
     def on_image_click(self,image):
         if not self.inputPad:
             self.inputPad = Pad(int(2*self.app_width/3),int(2*self.app_height/3))
-            self.widgetQ.enqueue(WidgetWrapper(
+            self.widgetQ.append(WidgetWrapper(
                 self.inputPad,int(self.app_width/3)-20,int(self.app_height/3)-20))
+            self.__update_surface()
+        else:
+            self.widgetQ.remove(self.inputPad)
+            self.inputPad = None
             self.__update_surface()
