@@ -7,7 +7,7 @@ import libpub.prime.mask as mask
 from libpub.prime.utils import get_image_locations,get_uniform_fit, \
     LAYOUT_STEP, LAYOUT_UNIFORM_OVERLAP,LAYOUT_UNIFORM_SPREAD
 
-FOLDER_PATH='/photos/altimages/jyro'
+#FOLDER_PATH='/photos/altimages/jyro'
 #FOLDER_PATH='/mnt/bluebox/photos'
 
 
@@ -110,11 +110,13 @@ class App:
     app_height = 480
     
     # Publishr app specific private members
+    FOLDER_PATH = None
     images = []
-    
     inputPad = None
     
-    def __init__(self):                    
+    def __init__(self,folder_path):                    
+        
+        self.FOLDER_PATH = folder_path
         
         self.widgetQ = WidgetQueue()
         
@@ -125,8 +127,8 @@ class App:
         
         LIMIT = 50
         # Get list of images to display
-        if os.path.isdir(FOLDER_PATH):
-            files = os.listdir(FOLDER_PATH)
+        if os.path.isdir(self.FOLDER_PATH):
+            files = os.listdir(self.FOLDER_PATH)
             for f in files:
                 if len(self.images) >= LIMIT:
                     break
@@ -135,7 +137,7 @@ class App:
                     f.lower().endswith('jpeg') or  \
                     f.lower().endswith('xcf') or  \
                     f.lower().endswith('gif'):
-                        self.images.append(FOLDER_PATH+os.sep+f)
+                        self.images.append(self.FOLDER_PATH+os.sep+f)
 
         self.__load_images()
         self.__update_surface()

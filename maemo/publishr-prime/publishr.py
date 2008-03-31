@@ -16,8 +16,21 @@ from libpub.prime.app import App as PublishrApp
 
 from libpub.prime.utils import get_image_locations,LAYOUT_STEP,LAYOUT_UNIFORM_SPREAD
 
+def detect_platform():
+    sin,soe = os.popen4('uname -n')
+    line = soe.read()
+    if line.lower().find('nokia') >= 0:
+        return 'Nokia'
+    else:
+        return 'Desktop'
+        
+if detect_platform() == 'Nokia':
+    from hildon import Window as BaseWindow
+else:
+    from gtk import Window as BaseWindow
     
-class Canvas(gtk.Window):
+
+class Canvas(BaseWindow):
     key_listeners = []
     pointer_listeners = []
     appQ = []
@@ -33,7 +46,11 @@ class Canvas(gtk.Window):
     CANVAS_HEIGHT = 480
     
     def __init__(self):
-        gtk.Window.__init__(self)
+        BaseWindow.__init__(self)
+        
+        if detect_platform() == 'Nokia':
+            self.fullscreen()
+            
         self.connect("destroy", gtk.main_quit)
         self.connect('key-press-event',self.key_handler)
         self.set_default_size(self.CANVAS_WIDTH,self.CANVAS_HEIGHT)
@@ -46,7 +63,6 @@ class Canvas(gtk.Window):
         self.da.connect('button_release_event',self.button_release)
         self.da.connect('motion_notify_event',self.motion_notify)
 
-    
         self.da.set_events(gtk.gdk.EXPOSURE_MASK
                        | gtk.gdk.LEAVE_NOTIFY_MASK
                        | gtk.gdk.BUTTON_PRESS_MASK
@@ -58,7 +74,11 @@ class Canvas(gtk.Window):
         self.show_all()
         
     def load(self):
-        app = PublishrApp()
+        if detect_platform() == 'Nokia':
+            app = PublishrApp('/mnt/bluebox/photos')
+        else:
+            app = PublishrApp('/photos/altimages/jyro')
+            
         app.register_change_listener(self.on_app_change)
         self.appQ.append((app,0,0))
         self.isLoaded = True
@@ -66,7 +86,6 @@ class Canvas(gtk.Window):
     def on_app_change(self,app):
         # In future we will use app's params to decide if we want
         # to update or not
-        print "on_app_change"
         self.redraw()
         
     def redraw(self):
