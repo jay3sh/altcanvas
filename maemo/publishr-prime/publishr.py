@@ -150,23 +150,6 @@ class Canvas(BaseWindow):
         gtk.main()
 
 
-
-def test_thread(app):
-    for c in 'This is a test string':
-        print 'testing '+c
-        app.dispatch_key_event(ord(c),0)
-    
-    for m in ((100,23),(50,234),(44,35)):
-        print 'pointing (%d,%d)'%m
-        app.update_pointer(m[0],m[1])
-        
-    app.redraw()
-
 if __name__ == '__main__':
     canvas = Canvas()
-    
-    if len(sys.argv) > 1 and sys.argv[1] == '--test':
-        import thread
-        thread.start_new_thread(test_thread, (canvas,))
-    
     canvas.run()
