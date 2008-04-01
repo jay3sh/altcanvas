@@ -102,16 +102,33 @@ class WidgetQueue:
             if ww.widget.id == widget.id:
                 self.widgetQ.remove(ww)
                 self.__recalculate_clouds()
-                return True
-            
+                return 
         raise Exception('Widget not found in Queue')
+    
+    def insert(self,location,widgetWrapper):
+        self.widgetQ.insert(location,widgetWrapper)
+        self.__recalculate_clouds()
+    
+    def hasWidget(self,widget):
+        for ww in self.widgetQ:
+            if ww.widget.id == widget.id:
+                return True
+        return False
+    
+    def getWidget(self,widget):
+        i = 0
+        for ww in self.widgetQ:
+            if ww.widget.id == widget.id:
+                return (i,ww)
+            i = i+1
+        return None
 
     def next(self):
         for widget in self.widgetQ:
             yield(widget)
             
 class App:
-    widgetQ = []
+    widgetQ = None
     
     surface = None
     ctx = None
@@ -125,6 +142,7 @@ class App:
     FOLDER_PATH = None
     images = []
     inputPad = None
+    imageOnPadW = None
     
     def __init__(self,folder_path):                    
         
@@ -192,17 +210,38 @@ class App:
                 ww.widget.key_listener(keyval,state)
                 
     def dispatch_pointer_event(self,x,y,pressed):
+        i = 0
         for ww in self.widgetQ.next():
             if hasattr(ww.widget,'pointer_listener'):
                 ww.widget.pointer_listener(x-ww.x,y-ww.y,pressed)
+                i = i+1
+                
+        print 'Dispatched pointer to %d listeners'%i
+            
                 
     def on_image_click(self,image):
         if not self.inputPad:
             self.inputPad = Pad(int(2*self.app_width/3),int(2*self.app_height/3))
-            self.widgetQ.append(WidgetWrapper(
-                self.inputPad,int(self.app_width/3)-20,int(self.app_height/3)-20))
-            self.__update_surface()
-        else:
-            self.widgetQ.remove(self.inputPad)
-            self.inputPad = None
-            self.__update_surface()
+            
+        ipx = int(self.app_width/3)-20
+        ipy = int(self.app_height/3)-20
+        
+        if not self.widgetQ.hasWidget(self.inputPad):
+            self.widgetQ.append(WidgetWrapper(self.inputPad,ipx,ipy))
+            
+        (pos,imageW) = self.widgetQ.getWidget(image)
+        
+        # remove the image from queue and insert at new location
+        # also add the image previously on pad to its old position
+        self.widgetQ.remove(image)
+        self.widgetQ.append(WidgetWrapper(image,ipx+20,ipy+20))
+        if self.imageOnPadW:
+            self.widgetQ.remove(self.imageOnPadW[1].widget)
+            self.widgetQ.insert(self.imageOnPadW[0],self.imageOnPadW[1])
+        
+        # Find the wrapper widget for the parameter image and save it
+        self.imageOnPadW = (pos,imageW)
+        
+        self.__update_surface()
+        
+        
