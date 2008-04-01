@@ -7,7 +7,6 @@ from libpub.prime.widget import Widget
 class FancyEntry(Widget):
     surface = None
     text = ''
-    parent = None
     ctx = None
     text_ctx = None
     text_surface = None
@@ -15,6 +14,8 @@ class FancyEntry(Widget):
     size = 0
     inner_margin_ratio = 1.2
     outer_margin_ratio = 1.4
+    
+    change_listener = None
     
     def get_font_extents(self,fontface,fontsize):
         self.surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,400,200)
@@ -26,11 +27,10 @@ class FancyEntry(Widget):
         
         return ctx.font_extents()
     
-    def __init__(self,parent=0,w=0,h=0,size=10,
+    def __init__(self,w=0,h=0,size=10,
                  fontface='sans-serif',fontsize=20):
         
         Widget.__init__(self,w,h)
-        self.parent = parent
         
         
         asc,des,hgt,maxx,maxy = self.get_font_extents(fontface,fontsize)
@@ -55,6 +55,12 @@ class FancyEntry(Widget):
         self.text_ctx.set_tolerance(.1)
         self.text_ctx.select_font_face(fontface)
         self.text_ctx.set_font_size(fontsize)
+        
+        
+        self.get_surface()
+        
+    def register_change_listener(self,listener):
+        self.change_listener = listener
         
     def get_surface(self):
         
@@ -151,11 +157,13 @@ class FancyEntry(Widget):
         
     def key_listener(self,key,state):
         self.text += chr(key)
-        self.parent.queue_draw()
+        if self.change_listener:
+            self.get_surface()
+            self.change_listener.on_surface_change(self)
         
     def pointer_listener(self,x,y,pressed=False):
         oldFocus = self.hasFocus
-        if x > self.x and x < self.x+self.w and y > self.y and y < self.y+self.h:
+        if x > 0 and x < self.w and y > 0 and y < self.h:
             self.hasFocus = True
         else:
             self.hasFocus = False

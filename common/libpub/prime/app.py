@@ -4,6 +4,7 @@ import cairo
 from libpub.prime.widgets.image import Image
 from libpub.prime.widgets.pad import Pad 
 import libpub.prime.mask as mask
+from libpub.prime.widgets.fancyentry import FancyEntry 
 from libpub.prime.utils import get_image_locations,get_uniform_fit, \
     LAYOUT_STEP, LAYOUT_UNIFORM_OVERLAP,LAYOUT_UNIFORM_SPREAD
 
@@ -216,7 +217,8 @@ class App:
                 ww.widget.pointer_listener(x-ww.x,y-ww.y,pressed)
                 i = i+1
                 
-        print 'Dispatched pointer to %d listeners'%i
+    def on_surface_change(self,widget):
+        self.__update_surface()
             
                 
     def on_image_click(self,image):
@@ -241,6 +243,10 @@ class App:
         
         # Find the wrapper widget for the parameter image and save it
         self.imageOnPadW = (pos,imageW)
+        
+        entry1 = FancyEntry()
+        entry1.register_change_listener(self)
+        self.widgetQ.append(WidgetWrapper(entry1,ipx+200,ipy+200))
         
         self.__update_surface()
         
