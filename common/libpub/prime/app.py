@@ -47,12 +47,12 @@ class WidgetQueue:
            
                         (nx0,ny0)<-------- nw -------->
                                ^ ----------------------
-					           | |                    |
-					           | |                    |
-					          nh |     newWidget      |
-					           | |                    |
-					           | |                    |
-					           v ---------------------- (nx1,ny1)
+                               | |                    |
+                               | |                    |
+                              nh |     newWidget      |
+                               | |                    |
+                               | |                    |
+                               v ---------------------- (nx1,ny1)
         '''
         
         # Cleanup all the clouds before recalculating
