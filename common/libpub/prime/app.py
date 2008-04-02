@@ -3,23 +3,14 @@ import os
 import cairo
 from libpub.prime.widgets.image import Image
 from libpub.prime.widgets.pad import Pad 
+from libpub.prime.widget import WidgetWrapper
 import libpub.prime.mask as mask
 from libpub.prime.widgets.fancyentry import FancyEntry 
 from libpub.prime.utils import get_image_locations,get_uniform_fit, \
     LAYOUT_STEP, LAYOUT_UNIFORM_OVERLAP,LAYOUT_UNIFORM_SPREAD
+from libpub.prime.animation import Path
 
 
-class WidgetWrapper:
-    widget = None
-    x = -1
-    y = -1
-    isKeyActive = True
-    
-    def __init__(self,widget,x,y,isKeyActive=True):
-        self.widget = widget
-        self.x = x
-        self.y = y
-        self.isKeyActive = isKeyActive
 
 class WidgetQueue:
     widgetQ = []
@@ -235,18 +226,54 @@ class App:
         
         # remove the image from queue and insert at new location
         # also add the image previously on pad to its old position
+        
+        pathIn = Path(imageW.widget)
+        pathIn.add_start((imageW.x,imageW.y))
+        pathIn.add_stop((ipx+20,ipy+20))
+        orderIn = pos
+        inPoints = pathIn.get_points()
+        
+        if self.imageOnPadW:
+            pathOut = Path(self.imageOnPadW[1].widget)
+            pathOut.add_start((ipx+20,ipy+20))
+            pathOut.add_stop((self.imageOnPadW[1].x,self.imageOnPadW[1].y))
+            orderOut = self.imageOnPadW[0]
+            outPoints = pathOut.get_points()
+        
+        for i in range(len(inPoints)):
+            inP = inPoints[i]
+            
+            self.widgetQ.remove(inP.widget)
+            #inW = pathIn.get_widget().next()
+            #self.widgetQ.insert(orderIn,inW)
+            self.widgetQ.insert(orderIn, inP)
+            
+            if self.imageOnPadW:
+                outP = outPoints[i]
+                self.widgetQ.remove(self.imageOnPadW[1].widget)
+                self.widgetQ.insert(orderOut, outP)
+                #outW = pathIn.get_widget().next()
+            	#self.widgetQ.insert(orderOut,outW)
+        
+        self.imageOnPadW = (pos,imageW)
+        '''
         self.widgetQ.remove(image)
         self.widgetQ.append(WidgetWrapper(image,ipx+20,ipy+20))
+        image.disable_pointer_listener()
         if self.imageOnPadW:
             self.widgetQ.remove(self.imageOnPadW[1].widget)
             self.widgetQ.insert(self.imageOnPadW[0],self.imageOnPadW[1])
+            self.imageOnPadW[1].widget.enable_pointer_listener()
         
         # Find the wrapper widget for the parameter image and save it
         self.imageOnPadW = (pos,imageW)
+        '''
         
+        '''
         entry1 = FancyEntry()
         entry1.register_change_listener(self)
         self.widgetQ.append(WidgetWrapper(entry1,ipx+200,ipy+200))
+        '''
         
         self.__update_surface()
         

@@ -1,6 +1,18 @@
 
 import random
 
+class WidgetWrapper:
+    widget = None
+    x = -1
+    y = -1
+    isKeyActive = True
+    
+    def __init__(self,widget,x,y,isKeyActive=True):
+        self.widget = widget
+        self.x = x
+        self.y = y
+        self.isKeyActive = isKeyActive
+        
 class Widget:
     id = None
     w = 0
