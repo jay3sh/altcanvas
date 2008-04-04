@@ -8,6 +8,8 @@ class Image(Widget):
     path = None
     click_listener = None
     
+    __pointer_listener_enabled = True
+    
     def __init__(self,path,w,h,X_MARGIN=0,Y_MARGIN=0):
         Widget.__init__(self, w, h)
         surface1 = cairo.ImageSurface(cairo.FORMAT_ARGB32,w,h)
@@ -39,6 +41,9 @@ class Image(Widget):
         self.click_listener = click_listener
         
     def pointer_listener(self,x,y,pressed=False):
+        if not self.__pointer_listener_enabled:
+            return
+        
         oldFocus = self.hasFocus
         
         if x > 0 and x < self.w and y > 0 and y < self.h:
@@ -53,5 +58,12 @@ class Image(Widget):
             self.hasFocus = False
             
         if not oldFocus and self.hasFocus:
+            #print self.path + ' gained focus'
             if self.click_listener:
                 self.click_listener(self)
+                
+    def disable_pointer_listener(self):
+        self.__pointer_listener_enabled = False
+        
+    def enable_pointer_listener(self):
+        self.__pointer_listener_enabled = True

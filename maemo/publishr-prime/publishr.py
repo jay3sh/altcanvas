@@ -35,6 +35,7 @@ class Canvas(BaseWindow):
     pointer_listeners = []
     appQ = []
     da = None
+    gc = None
     lastx = 0
     lasty = 0
     curx = 0
@@ -96,6 +97,11 @@ class Canvas(BaseWindow):
             app_surface = app[0].get_surface()
             self.ctx.set_source_surface(app_surface,app[1],app[2])
             self.ctx.paint()
+            
+        if not self.gc:
+            self.gc = gtk.gdk.GC(self.da.window)
+        self.da.window.draw_drawable(self.gc, self.pixmap, 0,0, 0,0, -1,-1)
+            
         
     def configure(self,widget,event):
         _,_,w,h = widget.allocation
@@ -117,8 +123,9 @@ class Canvas(BaseWindow):
         # redraw the drawing area
         self.redraw()
         
-        gc = gtk.gdk.GC(widget.window)
-        widget.window.draw_drawable(gc, self.pixmap, 0,0, 0,0, -1,-1)
+        if not self.gc:
+            self.gc = gtk.gdk.GC(widget.window)
+        widget.window.draw_drawable(self.gc, self.pixmap, 0,0, 0,0, -1,-1)
         
     def key_handler(self,window,event):
         keyval = event.keyval

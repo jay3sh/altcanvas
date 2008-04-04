@@ -98,8 +98,11 @@ class WidgetQueue:
         raise Exception('Widget not found in Queue')
     
     def insert(self,location,widgetWrapper):
-        self.widgetQ.insert(location,widgetWrapper)
-        self.__recalculate_clouds()
+        if location < 0:
+            self.append(widgetWrapper)
+        else:
+            self.widgetQ.insert(location,widgetWrapper)
+            self.__recalculate_clouds()
     
     def hasWidget(self,widget):
         for ww in self.widgetQ:
@@ -119,6 +122,11 @@ class WidgetQueue:
         for widget in self.widgetQ:
             yield(widget)
             
+    def prev(self):
+        for i in range(len(self.widgetQ)):
+            yield(widgetQ[len(self.widgetQ)-i-1])
+            
+            
 class App:
     widgetQ = None
     
@@ -134,7 +142,11 @@ class App:
     FOLDER_PATH = None
     images = []
     inputPad = None
-    imageOnPadW = None
+    
+    class ImageOnPad:
+        pass
+    
+    imageOnPad = None
     
     def __init__(self,folder_path):                    
         
@@ -222,8 +234,88 @@ class App:
         if not self.widgetQ.hasWidget(self.inputPad):
             self.widgetQ.append(WidgetWrapper(self.inputPad,ipx,ipy))
             
-        (pos,imageW) = self.widgetQ.getWidget(image)
+        '''
+        # WORKING
         
+        (orderIn,imageW) = self.widgetQ.getWidget(image)
+        
+        x0 = imageW.x
+        y0 = imageW.y
+        x1 = ipx
+        y1 = ipy
+        
+        from time import sleep
+        
+        for step in range(5):
+            sx = x0 + int((step+1)*(ipx - x0)/5)
+            sy = y0 + int((step+1)*(ipy - y0)/5)
+            
+            self.widgetQ.remove(image)
+            
+            self.widgetQ.append(WidgetWrapper(image,sx,sy))
+            
+            self.__update_surface()
+            sleep(0.01)
+        '''
+            
+            
+        if self.imageOnPad:
+            padOrder,_ = self.widgetQ.getWidget(self.imageOnPad.widget)
+        else:
+            padOrder = -1
+        
+        NUM_STEPS = 3 
+        #inComing
+        pathIn = Path(image)
+        (orderIn,imageW) = self.widgetQ.getWidget(image)
+        pathIn.add_start(imageW.x,imageW.y,orderIn)
+        pathIn.add_stop(ipx,ipy,padOrder)
+        pathIn.num_steps = NUM_STEPS 
+        pathInPoints = pathIn.get_points()
+        
+        pathOut = None
+        #outGoing
+        if self.imageOnPad:
+            pathOut = Path(self.imageOnPad.widget)
+            pathOut.add_start(ipx,ipy,padOrder)
+            pathOut.add_stop(self.imageOnPad.x,self.imageOnPad.y,self.imageOnPad.order)
+            pathOut.num_steps = NUM_STEPS
+            pathOutPoints = pathOut.get_points()
+            
+        from time import sleep
+        
+        for i in range(NUM_STEPS):
+            if i == 0:
+                continue
+            
+            self.widgetQ.remove(pathIn.widget)
+            if pathOut:
+                self.widgetQ.remove(pathOut.widget)
+                
+            (order,ww) = pathInPoints[i]
+            if padOrder == -1:
+                self.widgetQ.append(ww)
+                padOrder,_ = self.widgetQ.getWidget(ww.widget)
+            else:
+                self.widgetQ.insert(padOrder,ww)
+                
+            if pathOut:
+                (order,ww) = pathOutPoints[i]
+            	self.widgetQ.insert(order,ww)
+        
+            self.__update_surface()
+            #sleep(0.01)
+            
+        self.imageOnPad = self.ImageOnPad()
+        self.imageOnPad.widget = image
+        self.imageOnPad.x = imageW.x
+        self.imageOnPad.y = imageW.y
+        self.imageOnPad.order = orderIn
+            
+            
+            
+            
+        '''
         # remove the image from queue and insert at new location
         # also add the image previously on pad to its old position
         
@@ -256,6 +348,8 @@ class App:
             	#self.widgetQ.insert(orderOut,outW)
         
         self.imageOnPadW = (pos,imageW)
+        '''
+        
         '''
         self.widgetQ.remove(image)
         self.widgetQ.append(WidgetWrapper(image,ipx+20,ipy+20))

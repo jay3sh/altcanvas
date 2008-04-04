@@ -5,40 +5,47 @@ from libpub.prime.widget import WidgetWrapper
 
 class Path:
     widget = None
-    total_steps = 0
+    num_steps = 0
     locus = None
-    start = None
-    end = None
     
-    def __init__(self,widget,total_steps=5,locus=LINE):
+    class PathPoint:
+        pass
+    
+    start = None
+    stop = None
+    
+    def __init__(self,widget,num_steps=5,locus=LINE):
         self.widget = widget
-        self.total_steps = total_steps
+        self.num_steps = num_steps 
         self.locus = locus 
     
-    def add_start(self,point):
-        self.start = point
+    def add_start(self,x,y,order):
+        self.start = self.PathPoint()
+        self.start.x = x
+        self.start.y = y
+        self.start.order = order
         
-    def add_stop(self,point):
-        self.end = point
+    def add_stop(self,x,y,order):
+        self.stop = self.PathPoint()
+        self.stop.x = x
+        self.stop.y = y
+        self.stop.order = order
         
+    
     def get_widget(self):
-        for step in range(self.total_steps):
-            nx = self.start[0] + \
-                int((step+1)*(self.end[0] - self.start[0])/self.total_steps)
-            ny = self.start[1] + \
-                int((step+1)*(self.end[1] - self.start[1])/self.total_steps)
+        for step in range(self.num_steps):
+            nx = self.start.x + int((step+1)*(self.stop.x - self.start.x)/self.num_steps)
+            ny = self.start.y + int((step+1)*(self.stop.y - self.start.y)/self.num_steps)
         
             print '%d: %d,%d'%(step,nx,ny)
             yield WidgetWrapper(self.widget,nx,ny)
             
     def get_points(self):
         points = []
-        for step in range(self.total_steps):
-            nx = self.start[0] + \
-                int((step+1)*(self.end[0] - self.start[0])/self.total_steps)
-            ny = self.start[1] + \
-                int((step+1)*(self.end[1] - self.start[1])/self.total_steps)
+        for step in range(self.num_steps):
+            nx = self.start.x + int((step+1)*(self.stop.x - self.start.x)/self.num_steps)
+            ny = self.start.y + int((step+1)*(self.stop.y - self.start.y)/self.num_steps)
         
-            points.append(WidgetWrapper(self.widget,nx,ny))
+            points.append((self.stop.order,WidgetWrapper(self.widget,nx,ny)))
     
         return points
