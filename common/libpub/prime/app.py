@@ -234,30 +234,6 @@ class App:
         if not self.widgetQ.hasWidget(self.inputPad):
             self.widgetQ.append(WidgetWrapper(self.inputPad,ipx,ipy))
             
-        '''
-        # WORKING
-        
-        (orderIn,imageW) = self.widgetQ.getWidget(image)
-        
-        x0 = imageW.x
-        y0 = imageW.y
-        x1 = ipx
-        y1 = ipy
-        
-        from time import sleep
-        
-        for step in range(5):
-            sx = x0 + int((step+1)*(ipx - x0)/5)
-            sy = y0 + int((step+1)*(ipy - y0)/5)
-            
-            self.widgetQ.remove(image)
-            
-            self.widgetQ.append(WidgetWrapper(image,sx,sy))
-            
-            self.__update_surface()
-            sleep(0.01)
-        '''
-            
             
         if self.imageOnPad:
             padOrder,_ = self.widgetQ.getWidget(self.imageOnPad.widget)
@@ -282,16 +258,16 @@ class App:
             pathOut.num_steps = NUM_STEPS
             pathOutPoints = pathOut.get_points()
             
-        from time import sleep
-        
         for i in range(NUM_STEPS):
             if i == 0:
                 continue
             
+            # Remove old instances of moving image widgets
             self.widgetQ.remove(pathIn.widget)
             if pathOut:
                 self.widgetQ.remove(pathOut.widget)
                 
+            # Add new instances of moving image widgets
             (order,ww) = pathInPoints[i]
             if padOrder == -1:
                 self.widgetQ.append(ww)
@@ -303,9 +279,11 @@ class App:
                 (order,ww) = pathOutPoints[i]
             	self.widgetQ.insert(order,ww)
         
+            # refresh the surface
             self.__update_surface()
-            #sleep(0.01)
             
+            
+        # Save the imageOnPad
         self.imageOnPad = self.ImageOnPad()
         self.imageOnPad.widget = image
         self.imageOnPad.x = imageW.x
@@ -313,55 +291,6 @@ class App:
         self.imageOnPad.order = orderIn
             
             
-            
-            
-        '''
-        # remove the image from queue and insert at new location
-        # also add the image previously on pad to its old position
-        
-        pathIn = Path(imageW.widget)
-        pathIn.add_start((imageW.x,imageW.y))
-        pathIn.add_stop((ipx+20,ipy+20))
-        orderIn = pos
-        inPoints = pathIn.get_points()
-        
-        if self.imageOnPadW:
-            pathOut = Path(self.imageOnPadW[1].widget)
-            pathOut.add_start((ipx+20,ipy+20))
-            pathOut.add_stop((self.imageOnPadW[1].x,self.imageOnPadW[1].y))
-            orderOut = self.imageOnPadW[0]
-            outPoints = pathOut.get_points()
-        
-        for i in range(len(inPoints)):
-            inP = inPoints[i]
-            
-            self.widgetQ.remove(inP.widget)
-            #inW = pathIn.get_widget().next()
-            #self.widgetQ.insert(orderIn,inW)
-            self.widgetQ.insert(orderIn, inP)
-            
-            if self.imageOnPadW:
-                outP = outPoints[i]
-                self.widgetQ.remove(self.imageOnPadW[1].widget)
-                self.widgetQ.insert(orderOut, outP)
-                #outW = pathIn.get_widget().next()
-            	#self.widgetQ.insert(orderOut,outW)
-        
-        self.imageOnPadW = (pos,imageW)
-        '''
-        
-        '''
-        self.widgetQ.remove(image)
-        self.widgetQ.append(WidgetWrapper(image,ipx+20,ipy+20))
-        image.disable_pointer_listener()
-        if self.imageOnPadW:
-            self.widgetQ.remove(self.imageOnPadW[1].widget)
-            self.widgetQ.insert(self.imageOnPadW[0],self.imageOnPadW[1])
-            self.imageOnPadW[1].widget.enable_pointer_listener()
-        
-        # Find the wrapper widget for the parameter image and save it
-        self.imageOnPadW = (pos,imageW)
-        '''
         
         '''
         entry1 = FancyEntry()

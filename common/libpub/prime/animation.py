@@ -32,12 +32,11 @@ class Path:
         self.stop.order = order
         
     
-    def get_widget(self):
+    def get_next_point(self):
         for step in range(self.num_steps):
             nx = self.start.x + int((step+1)*(self.stop.x - self.start.x)/self.num_steps)
             ny = self.start.y + int((step+1)*(self.stop.y - self.start.y)/self.num_steps)
         
-            print '%d: %d,%d'%(step,nx,ny)
             yield WidgetWrapper(self.widget,nx,ny)
             
     def get_points(self):
