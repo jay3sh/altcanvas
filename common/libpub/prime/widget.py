@@ -26,8 +26,6 @@ class Widget:
     clouds = []
     
     hasFocus = False
-    # future ideal boundary definition
-    enclosure = None
     
     
     def __init__(self,w,h,id=None):
@@ -38,5 +36,47 @@ class Widget:
             
         self.clouds = []
         
+        self.click_listener = None
+        self.tap_listener = None
         
-    
+        self.__pointer_listener_enabled = True
+        
+        
+    def register_click_listener(self,click_listener):
+        self.click_listener = click_listener
+        
+    def register_tap_listener(self,tap_listener):
+        self.tap_listener = tap_listener
+        
+    def pointer_listener(self,x,y,pressed=False):
+        print 'pointer listener of '+self.id
+        if not self.__pointer_listener_enabled:
+            return
+        
+        oldFocus = self.hasFocus
+        
+        if x > 0 and x < self.w and y > 0 and y < self.h:
+            # Check if we are under any cloud
+            for cloud in self.clouds:
+            	if x > cloud[0] and x < cloud[2] and y > cloud[1] and y < cloud[3]:
+                    self.hasFocus = False
+            	    return
+            # We are not under any cloud
+            self.hasFocus = True
+        else:
+            self.hasFocus = False
+            
+        if self.hasFocus:
+            if self.tap_listener:
+                self.tap_listener(self)
+            
+        if not oldFocus and self.hasFocus:
+            if self.click_listener:
+                self.click_listener(self)
+                
+    def disable_pointer_listener(self):
+        self.__pointer_listener_enabled = False
+        
+    def enable_pointer_listener(self):
+        self.__pointer_listener_enabled = True
+        

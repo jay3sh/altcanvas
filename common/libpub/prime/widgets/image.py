@@ -37,6 +37,7 @@ class Image(Widget):
         ctx3.set_source_surface(surface1)
         ctx3.mask_surface(gradient)
         
+    '''
     def register_click_listener(self,click_listener):
         self.click_listener = click_listener
         
@@ -67,3 +68,4 @@ class Image(Widget):
         
     def enable_pointer_listener(self):
         self.__pointer_listener_enabled = True
+    '''

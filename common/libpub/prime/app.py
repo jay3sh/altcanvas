@@ -144,6 +144,7 @@ class App:
     images = []
     inputPad = None
     background = None
+    bg_ignore_count = 0
     
     class ImageOnPad:
         pass
@@ -185,7 +186,10 @@ class App:
             #self.background = Pad(self.app_width,self.app_height, 
             #                     color=bgcolor,type=Pad.WALLPAPER)
             self.background = Pad(self.app_width,self.app_height, 
-                                 type=Pad.WALLPAPER)
+                                 texture=Pad.WALLPAPER,shape=Pad.RECT)
+           
+            print 'BG ID = '+self.background.id
+            self.background.register_tap_listener(self.on_background_tap)
         self.widgetQ.append(WidgetWrapper(self.background,0,0))
             
         imgw,imgh = get_uniform_fit(len(self.images),max_x=800,max_y=480)
@@ -193,7 +197,7 @@ class App:
         for (x,y) in get_image_locations(
                 len(self.images),layout=LAYOUT_UNIFORM_OVERLAP,owidth=imgw,oheight=imgh):
             img = Image(self.images[i],imgw,imgh, 
-                        X_MARGIN=int(0.1*imgw),Y_MARGIN=int(0.1*imgh))
+                        X_MARGIN=int(0.05*imgw),Y_MARGIN=int(0.05*imgh))
             img.register_click_listener(self.on_image_click)
             self.widgetQ.append(WidgetWrapper(img,x,y))
             i = i+1
@@ -234,13 +238,23 @@ class App:
     def on_surface_change(self,widget):
         self.__update_surface()
             
+            
+    def on_background_tap(self,pad):
+        # Remove the input pad from widgetQ
+        self.bg_ignore_count += 1
+        print 'bg clicked %d,%d'%(self.bg_ignore_count,len(pad.clouds))
+        if self.inputPad and self.widgetQ.hasWidget(self.inputPad):
+            self.widgetQ.remove(self.inputPad)
+            self.__update_surface()
                 
     def on_image_click(self,image):
         if not self.inputPad:
             padcolor = RGBA()
-            padcolor.r,padcolor.g,padcolor.b = html2rgb(0xFF,0xFF,0xCC)
+            padcolor.r,padcolor.g,padcolor.b = html2rgb(0x0F,0x0F,0x0F)
+            padcolor.a = 0.85
             self.inputPad = Pad(int(2*self.app_width/3),int(2*self.app_height/3),
-                                color=padcolor,type=Pad.RECT_GRAD_EXPLOSION)
+                                color=padcolor,texture=Pad.PLAIN,
+                                shape=Pad.ROUNDED_RECT)
             
         px = int(self.app_width/6)
         py = int(self.app_height/6)
