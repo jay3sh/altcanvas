@@ -25,12 +25,12 @@ class Pad(Widget):
             ctx.set_source_surface(border_surface)
             ctx.paint()
             
-            ctx.set_source_rgba(color.r,color.b,color.b,color.a)
+            ctx.set_source_rgba(color.r,color.g,color.b,color.a)
             ctx.rectangle(BORDER/2,BORDER/2,w-BORDER,h-BORDER)
             ctx.fill()
         
         elif type == self.PLAIN:
-            ctx.set_source_rgba(color.r,color.b,color.b,color.a)
+            ctx.set_source_rgba(color.r,color.g,color.b,color.a)
             ctx.rectangle(0,0,w,h)
             ctx.fill()
             
