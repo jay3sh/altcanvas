@@ -41,8 +41,6 @@ class Canvas(BaseWindow):
     isLoaded = False
     
     __ignore_pointer_count = 0
-    __block_pointer_input = False 
-    __POINTER_INPUT_BLOCK_TIME = 1 # in seconds
     
     CANVAS_WIDTH = 800
     CANVAS_HEIGHT = 480
@@ -74,8 +72,6 @@ class Canvas(BaseWindow):
     
         self.add(self.da)
         self.show_all()
-        
-        #self.__block_pointer_input = thread.allocate_lock()
         
     def load(self):
         if detect_platform() == 'Nokia':
@@ -147,23 +143,6 @@ class Canvas(BaseWindow):
             y = event.y
             state = event.state
         
-        '''
-        if self.__block_pointer_input.acquire(1):
-            print 'distributing event'
-            for app in self.appQ:
-          		app[0].dispatch_pointer_event(x,y,self.pressed)
-            #thread.start_new_thread(self.__hold_pointer_input,())
-        '''
-        '''
-        if not self.__block_pointer_input:
-            print 'accepting'
-            for app in self.appQ:
-            	app[0].dispatch_pointer_event(x,y,self.pressed)
-            thread.start_new_thread(self.__hold_pointer_input,())
-            print 'forked thread'
-        else:
-            print 'skipping'
-        '''
         
         self.__ignore_pointer_count += 1
         self.__ignore_pointer_count %= 3
@@ -174,14 +153,6 @@ class Canvas(BaseWindow):
         
         widget.queue_draw()
 
-    def __hold_pointer_input(self):
-        self.__block_pointer_input = True
-        #if self.__block_pointer_input.acquire():
-        log.writeln('blocking for %d seconds'%self.__POINTER_INPUT_BLOCK_TIME)
-        time.sleep(self.__POINTER_INPUT_BLOCK_TIME)
-        log.writeln('unblocking')
-        #self.__block_pointer_input.release()
-        self.__block_pointer_input = False 
 
     def run(self):
         gtk.main()
