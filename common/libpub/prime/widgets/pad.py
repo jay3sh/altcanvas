@@ -16,7 +16,6 @@ else:
 class Pad(Widget):
     (RECT,ROUNDED_RECT) = range(2)
     (PLAIN,GRAD_EXPLOSION,WALLPAPER) = range(3)
-    surface = None
     
     def __init__(self,w,h,color=RGBA(0,0,0,1),texture=PLAIN,shape=RECT):
         Widget.__init__(self,w,h)

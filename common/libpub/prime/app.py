@@ -3,6 +3,7 @@ import os
 import cairo
 from libpub.prime.widgets.image import Image
 from libpub.prime.widgets.pad import Pad 
+from libpub.prime.widgets.label import Label 
 from libpub.prime.widget import WidgetWrapper
 import libpub.prime.mask as mask
 from libpub.prime.widgets.fancyentry import FancyEntry 
@@ -176,6 +177,7 @@ class App:
         pass
     
     imageOnPad = None
+    labelOnPad = None
     
     def __init__(self,folder_path):                    
         
@@ -298,6 +300,8 @@ class App:
                     (order,ww) = pathOutPoints[i]
                     self.widgetQ.insert(order,ww)
             
+            if self.widgetQ.hasWidget(self.labelOnPad):
+                self.widgetQ.remove(self.labelOnPad)
             # there is no image on input pad now
             self.imageOnPad = None
             
@@ -380,6 +384,10 @@ class App:
             # refresh the surface
             self.__update_surface()
             
+        if not self.labelOnPad:
+            self.labelOnPad = Label('Name')
+            
+        self.widgetQ.append(WidgetWrapper(self.labelOnPad,ipx,ipy+image.h+10))
             
         # Save the imageOnPad
         self.imageOnPad = self.ImageOnPad()

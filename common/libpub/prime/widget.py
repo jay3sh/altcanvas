@@ -18,6 +18,9 @@ class Widget:
     id_str = None
     w = 0
     h = 0
+    
+    surface = None
+    
     '''
         "clouds" are the parts of other widgets that cloud
         this widget's surface. While responding to the pointer events
@@ -37,6 +40,7 @@ class Widget:
             self.id_str = str(random.randint(1,9999))
             self.id = str(int(time.time()))+'_'+self.id_str
             
+        self.surface = None
         self.clouds = []
         
         self.click_listener = None
