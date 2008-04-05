@@ -15,6 +15,7 @@ class WidgetWrapper:
         
 class Widget:
     id = None
+    id_str = None
     w = 0
     h = 0
     '''
@@ -32,7 +33,9 @@ class Widget:
         self.w = w
         self.h = h
         if not id:
-            self.id = 'ALTCANVAS_WIDGET_'+str(random.randint(1,9999))
+            import time
+            self.id_str = str(random.randint(1,9999))
+            self.id = str(int(time.time()))+'_'+self.id_str
             
         self.clouds = []
         
@@ -49,7 +52,6 @@ class Widget:
         self.tap_listener = tap_listener
         
     def pointer_listener(self,x,y,pressed=False):
-        print 'pointer listener of '+self.id
         if not self.__pointer_listener_enabled:
             return
         

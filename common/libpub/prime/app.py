@@ -8,13 +8,14 @@ import libpub.prime.mask as mask
 from libpub.prime.widgets.fancyentry import FancyEntry 
 from libpub.prime.utils import get_image_locations,get_uniform_fit, \
     LAYOUT_STEP, LAYOUT_UNIFORM_OVERLAP,LAYOUT_UNIFORM_SPREAD, \
-    detect_platform,RGBA,html2rgb
+    detect_platform,RGBA,html2rgb,log
 from libpub.prime.animation import Path
 
 
 
 class WidgetQueue:
     widgetQ = []
+    DEBUG = True
     
     def __init__(self):
         pass
@@ -86,15 +87,33 @@ class WidgetQueue:
                                             min(ox1,nx1)-ox0,
                                             min(oy1,ny1)-oy0))
     
+    def dumpQ(self,op):
+        if not self.DEBUG:
+            return
+        log.write(op+':')
+        for ww in self.widgetQ:
+            log.write(ww.widget.id_str)
+            log.write('-')
+            
+        log.writeln(' ')
+            
     def append(self,widgetWrapper):
         self.widgetQ.append(widgetWrapper)
         self.__recalculate_clouds()
+        self.dumpQ('Append('+widgetWrapper.widget.id_str+
+                       ','+str(widgetWrapper.x)+
+                       ','+str(widgetWrapper.y)+
+                       ')')
         
     def remove(self,widget): 
         for ww in self.widgetQ:
             if ww.widget.id == widget.id:
                 self.widgetQ.remove(ww)
                 self.__recalculate_clouds()
+                self.dumpQ('Remove('+ww.widget.id_str+
+                       ','+str(ww.x)+
+                       ','+str(ww.y)+
+                       ')')
                 return 
         raise Exception('Widget not found in Queue')
     
@@ -104,6 +123,11 @@ class WidgetQueue:
         else:
             self.widgetQ.insert(location,widgetWrapper)
             self.__recalculate_clouds()
+            self.dumpQ('Insert('+
+                       widgetWrapper.widget.id_str+
+                       ','+str(widgetWrapper.x)+
+                       ','+str(widgetWrapper.y)+
+                       ')')
     
     def hasWidget(self,widget):
         for ww in self.widgetQ:
@@ -145,6 +169,8 @@ class App:
     inputPad = None
     background = None
     bg_ignore_count = 0
+    px = 0
+    py = 0
     
     class ImageOnPad:
         pass
@@ -187,9 +213,10 @@ class App:
             #                     color=bgcolor,type=Pad.WALLPAPER)
             self.background = Pad(self.app_width,self.app_height, 
                                  texture=Pad.WALLPAPER,shape=Pad.RECT)
-           
-            print 'BG ID = '+self.background.id
             self.background.register_tap_listener(self.on_background_tap)
+            log.writeln('BG (%s)'%(self.background.id_str))
+            
+            
         self.widgetQ.append(WidgetWrapper(self.background,0,0))
             
         imgw,imgh = get_uniform_fit(len(self.images),max_x=800,max_y=480)
@@ -198,6 +225,7 @@ class App:
                 len(self.images),layout=LAYOUT_UNIFORM_OVERLAP,owidth=imgw,oheight=imgh):
             img = Image(self.images[i],imgw,imgh, 
                         X_MARGIN=int(0.05*imgw),Y_MARGIN=int(0.05*imgh))
+            log.writeln('%s (%s)'%(img.path,img.id_str))
             img.register_click_listener(self.on_image_click)
             self.widgetQ.append(WidgetWrapper(img,x,y))
             i = i+1
@@ -242,7 +270,37 @@ class App:
     def on_background_tap(self,pad):
         # Remove the input pad from widgetQ
         self.bg_ignore_count += 1
-        print 'bg clicked %d,%d'%(self.bg_ignore_count,len(pad.clouds))
+        #print 'bg clicked %d,%d'%(self.bg_ignore_count,len(pad.clouds))
+        
+        if detect_platform() == 'Nokia':
+            NUM_STEPS = 3
+        else:
+            NUM_STEPS = 13 
+            
+        if self.imageOnPad:
+            padOrder,_ = self.widgetQ.getWidget(self.imageOnPad.widget)
+            
+            ipx = self.px + int(self.app_width/20)
+            ipy = self.py + int(self.app_height/3 - self.imageOnPad.widget.h/2)
+            pathOut = Path(self.imageOnPad.widget)
+            pathOut.add_start(ipx,ipy,padOrder)
+            pathOut.add_stop(self.imageOnPad.x,self.imageOnPad.y,self.imageOnPad.order)
+            pathOut.num_steps = NUM_STEPS
+            pathOutPoints = pathOut.get_points()
+            
+            for i in range(NUM_STEPS):
+                if i == 0:
+                    continue
+                
+                if pathOut:
+                    self.widgetQ.remove(pathOut.widget)
+            
+                    (order,ww) = pathOutPoints[i]
+                    self.widgetQ.insert(order,ww)
+            
+            # there is no image on input pad now
+            self.imageOnPad = None
+            
         if self.inputPad and self.widgetQ.hasWidget(self.inputPad):
             self.widgetQ.remove(self.inputPad)
             self.__update_surface()
@@ -252,15 +310,17 @@ class App:
             padcolor = RGBA()
             padcolor.r,padcolor.g,padcolor.b = html2rgb(0x0F,0x0F,0x0F)
             padcolor.a = 0.85
-            self.inputPad = Pad(int(2*self.app_width/3),int(2*self.app_height/3),
+            self.inputPad = Pad(int(5*self.app_width/6),int(5*self.app_height/6),
                                 color=padcolor,texture=Pad.PLAIN,
                                 shape=Pad.ROUNDED_RECT)
             
-        px = int(self.app_width/6)
-        py = int(self.app_height/6)
+            log.writeln('InputPad (%s)'%(self.inputPad.id_str))
+            
+        self.px = int(self.app_width/12)
+        self.py = int(self.app_height/12)
         
         if not self.widgetQ.hasWidget(self.inputPad):
-            self.widgetQ.append(WidgetWrapper(self.inputPad,px,py))
+            self.widgetQ.append(WidgetWrapper(self.inputPad,self.px,self.py))
             
         # Detect if incoming image is the same one on the pad
         if self.imageOnPad and image.id == self.imageOnPad.widget.id:
@@ -276,8 +336,8 @@ class App:
         else:
             NUM_STEPS = 13 
             
-        ipx = px + int(self.app_width/20)
-        ipy = py + int(self.app_height/3 - image.h/2)
+        ipx = self.px + int(self.app_width/20)
+        ipy = self.py + int(self.app_height/3 - image.h/2)
         
         #inComing
         pathIn = Path(image)

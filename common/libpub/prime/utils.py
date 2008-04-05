@@ -1,8 +1,23 @@
 
 import os
+import sys
 import cairo
 from math import sqrt
 import random
+    
+    
+class Log:
+    def __init__(self):
+        pass
+    
+    def write(self,str):
+        sys.stdout.write(str)
+        
+    def writeln(self,str):
+        print str
+    
+log = Log()
+    
     
 class RGBA:
     r = None
