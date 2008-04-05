@@ -44,7 +44,7 @@ class ScratchApp(gtk.Window):
         #
         # Choose HERE which scratch to draw
         #
-        self.draw_grad_rect(surface)
+        self.draw_round_corner_rect(surface)
         
         self.ctx.set_source_surface(surface,0,0)
         self.ctx.paint()
@@ -55,6 +55,33 @@ class ScratchApp(gtk.Window):
     def run(self):
         gtk.main()
         
+        
+    def draw_round_corner_rect(self,surface):
+        w = surface.get_width()
+        h = surface.get_height()
+        ctx = cairo.Context(surface)
+        
+        ctx.set_source_rgba(0.2,0.2,0.2,1)
+        
+        x0 = 100
+        y0 = 100
+        x1 = w-200
+        y1 = h-200
+        
+        vr = 20
+        
+        ctx.move_to(x0+vr,y0)
+        ctx.line_to(x1-vr,y0)
+        ctx.arc(x1-vr,y0+vr,vr,3*PI/2,0)
+        ctx.line_to(x1,y1-vr)
+        ctx.arc(x1-vr,y1-vr,vr,0,PI/2)
+        ctx.line_to(x0+vr,y1)
+        ctx.arc(x0+vr,y1-vr,vr,PI/2,PI)
+        ctx.line_to(x0,y0+vr)
+        ctx.arc(x0+vr,y0+vr,vr,PI,3*PI/2)
+        
+        #ctx.rectangle(100,100,w-200,h-200)
+        ctx.fill()
         
     def draw_grad_rect(self,surface):
         self.draw_grad_rect_inner(surface, 
