@@ -14,15 +14,9 @@ import libpub.prime.mask as mask
 
 from libpub.prime.app import App as PublishrApp
 
-from libpub.prime.utils import get_image_locations,LAYOUT_STEP,LAYOUT_UNIFORM_SPREAD
+from libpub.prime.utils import get_image_locations,LAYOUT_STEP,LAYOUT_UNIFORM_SPREAD,detect_platform
 
-def detect_platform():
-    sin,soe = os.popen4('uname -n')
-    line = soe.read()
-    if line.lower().find('nokia') >= 0:
-        return 'Nokia'
-    else:
-        return 'Desktop'
+
         
 if detect_platform() == 'Nokia':
     from hildon import Window as BaseWindow
@@ -88,6 +82,7 @@ class Canvas(BaseWindow):
         # In future we will use app's params to decide if we want
         # to update or not
         self.redraw()
+        self.da.window.draw_drawable(self.gc, self.pixmap, 0,0, 0,0, -1,-1)
         
     def redraw(self):
         self.ctx.rectangle(0,0,self.CANVAS_WIDTH,self.CANVAS_HEIGHT)
@@ -97,10 +92,6 @@ class Canvas(BaseWindow):
             app_surface = app[0].get_surface()
             self.ctx.set_source_surface(app_surface,app[1],app[2])
             self.ctx.paint()
-            
-        if not self.gc:
-            self.gc = gtk.gdk.GC(self.da.window)
-        self.da.window.draw_drawable(self.gc, self.pixmap, 0,0, 0,0, -1,-1)
             
         
     def configure(self,widget,event):

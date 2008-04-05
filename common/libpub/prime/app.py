@@ -7,7 +7,8 @@ from libpub.prime.widget import WidgetWrapper
 import libpub.prime.mask as mask
 from libpub.prime.widgets.fancyentry import FancyEntry 
 from libpub.prime.utils import get_image_locations,get_uniform_fit, \
-    LAYOUT_STEP, LAYOUT_UNIFORM_OVERLAP,LAYOUT_UNIFORM_SPREAD
+    LAYOUT_STEP, LAYOUT_UNIFORM_OVERLAP,LAYOUT_UNIFORM_SPREAD, \
+    detect_platform,RGBA,html2rgb
 from libpub.prime.animation import Path
 
 
@@ -116,7 +117,7 @@ class WidgetQueue:
             if ww.widget.id == widget.id:
                 return (i,ww)
             i = i+1
-        return None
+        raise Exception('%d Not found'%widget.id)
 
     def next(self):
         for widget in self.widgetQ:
@@ -142,6 +143,7 @@ class App:
     FOLDER_PATH = None
     images = []
     inputPad = None
+    background = None
     
     class ImageOnPad:
         pass
@@ -177,6 +179,15 @@ class App:
         self.__update_surface()
         
     def __load_images(self):
+        if not self.background:
+            #bgcolor = RGBA()
+            #bgcolor.r,bgcolor.g,bgcolor.b = html2rgb(0x00,0x99,0x33)            
+            #self.background = Pad(self.app_width,self.app_height, 
+            #                     color=bgcolor,type=Pad.WALLPAPER)
+            self.background = Pad(self.app_width,self.app_height, 
+                                 type=Pad.WALLPAPER)
+        self.widgetQ.append(WidgetWrapper(self.background,0,0))
+            
         imgw,imgh = get_uniform_fit(len(self.images),max_x=800,max_y=480)
         i = 0
         for (x,y) in get_image_locations(
@@ -226,26 +237,36 @@ class App:
                 
     def on_image_click(self,image):
         if not self.inputPad:
-            self.inputPad = Pad(int(2*self.app_width/3),int(2*self.app_height/3))
+            padcolor = RGBA()
+            padcolor.r,padcolor.g,padcolor.b = html2rgb(0xFF,0xCC,0x33)
+            self.inputPad = Pad(int(2*self.app_width/3),int(2*self.app_height/3),
+                                color=padcolor,type=Pad.RECT_GRAD_EXPLOSION)
             
-        ipx = int(self.app_width/3)-20
-        ipy = int(self.app_height/3)-20
+        ipx = int(self.app_width/6)
+        ipy = int(self.app_height/6)
         
         if not self.widgetQ.hasWidget(self.inputPad):
             self.widgetQ.append(WidgetWrapper(self.inputPad,ipx,ipy))
             
-            
+        # Detect if incoming image is the same one on the pad
+        if self.imageOnPad and image.id == self.imageOnPad.widget.id:
+            return
+        
         if self.imageOnPad:
             padOrder,_ = self.widgetQ.getWidget(self.imageOnPad.widget)
         else:
             padOrder = -1
         
-        NUM_STEPS = 3 
+        if detect_platform() == 'Nokia':
+            NUM_STEPS = 3
+        else:
+            NUM_STEPS = 13 
+            
         #inComing
         pathIn = Path(image)
         (orderIn,imageW) = self.widgetQ.getWidget(image)
         pathIn.add_start(imageW.x,imageW.y,orderIn)
-        pathIn.add_stop(ipx,ipy,padOrder)
+        pathIn.add_stop(ipx+10,ipy+10,padOrder)
         pathIn.num_steps = NUM_STEPS 
         pathInPoints = pathIn.get_points()
         
@@ -253,7 +274,7 @@ class App:
         #outGoing
         if self.imageOnPad:
             pathOut = Path(self.imageOnPad.widget)
-            pathOut.add_start(ipx,ipy,padOrder)
+            pathOut.add_start(ipx+10,ipy+10,padOrder)
             pathOut.add_stop(self.imageOnPad.x,self.imageOnPad.y,self.imageOnPad.order)
             pathOut.num_steps = NUM_STEPS
             pathOutPoints = pathOut.get_points()
