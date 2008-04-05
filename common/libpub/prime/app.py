@@ -15,7 +15,7 @@ from libpub.prime.animation import Path
 
 class WidgetQueue:
     widgetQ = []
-    DEBUG = True
+    DEBUG = False 
     
     def __init__(self):
         pass

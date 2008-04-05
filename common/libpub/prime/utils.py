@@ -14,7 +14,8 @@ class Log:
         sys.stdout.write(str)
         
     def writeln(self,str):
-        print str
+        sys.stdout.write(str+'\n')
+        sys.stdout.flush()
     
 log = Log()
     
