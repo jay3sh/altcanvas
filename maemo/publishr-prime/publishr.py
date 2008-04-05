@@ -1,5 +1,7 @@
 
 import sys
+import thread
+import time
 import gtk
 from gtk import keysyms
 import os
@@ -14,7 +16,8 @@ import libpub.prime.mask as mask
 
 from libpub.prime.app import App as PublishrApp
 
-from libpub.prime.utils import get_image_locations,LAYOUT_STEP,LAYOUT_UNIFORM_SPREAD,detect_platform
+from libpub.prime.utils import get_image_locations,\
+    LAYOUT_STEP,LAYOUT_UNIFORM_SPREAD,detect_platform,log
 
 
         
@@ -36,6 +39,9 @@ class Canvas(BaseWindow):
     cury = 0
     pressed = False
     isLoaded = False
+    
+    __block_pointer_input = False
+    __POINTER_INPUT_BLOCK_TIME = 1 # in seconds
     
     CANVAS_WIDTH = 800
     CANVAS_HEIGHT = 480
@@ -138,11 +144,22 @@ class Canvas(BaseWindow):
             y = event.y
             state = event.state
         
-        for app in self.appQ:
-            app[0].dispatch_pointer_event(x,y,self.pressed)
+        if not self.__block_pointer_input:
+            print 'accepting'
+            for app in self.appQ:
+            	app[0].dispatch_pointer_event(x,y,self.pressed)
+            thread.start_new_thread(self.__hold_pointer_input,())
+        else:
+            print 'skipping'
         
         widget.queue_draw()
 
+    def __hold_pointer_input(self):
+        self.__block_pointer_input = True
+        log.writeln('blocking for %d seconds'%self.__POINTER_INPUT_BLOCK_TIME)
+        time.sleep(self.__POINTER_INPUT_BLOCK_TIME)
+        log.writeln('unblocking')
+        self.__block_pointer_input = False 
 
     def run(self):
         gtk.main()
