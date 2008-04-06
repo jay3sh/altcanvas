@@ -44,9 +44,9 @@ class ScratchApp(gtk.Window):
         #
         # Choose HERE which scratch to draw
         #
-        self.draw_round_corner_rect(surface)
+        self.draw_label(surface)
         
-        self.ctx.set_source_surface(surface,0,0)
+        self.ctx.set_source_surface(surface,w/2,h/2)
         self.ctx.paint()
         
         self.gc = gtk.gdk.GC(widget.window)
@@ -54,6 +54,74 @@ class ScratchApp(gtk.Window):
     
     def run(self):
         gtk.main()
+        
+    def draw_label(self,parent_surface):
+        
+        def get_font_extents(fontface,fontsize):
+            surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,400,200)
+            ctx = cairo.Context(surface)
+            ctx.set_line_width(6)
+            ctx.set_tolerance(.1)
+            ctx.select_font_face(fontface)
+            ctx.set_font_size(fontsize)
+            
+            return ctx.font_extents()
+        
+        w = 100
+        x_margin = 10
+        y_margin = 10
+        
+        text = 'spider mobile 2.0'
+        fontface = 'sans-serif'
+        fontsize = 15
+        asc,des,hgt,maxx,maxy = get_font_extents(fontface,fontsize)
+        
+        text_width = maxx*len(text)
+        chars_per_line = int(w/maxx)
+        num_lines = int(len(text)/chars_per_line)+1
+        h = num_lines * int(hgt+des) + y_margin
+        hi = int(hgt+des)
+        
+        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,w,h)
+        ctx = cairo.Context(surface)
+        
+        ctx.rectangle(0,0,w,h)
+        ctx.stroke()
+        
+        ctx.set_line_width(6)
+        ctx.set_tolerance(.1)
+        ctx.select_font_face(fontface)
+        ctx.set_font_size(fontsize)
+        
+        used = 0
+        line = 0
+        for char in text:
+            if(used >= w):
+                used = 0
+                line += 1
+                
+            x_bearing,y_bearing,width,height,x_adv,y_adv = ctx.text_extents(str(char))
+            
+            used += width
+            ctx.show_text(str(char))
+            ctx.move_to(x_margin+x_bearing+used,line*hi+y_margin+(-y_bearing))
+                
+            
+        
+        '''# old approach
+        
+        ctx.set_source_rgb(0,0,0)
+        for i in range(num_lines):
+            line = text[i*chars_per_line:(i+1)*chars_per_line]
+            (x, y, width, height, dx, dy) = ctx.text_extents(line)
+            ctx.move_to(x_margin+x,i*hi+y_margin+(-y))
+            ctx.show_text(line)        
+        '''
+        
+        parent_ctx = cairo.Context(parent_surface)
+        parent_ctx.set_source_surface(surface)
+        parent_ctx.paint()
+        
         
         
     def draw_round_corner_rect(self,surface):
