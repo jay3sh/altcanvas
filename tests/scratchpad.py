@@ -14,6 +14,7 @@ class ScratchApp(gtk.Window):
         gtk.Window.__init__(self)
         self.set_default_size(self.CANVAS_WIDTH,self.CANVAS_HEIGHT)
         self.da = gtk.DrawingArea()
+        self.connect("destroy", gtk.main_quit)
         self.da.connect('expose_event',self.expose)
         self.da.connect('configure_event',self.configure)
         
@@ -93,19 +94,49 @@ class ScratchApp(gtk.Window):
         ctx.select_font_face(fontface)
         ctx.set_font_size(fontsize)
         
+        '''
+        # @summary: character by character drawing
+        
         used = 0
         line = 0
         for char in text:
-            if(used >= w):
-                used = 0
-                line += 1
                 
             x_bearing,y_bearing,width,height,x_adv,y_adv = ctx.text_extents(str(char))
             
-            used += width
+            if(used+width >= w):
+                used = 0
+                line += 1
+            
+            ctx.move_to(x_margin+used+x_bearing,line*hi+y_margin)
             ctx.show_text(str(char))
-            ctx.move_to(x_margin+x_bearing+used,line*hi+y_margin+(-y_bearing))
+            
+            used += width+x_adv
+        '''
+        
+        # @summary: word by word drawing
+        used = 0
+        line = 0
+        for word in text.split(' '):
+        
+            x_bearing,y_bearing,width,height,x_adv,y_adv = ctx.text_extents(word)
+            
+            if( used > 0 and used+width >= w):
+                used = 0
+                line += 1
                 
+            print '%s: %d'%(word,x_margin+used+x_bearing)
+                
+            ctx.move_to(x_margin+used+x_bearing,line*hi+y_margin-y_bearing)
+            ctx.show_text(word)
+            used += x_adv
+            
+            x_bearing,y_bearing,width,height,x_adv,y_adv = ctx.text_extents(str(' '))
+            
+            print ' : %d'%(x_margin+used+x_bearing)
+            
+            ctx.move_to(x_margin+used+x_bearing,line*hi+y_margin-y_bearing)
+            ctx.show_text(str(' '))
+            used += x_adv
             
         
         '''# old approach
