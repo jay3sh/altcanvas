@@ -16,7 +16,7 @@ from libpub.prime.animation import Path
 
 class WidgetQueue:
     widgetQ = []
-    DEBUG = False 
+    DEBUG = True 
     
     def __init__(self):
         pass
@@ -268,7 +268,6 @@ class App:
     def on_surface_change(self,widget):
         self.__update_surface()
             
-            
     def on_background_tap(self,pad):
         # Remove the input pad from widgetQ
         self.bg_ignore_count += 1
@@ -302,12 +301,15 @@ class App:
             
             if self.widgetQ.hasWidget(self.labelOnPad):
                 self.widgetQ.remove(self.labelOnPad)
+                
             # there is no image on input pad now
             self.imageOnPad = None
+            self.labelOnPad = None
             
         if self.inputPad and self.widgetQ.hasWidget(self.inputPad):
             self.widgetQ.remove(self.inputPad)
-            self.__update_surface()
+            
+        self.__update_surface()
                 
     def on_image_click(self,image):
         if not self.inputPad:
@@ -386,6 +388,10 @@ class App:
             
         if not self.labelOnPad:
             self.labelOnPad = Label('Name')
+        else:
+            self.widgetQ.remove(self.labelOnPad)
+            self.labelOnPad = Label('Name')
+            
             
         self.widgetQ.append(WidgetWrapper(self.labelOnPad,ipx,ipy+image.h+10))
             
