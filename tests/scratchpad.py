@@ -89,33 +89,30 @@ class ScratchApp(gtk.Window):
             line += 1
             return line
             
-        
-        
-        
-        w = 110
+            
+            
+        w = 300 
         x_margin = 10
         y_margin = 10
         
-        text = 'spider-mobil 2.0 is the fastest racecar ever built'
+        text = 'spider-mobil 2.0 is the fastest racecar ever built' + \
+            ' and will ever build. What are you saygin? This is not true?'
         fontface = 'sans-serif'
-        fontsize = 15
+        fontsize = 20 
         
-        print calculate_num_lines(text,fontface,fontsize)
         
-        # font_extents based calculations
-        
+        # Calculate height
         asc,des,hgt,maxx,maxy = get_font_extents(fontface,fontsize)
         
-        chars_per_line = int(w/(maxx/2))
-        num_lines = int(len(text)/chars_per_line)
+        num_lines = calculate_num_lines(text,fontface,fontsize)
+        
         h = num_lines * int(hgt+des) + y_margin
+        
         hi = int(hgt+des)
         
-        print num_lines
         
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,w,h)
         ctx = cairo.Context(surface)
-        
 
         
         # recalculate height finish
@@ -174,28 +171,8 @@ class ScratchApp(gtk.Window):
             used += x_adv
         '''
         
-        # recalculate height
-        line = 0
-        used = 0
-        _,_,_,_,space_x_adv,_ = ctx.text_extents(str(' '))
-        
-        for word in text.split(' '):
-            _,_,width,_,x_adv,_ = ctx.text_extents(word)
-            if( used > 0 and used+width >= w):
-                used = 0
-                line += 1
-            used += x_adv + space_x_adv
-        line += 1
-        print line        
-            
-            
-            
-            
-            
-            
-        
         # @summary: word by word drawing, center justified
-        used = 0
+        used = 0 
         line = 0
         line_text = ''
         _,_,_,_,space_x_adv,_ = ctx.text_extents(str(' '))
@@ -208,7 +185,7 @@ class ScratchApp(gtk.Window):
                 ctx.move_to(x_b+int((w-used)/2),line*hi+y_margin-y_b)
                 ctx.show_text(line_text)
                 line_text = ''
-                used = 0
+                used = 0 
                 line += 1
                 
             line_text += word+' '
