@@ -113,7 +113,8 @@ class ScratchApp(gtk.Window):
             used += width+x_adv
         '''
         
-        # @summary: word by word drawing
+        '''
+        # @summary: word by word drawing, left justified
         used = 0
         line = 0
         for word in text.split(' '):
@@ -137,6 +138,38 @@ class ScratchApp(gtk.Window):
             ctx.move_to(x_margin+used+x_bearing,line*hi+y_margin-y_bearing)
             ctx.show_text(str(' '))
             used += x_adv
+        '''
+        
+        # @summary: word by word drawing, center justified
+        used = 0
+        line = 0
+        line_text = ''
+        for word in text.split(' '):
+        
+            x_bearing,y_bearing,width,height,x_adv,y_adv = ctx.text_extents(word)
+            
+            if( used > 0 and used+width >= w):
+                x_bearing,y_bearing,width,height,x_adv,y_adv = ctx.text_extents(line_text)
+                ctx.move_to(x_bearing+int((w-used)/2),line*hi+y_margin-y_bearing)
+                ctx.show_text(line_text)
+                line_text = ''
+                used = 0
+                line += 1
+                
+            line_text += word+' '
+                
+            used += x_adv
+            
+            x_bearing,y_bearing,width,height,x_adv,y_adv = ctx.text_extents(str(' '))
+            
+            used += x_adv
+            
+        # Deal with remaining text
+        if line_text != '':
+            x_bearing,y_bearing,width,height,x_adv,y_adv = ctx.text_extents(line_text)
+            ctx.move_to(x_bearing+int((w-used)/2),line*hi+y_margin-y_bearing)
+            ctx.show_text(line_text)
+            
             
         
         '''# old approach
