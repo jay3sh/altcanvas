@@ -19,6 +19,7 @@ class Entry(Widget):
         return ctx.font_extents()
     
     def __init__(self,w=0,
+                 label='Description',
                  fontface='sans-serif',
                  fontangle=cairo.FONT_SLANT_NORMAL,
                  fontweight=cairo.FONT_WEIGHT_NORMAL,
@@ -34,6 +35,7 @@ class Entry(Widget):
         self.ocolor = ocolor
         self.bcolor = bcolor
         self.tcolor = tcolor
+        self.label = label
         
         asc,des,hgt,maxx,maxy = self.get_font_extents(fontface,fontsize)
         
@@ -49,6 +51,18 @@ class Entry(Widget):
         self.ctx.set_font_size(fontsize)
         
         self.__draw()
+        
+    def __draw_label(self):
+        if not self.label:
+            return
+        
+        self.ctx.save()
+        self.ctx.set_source_rgba(self.tcolor.r,self.tcolor.g,
+                                 self.tcolor.b,self.tcolor.a)
+        self.ctx.move_to(self.w-100,0)
+        self.ctx.show_text(self.label)
+        self.ctx.restore()
+        
 
     def __draw(self):
         w = self.w
@@ -78,12 +92,12 @@ class Entry(Widget):
         (x, y, width, height, dx, dy) = self.ctx.text_extents(self.text)
         x_margin = 10
         y_margin = 10
-        self.ctx.save()
         self.ctx.move_to(x_margin+x,y_margin+(-y))
         self.ctx.set_source_rgba(self.tcolor.r,self.tcolor.g,
                                  self.tcolor.b,self.tcolor.a)
         self.ctx.show_text(self.text)        
-        self.ctx.restore()
+        
+        self.__draw_label()
         
     def register_change_listener(self,listener):
         self.change_listener = listener
@@ -97,6 +111,10 @@ class Entry(Widget):
         
     def pointer_listener(self,x,y,pressed=False):
         Widget.pointer_listener(self, x, y, pressed)
+        if self.gainedFocus or self.lostFocus:
+            self.__draw()
+            if self.change_listener:
+                self.change_listener.on_surface_change(self)
         
             
             

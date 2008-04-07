@@ -30,6 +30,8 @@ class Widget:
     clouds = []
     
     hasFocus = False
+    gainedFocus = False
+    lostFocus = False
     
     
     def __init__(self,w,h,id=None):
@@ -77,8 +79,14 @@ class Widget:
                 self.tap_listener(self)
             
         if not oldFocus and self.hasFocus:
+            self.gainedFocus = True
+            self.lostFocus = False
             if self.click_listener:
                 self.click_listener(self)
+                
+        if oldFocus and not self.hasFocus:
+            self.lostFocus = True
+            self.gainedFocus = False
                 
     def disable_pointer_listener(self):
         self.__pointer_listener_enabled = False
