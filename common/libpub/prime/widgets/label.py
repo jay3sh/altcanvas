@@ -5,22 +5,22 @@ from libpub.prime.utils import RGBA
 
 class Label(Widget):
     
-    def get_font_extents(self,fontface,fontsize):
+    def get_font_extents(self,fontface,fontsize,fontangle,fontweight):
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,400,200)
         ctx = cairo.Context(surface)
         ctx.set_line_width(6)
         ctx.set_tolerance(.1)
-        ctx.select_font_face(fontface)
+        ctx.select_font_face(fontface,fontangle,fontweight)
         ctx.set_font_size(fontsize)
         
         return ctx.font_extents()
     
-    def calculate_num_lines(self,text,fontface,fontsize):
+    def calculate_num_lines(self,text,fontface,fontsize,fontangle,fontweight):
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,400,200)
         ctx = cairo.Context(surface)
         ctx.set_line_width(6)
         ctx.set_tolerance(.1)
-        ctx.select_font_face(fontface)
+        ctx.select_font_face(fontface,fontangle,fontweight)
         ctx.set_font_size(fontsize)
         
         line = 0
@@ -36,7 +36,10 @@ class Label(Widget):
         line += 1
         return line
     
-    def __init__(self,text,fontface='sans-serif',fontsize=0,w=0,color=RGBA()):
+    def __init__(self,text,fontface='sans-serif',
+                 fontangle=cairo.FONT_SLANT_NORMAL,
+                 fontweight=cairo.FONT_WEIGHT_NORMAL,
+                 fontsize=0,w=0,color=RGBA()):
         
         if not w or not fontsize:
             raise Exception('width OR fontsize should be supplied')
@@ -44,9 +47,11 @@ class Label(Widget):
         x_margin = 10
         y_margin = 10
         
-        asc,des,hgt,maxx,maxy = self.get_font_extents(fontface,fontsize)
+        asc,des,hgt,maxx,maxy = self.get_font_extents(
+                                    fontface,fontsize,fontangle,fontweight)
         
-        num_lines = self.calculate_num_lines(text,fontface,fontsize)
+        num_lines = self.calculate_num_lines(
+                                    text,fontface,fontsize,fontangle,fontweight)
         
         h = num_lines * int(hgt+des) + y_margin
         
@@ -58,7 +63,7 @@ class Label(Widget):
         ctx = cairo.Context(self.surface)
         ctx.set_line_width(6)
         ctx.set_tolerance(.1)
-        ctx.select_font_face(fontface)
+        ctx.select_font_face(fontface,fontangle,fontweight)
         ctx.set_font_size(fontsize)
         
         ctx.set_source_rgba(color.r,color.g,color.b,color.a)

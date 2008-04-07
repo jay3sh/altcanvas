@@ -401,7 +401,10 @@ class App:
             self.widgetQ.remove(self.labelOnPad)
             
         self.labelOnPad = Label(imgName,w=self.imageOnPad.widget.h,
-                                fontsize=16,color=RGBA(1,1,1,1))
+                                fontface='Sans Serif',
+                                fontweight=cairo.FONT_WEIGHT_BOLD,
+                                fontsize=20,
+                                color=RGBA(1,1,1,1))
             
         self.widgetQ.append(WidgetWrapper(self.labelOnPad,ipx,ipy+image.h+10))
         
