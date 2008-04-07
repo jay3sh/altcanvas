@@ -16,7 +16,7 @@ from libpub.prime.animation import Path
 
 class WidgetQueue:
     widgetQ = []
-    DEBUG = True 
+    DEBUG = False 
     
     def __init__(self):
         pass
@@ -386,14 +386,6 @@ class App:
             # refresh the surface
             self.__update_surface()
             
-        if not self.labelOnPad:
-            self.labelOnPad = Label('Name')
-        else:
-            self.widgetQ.remove(self.labelOnPad)
-            self.labelOnPad = Label('Name')
-            
-            
-        self.widgetQ.append(WidgetWrapper(self.labelOnPad,ipx,ipy+image.h+10))
             
         # Save the imageOnPad
         self.imageOnPad = self.ImageOnPad()
@@ -402,7 +394,16 @@ class App:
         self.imageOnPad.y = imageW.y
         self.imageOnPad.order = orderIn
             
+        # Put the name of image on a label below the image
+        path = self.imageOnPad.widget.path
+        imgName = path[path.rfind('/')+1:path.rfind('.')]
+        if self.labelOnPad:
+            self.widgetQ.remove(self.labelOnPad)
             
+        self.labelOnPad = Label(imgName,w=self.imageOnPad.widget.h,
+                                fontsize=16,color=RGBA(1,1,1,1))
+            
+        self.widgetQ.append(WidgetWrapper(self.labelOnPad,ipx,ipy+image.h+10))
         
         '''
         entry1 = FancyEntry()
