@@ -45,9 +45,9 @@ class ScratchApp(gtk.Window):
         #
         # Choose HERE which scratch to draw
         #
-        self.draw_label(surface)
+        self.draw_fonts(surface)
         
-        self.ctx.set_source_surface(surface,w/2,h/2)
+        self.ctx.set_source_surface(surface)
         self.ctx.paint()
         
         self.gc = gtk.gdk.GC(widget.window)
@@ -55,6 +55,33 @@ class ScratchApp(gtk.Window):
     
     def run(self):
         gtk.main()
+        
+    def draw_fonts(self,surface):
+        ctx = cairo.Context(surface)
+        
+        fontfacelist = ['monospace',
+                        'courier',
+                        'courier new',
+                        'Times New Roman',
+                        'Arial',
+                        'serif',
+                        'sans-serif',
+                        'sans',
+                        'Fixed']
+        fontsize = 18
+        i = 0
+        for fontface in fontfacelist:
+        #for fontsize in range(8,20):
+            ctx.set_line_width(6)
+            ctx.set_tolerance(.1)
+            ctx.select_font_face(fontface)
+            ctx.set_font_size(fontsize)
+            
+            ctx.move_to(100,100+i*25)
+            ctx.show_text(fontface+' : Hello Font Faces!')
+            i += 1
+        
+        
         
     def draw_label(self,parent_surface):
         
