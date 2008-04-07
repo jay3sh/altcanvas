@@ -7,6 +7,7 @@ from libpub.prime.widgets.label import Label
 from libpub.prime.widget import WidgetWrapper
 import libpub.prime.mask as mask
 from libpub.prime.widgets.fancyentry import FancyEntry 
+from libpub.prime.widgets.entry import Entry 
 from libpub.prime.utils import get_image_locations,get_uniform_fit, \
     LAYOUT_STEP, LAYOUT_UNIFORM_OVERLAP,LAYOUT_UNIFORM_SPREAD, \
     detect_platform,RGBA,html2rgb,log
@@ -408,11 +409,26 @@ class App:
             
         self.widgetQ.append(WidgetWrapper(self.labelOnPad,ipx,ipy+image.h+10))
         
-        '''
-        entry1 = FancyEntry()
+        lpx = self.px + int(self.app_width/20) + image.w + \
+                        int(self.app_width/20)
+        lpy = self.py + 5*self.app_height/12
+        
+        icolor = RGBA()
+        icolor.r,icolor.g,icolor.b = html2rgb(0x3F,0x3F,0x3F)
+        icolor.a = 0.98
+        ocolor = RGBA()
+        ocolor.r,ocolor.g,ocolor.b = html2rgb(0x1F,0x1F,0x1F)
+        ocolor.a = 0.85
+        bcolor = RGBA()
+        bcolor.r,bcolor.g,bcolor.b = html2rgb(0xCF,0xCF,0xCF)
+        bcolor.a = 0.98
+        tcolor = RGBA()
+        tcolor.r,tcolor.g,tcolor.b = html2rgb(0xEF,0xEF,0xEF)
+        tcolor.a = 0.98
+        
+        entry1 = Entry(w=300,icolor=icolor,ocolor=ocolor,bcolor=bcolor,tcolor=tcolor)
         entry1.register_change_listener(self)
-        self.widgetQ.append(WidgetWrapper(entry1,ipx+200,ipy+200))
-        '''
+        self.widgetQ.append(WidgetWrapper(entry1,lpx,lpy))
         
         self.__update_surface()
         
