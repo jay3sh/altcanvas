@@ -68,23 +68,57 @@ class ScratchApp(gtk.Window):
             
             return ctx.font_extents()
         
-        w = 100
+        def calculate_num_lines(text,fontface,fontsize):
+            surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,400,200)
+            ctx = cairo.Context(surface)
+            ctx.set_line_width(6)
+            ctx.set_tolerance(.1)
+            ctx.select_font_face(fontface)
+            ctx.set_font_size(fontsize)
+            # recalculate height
+            line = 0
+            used = 0
+            _,_,_,_,space_x_adv,_ = ctx.text_extents(str(' '))
+            
+            for word in text.split(' '):
+                _,_,width,_,x_adv,_ = ctx.text_extents(word)
+                if( used > 0 and used+width >= w):
+                    used = 0
+                    line += 1
+                used += x_adv + space_x_adv
+            line += 1
+            return line
+            
+        
+        
+        
+        w = 110
         x_margin = 10
         y_margin = 10
         
-        text = 'spider mobile 2.0'
+        text = 'spider-mobil 2.0 is the fastest racecar ever built'
         fontface = 'sans-serif'
         fontsize = 15
+        
+        print calculate_num_lines(text,fontface,fontsize)
+        
+        # font_extents based calculations
+        
         asc,des,hgt,maxx,maxy = get_font_extents(fontface,fontsize)
         
-        text_width = maxx*len(text)
-        chars_per_line = int(w/maxx)
-        num_lines = int(len(text)/chars_per_line)+1
+        chars_per_line = int(w/(maxx/2))
+        num_lines = int(len(text)/chars_per_line)
         h = num_lines * int(hgt+des) + y_margin
         hi = int(hgt+des)
         
+        print num_lines
+        
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,w,h)
         ctx = cairo.Context(surface)
+        
+
+        
+        # recalculate height finish
         
         ctx.rectangle(0,0,w,h)
         ctx.stroke()
@@ -140,17 +174,38 @@ class ScratchApp(gtk.Window):
             used += x_adv
         '''
         
+        # recalculate height
+        line = 0
+        used = 0
+        _,_,_,_,space_x_adv,_ = ctx.text_extents(str(' '))
+        
+        for word in text.split(' '):
+            _,_,width,_,x_adv,_ = ctx.text_extents(word)
+            if( used > 0 and used+width >= w):
+                used = 0
+                line += 1
+            used += x_adv + space_x_adv
+        line += 1
+        print line        
+            
+            
+            
+            
+            
+            
+        
         # @summary: word by word drawing, center justified
         used = 0
         line = 0
         line_text = ''
+        _,_,_,_,space_x_adv,_ = ctx.text_extents(str(' '))
         for word in text.split(' '):
         
             x_bearing,y_bearing,width,height,x_adv,y_adv = ctx.text_extents(word)
             
             if( used > 0 and used+width >= w):
-                x_bearing,y_bearing,width,height,x_adv,y_adv = ctx.text_extents(line_text)
-                ctx.move_to(x_bearing+int((w-used)/2),line*hi+y_margin-y_bearing)
+                x_b,y_b,wdt,hgt,x_a,y_a = ctx.text_extents(line_text)
+                ctx.move_to(x_b+int((w-used)/2),line*hi+y_margin-y_b)
                 ctx.show_text(line_text)
                 line_text = ''
                 used = 0
@@ -158,11 +213,8 @@ class ScratchApp(gtk.Window):
                 
             line_text += word+' '
                 
-            used += x_adv
+            used += x_adv + space_x_adv
             
-            x_bearing,y_bearing,width,height,x_adv,y_adv = ctx.text_extents(str(' '))
-            
-            used += x_adv
             
         # Deal with remaining text
         if line_text != '':
