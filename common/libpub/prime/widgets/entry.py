@@ -102,9 +102,13 @@ class Entry(Widget):
     def register_change_listener(self,listener):
         self.change_listener = listener
         
+    KEY_BACKSPACE = 65288
     def key_listener(self,key,state):
         if self.hasFocus:
-            self.text += chr(key)
+            if key == self.KEY_BACKSPACE:
+                self.text = self.text[:len(self.text)-1]
+            else:
+                self.text += chr(key)
             self.__draw()
             if self.change_listener:
                 self.change_listener.on_surface_change(self)
