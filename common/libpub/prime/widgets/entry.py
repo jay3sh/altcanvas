@@ -1,10 +1,12 @@
 
 import cairo
 from libpub.prime.widget import Widget
-from libpub.prime.utils import RGBA
+from libpub.prime.utils import RGBA,show_multiline
 
 class Entry(Widget):
     text = ''
+    top_clearing = 0
+    line_width = 2
     parent = None
     ctx = None
     
@@ -19,6 +21,7 @@ class Entry(Widget):
         return ctx.font_extents()
     
     def __init__(self,w=0,
+                 num_lines=1,
                  label='Description',
                  fontface='sans-serif',
                  fontangle=cairo.FONT_SLANT_NORMAL,
@@ -31,6 +34,8 @@ class Entry(Widget):
         
         Widget.__init__(self,w=w,h=0)
         
+        self.num_lines = num_lines
+        self.fontsize = fontsize
         self.icolor = icolor
         self.ocolor = ocolor
         self.bcolor = bcolor
@@ -39,8 +44,10 @@ class Entry(Widget):
         
         asc,des,hgt,maxx,maxy = self.get_font_extents(fontface,fontsize)
         
-        #self.w = int(maxx*size)
-        self.h = int(1.2*(hgt+des))
+        # Leave some room for label text
+        self.top_clearing = int((hgt+des)/2)
+        
+        self.h = int(1.4*num_lines*(hgt+des)+self.top_clearing)
         
         
         self.surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,self.w,self.h)
@@ -56,11 +63,30 @@ class Entry(Widget):
         if not self.label:
             return
         
+        x_label_margin = 5
+        
         self.ctx.save()
+        
+        self.ctx.set_font_size(int(2*self.fontsize/3))
+        x_bearing,y_bearing,width,height,x_adv,y_adv = \
+            self.ctx.text_extents(self.label)
+        
+        # Draw label background rectangle
+        self.ctx.set_source_rgba(self.ocolor.r,self.ocolor.g,
+                                 self.ocolor.b,self.ocolor.a)
+        self.ctx.rectangle(self.w-width-x_label_margin,0,
+                           width,self.top_clearing-self.line_width)
+        self.ctx.fill()
+        
+        
+        # Draw the label text
         self.ctx.set_source_rgba(self.tcolor.r,self.tcolor.g,
                                  self.tcolor.b,self.tcolor.a)
-        self.ctx.move_to(self.w-100,0)
+            
+            
+        self.ctx.move_to(self.w-width-x_label_margin,-y_bearing)
         self.ctx.show_text(self.label)
+        
         self.ctx.restore()
         
 
@@ -70,7 +96,7 @@ class Entry(Widget):
         
         ##
         # Draw background
-        self.ctx.rectangle(0,0,w,h)
+        self.ctx.rectangle(0,self.top_clearing,w,h-self.top_clearing)
         if self.hasFocus:
             self.ctx.set_source_rgba(self.icolor.r,self.icolor.g,
                                      self.icolor.b,self.icolor.a)
@@ -82,20 +108,31 @@ class Entry(Widget):
         ##
         # Draw border 
         self.ctx.save()
-        self.ctx.rectangle(0,0,w,h)
-        self.ctx.set_line_width(2)
+        self.ctx.rectangle(0,self.top_clearing,w,h-self.top_clearing)
+        self.ctx.set_line_width(self.line_width)
         self.ctx.set_source_rgba(self.bcolor.r,self.bcolor.g,
                                  self.bcolor.b,self.bcolor.a)
         self.ctx.stroke()
         self.ctx.restore()
         
+        ##
+        # draw text
+        
         (x, y, width, height, dx, dy) = self.ctx.text_extents(self.text)
         x_margin = 10
-        y_margin = 10
-        self.ctx.move_to(x_margin+x,y_margin+(-y))
+        y_margin = self.top_clearing + 10
+        
+        hi = height
+        self.ctx.set_source_rgba(self.tcolor.r,self.tcolor.g,
+                                 self.tcolor.b,self.tcolor.a)
+        show_multiline(w,hi,self.ctx,self.text,y_margin)
+        
+        '''
+        self.ctx.move_to(x_margin+x,y_margin+(-y)+self.top_clearing)
         self.ctx.set_source_rgba(self.tcolor.r,self.tcolor.g,
                                  self.tcolor.b,self.tcolor.a)
         self.ctx.show_text(self.text)        
+        '''
         
         self.__draw_label()
         

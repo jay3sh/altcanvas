@@ -247,7 +247,6 @@ class App:
             self.change_listener(self)
             
     def get_surface(self):
-        # TODO: Is this the right place to change hasChanged?
         self.hasChanged = False
         return self.surface
 
@@ -426,7 +425,8 @@ class App:
         tcolor.r,tcolor.g,tcolor.b = html2rgb(0xEF,0xEF,0xEF)
         tcolor.a = 0.98
         
-        entry1 = Entry(w=300,icolor=icolor,ocolor=ocolor,bcolor=bcolor,tcolor=tcolor)
+        entry1 = Entry(w=300,num_lines=3,
+                       icolor=icolor,ocolor=ocolor,bcolor=bcolor,tcolor=tcolor)
         entry1.register_change_listener(self)
         self.widgetQ.append(WidgetWrapper(entry1,lpx,lpy))
         

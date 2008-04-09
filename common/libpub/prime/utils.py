@@ -276,5 +276,35 @@ def detect_platform():
     else:
         return 'Desktop'
     
+def show_multiline(w,hi,ctx,text,y_margin):
+    # @summary: word by word drawing, center justified
+    
+    used = 0 
+    line = 0
+    line_text = ''
+    _,_,_,_,space_x_adv,_ = ctx.text_extents(str(' '))
+    for word in text.split(' '):
+    
+        x_bearing,y_bearing,width,height,x_adv,y_adv = ctx.text_extents(word)
+        
+        if( used > 0 and used+width >= w):
+            x_b,y_b,wdt,hgt,x_a,y_a = ctx.text_extents(line_text)
+            ctx.move_to(x_b+int((w-used)/2),line*hi+y_margin-y_b)
+            ctx.show_text(line_text)
+            line_text = ''
+            used = 0 
+            line += 1
+            
+        line_text += word+' '
+            
+        used += x_adv + space_x_adv
+        
+    # Deal with remaining text
+    if line_text != '':
+        x_bearing,y_bearing,width,height,x_adv,y_adv = ctx.text_extents(line_text)
+        ctx.move_to(x_bearing+int((w-used)/2),line*hi+y_margin-y_bearing)
+        ctx.show_text(line_text)
+    
+    
 if __name__ == '__main__':
     print html2rgb(0xFF,0x33,0x33)
