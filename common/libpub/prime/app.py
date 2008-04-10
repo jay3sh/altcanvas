@@ -13,6 +13,7 @@ from libpub.prime.utils import get_image_locations,get_uniform_fit, \
     detect_platform,RGBA,html2rgb,log
 from libpub.prime.animation import Path
 from libpub.prime.widgetq import WidgetQueue
+from libpub.prime.layer import Layer,ImageLayer
 
             
 class App:
@@ -66,43 +67,25 @@ class App:
                     f.lower().endswith('gif'):
                         self.images.append(self.FOLDER_PATH+os.sep+f)
 
-        self.__load_images()
+        #self.__load_images()
+        self.layers = []
+        
+        imageLayer = ImageLayer(isVisible=True,images=self.images)
+        
+        self.layers.append(imageLayer)
+        
+        
         self.__update_surface()
         
-    def __load_images(self):
-        if not self.background:
-            #bgcolor = RGBA()
-            #bgcolor.r,bgcolor.g,bgcolor.b = html2rgb(0x00,0x99,0x33)            
-            #self.background = Pad(self.app_width,self.app_height, 
-            #                     color=bgcolor,type=Pad.WALLPAPER)
-            self.background = Pad(self.app_width,self.app_height, 
-                                 texture=Pad.WALLPAPER,shape=Pad.RECT)
-            self.background.register_tap_listener(self.on_background_tap)
-            log.writeln('BG (%s)'%(self.background.id_str))
-            
-            
-        self.widgetQ.append(WidgetWrapper(self.background,0,0))
-            
-        imgw,imgh = get_uniform_fit(len(self.images),max_x=800,max_y=480)
-        i = 0
-        for (x,y) in get_image_locations(
-                len(self.images),layout=LAYOUT_UNIFORM_OVERLAP,owidth=imgw,oheight=imgh):
-            img = Image(self.images[i],imgw,imgh, 
-                        X_MARGIN=int(0.05*imgw),Y_MARGIN=int(0.05*imgh))
-            log.writeln('%s (%s)'%(img.path,img.id_str))
-            img.register_click_listener(self.on_image_click)
-            self.widgetQ.append(WidgetWrapper(img,x,y))
-            i = i+1
-
     def __update_surface(self):
         # Create Image widgets for images and lay them out on the surface
         self.ctx.rectangle(0,0,self.app_width,self.app_height)
         self.ctx.set_source_rgba(0,0,0,1)
         self.ctx.fill()
-        for ww in self.widgetQ.next():
-            self.ctx.set_source_surface(ww.widget.surface,ww.x,ww.y)
-            self.ctx.paint()
-            
+        
+        for layer in self.layers:
+            layer.draw(self.ctx)
+        
         self.hasChanged = True
         if self.change_listener:
             self.change_listener(self)

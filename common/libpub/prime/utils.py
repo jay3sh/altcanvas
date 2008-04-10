@@ -8,14 +8,16 @@ import random
     
 class Log:
     def __init__(self):
-        pass
+        self.DEBUG = False
     
     def write(self,str):
-        sys.stdout.write(str)
+        if self.DEBUG:
+            sys.stdout.write(str)
         
     def writeln(self,str):
-        sys.stdout.write(str+'\n')
-        sys.stdout.flush()
+        if self.DEBUG:
+            sys.stdout.write(str+'\n')
+            sys.stdout.flush()
     
 log = Log()
     
