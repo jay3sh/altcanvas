@@ -14,7 +14,7 @@ from libpub.prime.widgets.fancyentry import FancyEntry
 
 import libpub.prime.mask as mask
 
-from libpub.prime.app import App as PublishrApp
+from libpub.prime.app import PublishrApp
 
 from libpub.prime.utils import get_image_locations,\
     LAYOUT_STEP,LAYOUT_UNIFORM_SPREAD,detect_platform,log

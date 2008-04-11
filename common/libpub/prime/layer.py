@@ -18,23 +18,37 @@ class Layer:
     app_width = 800
     app_height = 480
     
+    # This will serve as global access mechanism to top level App object
+    App = None
     
-    def __init__(self,isVisible=True):
-        self.widgetQ = WidgetQueue()
+    def __init__(self,app,isVisible=True):
+        self.App = app
         self.isVisible = isVisible
+        
+        self.widgetQ = WidgetQueue()
     
     def draw(self,ctx):
         for ww in self.widgetQ.next():
             ctx.set_source_surface(ww.widget.surface,ww.x,ww.y)
             ctx.paint()
+            
+    def pointer_listener(self,x,y,pressed):
+        i = 0
+        for ww in self.widgetQ.next():
+            if hasattr(ww.widget,'pointer_listener'):
+                ww.widget.pointer_listener(x-ww.x,y-ww.y,pressed)
+                i = i+1
+                
+    def get_widget(self,widget):
+        return self.widgetQ.getWidget(widget)[1]
     
 class ImageLayer(Layer):
     # App specific members
     background = None
     images = None
     
-    def __init__(self,isVisible=True,images=None):
-        Layer.__init__(self, isVisible)
+    def __init__(self,app,isVisible=True,images=None):
+        Layer.__init__(self, app, isVisible)
         self.images = images
         
         # Background
@@ -65,7 +79,7 @@ class ImageLayer(Layer):
             log.writeln('%s (%s)'%(img.path,img.id_str))
             
             # TODO
-            img.register_click_listener(on_image_click)
+            img.register_click_listener(self.App.on_image_click)
             
             self.widgetQ.append(WidgetWrapper(img,x,y))
             
@@ -77,7 +91,8 @@ class InputLayer(Layer):
     imageOnPad = None
     imageLabel = None
     
-    def __init__(self):
+    def __init__(self,app):
+        Layer.__init__(self, app, isVisible=True)
         padcolor = RGBA()
         padcolor.r,padcolor.g,padcolor.b = html2rgb(0x0F,0x0F,0x0F)
         padcolor.a = 0.85
