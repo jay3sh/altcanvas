@@ -40,7 +40,7 @@ class Layer:
                 i = i+1
                 
     def get_widget(self,widget):
-        return self.widgetQ.getWidget(widget)[1]
+        return self.widgetQ.getWidget(widget)
     
     def remove_widget(self,widget):
         self.widgetQ.remove(widget)

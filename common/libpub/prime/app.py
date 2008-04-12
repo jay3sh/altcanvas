@@ -103,6 +103,8 @@ class PublishrApp(App):
                         
         self.imageLayer = ImageLayer(app=self,isVisible=True,images=self.images)
         
+        self.imageLayer.widgetQ.dumpQ('imageLayer')
+        
         self.layers.append(self.imageLayer)
 
         self.update_surface()
@@ -156,6 +158,7 @@ class PublishrApp(App):
         if self.inputLayer == None:
             self.inputLayer = InputLayer(app=self,image_dim=(image.w,image.h))
             self.layers.append(self.inputLayer)
+            self.inputLayer.widgetQ.dumpQ('inputLayer')
             
         ipx = self.inputLayer.ipx
         ipy = self.inputLayer.ipy
@@ -168,6 +171,12 @@ class PublishrApp(App):
         #inComing
         pathIn = Path(image)
         imageW = self.imageLayer.get_widget(image)
+        if not imageW:
+            # This means that this handler got called while
+            # another one was already in the middle of an animation
+            # and had removed this image widget from the imageLayer queue
+            # It is safe to ignore and stop this handler
+            return
         pathIn.add_start(imageW.x,imageW.y)
         pathIn.add_stop(ipx,ipy)
         pathIn.num_steps = NUM_STEPS 
@@ -187,18 +196,21 @@ class PublishrApp(App):
             
         for i in range(NUM_STEPS):
             if i == 0:
-                continue
-            
-            # Remove old instances of moving image widgets
-            self.imageLayer.remove_widget(pathIn.widget)
-            if pathOut:
-                self.inputLayer.remove_widget(pathOut.widget)
+                self.imageLayer.remove_widget(pathIn.widget)
+                ww = pathInPoints[i]
+                self.inputLayer.add_widget(ww)
                 
-            # Add new instances of moving image widgets
+                if pathOut:
+                    self.inputLayer.remove_widget(pathOut.widget)
+                    ww = pathOutPoints[i]
+                    self.imageLayer.add_widget(ww)
+            
+            self.inputLayer.remove_widget(pathIn.widget)
             ww = pathInPoints[i]
             self.inputLayer.add_widget(ww)
             
             if pathOut:
+                self.imageLayer.remove_widget(pathOut.widget)
                 ww = pathOutPoints[i]
             	self.imageLayer.add_widget(ww)
         

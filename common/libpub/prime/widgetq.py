@@ -1,11 +1,13 @@
 
+import random
+from libpub.prime.utils import log
 
 class WidgetQueue:
     widgetQ = []
-    DEBUG = False 
     
     def __init__(self):
-        pass
+        self.widgetQ = []
+        print 'widgetQ ID %d'%random.randint(1,9999)
     
     def __recalculate_clouds(self):
         '''
@@ -75,8 +77,6 @@ class WidgetQueue:
                                             min(oy1,ny1)-oy0))
     
     def dumpQ(self,op):
-        if not self.DEBUG:
-            return
         log.write(op+':')
         for ww in self.widgetQ:
             log.write(ww.widget.id_str)
@@ -123,12 +123,10 @@ class WidgetQueue:
         return False
     
     def getWidget(self,widget):
-        i = 0
         for ww in self.widgetQ:
             if ww.widget.id == widget.id:
-                return (i,ww)
-            i = i+1
-        raise Exception('%d Not found'%widget.id)
+                return ww
+        return None
 
     def next(self):
         for widget in self.widgetQ:
