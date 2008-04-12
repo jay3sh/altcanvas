@@ -13,7 +13,7 @@ from libpub.prime.utils import get_image_locations,get_uniform_fit, \
     detect_platform,RGBA,html2rgb,log
 from libpub.prime.animation import Path
 from libpub.prime.widgetq import WidgetQueue
-from libpub.prime.layer import Layer,ImageLayer
+from libpub.prime.layer import Layer,ImageLayer, InputLayer
 
             
 class App:
@@ -27,8 +27,6 @@ class App:
     app_height = 480
     
     def __init__(self):                    
-        
-        
         # Setup cairo surface and context
         self.surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,
                                           self.app_width,self.app_height)
@@ -38,16 +36,14 @@ class App:
         self.layers = []
         
         
-        
-        
     def update_surface(self):
         # Create Image widgets for images and lay them out on the surface
         self.ctx.rectangle(0,0,self.app_width,self.app_height)
         self.ctx.set_source_rgba(0,0,0,1)
         self.ctx.fill()
         
-        for layer in self.layers:
-            layer.draw(self.ctx)
+        for i in range(len(self.layers)):
+            self.layers[i].draw(self.ctx)
         
         self.hasChanged = True
         if self.change_listener:
@@ -158,17 +154,22 @@ class PublishrApp(App):
     def on_image_click(self,image):
             
         if self.inputLayer == None:
-            inputLayer = InputLayer(app=self)
-            self.layers.append(inputLayer)
+            self.inputLayer = InputLayer(app=self,image_dim=(image.w,image.h))
+            self.layers.append(self.inputLayer)
             
-        ipx = self.px + int(self.app_width/20)
-        ipy = self.py + int(self.app_height/3 - image.h/2)
+        ipx = self.inputLayer.ipx
+        ipy = self.inputLayer.ipy
         
+        if detect_platform() == 'Nokia':
+            NUM_STEPS = 3
+        else:
+            NUM_STEPS = 13 
+            
         #inComing
         pathIn = Path(image)
         imageW = self.imageLayer.get_widget(image)
-        pathIn.add_start(imageW.x,imageW.y,0)
-        pathIn.add_stop(ipx,ipy,0)
+        pathIn.add_start(imageW.x,imageW.y)
+        pathIn.add_stop(ipx,ipy)
         pathIn.num_steps = NUM_STEPS 
         pathInPoints = pathIn.get_points()
         
@@ -176,31 +177,30 @@ class PublishrApp(App):
         #outGoing
         if self.inputLayer.imageOnPad:
             pathOut = Path(self.inputLayer.imageOnPad.widget)
-            pathOut.add_start(ipx,ipy,0)
-            pathOut.add_stop(self.imageOnPad.x,self.imageOnPad.y,0)
+            pathOut.add_start(ipx,ipy)
+            pathOut.add_stop(self.inputLayer.imageOnPad.x,self.inputLayer.imageOnPad.y)
             pathOut.num_steps = NUM_STEPS
             pathOutPoints = pathOut.get_points()
+            
+        # replace the outgoing image with new one
+        self.inputLayer.imageOnPad = self.imageLayer.get_widget(image)
             
         for i in range(NUM_STEPS):
             if i == 0:
                 continue
             
             # Remove old instances of moving image widgets
-            self.imageLayer.widgetQ.remove(pathIn.widget)
+            self.imageLayer.remove_widget(pathIn.widget)
             if pathOut:
-                self.widgetQ.remove(pathOut.widget)
+                self.inputLayer.remove_widget(pathOut.widget)
                 
             # Add new instances of moving image widgets
-            (order,ww) = pathInPoints[i]
-            if padOrder == -1:
-                self.widgetQ.append(ww)
-                padOrder,_ = self.widgetQ.getWidget(ww.widget)
-            else:
-                self.widgetQ.insert(padOrder,ww)
-                
+            ww = pathInPoints[i]
+            self.inputLayer.add_widget(ww)
+            
             if pathOut:
-                (order,ww) = pathOutPoints[i]
-            	self.widgetQ.insert(order,ww)
+                ww = pathOutPoints[i]
+            	self.imageLayer.add_widget(ww)
         
             # refresh the surface
             self.update_surface()

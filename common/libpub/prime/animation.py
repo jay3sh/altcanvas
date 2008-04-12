@@ -19,17 +19,15 @@ class Path:
         self.num_steps = num_steps 
         self.locus = locus 
     
-    def add_start(self,x,y,order):
+    def add_start(self,x,y):
         self.start = self.PathPoint()
         self.start.x = x
         self.start.y = y
-        self.start.order = order
         
-    def add_stop(self,x,y,order):
+    def add_stop(self,x,y):
         self.stop = self.PathPoint()
         self.stop.x = x
         self.stop.y = y
-        self.stop.order = order
         
     
     def get_next_point(self):
@@ -45,6 +43,6 @@ class Path:
             nx = self.start.x + int((step+1)*(self.stop.x - self.start.x)/self.num_steps)
             ny = self.start.y + int((step+1)*(self.stop.y - self.start.y)/self.num_steps)
         
-            points.append((self.stop.order,WidgetWrapper(self.widget,nx,ny)))
+            points.append(WidgetWrapper(self.widget,nx,ny))
     
         return points

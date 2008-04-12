@@ -42,6 +42,12 @@ class Layer:
     def get_widget(self,widget):
         return self.widgetQ.getWidget(widget)[1]
     
+    def remove_widget(self,widget):
+        self.widgetQ.remove(widget)
+        
+    def add_widget(self,widgetW):
+        self.widgetQ.append(widgetW)
+    
 class ImageLayer(Layer):
     # App specific members
     background = None
@@ -84,6 +90,12 @@ class ImageLayer(Layer):
             self.widgetQ.append(WidgetWrapper(img,x,y))
             
             i = i+1
+            
+        print 'ImageLayer l(widgetQ) = %d'%len(self.widgetQ.widgetQ)
+            
+    def draw(self,ctx):
+        #print 'Imagelayer draw - %d'%(len(self.widgetQ.widgetQ))
+        Layer.draw(self, ctx)
 
 
 class InputLayer(Layer):
@@ -91,7 +103,7 @@ class InputLayer(Layer):
     imageOnPad = None
     imageLabel = None
     
-    def __init__(self,app):
+    def __init__(self,app,image_dim=(0,0)):
         Layer.__init__(self, app, isVisible=True)
         padcolor = RGBA()
         padcolor.r,padcolor.g,padcolor.b = html2rgb(0x0F,0x0F,0x0F)
@@ -100,24 +112,26 @@ class InputLayer(Layer):
                             color=padcolor,texture=Pad.PLAIN,
                             shape=Pad.ROUNDED_RECT)
     
+        image_h = image_dim[1]
         self.px = int(self.app_width/12)
         self.py = int(self.app_height/12)
+        self.ipx = self.px + int(self.app_width/20)
+        self.ipy = self.py + int(self.app_height/3 - image_h/2)
         
         if not self.widgetQ.hasWidget(self.background):
             self.widgetQ.append(WidgetWrapper(self.background,self.px,self.py))
+            
+        print 'InputLayer l(widgetQ) = %d'%len(self.widgetQ.widgetQ)
 
-        if detect_platform() == 'Nokia':
-            self.NUM_STEPS = 3
-        else:
-            self.NUM_STEPS = 13 
+    def draw(self,ctx):
+        #print 'Inputlayer draw - %d'%(len(self.widgetQ.widgetQ))
+        Layer.draw(self, ctx)
 
     def show_image(self,image):
         # Detect if incoming image is the same one on the pad
         if self.imageOnPad and image.id == self.imageOnPad.widget.id:
             return
 
-        ipx = self.px + int(self.app_width/20)
-        ipy = self.py + int(self.app_height/3 - image.h/2)
         
         # Put the name of image on a label below the image
         path = self.imageOnPad.widget.path
