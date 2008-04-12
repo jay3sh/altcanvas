@@ -136,7 +136,7 @@ class InputLayer(Layer):
             return
         '''
         
-        self.widgetQ.append(self.imageOnPad)
+        self.widgetQ.append(WidgetWrapper(self.imageOnPad.widget,self.ipx,self.ipy))
 
         
         # Put the name of image on a label below the image

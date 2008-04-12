@@ -207,9 +207,7 @@ class PublishrApp(App):
                     ww = pathOutPoints[i]
                     self.imageLayer.add_widget(ww)
                     
-                continue
-                    
-            if i == NUM_STEPS-1:
+            elif i == NUM_STEPS-1:
                 # In the last step remove the widgets in motion
                 # and draw the final layers with their own widget
                 # arrangements
@@ -223,16 +221,15 @@ class PublishrApp(App):
                     ww = pathOutPoints[i]
                     self.imageLayer.add_widget(ww)
                     
-                continue
-            
-            self.inputLayer.remove_widget(pathIn.widget)
-            ww = pathInPoints[i]
-            self.inputLayer.add_widget(ww)
-            
-            if pathOut:
-                self.imageLayer.remove_widget(pathOut.widget)
-                ww = pathOutPoints[i]
-            	self.imageLayer.add_widget(ww)
+            else:
+                self.inputLayer.remove_widget(pathIn.widget)
+                ww = pathInPoints[i]
+                self.inputLayer.add_widget(ww)
+                
+                if pathOut:
+                    self.imageLayer.remove_widget(pathOut.widget)
+                    ww = pathOutPoints[i]
+                    self.imageLayer.add_widget(ww)
         
             # refresh the surface
             self.update_surface()
