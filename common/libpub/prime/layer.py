@@ -5,6 +5,8 @@ from libpub.prime.utils import *
 
 from libpub.prime.widgets.pad import Pad
 from libpub.prime.widgets.image import Image 
+from libpub.prime.widgets.label import Label 
+from libpub.prime.widgets.entry import Entry 
 
 from libpub.prime.logic import on_image_click
 
@@ -127,27 +129,33 @@ class InputLayer(Layer):
         #print 'Inputlayer draw - %d'%(len(self.widgetQ.widgetQ))
         Layer.draw(self, ctx)
 
-    def show_image(self,image):
+    def show_image(self):
         # Detect if incoming image is the same one on the pad
+        '''
         if self.imageOnPad and image.id == self.imageOnPad.widget.id:
             return
+        '''
+        
+        self.widgetQ.append(self.imageOnPad)
 
         
         # Put the name of image on a label below the image
         path = self.imageOnPad.widget.path
         imgName = path[path.rfind('/')+1:path.rfind('.')]
-        if self.labelOnPad:
-            self.widgetQ.remove(self.labelOnPad)
+        if self.imageLabel:
+            self.widgetQ.remove(self.imageLabel)
             
-        self.labelOnPad = Label(imgName,w=self.imageOnPad.widget.h,
+        self.imageLabel = Label(imgName,w=self.imageOnPad.widget.h,
                                 fontface='Sans Serif',
                                 fontweight=cairo.FONT_WEIGHT_BOLD,
                                 fontsize=20,
                                 color=RGBA(1,1,1,1))
             
-        self.widgetQ.append(WidgetWrapper(self.labelOnPad,ipx,ipy+image.h+10))
+        self.widgetQ.append(WidgetWrapper(self.imageLabel,
+                                          self.ipx,
+                                          self.ipy+self.imageOnPad.widget.h+10))
         
-        lpx = self.px + int(self.app_width/20) + image.w + \
+        lpx = self.px + int(self.app_width/20) + self.imageOnPad.widget.w + \
                         int(self.app_width/20)
         lpy = self.py + 5*self.app_height/12
         
@@ -169,7 +177,6 @@ class InputLayer(Layer):
         entry1.register_change_listener(self)
         self.widgetQ.append(WidgetWrapper(entry1,lpx,lpy))
         
-        self.__update_surface()
         
         
             

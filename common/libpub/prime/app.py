@@ -196,6 +196,8 @@ class PublishrApp(App):
             
         for i in range(NUM_STEPS):
             if i == 0:
+                # In first step switch the images from their
+                # existing layer to the destination layer
                 self.imageLayer.remove_widget(pathIn.widget)
                 ww = pathInPoints[i]
                 self.inputLayer.add_widget(ww)
@@ -204,6 +206,24 @@ class PublishrApp(App):
                     self.inputLayer.remove_widget(pathOut.widget)
                     ww = pathOutPoints[i]
                     self.imageLayer.add_widget(ww)
+                    
+                continue
+                    
+            if i == NUM_STEPS-1:
+                # In the last step remove the widgets in motion
+                # and draw the final layers with their own widget
+                # arrangements
+                self.inputLayer.remove_widget(pathIn.widget)
+                self.inputLayer.show_image()
+                
+                # TODO: for outgoing widget need to call imageLayers's
+                # function
+                if pathOut:
+                    self.imageLayer.remove_widget(pathOut.widget)
+                    ww = pathOutPoints[i]
+                    self.imageLayer.add_widget(ww)
+                    
+                continue
             
             self.inputLayer.remove_widget(pathIn.widget)
             ww = pathInPoints[i]
