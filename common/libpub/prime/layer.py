@@ -16,6 +16,8 @@ class Layer:
     
     isVisible = False
     
+    hasFocus = False
+    
     # Yes this will be a generic property
     app_width = 800
     app_height = 480
@@ -29,7 +31,7 @@ class Layer:
         
         self.widgetQ = WidgetQueue()
     
-    def draw(self,ctx):
+    def redraw(self,ctx):
         for ww in self.widgetQ.next():
             ctx.set_source_surface(ww.widget.surface,ww.x,ww.y)
             ctx.paint()
@@ -93,11 +95,6 @@ class ImageLayer(Layer):
             
             i = i+1
             
-        print 'ImageLayer l(widgetQ) = %d'%len(self.widgetQ.widgetQ)
-            
-    def draw(self,ctx):
-        #print 'Imagelayer draw - %d'%(len(self.widgetQ.widgetQ))
-        Layer.draw(self, ctx)
 
 
 class InputLayer(Layer):
@@ -125,9 +122,6 @@ class InputLayer(Layer):
             
         print 'InputLayer l(widgetQ) = %d'%len(self.widgetQ.widgetQ)
 
-    def draw(self,ctx):
-        #print 'Inputlayer draw - %d'%(len(self.widgetQ.widgetQ))
-        Layer.draw(self, ctx)
 
     def show_image(self):
         # Detect if incoming image is the same one on the pad

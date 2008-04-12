@@ -19,6 +19,9 @@ class Widget:
     w = 0
     h = 0
     
+    # Parent App
+    app = None
+    
     surface = None
     
     '''

@@ -6,6 +6,7 @@ import gtk
 from gtk import keysyms
 import os
 import cairo
+import libpub
 
 from libpub.prime.widgets.image import Image
 from libpub.prime.widgets.label import Label 
@@ -74,27 +75,34 @@ class Canvas(BaseWindow):
         self.show_all()
         
     def load(self):
+        if self.isLoaded:
+            return
+        
         if detect_platform() == 'Nokia':
             app = PublishrApp('/mnt/bluebox/photos')
         else:
             app = PublishrApp('/photos/altimages/jyro')
             
-        app.register_change_listener(self.on_app_change)
+        #app.register_change_listener(self.on_app_change)
         self.appQ.append((app,0,0))
         self.isLoaded = True
         
+    '''
     def on_app_change(self,app):
         # In future we will use app's params to decide if we want
         # to update or not
         self.redraw()
         self.da.window.draw_drawable(self.gc, self.pixmap, 0,0, 0,0, -1,-1)
+    '''
         
-    def redraw(self):
+    def __redraw(self):
         self.ctx.rectangle(0,0,self.CANVAS_WIDTH,self.CANVAS_HEIGHT)
         self.ctx.set_source_rgba(0,0,0,1)
         self.ctx.fill()
         for app in self.appQ:
-            app_surface = app[0].get_surface()
+            #app_surface = app[0].get_surface()
+            app[0].redraw()
+            app_surface = app[0].surface
             self.ctx.set_source_surface(app_surface,app[1],app[2])
             self.ctx.paint()
             
@@ -108,20 +116,19 @@ class Canvas(BaseWindow):
         self.ctx.rectangle(0,0,w,h)
         self.ctx.fill()
         
-        # Load initial set of widgets
-        if not self.isLoaded:
-            self.load()
-        
         # triggers expose event
         widget.queue_draw()
     
     def expose(self,widget,event):
         # redraw the drawing area
-        self.redraw()
+        self.__redraw()
         
         if not self.gc:
             self.gc = gtk.gdk.GC(widget.window)
         widget.window.draw_drawable(self.gc, self.pixmap, 0,0, 0,0, -1,-1)
+        
+    def redraw(self):
+        self.expose(self.da, None)
         
     def key_handler(self,window,event):
         keyval = event.keyval
@@ -143,7 +150,6 @@ class Canvas(BaseWindow):
             y = event.y
             state = event.state
         
-        
         self.__ignore_pointer_count += 1
         self.__ignore_pointer_count %= 3
         
@@ -155,9 +161,11 @@ class Canvas(BaseWindow):
 
 
     def run(self):
+        self.load()
         gtk.main()
 
 
 if __name__ == '__main__':
     canvas = Canvas()
+    libpub.prime.canvas = canvas
     canvas.run()

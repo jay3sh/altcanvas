@@ -15,6 +15,7 @@ from libpub.prime.animation import Path
 from libpub.prime.widgetq import WidgetQueue
 from libpub.prime.layer import Layer,ImageLayer, InputLayer
 
+import libpub
             
 class App:
     
@@ -36,18 +37,20 @@ class App:
         self.layers = []
         
         
-    def update_surface(self):
+    def redraw(self):
         # Create Image widgets for images and lay them out on the surface
         self.ctx.rectangle(0,0,self.app_width,self.app_height)
         self.ctx.set_source_rgba(0,0,0,1)
         self.ctx.fill()
         
         for i in range(len(self.layers)):
-            self.layers[i].draw(self.ctx)
+            self.layers[i].redraw(self.ctx)
         
+        '''
         self.hasChanged = True
         if self.change_listener:
             self.change_listener(self)
+        '''
             
     def get_surface(self):
         self.hasChanged = False
@@ -66,7 +69,8 @@ class App:
             layer.pointer_listener(x,y,pressed)
                 
     def on_surface_change(self,widget):
-        self.update_surface()
+        #self.update_surface()
+        libpub.prime.canvas.redraw()
             
             
             
@@ -107,7 +111,8 @@ class PublishrApp(App):
         
         self.layers.append(self.imageLayer)
 
-        self.update_surface()
+        #self.update_surface()
+        libpub.prime.canvas.redraw()
         
         
     def on_background_tap(self,pad):
@@ -151,7 +156,8 @@ class PublishrApp(App):
         if self.inputPad and self.widgetQ.hasWidget(self.inputPad):
             self.widgetQ.remove(self.inputPad)
             
-        self.update_surface()
+        #self.update_surface()
+        libpub.prime.canvas.redraw()
                 
     def on_image_click(self,image):
             
@@ -231,6 +237,9 @@ class PublishrApp(App):
                     ww = pathOutPoints[i]
                     self.imageLayer.add_widget(ww)
         
-            # refresh the surface
-            self.update_surface()
+        self.inputLayer.hasFocus = True
+        
+        # refresh the surface
+        #self.update_surface()
+        libpub.prime.canvas.redraw()
             
