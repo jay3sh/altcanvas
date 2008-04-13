@@ -16,7 +16,7 @@ class Layer:
     
     isVisible = False
     
-    hasFocus = False
+    hasKeyFocus = False
     
     # Yes this will be a generic property
     app_width = 800
@@ -58,7 +58,7 @@ class ImageLayer(Layer):
     images = None
     
     def __init__(self,app,isVisible=True,images=None):
-        Layer.__init__(self, app, isVisible)
+        Layer.__init__(self, app=app, isVisible=isVisible)
         self.images = images
         
         # Background
@@ -103,7 +103,7 @@ class InputLayer(Layer):
     imageLabel = None
     
     def __init__(self,app,image_dim=(0,0)):
-        Layer.__init__(self, app, isVisible=True)
+        Layer.__init__(self, app=app, isVisible=True)
         padcolor = RGBA()
         padcolor.r,padcolor.g,padcolor.b = html2rgb(0x0F,0x0F,0x0F)
         padcolor.a = 0.85
@@ -120,7 +120,7 @@ class InputLayer(Layer):
         if not self.widgetQ.hasWidget(self.background):
             self.widgetQ.append(WidgetWrapper(self.background,self.px,self.py))
             
-        print 'InputLayer l(widgetQ) = %d'%len(self.widgetQ.widgetQ)
+            
 
 
     def show_image(self):

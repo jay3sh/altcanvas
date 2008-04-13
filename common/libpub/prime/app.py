@@ -21,8 +21,7 @@ class App:
     
     surface = None
     ctx = None
-    hasChanged = True
-    change_listener = None
+    
     
     app_width = 800
     app_height = 480
@@ -33,8 +32,8 @@ class App:
                                           self.app_width,self.app_height)
         self.ctx = cairo.Context(self.surface)
         
-        #self.__load_images()
         self.layers = []
+        
         
         
     def redraw(self):
@@ -46,23 +45,16 @@ class App:
         for i in range(len(self.layers)):
             self.layers[i].redraw(self.ctx)
         
-        '''
-        self.hasChanged = True
-        if self.change_listener:
-            self.change_listener(self)
-        '''
-            
-    def get_surface(self):
-        self.hasChanged = False
-        return self.surface
 
-    def register_change_listener(self,change_listener):
-        self.change_listener = change_listener
-        
+
     def dispatch_key_event(self,keyval,state):
+        '''
         for ww in self.widgetQ.next():
             if hasattr(ww.widget,'key_listener'):
                 ww.widget.key_listener(keyval,state)
+        '''
+        for layer in self.layers:
+            layer.key_listener(x,y,pressed)
                 
     def dispatch_pointer_event(self,x,y,pressed):
         for layer in self.layers:
@@ -111,7 +103,6 @@ class PublishrApp(App):
         
         self.layers.append(self.imageLayer)
 
-        #self.update_surface()
         libpub.prime.canvas.redraw()
         
         
@@ -156,7 +147,6 @@ class PublishrApp(App):
         if self.inputPad and self.widgetQ.hasWidget(self.inputPad):
             self.widgetQ.remove(self.inputPad)
             
-        #self.update_surface()
         libpub.prime.canvas.redraw()
                 
     def on_image_click(self,image):
@@ -236,10 +226,10 @@ class PublishrApp(App):
                     self.imageLayer.remove_widget(pathOut.widget)
                     ww = pathOutPoints[i]
                     self.imageLayer.add_widget(ww)
+                    
+            libpub.prime.canvas.redraw()
         
         self.inputLayer.hasFocus = True
         
         # refresh the surface
-        #self.update_surface()
-        libpub.prime.canvas.redraw()
             

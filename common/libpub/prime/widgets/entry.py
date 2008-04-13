@@ -2,6 +2,7 @@
 import cairo
 from libpub.prime.widget import Widget
 from libpub.prime.utils import RGBA,show_multiline
+import libpub
 
 class Entry(Widget):
     text = ''
@@ -147,15 +148,13 @@ class Entry(Widget):
             else:
                 self.text += chr(key)
             self.__draw()
-            if self.change_listener:
-                self.change_listener.on_surface_change(self)
+            libpub.prime.canvas.redraw()
         
     def pointer_listener(self,x,y,pressed=False):
         Widget.pointer_listener(self, x, y, pressed)
         if self.gainedFocus or self.lostFocus:
             self.__draw()
-            if self.change_listener:
-                self.change_listener.on_surface_change(self)
+            libpub.prime.canvas.redraw()
         
             
             
