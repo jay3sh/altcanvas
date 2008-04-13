@@ -86,7 +86,7 @@ class WidgetQueue:
             
     def append(self,widgetWrapper):
         self.widgetQ.append(widgetWrapper)
-        self.__recalculate_clouds()
+        #self.__recalculate_clouds()
         self.dumpQ('Append('+widgetWrapper.widget.id_str+
                        ','+str(widgetWrapper.x)+
                        ','+str(widgetWrapper.y)+
@@ -96,7 +96,7 @@ class WidgetQueue:
         for ww in self.widgetQ:
             if ww.widget.id == widget.id:
                 self.widgetQ.remove(ww)
-                self.__recalculate_clouds()
+                #self.__recalculate_clouds()
                 self.dumpQ('Remove('+ww.widget.id_str+
                        ','+str(ww.x)+
                        ','+str(ww.y)+
@@ -109,7 +109,7 @@ class WidgetQueue:
             self.append(widgetWrapper)
         else:
             self.widgetQ.insert(location,widgetWrapper)
-            self.__recalculate_clouds()
+            #self.__recalculate_clouds()
             self.dumpQ('Insert('+
                        widgetWrapper.widget.id_str+
                        ','+str(widgetWrapper.x)+

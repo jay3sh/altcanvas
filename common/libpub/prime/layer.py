@@ -125,11 +125,6 @@ class InputLayer(Layer):
 
     def show_image(self):
         # Detect if incoming image is the same one on the pad
-        '''
-        if self.imageOnPad and image.id == self.imageOnPad.widget.id:
-            return
-        '''
-        
         self.widgetQ.append(WidgetWrapper(self.imageOnPad.widget,self.ipx,self.ipy))
 
         
@@ -166,10 +161,11 @@ class InputLayer(Layer):
         tcolor.r,tcolor.g,tcolor.b = html2rgb(0xEF,0xEF,0xEF)
         tcolor.a = 0.98
         
-        entry1 = Entry(w=300,num_lines=3,
-                       icolor=icolor,ocolor=ocolor,bcolor=bcolor,tcolor=tcolor)
-        entry1.register_change_listener(self)
-        self.widgetQ.append(WidgetWrapper(entry1,lpx,lpy))
+        if not self.entryDesc:
+            self.entryDesc = Entry(w=300,num_lines=3,
+                   icolor=icolor,ocolor=ocolor,bcolor=bcolor,tcolor=tcolor)
+            self.entryDesc.register_change_listener(self)
+            self.widgetQ.append(WidgetWrapper(self.entryDesc,lpx,lpy))
         
         
         

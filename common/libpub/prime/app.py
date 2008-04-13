@@ -10,7 +10,7 @@ from libpub.prime.widgets.fancyentry import FancyEntry
 from libpub.prime.widgets.entry import Entry 
 from libpub.prime.utils import get_image_locations,get_uniform_fit, \
     LAYOUT_STEP, LAYOUT_UNIFORM_OVERLAP,LAYOUT_UNIFORM_SPREAD, \
-    detect_platform,RGBA,html2rgb,log
+    detect_platform,RGBA,html2rgb,log,recalculate_clouds
 from libpub.prime.animation import Path
 from libpub.prime.widgetq import WidgetQueue
 from libpub.prime.layer import Layer,ImageLayer, InputLayer
@@ -45,6 +45,16 @@ class App:
         for i in range(len(self.layers)):
             self.layers[i].redraw(self.ctx)
         
+        
+    def adjust_clouds(self):
+        widgetQ = []
+        print len(widgetQ)
+        for layer in self.layers:
+            print len(layer.widgetQ.widgetQ)
+            widgetQ += layer.widgetQ.widgetQ
+        print len(widgetQ)
+        print '===='
+        recalculate_clouds(widgetQ)
 
 
     def dispatch_key_event(self,keyval,state):
@@ -98,6 +108,9 @@ class PublishrApp(App):
                         self.images.append(self.FOLDER_PATH+os.sep+f)
                         
         self.imageLayer = ImageLayer(app=self,isVisible=True,images=self.images)
+        
+        #recalculate_clouds(self.imageLayer.widgetQ.widgetQ)
+        self.adjust_clouds()
         
         self.imageLayer.widgetQ.dumpQ('imageLayer')
         
@@ -227,6 +240,9 @@ class PublishrApp(App):
                     ww = pathOutPoints[i]
                     self.imageLayer.add_widget(ww)
                     
+            #recalculate_clouds(self.imageLayer.widgetQ.widgetQ +
+            #                   self.inputLayer.widgetQ.widgetQ)
+            self.adjust_clouds()
             libpub.prime.canvas.redraw()
         
         self.inputLayer.hasFocus = True

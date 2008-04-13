@@ -307,6 +307,45 @@ def show_multiline(w,hi,ctx,text,y_margin):
         ctx.move_to(x_bearing+int((w-used)/2),line*hi+y_margin-y_bearing)
         ctx.show_text(line_text)
     
+def recalculate_clouds(widgetQ):
+        # Cleanup all the clouds before recalculating
+        for ww in widgetQ:
+            ww.widget.clouds = []
+            
+        for top in range(len(widgetQ)):
+        
+            newWidget = widgetQ[top]
+            
+            for i in range(top):
+                ww = widgetQ[i]
+                ox0 = ww.x
+                oy0 = ww.y
+                ox1 = ox0 + ww.widget.w
+                oy1 = oy0 + ww.widget.h
+               
+                nx0 = newWidget.x
+                ny0 = newWidget.y
+                nx1 = nx0 + newWidget.widget.w
+                ny1 = ny0 + newWidget.widget.h
+                
+                if (ox0 < nx0 and ox1 < nx0) or (ox0 > nx1 and ox1 > nx1) or \
+                    (oy0 < ny0 and oy1 < ny0) or (oy0 > ny1 and  oy1 > ny1):
+                    # There is no overlap
+                    continue
+                else:
+                    '''
+                    There is an overlap
+                    Calculate the intersection of two widgets' extents
+                    and add it to the cloud list of the old widget
+                    Also translate them into widget's coordinate system
+                    
+                    These are top-left and bottom-right vertices of the rectangular
+                    intersection of two widgets.
+                    '''
+                    ww.widget.clouds.append((max(ox0,nx0)-ox0,
+                                            max(oy0,ny0)-oy0,
+                                            min(ox1,nx1)-ox0,
+                                            min(oy1,ny1)-oy0))
     
 if __name__ == '__main__':
     print html2rgb(0xFF,0x33,0x33)
