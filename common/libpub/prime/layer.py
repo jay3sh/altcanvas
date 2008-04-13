@@ -37,11 +37,14 @@ class Layer:
             ctx.paint()
             
     def pointer_listener(self,x,y,pressed):
-        i = 0
         for ww in self.widgetQ.next():
             if hasattr(ww.widget,'pointer_listener'):
                 ww.widget.pointer_listener(x-ww.x,y-ww.y,pressed)
-                i = i+1
+                
+    def key_listener(self,key,state):
+        for ww in self.widgetQ.next():
+            if hasattr(ww.widget,'key_listener'):
+                ww.widget.key_listener(key,state)
                 
     def get_widget(self,widget):
         return self.widgetQ.getWidget(widget)
@@ -167,7 +170,6 @@ class InputLayer(Layer):
         if not self.entryDesc:
             self.entryDesc = Entry(w=300,num_lines=3,
                    icolor=icolor,ocolor=ocolor,bcolor=bcolor,tcolor=tcolor)
-            self.entryDesc.register_change_listener(self)
             self.widgetQ.append(WidgetWrapper(self.entryDesc,lpx,lpy))
         
         

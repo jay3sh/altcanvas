@@ -52,15 +52,9 @@ class App:
             widgetQ += layer.widgetQ.widgetQ
         recalculate_clouds(widgetQ)
 
-
     def dispatch_key_event(self,keyval,state):
-        '''
-        for ww in self.widgetQ.next():
-            if hasattr(ww.widget,'key_listener'):
-                ww.widget.key_listener(keyval,state)
-        '''
         for layer in self.layers:
-            layer.key_listener(x,y,pressed)
+            layer.key_listener(keyval,state)
                 
     def dispatch_pointer_event(self,x,y,pressed):
         for layer in self.layers:

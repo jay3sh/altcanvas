@@ -58,9 +58,9 @@ class Entry(Widget):
         self.ctx.select_font_face(fontface,fontangle,fontweight)
         self.ctx.set_font_size(fontsize)
         
-        self.__draw()
+        self.redraw()
         
-    def __draw_label(self):
+    def redraw_label(self):
         if not self.label:
             return
         
@@ -84,14 +84,13 @@ class Entry(Widget):
         self.ctx.set_source_rgba(self.tcolor.r,self.tcolor.g,
                                  self.tcolor.b,self.tcolor.a)
             
-            
         self.ctx.move_to(self.w-width-x_label_margin,-y_bearing)
         self.ctx.show_text(self.label)
         
         self.ctx.restore()
         
 
-    def __draw(self):
+    def redraw(self):
         w = self.w
         h = self.h
         
@@ -128,32 +127,28 @@ class Entry(Widget):
                                  self.tcolor.b,self.tcolor.a)
         show_multiline(w,hi,self.ctx,self.text,y_margin)
         
-        '''
-        self.ctx.move_to(x_margin+x,y_margin+(-y)+self.top_clearing)
-        self.ctx.set_source_rgba(self.tcolor.r,self.tcolor.g,
-                                 self.tcolor.b,self.tcolor.a)
-        self.ctx.show_text(self.text)        
-        '''
-        
-        self.__draw_label()
-        
-    def register_change_listener(self,listener):
-        self.change_listener = listener
+        self.redraw_label()
         
     KEY_BACKSPACE = 65288
+    KEY_ENTER = 65293
     def key_listener(self,key,state):
         if self.hasFocus:
             if key == self.KEY_BACKSPACE:
                 self.text = self.text[:len(self.text)-1]
+            elif int(key) > 256:
+                # ignore 
+                # We are not supporting non-character keys
+                pass
             else:
                 self.text += chr(key)
-            self.__draw()
+                    
+            self.redraw()
             libpub.prime.canvas.redraw()
         
     def pointer_listener(self,x,y,pressed=False):
         Widget.pointer_listener(self, x, y, pressed)
         if self.gainedFocus or self.lostFocus:
-            self.__draw()
+            self.redraw()
             libpub.prime.canvas.redraw()
         
             
