@@ -4,6 +4,7 @@ from libpub.prime.widget import Widget
 from libpub.prime.utils import RGBA,show_multiline
 
 class Label(Widget):
+    text = None
     
     def get_font_extents(self,fontface,fontsize,fontangle,fontweight):
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,0,0)
@@ -42,33 +43,42 @@ class Label(Widget):
                  fontweight=cairo.FONT_WEIGHT_NORMAL,
                  fontsize=0,w=0,color=RGBA()):
         
+        self.text = text
+        self.fontface = fontface
+        self.fontangle = fontangle
+        self.fontweight = fontweight
+        self.fontsize = fontsize
+        self.color = color
+        
         if not w or not fontsize:
             raise Exception('width OR fontsize should be supplied')
             
-        x_margin = 10
-        y_margin = 10
+        self.x_margin = 10
+        self.y_margin = 10
         
         asc,des,hgt,maxx,maxy = self.get_font_extents(
                                     fontface,fontsize,fontangle,fontweight)
         
         num_lines = self.calculate_num_lines(
-                                    w,text,fontface,fontsize,fontangle,fontweight)
+                                    w,self.text,fontface,fontsize,fontangle,fontweight)
         
-        hi = int(hgt+des)
+        self.hi = int(hgt+des)
         
-        h = num_lines * hi + y_margin
-        
+        h = num_lines * self.hi + self.y_margin
         
         Widget.__init__(self, w=w, h=h)
         
+        self.redraw()
+        
+    def redraw(self):
         self.surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,self.w,self.h)
         ctx = cairo.Context(self.surface)
         ctx.set_line_width(6)
         ctx.set_tolerance(.1)
-        ctx.select_font_face(fontface,fontangle,fontweight)
-        ctx.set_font_size(fontsize)
+        ctx.select_font_face(self.fontface,self.fontangle,self.fontweight)
+        ctx.set_font_size(self.fontsize)
         
-        ctx.set_source_rgba(color.r,color.g,color.b,color.a)
+        ctx.set_source_rgba(self.color.r,self.color.g,self.color.b,self.color.a)
             
-        show_multiline(w,hi,ctx,text,y_margin)
+        show_multiline(self.w,self.hi,ctx,self.text,self.y_margin)
     

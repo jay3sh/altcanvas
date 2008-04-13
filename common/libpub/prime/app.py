@@ -48,12 +48,8 @@ class App:
         
     def adjust_clouds(self):
         widgetQ = []
-        print len(widgetQ)
         for layer in self.layers:
-            print len(layer.widgetQ.widgetQ)
             widgetQ += layer.widgetQ.widgetQ
-        print len(widgetQ)
-        print '===='
         recalculate_clouds(widgetQ)
 
 

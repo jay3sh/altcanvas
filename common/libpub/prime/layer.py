@@ -101,6 +101,7 @@ class InputLayer(Layer):
     background = None
     imageOnPad = None
     imageLabel = None
+    entryDesc = None
     
     def __init__(self,app,image_dim=(0,0)):
         Layer.__init__(self, app=app, isVisible=True)
@@ -131,18 +132,20 @@ class InputLayer(Layer):
         # Put the name of image on a label below the image
         path = self.imageOnPad.widget.path
         imgName = path[path.rfind('/')+1:path.rfind('.')]
-        if self.imageLabel:
-            self.widgetQ.remove(self.imageLabel)
-            
-        self.imageLabel = Label(imgName,w=self.imageOnPad.widget.h,
+        
+        if not self.imageLabel:
+            self.imageLabel = Label(imgName,w=self.imageOnPad.widget.h,
                                 fontface='Sans Serif',
                                 fontweight=cairo.FONT_WEIGHT_BOLD,
                                 fontsize=20,
                                 color=RGBA(1,1,1,1))
             
-        self.widgetQ.append(WidgetWrapper(self.imageLabel,
+            self.widgetQ.append(WidgetWrapper(self.imageLabel,
                                           self.ipx,
                                           self.ipy+self.imageOnPad.widget.h+10))
+        else:
+            self.imageLabel.text = imgName
+            self.imageLabel.redraw()
         
         lpx = self.px + int(self.app_width/20) + self.imageOnPad.widget.w + \
                         int(self.app_width/20)
