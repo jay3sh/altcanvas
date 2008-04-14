@@ -115,6 +115,7 @@ class ImageLayer(Layer):
                                    tcolor=tcolor)
         self.widgetQ.append(WidgetWrapper(self.importButton,self.app_width-240,
                                           self.app_height-50))
+        self.importButton.register_click_listener(self.App.on_import_clicked)
             
         self.publishButton = Button(100,35,'Publish',fontsize=16,
                                    fontweight=cairo.FONT_WEIGHT_NORMAL,
@@ -123,6 +124,7 @@ class ImageLayer(Layer):
                                    tcolor=tcolor)
         self.widgetQ.append(WidgetWrapper(self.publishButton,self.app_width-120,
                                           self.app_height-50))
+        self.publishButton.register_click_listener(self.App.on_publish_clicked)
 
 
 class InputLayer(Layer):

@@ -230,5 +230,27 @@ class PublishrApp(App):
             self.adjust_clouds()
             libpub.prime.canvas.redraw()
         
+    def on_import_clicked(self,widget):
+        import gtk
+        if detect_platform() == 'Nokia':
+            import hildon
+            fileChooserDlg = hildon.FileChooserDialog(
+                            libpub.prime.canvas,
+                            gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
+        else:
+            fileChooserDlg = gtk.FileChooserDialog('Open picture to publish',
+                            libpub.prime.canvas,
+                            gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
+                            (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                             gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+            
+        resp = fileChooserDlg.run()
+    
+        if resp == gtk.RESPONSE_OK:
+            print fileChooserDlg.get_filename()
+            
+        fileChooserDlg.destroy()
         
+    def on_publish_clicked(self,widget):
+        print 'publish clicked'
             
