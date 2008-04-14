@@ -70,8 +70,7 @@ class ImageLayer(Layer):
             self.background = Pad(self.app_width,self.app_height, 
                                  texture=Pad.WALLPAPER,shape=Pad.RECT)
             
-            # TODO
-            #self.background.register_tap_listener(self.on_background_tap)
+            self.background.register_tap_listener(self.App.on_background_tap)
             
             log.writeln('BG (%s)'%(self.background.id_str))
             
@@ -91,7 +90,6 @@ class ImageLayer(Layer):
             
             log.writeln('%s (%s)'%(img.path,img.id_str))
             
-            # TODO
             img.register_click_listener(self.App.on_image_click)
             
             self.widgetQ.append(WidgetWrapper(img,x,y))

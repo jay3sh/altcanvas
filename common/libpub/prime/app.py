@@ -60,10 +60,6 @@ class App:
         for layer in self.layers:
             layer.pointer_listener(x,y,pressed)
                 
-    def on_surface_change(self,widget):
-        #self.update_surface()
-        libpub.prime.canvas.redraw()
-            
             
             
 class PublishrApp(App):
@@ -99,7 +95,6 @@ class PublishrApp(App):
                         
         self.imageLayer = ImageLayer(app=self,isVisible=True,images=self.images)
         
-        #recalculate_clouds(self.imageLayer.widgetQ.widgetQ)
         self.adjust_clouds()
         
         self.imageLayer.widgetQ.dumpQ('imageLayer')
@@ -111,53 +106,54 @@ class PublishrApp(App):
         
     def on_background_tap(self,pad):
         # Remove the input pad from widgetQ
-        self.bg_ignore_count += 1
-        #print 'bg clicked %d,%d'%(self.bg_ignore_count,len(pad.clouds))
         
         if detect_platform() == 'Nokia':
             NUM_STEPS = 3
         else:
             NUM_STEPS = 13 
             
-        if self.imageOnPad:
-            padOrder,_ = self.widgetQ.getWidget(self.imageOnPad.widget)
+        if self.inputLayer in self.layers:
             
             ipx = self.px + int(self.app_width/20)
-            ipy = self.py + int(self.app_height/3 - self.imageOnPad.widget.h/2)
-            pathOut = Path(self.imageOnPad.widget)
-            pathOut.add_start(ipx,ipy,padOrder)
-            pathOut.add_stop(self.imageOnPad.x,self.imageOnPad.y,self.imageOnPad.order)
+            ipy = self.py + int(self.app_height/3 - 
+                                self.inputLayer.imageOnPad.widget.h/2)
+            pathOut = Path(self.inputLayer.imageOnPad.widget)
+            pathOut.add_start(ipx,ipy)
+            pathOut.add_stop(self.inputLayer.imageOnPad.x,
+                             self.inputLayer.imageOnPad.y)
             pathOut.num_steps = NUM_STEPS
             pathOutPoints = pathOut.get_points()
             
             for i in range(NUM_STEPS):
                 if i == 0:
-                    continue
+                    self.inputLayer.remove_widget(pathOut.widget)
+            
+                    ww = pathOutPoints[i]
+                    self.imageLayer.add_widget(ww)
                 
-                if pathOut:
-                    self.widgetQ.remove(pathOut.widget)
+                else:
+                    self.imageLayer.remove_widget(pathOut.widget)
+                    ww = pathOutPoints[i]
+                    self.imageLayer.add_widget(ww)
+                    
+                self.adjust_clouds()
+                libpub.prime.canvas.redraw()
             
-                    (order,ww) = pathOutPoints[i]
-                    self.widgetQ.insert(order,ww)
+            self.inputLayer.imageOnPad = None
+            self.layers.remove(self.inputLayer)
             
-            if self.widgetQ.hasWidget(self.labelOnPad):
-                self.widgetQ.remove(self.labelOnPad)
-                
-            # there is no image on input pad now
-            self.imageOnPad = None
-            self.labelOnPad = None
-            
-        if self.inputPad and self.widgetQ.hasWidget(self.inputPad):
-            self.widgetQ.remove(self.inputPad)
-            
-        libpub.prime.canvas.redraw()
+            self.adjust_clouds()
+            libpub.prime.canvas.redraw()
                 
     def on_image_click(self,image):
             
+        log.writeln('on_image_click - %s'%image.id_str)
+        
         if self.inputLayer == None:
             self.inputLayer = InputLayer(app=self,image_dim=(image.w,image.h))
+            
+        if self.inputLayer not in self.layers:
             self.layers.append(self.inputLayer)
-            self.inputLayer.widgetQ.dumpQ('inputLayer')
             
         ipx = self.inputLayer.ipx
         ipy = self.inputLayer.ipy
@@ -194,6 +190,7 @@ class PublishrApp(App):
         self.inputLayer.imageOnPad = self.imageLayer.get_widget(image)
             
         for i in range(NUM_STEPS):
+            log.writeln('on_image_click %d'%i)
             if i == 0:
                 # In first step switch the images from their
                 # existing layer to the destination layer
@@ -230,8 +227,7 @@ class PublishrApp(App):
                     ww = pathOutPoints[i]
                     self.imageLayer.add_widget(ww)
                     
-            #recalculate_clouds(self.imageLayer.widgetQ.widgetQ +
-            #                   self.inputLayer.widgetQ.widgetQ)
+                    
             self.adjust_clouds()
             libpub.prime.canvas.redraw()
         
