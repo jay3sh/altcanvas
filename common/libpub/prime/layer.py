@@ -103,6 +103,8 @@ class InputLayer(Layer):
     imageOnPad = None
     imageLabel = None
     entryDesc = None
+    entryTitle = None
+    entryTags = None
     
     def __init__(self,app,image_dim=(0,0)):
         Layer.__init__(self, app=app, isVisible=True)
@@ -148,9 +150,13 @@ class InputLayer(Layer):
             self.imageLabel.text = imgName
             self.imageLabel.redraw()
         
-        lpx = self.px + int(self.app_width/20) + self.imageOnPad.widget.w + \
+        x_entry = self.px + int(self.app_width/20) + self.imageOnPad.widget.w + \
                         int(self.app_width/20)
-        lpy = self.py + 5*self.app_height/12
+                        
+        y_title = self.py + 2*self.app_height/12
+        y_desc = self.py + 4*self.app_height/12
+        y_tags = self.py + 8*self.app_height/12
+        y_buttons = self.py + 10*self.app_height/12
         
         icolor = RGBA()
         icolor.r,icolor.g,icolor.b = html2rgb(0x3F,0x3F,0x3F)
@@ -165,11 +171,20 @@ class InputLayer(Layer):
         tcolor.r,tcolor.g,tcolor.b = html2rgb(0xEF,0xEF,0xEF)
         tcolor.a = 0.98
         
-        if not self.entryDesc:
-            self.entryDesc = Entry(w=300,num_lines=3,
+        if not self.entryTitle:
+            self.entryTitle = Entry(w=300,num_lines=1,label='Title',
                    icolor=icolor,ocolor=ocolor,bcolor=bcolor,tcolor=tcolor)
-            self.widgetQ.append(WidgetWrapper(self.entryDesc,lpx,lpy))
+            self.widgetQ.append(WidgetWrapper(self.entryTitle,x_entry,y_title))
         
+        if not self.entryDesc:
+            self.entryDesc = Entry(w=300,num_lines=3,label='Description',
+                   icolor=icolor,ocolor=ocolor,bcolor=bcolor,tcolor=tcolor)
+            self.widgetQ.append(WidgetWrapper(self.entryDesc,x_entry,y_desc))
+        
+        if not self.entryTags:
+            self.entryTags = Entry(w=300,num_lines=1,label='Tags',
+                   icolor=icolor,ocolor=ocolor,bcolor=bcolor,tcolor=tcolor)
+            self.widgetQ.append(WidgetWrapper(self.entryTags,x_entry,y_tags))
         
         
             

@@ -23,7 +23,7 @@ class Entry(Widget):
     
     def __init__(self,w=0,
                  num_lines=1,
-                 label='Description',
+                 label='',
                  fontface='sans-serif',
                  fontangle=cairo.FONT_SLANT_NORMAL,
                  fontweight=cairo.FONT_WEIGHT_NORMAL,
