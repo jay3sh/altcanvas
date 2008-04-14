@@ -129,10 +129,10 @@ class InputLayer(Layer):
         '''
             Saves the fields into the image object that is currently on pad
         '''
-        image2save = self.imageOnPad.widget
-        image2save.title = self.entryTitle.text
-        image2save.desc = self.entryDesc.text
-        image2save.tags = self.entryTags.text
+        image2save = self.imageOnPad.widget.set_info(
+                                            self.entryTitle.text,
+                                            self.entryDesc.text,
+                                            self.entryTags.text)
         
     def load_image_info(self):
         '''

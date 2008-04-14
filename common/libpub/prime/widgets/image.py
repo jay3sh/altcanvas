@@ -1,6 +1,7 @@
 import cairo
 import gtk
 from libpub.prime.widget import Widget
+from libpub.prime import utils
 import libpub.prime.mask as mask
 
 class Image(Widget):
@@ -38,6 +39,11 @@ class Image(Widget):
         ctx3.mask_surface(gradient)
         
         
+if utils.detect_platform() == 'Nokia':
+    TICK_PATH = '/mnt/bluebox/altcanvas/install/tick.png'
+else:
+    TICK_PATH = '/home/jayesh/workspace/altcanvas/install/tick.svg'
+        
 class PublishrImage(Image):
     title = None
     desc = None
@@ -49,5 +55,13 @@ class PublishrImage(Image):
         self.title = title
         self.desc = desc
         self.tags = tags
+        
+        if self.title:
+            ctx = cairo.Context(self.surface)
+            ctx1 = gtk.gdk.CairoContext(ctx)
+            pixbuf = gtk.gdk.pixbuf_new_from_file(TICK_PATH)
+            ctx1.set_source_pixbuf(pixbuf,0,0)
+            ctx1.paint()
+            
         
     
