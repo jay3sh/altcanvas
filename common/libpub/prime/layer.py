@@ -4,7 +4,7 @@ from libpub.prime.widget import WidgetWrapper
 from libpub.prime.utils import * 
 
 from libpub.prime.widgets.pad import Pad
-from libpub.prime.widgets.image import Image 
+from libpub.prime.widgets.image import Image,PublishrImage 
 from libpub.prime.widgets.label import Label 
 from libpub.prime.widgets.entry import Entry 
 
@@ -85,7 +85,7 @@ class ImageLayer(Layer):
                 len(self.images),layout=LAYOUT_UNIFORM_OVERLAP,
                 owidth=imgw,oheight=imgh):
             
-            img = Image(self.images[i],imgw,imgh, 
+            img = PublishrImage(self.images[i],imgw,imgh, 
                         X_MARGIN=int(0.05*imgw),Y_MARGIN=int(0.05*imgh))
             
             log.writeln('%s (%s)'%(img.path,img.id_str))
@@ -125,12 +125,27 @@ class InputLayer(Layer):
             self.widgetQ.append(WidgetWrapper(self.background,self.px,self.py))
             
             
-
+    def save_image_info(self):
+        '''
+            Saves the fields into the image object that is currently on pad
+        '''
+        image2save = self.imageOnPad.widget
+        image2save.title = self.entryTitle.text
+        image2save.desc = self.entryDesc.text
+        image2save.tags = self.entryTags.text
+        
+    def load_image_info(self):
+        '''
+            Loads the fields from the image object that is currently on pad
+        '''
+        image2load = self.imageOnPad.widget
+        self.entryTitle.text = image2load.title
+        self.entryDesc.text = image2load.desc
+        self.entryTags.text = image2load.tags
 
     def show_image(self):
         # Detect if incoming image is the same one on the pad
         self.widgetQ.append(WidgetWrapper(self.imageOnPad.widget,self.ipx,self.ipy))
-
         
         # Put the name of image on a label below the image
         path = self.imageOnPad.widget.path
@@ -159,10 +174,10 @@ class InputLayer(Layer):
         
         icolor = RGBA()
         icolor.r,icolor.g,icolor.b = html2rgb(0x3F,0x3F,0x3F)
-        icolor.a = 0.98
+        icolor.a = 1.00
         ocolor = RGBA()
         ocolor.r,ocolor.g,ocolor.b = html2rgb(0x1F,0x1F,0x1F)
-        ocolor.a = 0.85
+        ocolor.a = 1.00
         bcolor = RGBA()
         bcolor.r,bcolor.g,bcolor.b = html2rgb(0xCF,0xCF,0xCF)
         bcolor.a = 0.98
@@ -185,5 +200,6 @@ class InputLayer(Layer):
                    icolor=icolor,ocolor=ocolor,bcolor=bcolor,tcolor=tcolor)
             self.widgetQ.append(WidgetWrapper(self.entryTags,x_entry,y_tags))
         
+        self.load_image_info()
         
             

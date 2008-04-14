@@ -37,35 +37,17 @@ class Image(Widget):
         ctx3.set_source_surface(surface1)
         ctx3.mask_surface(gradient)
         
-    '''
-    def register_click_listener(self,click_listener):
-        self.click_listener = click_listener
         
-    def pointer_listener(self,x,y,pressed=False):
-        if not self.__pointer_listener_enabled:
-            return
+class PublishrImage(Image):
+    title = None
+    desc = None
+    tags = None
+    def __init__(self,path,w,h,X_MARGIN=0,Y_MARGIN=0):
+        Image.__init__(self, path, w, h, X_MARGIN, Y_MARGIN)
         
-        oldFocus = self.hasFocus
+    def set_info(self,title,desc,tags=None):
+        self.title = title
+        self.desc = desc
+        self.tags = tags
         
-        if x > 0 and x < self.w and y > 0 and y < self.h:
-            # Check if we are under any cloud
-            for cloud in self.clouds:
-            	if x > cloud[0] and x < cloud[2] and y > cloud[1] and y < cloud[3]:
-                    self.hasFocus = False
-            	    return
-            # We are not under any cloud
-            self.hasFocus = True
-        else:
-            self.hasFocus = False
-            
-        if not oldFocus and self.hasFocus:
-            #print self.path + ' gained focus'
-            if self.click_listener:
-                self.click_listener(self)
-                
-    def disable_pointer_listener(self):
-        self.__pointer_listener_enabled = False
-        
-    def enable_pointer_listener(self):
-        self.__pointer_listener_enabled = True
-    '''
+    

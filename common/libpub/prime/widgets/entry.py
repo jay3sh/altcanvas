@@ -60,7 +60,7 @@ class Entry(Widget):
         
         self.redraw()
         
-    def redraw_label(self):
+    def draw_label(self):
         if not self.label:
             return
         
@@ -68,7 +68,7 @@ class Entry(Widget):
         
         self.ctx.save()
         
-        self.ctx.set_font_size(int(2*self.fontsize/3))
+        self.ctx.set_font_size(int(self.fontsize))
         x_bearing,y_bearing,width,height,x_adv,y_adv = \
             self.ctx.text_extents(self.label)
         
@@ -76,7 +76,8 @@ class Entry(Widget):
         self.ctx.set_source_rgba(self.ocolor.r,self.ocolor.g,
                                  self.ocolor.b,self.ocolor.a)
         self.ctx.rectangle(self.w-width-x_label_margin,0,
-                           width,self.top_clearing-self.line_width)
+                           width,height)
+        
         self.ctx.fill()
         
         
@@ -115,32 +116,39 @@ class Entry(Widget):
         self.ctx.stroke()
         self.ctx.restore()
         
+        self.draw_label()
+        
         ##
         # draw text
+        if not self.text:
+            return
         
         (x, y, width, height, dx, dy) = self.ctx.text_extents(self.text)
         x_margin = 10
         y_margin = self.top_clearing + 10
         
-        hi = height
+        hi = int(1.4*height)
         self.ctx.set_source_rgba(self.tcolor.r,self.tcolor.g,
                                  self.tcolor.b,self.tcolor.a)
         show_multiline(w,hi,self.ctx,self.text,y_margin)
         
-        self.redraw_label()
         
     KEY_BACKSPACE = 65288
     KEY_ENTER = 65293
     def key_listener(self,key,state):
         if self.hasFocus:
             if key == self.KEY_BACKSPACE:
-                self.text = self.text[:len(self.text)-1]
+                if self.text:
+                    self.text = self.text[:len(self.text)-1]
             elif int(key) > 256:
                 # ignore 
                 # We are not supporting non-character keys
                 pass
             else:
-                self.text += chr(key)
+                if not self.text:
+                    self.text = chr(key)
+                else:
+                    self.text += chr(key)
                     
             self.redraw()
             libpub.prime.canvas.redraw()

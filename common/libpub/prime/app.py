@@ -114,6 +114,8 @@ class PublishrApp(App):
             
         if self.inputLayer in self.layers:
             
+            self.inputLayer.save_image_info()
+            
             ipx = self.px + int(self.app_width/20)
             ipy = self.py + int(self.app_height/3 - 
                                 self.inputLayer.imageOnPad.widget.h/2)
@@ -141,9 +143,6 @@ class PublishrApp(App):
                 self.adjust_clouds()
                 libpub.prime.canvas.redraw()
             
-            
-            #self.adjust_clouds()
-            #libpub.prime.canvas.redraw()
                 
     def on_image_click(self,image):
             
@@ -180,6 +179,7 @@ class PublishrApp(App):
         pathOut = None
         #outGoing
         if self.inputLayer.imageOnPad:
+            self.inputLayer.save_image_info()
             pathOut = Path(self.inputLayer.imageOnPad.widget)
             pathOut.add_start(ipx,ipy)
             pathOut.add_stop(self.inputLayer.imageOnPad.x,self.inputLayer.imageOnPad.y)
@@ -227,11 +227,8 @@ class PublishrApp(App):
                     ww = pathOutPoints[i]
                     self.imageLayer.add_widget(ww)
                     
-                    
             self.adjust_clouds()
             libpub.prime.canvas.redraw()
         
-        self.inputLayer.hasFocus = True
         
-        # refresh the surface
             
