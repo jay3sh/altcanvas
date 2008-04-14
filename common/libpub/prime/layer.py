@@ -153,10 +153,9 @@ class InputLayer(Layer):
         x_entry = self.px + int(self.app_width/20) + self.imageOnPad.widget.w + \
                         int(self.app_width/20)
                         
-        y_title = self.py + 2*self.app_height/12
-        y_desc = self.py + 4*self.app_height/12
-        y_tags = self.py + 8*self.app_height/12
-        y_buttons = self.py + 10*self.app_height/12
+        y_title = self.py + 1*self.app_height/12
+        y_desc = self.py + 3*self.app_height/12
+        y_tags = self.py + 7*self.app_height/12
         
         icolor = RGBA()
         icolor.r,icolor.g,icolor.b = html2rgb(0x3F,0x3F,0x3F)
