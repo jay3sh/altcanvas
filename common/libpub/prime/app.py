@@ -131,6 +131,8 @@ class PublishrApp(App):
                     ww = pathOutPoints[i]
                     self.imageLayer.add_widget(ww)
                 
+                    self.inputLayer.imageOnPad = None
+                    self.layers.remove(self.inputLayer)
                 else:
                     self.imageLayer.remove_widget(pathOut.widget)
                     ww = pathOutPoints[i]
@@ -139,11 +141,9 @@ class PublishrApp(App):
                 self.adjust_clouds()
                 libpub.prime.canvas.redraw()
             
-            self.inputLayer.imageOnPad = None
-            self.layers.remove(self.inputLayer)
             
-            self.adjust_clouds()
-            libpub.prime.canvas.redraw()
+            #self.adjust_clouds()
+            #libpub.prime.canvas.redraw()
                 
     def on_image_click(self,image):
             

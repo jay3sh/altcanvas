@@ -7,7 +7,6 @@ class WidgetQueue:
     
     def __init__(self):
         self.widgetQ = []
-        print 'widgetQ ID %d'%random.randint(1,9999)
     
     def __recalculate_clouds(self):
         '''
