@@ -41,6 +41,9 @@ class Pad(Widget):
             ctx.fill()
             
         elif texture == self.PLAIN and shape == self.ROUNDED_RECT:
+            ctx.set_source_rgba(color.r,color.g,color.b,color.a)
+            utils.draw_rounded_rect(ctx, 0, 0, w, h)
+            '''
             x0 = 0
             y0 = 0
             x1 = x0+w
@@ -60,6 +63,7 @@ class Pad(Widget):
             ctx.arc(x0+vr,y0+vr,vr,PI,3*PI/2)
             
             ctx.fill()
+            '''
             
         elif texture == self.WALLPAPER:
             ctx1 = gtk.gdk.CairoContext(ctx)

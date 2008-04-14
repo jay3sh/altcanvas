@@ -3,6 +3,7 @@ import os
 import sys
 import cairo
 from math import sqrt
+from math import pi as PI
 import random
     
     
@@ -348,6 +349,27 @@ def recalculate_clouds(widgetQ):
                                             max(oy0,ny0)-oy0,
                                             min(ox1,nx1)-ox0,
                                             min(oy1,ny1)-oy0))
+                    
+def draw_rounded_rect(ctx,x,y,w,h,vr=None):
+    x = 0
+    y = 0
+    x1 = x+w
+    y1 = y+h
+    
+    if not vr:
+        vr = int(min(w,h)/10)
+    
+    ctx.move_to(x+vr,y)
+    ctx.line_to(x1-vr,y)
+    ctx.arc(x1-vr,y+vr,vr,3*PI/2,0)
+    ctx.line_to(x1,y1-vr)
+    ctx.arc(x1-vr,y1-vr,vr,0,PI/2)
+    ctx.line_to(x+vr,y1)
+    ctx.arc(x+vr,y1-vr,vr,PI/2,PI)
+    ctx.line_to(x,y+vr)
+    ctx.arc(x+vr,y+vr,vr,PI,3*PI/2)
+    
+    ctx.fill()
     
 if __name__ == '__main__':
     print html2rgb(0xFF,0x33,0x33)

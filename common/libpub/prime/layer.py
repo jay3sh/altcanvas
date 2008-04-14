@@ -7,6 +7,7 @@ from libpub.prime.widgets.pad import Pad
 from libpub.prime.widgets.image import Image,PublishrImage 
 from libpub.prime.widgets.label import Label 
 from libpub.prime.widgets.entry import Entry 
+from libpub.prime.widgets.button import Button
 
 from libpub.prime.logic import on_image_click
 
@@ -96,6 +97,32 @@ class ImageLayer(Layer):
             
             i = i+1
             
+        # Buttons
+        icolor = RGBA()
+        icolor.r,icolor.g,icolor.b = html2rgb(0x3F,0x3F,0x3F)
+        icolor.a = 1.00
+        ocolor = RGBA()
+        ocolor.r,ocolor.g,ocolor.b = html2rgb(0x1F,0x1F,0x1F)
+        ocolor.a = 0.50
+        tcolor = RGBA()
+        tcolor.r,tcolor.g,tcolor.b = html2rgb(0xEF,0xEF,0xEF)
+        tcolor.a = 0.98
+        
+        self.importButton = Button(100,35,'Import',fontsize=16,
+                                   fontweight=cairo.FONT_WEIGHT_NORMAL,
+                                   icolor=icolor,
+                                   ocolor=ocolor,
+                                   tcolor=tcolor)
+        self.widgetQ.append(WidgetWrapper(self.importButton,self.app_width-240,
+                                          self.app_height-50))
+            
+        self.publishButton = Button(100,35,'Publish',fontsize=16,
+                                   fontweight=cairo.FONT_WEIGHT_NORMAL,
+                                   icolor=icolor,
+                                   ocolor=ocolor,
+                                   tcolor=tcolor)
+        self.widgetQ.append(WidgetWrapper(self.publishButton,self.app_width-120,
+                                          self.app_height-50))
 
 
 class InputLayer(Layer):
