@@ -9,7 +9,6 @@ from libpub.prime.widgets.label import Label
 from libpub.prime.widgets.entry import Entry 
 from libpub.prime.widgets.button import Button
 
-from libpub.prime.logic import on_image_click
 
 class Layer:
     
@@ -113,19 +112,27 @@ class ImageLayer(Layer):
                                    icolor=icolor,
                                    ocolor=ocolor,
                                    tcolor=tcolor)
-        self.widgetQ.append(WidgetWrapper(self.importButton,self.app_width-240,
+        self.widgetQ.append(WidgetWrapper(self.importButton,self.app_width-300,
                                           self.app_height-50))
         self.importButton.register_click_listener(self.App.on_import_clicked)
             
-        self.publishButton = Button(100,35,'Publish',fontsize=16,
+        self.publishButton = Button(80,30,'Flickr',fontsize=14,
                                    fontweight=cairo.FONT_WEIGHT_NORMAL,
                                    icolor=icolor,
                                    ocolor=ocolor,
                                    tcolor=tcolor)
-        self.widgetQ.append(WidgetWrapper(self.publishButton,self.app_width-120,
+        self.widgetQ.append(WidgetWrapper(self.publishButton,self.app_width-200,
                                           self.app_height-50))
-        self.publishButton.register_click_listener(self.App.on_publish_clicked)
+        self.publishButton.register_click_listener(self.App.on_flickr_clicked)
 
+        self.publishButton = Button(80,30,'Picasa',fontsize=14,
+                                   fontweight=cairo.FONT_WEIGHT_NORMAL,
+                                   icolor=icolor,
+                                   ocolor=ocolor,
+                                   tcolor=tcolor)
+        self.widgetQ.append(WidgetWrapper(self.publishButton,self.app_width-100,
+                                          self.app_height-50))
+        #self.publishButton.register_click_listener(self.App.on_publish_clicked)
 
 class InputLayer(Layer):
     background = None
@@ -231,4 +238,50 @@ class InputLayer(Layer):
         
         self.load_image_info()
         
+class FlickrLayer(Layer):
+    flickr = None 
+    
+    def __init__(self,app):
+        Layer.__init__(self, app=app, isVisible=True)
+        
+        import libpub
+        import libpub.flickr
+        self.flickr = libpub.flickr.FlickrObject()
+        
+        self.px = int(self.app_width/6) - 150
+        self.py = int(self.app_height/6) - 20
+        
+        padcolor = RGBA()
+        padcolor.r,padcolor.g,padcolor.b = html2rgb(0x0F,0x0F,0x0F)
+        padcolor.a = 0.85
+        self.background = Pad(int(self.app_width/6),int(self.app_height/6),
+                            color=padcolor,texture=Pad.PLAIN,
+                            shape=Pad.ROUNDED_RECT)
+        
+        self.widgetQ.append(WidgetWrapper(self.background,self.px,self.py))
+        
+        ocolor = RGBA()
+        ocolor.r,ocolor.g,ocolor.b = html2rgb(0x3F,0x3F,0x3F)
+        ocolor.a = 1.00
+        bcolor = RGBA()
+        bcolor.r,bcolor.g,bcolor.b = html2rgb(0xCF,0xCF,0xCF)
+        bcolor.a = 0.98
+        tcolor = RGBA()
+        tcolor.r,tcolor.g,tcolor.b = html2rgb(0xEF,0xEF,0xEF)
             
+        self.loginButton = Button(300,35,
+                                  'Authorize altcanvas!',
+                                  fontsize=16,
+                                  fontweight=cairo.FONT_WEIGHT_NORMAL,
+                                  ocolor=ocolor,
+                                  tcolor=tcolor)
+        self.widgetQ.append(WidgetWrapper(self.loginButton,self.px+20,self.py+20))
+        #self.loginButton.register_click_listener(self.App.on_publish_clicked)
+    
+        '''
+        self.loginButton = Button(100,35,'Picasa',fontsize=16,
+                                   fontweight=cairo.FONT_WEIGHT_NORMAL,
+                                   ocolor=ocolor,
+                                   tcolor=tcolor)
+        self.widgetQ.append(WidgetWrapper(self.loginButton,self.px+140,self.py+20))
+        '''

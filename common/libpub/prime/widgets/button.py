@@ -25,7 +25,8 @@ class Button(Widget):
         
         # Draw shape
         ctx.set_source_rgba(ocolor.r,ocolor.g,ocolor.b,ocolor.a)
-        utils.draw_rounded_rect(ctx, 0, 0, w, h)
+        vr = int(min(w,h)/5)
+        utils.draw_rounded_rect(ctx, 0, 0, w, h, vr=vr)
         
         # Draw text
         self.text = text

@@ -371,5 +371,18 @@ def draw_rounded_rect(ctx,x,y,w,h,vr=None):
     
     ctx.fill()
     
+def open_browser(widget,url=None):
+    if detect_platform() == 'Nokia':
+        import osso
+        ctx = osso.Context('publishr',libpub.VERSION,False)
+
+    	osso_rpc = osso.Rpc(ctx)
+    	osso_rpc.rpc_run("com.nokia.osso_browser","/com/nokia/osso_browser/request",
+           	'com.nokia.osso_browser','load_url',rpc_args=(url,))
+    else:
+        os.system("%s '%s'" % ('firefox', url))
+        
+        
+        
 if __name__ == '__main__':
     print html2rgb(0xFF,0x33,0x33)

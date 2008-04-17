@@ -13,7 +13,7 @@ from libpub.prime.utils import get_image_locations,get_uniform_fit, \
     detect_platform,RGBA,html2rgb,log,recalculate_clouds
 from libpub.prime.animation import Path
 from libpub.prime.widgetq import WidgetQueue
-from libpub.prime.layer import Layer,ImageLayer, InputLayer
+from libpub.prime.layer import Layer,ImageLayer,InputLayer,FlickrLayer
 
 import libpub
             
@@ -74,6 +74,7 @@ class PublishrApp(App):
     
     imageLayer = None
     inputLayer = None
+    flickrLayer = None
     
     def __init__(self,folder_path):
         App.__init__(self)
@@ -142,6 +143,11 @@ class PublishrApp(App):
                     
                 self.adjust_clouds()
                 libpub.prime.canvas.redraw()
+                
+        if self.flickrLayer in self.layers:
+            self.layers.remove(self.flickrLayer)
+            self.adjust_clouds()
+            libpub.prime.canvas.redraw()
             
                 
     def on_image_click(self,image):
@@ -251,6 +257,16 @@ class PublishrApp(App):
             
         fileChooserDlg.destroy()
         
-    def on_publish_clicked(self,widget):
-        print 'publish clicked'
+    def on_flickr_clicked(self,widget):
+        self.flickrLayer = FlickrLayer(app=self)
+        
+        
+        if self.flickrLayer not in self.layers:
+            self.layers.append(self.flickrLayer)
+            
+            self.adjust_clouds()
+            libpub.prime.canvas.redraw()
+            
+        
+        
             
