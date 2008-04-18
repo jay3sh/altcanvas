@@ -241,7 +241,7 @@ class PublishrApp(App):
             self.adjust_clouds()
             libpub.prime.canvas.redraw()
         
-    def on_import_clicked(self,widget):
+    def on_import_clicked(self,importButton):
         import gtk
         if detect_platform() == 'Nokia':
             import hildon
@@ -257,10 +257,22 @@ class PublishrApp(App):
             
         resp = fileChooserDlg.run()
     
+        images = []
         if resp == gtk.RESPONSE_OK:
-            print fileChooserDlg.get_filename()
+            path = fileChooserDlg.get_filename()
+            
+            if os.path.isdir(path):
+                files = os.listdir(path)
+                for f in files:
+                    if f.lower().endswith('jpg') or  \
+                        f.lower().endswith('jpeg') or  \
+                        f.lower().endswith('gif'):
+                            images.append(path+os.sep+f)
+            else:
+                images.append(path)
             
         fileChooserDlg.destroy()
+        self.imageLayer.display_images(images)
         
     def on_flickr_clicked(self,widget):
         self.flickrLayer = FlickrLayer(app=self)

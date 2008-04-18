@@ -9,7 +9,7 @@ import random
     
 class Log:
     def __init__(self):
-        self.DEBUG = False 
+        self.DEBUG = True 
     
     def write(self,str):
         if self.DEBUG:

@@ -76,26 +76,6 @@ class ImageLayer(Layer):
             
         self.widgetQ.append(WidgetWrapper(self.background,0,0))
             
-        # Images
-        imgw,imgh = get_uniform_fit(len(self.images),
-                                max_x=self.app_width,max_y=self.app_height)
-        i = 0
-        
-        for (x,y) in get_image_locations(
-                len(self.images),layout=LAYOUT_UNIFORM_OVERLAP,
-                owidth=imgw,oheight=imgh):
-            
-            img = PublishrImage(self.images[i],imgw,imgh, 
-                        X_MARGIN=int(0.05*imgw),Y_MARGIN=int(0.05*imgh))
-            
-            log.writeln('%s (%s)'%(img.path,img.id_str))
-            
-            img.register_click_listener(self.App.on_image_click)
-            
-            self.widgetQ.append(WidgetWrapper(img,x,y))
-            
-            i = i+1
-            
         # Buttons
         icolor = RGBA()
         icolor.r,icolor.g,icolor.b = html2rgb(0x3F,0x3F,0x3F)
@@ -116,6 +96,7 @@ class ImageLayer(Layer):
                                           self.app_height-50))
         self.importButton.register_click_listener(self.App.on_import_clicked)
             
+        '''
         self.publishButton = Button(80,30,'Flickr',fontsize=14,
                                    fontweight=cairo.FONT_WEIGHT_NORMAL,
                                    icolor=icolor,
@@ -133,6 +114,29 @@ class ImageLayer(Layer):
         self.widgetQ.append(WidgetWrapper(self.publishButton,self.app_width-100,
                                           self.app_height-50))
         #self.publishButton.register_click_listener(self.App.on_publish_clicked)
+        '''
+        
+    def display_images(self,images):
+        # Images
+        imgw,imgh = get_uniform_fit(len(self.images),
+                                max_x=self.app_width,max_y=self.app_height)
+        i = 0
+        
+        for (x,y) in get_image_locations(
+                len(self.images),layout=LAYOUT_UNIFORM_OVERLAP,
+                owidth=imgw,oheight=imgh):
+            
+            img = PublishrImage(self.images[i],imgw,imgh, 
+                        X_MARGIN=int(0.05*imgw),Y_MARGIN=int(0.05*imgh))
+            
+            log.writeln('%s (%s)'%(img.path,img.id_str))
+            
+            img.register_click_listener(self.App.on_image_click)
+            
+            self.widgetQ.append(WidgetWrapper(img,x,y))
+            
+            i = i+1
+            
 
 class InputLayer(Layer):
     background = None
