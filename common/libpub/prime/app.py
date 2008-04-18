@@ -9,13 +9,14 @@ import libpub.prime.mask as mask
 from libpub.prime.widgets.fancyentry import FancyEntry 
 from libpub.prime.widgets.entry import Entry 
 from libpub.prime.utils import get_image_locations,get_uniform_fit, \
-    LAYOUT_STEP, LAYOUT_UNIFORM_OVERLAP,LAYOUT_UNIFORM_SPREAD, \
+    LAYOUT_STEP, LAYOUT_UNIFORM_OVERLAP,LAYOUT_UNIFORM_SPREAD, open_browser, \
     detect_platform,RGBA,html2rgb,log,recalculate_clouds
 from libpub.prime.animation import Path
 from libpub.prime.widgetq import WidgetQueue
 from libpub.prime.layer import Layer,ImageLayer,InputLayer,FlickrLayer
 
 import libpub
+import libpub.flickr_local as flickr
             
 class App:
     
@@ -103,6 +104,10 @@ class PublishrApp(App):
         self.layers.append(self.imageLayer)
 
         libpub.prime.canvas.redraw()
+        
+        # Other initialization
+        libpub.start_prime()
+        self.flickr = flickr.FlickrObject()
         
         
     def on_background_tap(self,pad):
@@ -260,12 +265,18 @@ class PublishrApp(App):
     def on_flickr_clicked(self,widget):
         self.flickrLayer = FlickrLayer(app=self)
         
-        
         if self.flickrLayer not in self.layers:
             self.layers.append(self.flickrLayer)
             
             self.adjust_clouds()
             libpub.prime.canvas.redraw()
+            
+    authflag = True 
+    def on_flickr_authorize(self,widget):
+        if self.authflag:
+            url = self.flickr.get_authurl()
+            open_browser(widget,url[0])
+            self.authflag = False
             
         
         

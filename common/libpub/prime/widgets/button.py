@@ -8,6 +8,7 @@ from libpub.prime.utils import RGBA
 
 class Button(Widget):
     text = ''
+    click_listener = None
     
     def __init__(self,w,h,text,
                  fontface='sans-serif',
@@ -39,4 +40,11 @@ class Button(Widget):
         ctx.move_to(int((w-width)/2),int((h-height)/2)-y_bearing)
         ctx.show_text(self.text)
         
+    def register_click_listener(self,click_listener):
+        self.click_listener = click_listener
+        
+    def pointer_listener(self,x,y,pressed=False):
+        Widget.pointer_listener(self, x, y, pressed)
+        if self.gainedFocus and self.click_listener:
+            self.click_listener(self)
     

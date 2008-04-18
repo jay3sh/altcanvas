@@ -56,6 +56,13 @@ def start(hostapp='_',fnames=None,guiwindow=None):
         
     window.show()
     
+def start_prime():
+    global conf,HOSTAPP,VERSION
+    HOSTAPP = 'Maemo' 
+    VERSION = '0.6.0'
+    import utils.config
+    conf = utils.config.Config()
+    
         
 LicenseList = [
     (0,"All rights reserved",

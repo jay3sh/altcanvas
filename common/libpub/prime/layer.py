@@ -244,17 +244,15 @@ class FlickrLayer(Layer):
     def __init__(self,app):
         Layer.__init__(self, app=app, isVisible=True)
         
-        import libpub
-        import libpub.flickr
-        self.flickr = libpub.flickr.FlickrObject()
-        
-        self.px = int(self.app_width/6) - 150
-        self.py = int(self.app_height/6) - 20
+        pad_w = int(self.app_width/2)
+        pad_h = int(self.app_height/2)
+        self.px = int(self.app_width/2) - int(pad_w/2)
+        self.py = int(self.app_height/2) - int(pad_h/2)
         
         padcolor = RGBA()
         padcolor.r,padcolor.g,padcolor.b = html2rgb(0x0F,0x0F,0x0F)
         padcolor.a = 0.85
-        self.background = Pad(int(self.app_width/6),int(self.app_height/6),
+        self.background = Pad(pad_w,pad_h,
                             color=padcolor,texture=Pad.PLAIN,
                             shape=Pad.ROUNDED_RECT)
         
@@ -268,15 +266,20 @@ class FlickrLayer(Layer):
         bcolor.a = 0.98
         tcolor = RGBA()
         tcolor.r,tcolor.g,tcolor.b = html2rgb(0xEF,0xEF,0xEF)
+        
+        login_w = 250
+        login_h = 35
+        lx = int(self.app_width/2 - login_w/2)
+        ly = int(self.app_height/2 - login_h/2)
             
-        self.loginButton = Button(300,35,
+        self.authorizeButton = Button(login_w,login_h,
                                   'Authorize altcanvas!',
-                                  fontsize=16,
+                                  fontsize=14,
                                   fontweight=cairo.FONT_WEIGHT_NORMAL,
                                   ocolor=ocolor,
                                   tcolor=tcolor)
-        self.widgetQ.append(WidgetWrapper(self.loginButton,self.px+20,self.py+20))
-        #self.loginButton.register_click_listener(self.App.on_publish_clicked)
+        self.widgetQ.append(WidgetWrapper(self.authorizeButton,lx,ly))
+        self.authorizeButton.register_click_listener(self.App.on_flickr_authorize)
     
         '''
         self.loginButton = Button(100,35,'Picasa',fontsize=16,
