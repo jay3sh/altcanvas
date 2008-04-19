@@ -257,7 +257,7 @@ class InputLayer(Layer):
         
         self.load_image_info()
         
-class FlickrLayer(Layer):
+class PublishLayer(Layer):
     flickr = None 
     
     def __init__(self,app):
@@ -286,24 +286,28 @@ class FlickrLayer(Layer):
         tcolor = RGBA()
         tcolor.r,tcolor.g,tcolor.b = html2rgb(0xEF,0xEF,0xEF)
         
-        login_w = 250
+        login_w = 100 
         login_h = 35
-        lx = int(self.app_width/2 - login_w/2)
-        ly = int(self.app_height/2 - login_h/2)
+        cx = self.px + pad_w/2
+        cy = self.py + pad_h/2
+        lx = int(self.px + login_w/4)
+        ly = int(self.py + login_h/4)
             
-        self.authorizeButton = Button(login_w,login_h,
-                                  'Authorize altcanvas!',
-                                  fontsize=14,
+        self.flickrButton = Button(login_w,login_h,
+                                  'Flickr',
+                                  fontsize=18,
                                   fontweight=cairo.FONT_WEIGHT_NORMAL,
                                   ocolor=ocolor,
                                   tcolor=tcolor)
-        self.widgetQ.append(WidgetWrapper(self.authorizeButton,lx,ly))
-        self.authorizeButton.register_click_listener(self.App.on_flickr_authorize)
+        self.widgetQ.append(WidgetWrapper(self.flickrButton,
+                                      cx-login_w-login_w/4,cy-login_h/4))
+        self.flickrButton.register_click_listener(self.App.on_flickr_authorize)
     
-        '''
-        self.loginButton = Button(100,35,'Picasa',fontsize=16,
+        self.picasaButton = Button(login_w,login_h,
+                                   'Picasa',
+                                   fontsize=18,
                                    fontweight=cairo.FONT_WEIGHT_NORMAL,
                                    ocolor=ocolor,
                                    tcolor=tcolor)
-        self.widgetQ.append(WidgetWrapper(self.loginButton,self.px+140,self.py+20))
-        '''
+        self.widgetQ.append(WidgetWrapper(self.picasaButton,
+                                      cx+login_w/4,cy-login_h/4))

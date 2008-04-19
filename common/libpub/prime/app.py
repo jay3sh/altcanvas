@@ -14,7 +14,7 @@ from libpub.prime.utils import get_image_locations,get_uniform_fit, \
 from libpub.prime.animation import Path
 from libpub.prime.widgetq import WidgetQueue
 from libpub.prime.layer import Layer,ImageLayer,InputLayer, \
-                                    ButtonLayer, FlickrLayer
+                                    ButtonLayer, PublishLayer
 
 import libpub
 import libpub.flickr_local as flickr
@@ -77,7 +77,7 @@ class PublishrApp(App):
     imageLayer = None
     buttonLayer = None
     inputLayer = None
-    flickrLayer = None
+    publishLayer = None
     
     def __init__(self,folder_path):
         App.__init__(self)
@@ -153,8 +153,8 @@ class PublishrApp(App):
                 self.adjust_clouds()
                 libpub.prime.canvas.redraw()
                 
-        if self.flickrLayer in self.layers:
-            self.layers.remove(self.flickrLayer)
+        if self.publishLayer in self.layers:
+            self.layers.remove(self.publishLayer)
             self.adjust_clouds()
             libpub.prime.canvas.redraw()
             
@@ -290,13 +290,11 @@ class PublishrApp(App):
         gtk.main_quit()
     
     def on_publish_clicked(self,widget):
-        pass
-    
-    def on_flickr_clicked(self,widget):
-        self.flickrLayer = FlickrLayer(app=self)
+        if not self.publishLayer:
+            self.publishLayer = PublishLayer(app=self)
         
-        if self.flickrLayer not in self.layers:
-            self.layers.append(self.flickrLayer)
+        if self.publishLayer not in self.layers:
+            self.layers.append(self.publishLayer)
             
             self.adjust_clouds()
             libpub.prime.canvas.redraw()
