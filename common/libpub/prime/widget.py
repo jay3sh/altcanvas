@@ -91,6 +91,9 @@ class Widget:
             self.lostFocus = True
             self.gainedFocus = False
                 
+    def reset_focus(self):
+        self.hasFocus = False
+        
     def disable_pointer_listener(self):
         self.__pointer_listener_enabled = False
         
