@@ -40,6 +40,7 @@ from the FlickrAPI method calls.
 '''
 
 import xml.dom.minidom
+import libpub
 
 __all__ = ('XMLNode', )
 
@@ -257,7 +258,6 @@ class Flickr:
                 if result != None:
                     photosets = []
                     sets = result.photosets[0].photoset
-                    #self.log.error(str(sets))
                     for set in sets:
                         photoset = PhotoSet()
                         photoset.id = set['id']
@@ -289,7 +289,7 @@ class Flickr:
             return None
 
         if result['stat'] != 'ok':
-            self.log.error('[ERROR] Flickr API call failed: %s'%(data))
+            libpub.alert('[ERROR] Flickr API call failed: %s'%(data))
             return None
         else:
             return result

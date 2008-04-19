@@ -79,7 +79,9 @@ class FlickrObject:
         self.flickr = Flickr()
         
     def __init__(self):
-        pass
+        authtoken = libpub.conf.get('FLICKR_TOKEN')
+        if authtoken != None:
+            self.authtoken = authtoken
             
     def has_auth(self):
         if self.authtoken:
@@ -106,7 +108,7 @@ class FlickrObject:
         return authurl
     
     def get_authtoken(self):
-        userinfo = self.flickr.auth_getToken(frob=frob)
+        userinfo = self.flickr.auth_getToken(frob=self.frob)
         self.authtoken = userinfo.token
         if self.authtoken:
             libpub.conf.set('FLICKR_TOKEN',self.authtoken)
