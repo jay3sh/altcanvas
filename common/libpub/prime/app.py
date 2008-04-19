@@ -13,7 +13,8 @@ from libpub.prime.utils import get_image_locations,get_uniform_fit, \
     detect_platform,RGBA,html2rgb,log,recalculate_clouds
 from libpub.prime.animation import Path
 from libpub.prime.widgetq import WidgetQueue
-from libpub.prime.layer import Layer,ImageLayer,InputLayer,FlickrLayer
+from libpub.prime.layer import Layer,ImageLayer,InputLayer, \
+                                    ButtonLayer, FlickrLayer
 
 import libpub
 import libpub.flickr_local as flickr
@@ -74,6 +75,7 @@ class PublishrApp(App):
     py = 0
     
     imageLayer = None
+    buttonLayer = None
     inputLayer = None
     flickrLayer = None
     
@@ -95,14 +97,16 @@ class PublishrApp(App):
                     f.lower().endswith('gif'):
                         self.images.append(self.FOLDER_PATH+os.sep+f)
                         
-        self.imageLayer = ImageLayer(app=self,isVisible=True,images=self.images)
-        
-        self.adjust_clouds()
-        
-        self.imageLayer.widgetQ.dumpQ('imageLayer')
+        self.imageLayer = ImageLayer(app=self,isVisible=True,
+                                         images=self.images)
         
         self.layers.append(self.imageLayer)
+        
+        self.buttonLayer = ButtonLayer(app=self,isVisible=True)
+        
+        self.layers.append(self.buttonLayer)
 
+        self.adjust_clouds()
         libpub.prime.canvas.redraw()
         
         # Other initialization

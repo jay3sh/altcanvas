@@ -76,6 +76,34 @@ class ImageLayer(Layer):
             
         self.widgetQ.append(WidgetWrapper(self.background,0,0))
             
+        
+    def display_images(self,images):
+        import libpub
+        # Images
+        imgw,imgh = get_uniform_fit(len(self.images),
+                                max_x=self.app_width,max_y=self.app_height)
+        i = 0
+        
+        for (x,y) in get_image_locations(
+                len(self.images),layout=LAYOUT_UNIFORM_OVERLAP,
+                owidth=imgw,oheight=imgh):
+            
+            img = PublishrImage(self.images[i],imgw,imgh, 
+                        X_MARGIN=int(0.05*imgw),Y_MARGIN=int(0.05*imgh))
+            
+            log.writeln('%s (%s)'%(img.path,img.id_str))
+            
+            img.register_click_listener(self.App.on_image_click)
+            
+            self.widgetQ.append(WidgetWrapper(img,x,y))
+            libpub.prime.canvas.redraw()
+            
+            i = i+1
+            
+            
+class ButtonLayer(Layer):
+    def __init__(self,app,image_dim=(0,0),isVisible=True):
+        Layer.__init__(self, app=app, isVisible=isVisible)
         # Buttons
         icolor = RGBA()
         icolor.r,icolor.g,icolor.b = html2rgb(0x3F,0x3F,0x3F)
@@ -124,30 +152,6 @@ class ImageLayer(Layer):
                                           self.app_height-50))
         #self.publishButton.register_click_listener(self.App.on_publish_clicked)
         '''
-        
-    def display_images(self,images):
-        import libpub
-        # Images
-        imgw,imgh = get_uniform_fit(len(self.images),
-                                max_x=self.app_width,max_y=self.app_height)
-        i = 0
-        
-        for (x,y) in get_image_locations(
-                len(self.images),layout=LAYOUT_UNIFORM_OVERLAP,
-                owidth=imgw,oheight=imgh):
-            
-            img = PublishrImage(self.images[i],imgw,imgh, 
-                        X_MARGIN=int(0.05*imgw),Y_MARGIN=int(0.05*imgh))
-            
-            log.writeln('%s (%s)'%(img.path,img.id_str))
-            
-            img.register_click_listener(self.App.on_image_click)
-            
-            self.widgetQ.append(WidgetWrapper(img,x,y))
-            libpub.prime.canvas.redraw()
-            
-            i = i+1
-            
 
 class InputLayer(Layer):
     background = None
