@@ -96,16 +96,16 @@ class ImageLayer(Layer):
                                           self.app_height-50))
         self.importButton.register_click_listener(self.App.on_import_clicked)
             
-        '''
         self.publishButton = Button(80,30,'Flickr',fontsize=14,
                                    fontweight=cairo.FONT_WEIGHT_NORMAL,
                                    icolor=icolor,
                                    ocolor=ocolor,
                                    tcolor=tcolor)
-        self.widgetQ.append(WidgetWrapper(self.publishButton,self.app_width-200,
+        self.widgetQ.append(WidgetWrapper(self.publishButton,self.app_width-150,
                                           self.app_height-50))
         self.publishButton.register_click_listener(self.App.on_flickr_clicked)
 
+        '''
         self.publishButton = Button(80,30,'Picasa',fontsize=14,
                                    fontweight=cairo.FONT_WEIGHT_NORMAL,
                                    icolor=icolor,
@@ -117,6 +117,7 @@ class ImageLayer(Layer):
         '''
         
     def display_images(self,images):
+        import libpub
         # Images
         imgw,imgh = get_uniform_fit(len(self.images),
                                 max_x=self.app_width,max_y=self.app_height)
@@ -134,6 +135,7 @@ class ImageLayer(Layer):
             img.register_click_listener(self.App.on_image_click)
             
             self.widgetQ.append(WidgetWrapper(img,x,y))
+            libpub.prime.canvas.redraw()
             
             i = i+1
             

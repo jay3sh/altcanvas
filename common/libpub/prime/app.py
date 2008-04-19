@@ -242,6 +242,7 @@ class PublishrApp(App):
             libpub.prime.canvas.redraw()
         
     def on_import_clicked(self,importButton):
+        importButton.disable_pointer_listener()
         import gtk
         if detect_platform() == 'Nokia':
             import hildon
@@ -257,10 +258,14 @@ class PublishrApp(App):
             
         resp = fileChooserDlg.run()
     
-        images = []
+        path = None
         if resp == gtk.RESPONSE_OK:
             path = fileChooserDlg.get_filename()
             
+        fileChooserDlg.destroy()
+        
+        if path:
+            images = []
             if os.path.isdir(path):
                 files = os.listdir(path)
                 for f in files:
@@ -271,8 +276,9 @@ class PublishrApp(App):
             else:
                 images.append(path)
             
-        fileChooserDlg.destroy()
-        self.imageLayer.display_images(images)
+            self.imageLayer.display_images(images)
+            
+        importButton.enable_pointer_listener()
         
     def on_flickr_clicked(self,widget):
         self.flickrLayer = FlickrLayer(app=self)
@@ -287,6 +293,8 @@ class PublishrApp(App):
     def on_flickr_authorize(self,widget):
         if self.authflag:
             url = self.flickr.get_authurl()
+            if detect_platform() == 'Nokia':
+                libpub.prime.canvas.unfullscreen()
             open_browser(widget,url[0])
             self.authflag = False
             
