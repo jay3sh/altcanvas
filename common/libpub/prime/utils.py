@@ -49,7 +49,7 @@ def get_uniform_fit(count,max_x,max_y,OVERLAP_FACTOR = 0.9):
     return (img_side,img_side)
 
 def get_image_locations(count,layout=LAYOUT_UNIFORM_SPREAD,
-                        oheight=0,owidth=0):
+                        oheight=0,owidth=0,randomize=True):
     '''
         @param count: Number of locations to generate
         @param layout: One of the predefined layouts 
@@ -70,6 +70,17 @@ def get_image_locations(count,layout=LAYOUT_UNIFORM_SPREAD,
     
     max_x = 800
     max_y = 480
+    
+    
+    def randomize_arr(arr):
+        l = len(arr)
+        for i in range(l):
+            pos = random.randint(1,l-1)
+            tmp = arr[pos]
+            arr[pos] = arr[0]
+            arr[0] = tmp
+        return arr
+
         
     if layout == LAYOUT_STEP:
         x = 20
@@ -120,7 +131,12 @@ def get_image_locations(count,layout=LAYOUT_UNIFORM_SPREAD,
         x_num_gaps = x_count - 1
         y_num_gaps = y_count - 1
             
-        for i in range(count):
+        if randomize:
+            positions = randomize_arr(range(count))
+        else:
+            positions = range(count)
+        
+        for i in positions:
             xc = i % x_count 
             yc = i / x_count 
             
