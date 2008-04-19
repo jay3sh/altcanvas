@@ -299,15 +299,23 @@ class PublishrApp(App):
             self.adjust_clouds()
             libpub.prime.canvas.redraw()
             
-    authflag = True 
+    def on_flickr_clicked(self,widget):
+        if not self.flickr.has_auth():
+            self.publishLayer.prompt_flickr_auth_1()
+        
     def on_flickr_authorize(self,widget):
-        if self.authflag:
+        if not self.flickr.has_auth():
             url = self.flickr.get_authurl()
             if detect_platform() == 'Nokia':
                 libpub.prime.canvas.unfullscreen()
             open_browser(widget,url[0])
-            self.authflag = False
+            self.publishLayer.prompt_flickr_auth_2()
             
+    def on_flickr_authdone(self,widget):
+        if detect_platform() == 'Nokia':
+            libpub.prime.canvas.fullscreen()
+            self.flickr.get_authtoken()
+            self.layers.remove(self.publishLayer)
         
         
             

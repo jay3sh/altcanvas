@@ -259,6 +259,9 @@ class InputLayer(Layer):
         
 class PublishLayer(Layer):
     flickr = None 
+    ocolor = RGBA()
+    bcolor = RGBA()
+    tcolor = RGBA()
     
     def __init__(self,app):
         Layer.__init__(self, app=app, isVisible=True)
@@ -277,37 +280,66 @@ class PublishLayer(Layer):
         
         self.widgetQ.append(WidgetWrapper(self.background,self.px,self.py))
         
-        ocolor = RGBA()
-        ocolor.r,ocolor.g,ocolor.b = html2rgb(0x3F,0x3F,0x3F)
-        ocolor.a = 1.00
-        bcolor = RGBA()
-        bcolor.r,bcolor.g,bcolor.b = html2rgb(0xCF,0xCF,0xCF)
-        bcolor.a = 0.98
-        tcolor = RGBA()
-        tcolor.r,tcolor.g,tcolor.b = html2rgb(0xEF,0xEF,0xEF)
+        self.ocolor.r,self.ocolor.g,self.ocolor.b = html2rgb(0x3F,0x3F,0x3F)
+        self.ocolor.a = 1.00
+        self.bcolor.r,self.bcolor.g,self.bcolor.b = html2rgb(0xCF,0xCF,0xCF)
+        self.bcolor.a = 0.98
+        self.tcolor.r,self.tcolor.g,self.tcolor.b = html2rgb(0xEF,0xEF,0xEF)
         
         login_w = 100 
         login_h = 35
-        cx = self.px + pad_w/2
-        cy = self.py + pad_h/2
-        lx = int(self.px + login_w/4)
-        ly = int(self.py + login_h/4)
+        self.cx = self.px + pad_w/2
+        self.cy = self.py + pad_h/2
             
         self.flickrButton = Button(login_w,login_h,
                                   'Flickr',
                                   fontsize=18,
                                   fontweight=cairo.FONT_WEIGHT_NORMAL,
-                                  ocolor=ocolor,
-                                  tcolor=tcolor)
+                                  ocolor=self.ocolor,
+                                  tcolor=self.tcolor)
         self.widgetQ.append(WidgetWrapper(self.flickrButton,
-                                      cx-login_w-login_w/4,cy-login_h/4))
-        self.flickrButton.register_click_listener(self.App.on_flickr_authorize)
+                                      self.cx-login_w-login_w/4,self.cy-login_h/4))
+        self.flickrButton.register_click_listener(self.App.on_flickr_clicked)
     
         self.picasaButton = Button(login_w,login_h,
                                    'Picasa',
                                    fontsize=18,
                                    fontweight=cairo.FONT_WEIGHT_NORMAL,
-                                   ocolor=ocolor,
-                                   tcolor=tcolor)
+                                   ocolor=self.ocolor,
+                                   tcolor=self.tcolor)
         self.widgetQ.append(WidgetWrapper(self.picasaButton,
-                                      cx+login_w/4,cy-login_h/4))
+                                      self.cx+login_w/4,self.cy-login_h/4))
+
+    def prompt_flickr_auth_1(self):
+        
+        self.widgetQ.remove(self.flickrButton)
+        self.widgetQ.remove(self.picasaButton)
+        
+        login_w = 275 
+        login_h = 35
+        self.flickrAuthButton = Button(login_w,login_h,
+                                       'Open Browser to authorize!',
+                                       fontsize=18,
+                                   	   fontweight=cairo.FONT_WEIGHT_NORMAL,
+                                   	   ocolor=self.ocolor,
+                                       tcolor=self.tcolor)
+        self.widgetQ.append(WidgetWrapper(self.flickrAuthButton,
+                                          self.cx-login_w/2,self.cy-login_h/2))
+        self.flickrAuthButton.register_click_listener(self.App.on_flickr_authorize)
+        
+    def prompt_flickr_auth_2(self):
+        if self.widgetQ.hasWidget(self.flickrAuthButton):
+            self.widgetQ.remove(self.flickrAuthButton)
+            
+        login_w = 100 
+        login_h = 35
+        self.flickrDoneButton = Button(login_w,login_h,
+                                       'Done ?!',
+                                       fontsize=18,
+                                   	   fontweight=cairo.FONT_WEIGHT_NORMAL,
+                                   	   ocolor=self.ocolor,
+                                       tcolor=self.tcolor)
+        self.widgetQ.append(WidgetWrapper(self.flickrDoneButton,
+                                          self.cx-login_w/2,self.cy-login_h/2))
+        
+        self.flickrDoneButton.register_click_listener(self.App.on_flickr_authdone)
