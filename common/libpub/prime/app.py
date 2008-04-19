@@ -278,8 +278,16 @@ class PublishrApp(App):
             
             self.imageLayer.display_images(images)
             
+        importButton.reset_focus()
         importButton.enable_pointer_listener()
         
+    def on_quit_clicked(self,widget):
+        import gtk
+        gtk.main_quit()
+    
+    def on_publish_clicked(self,widget):
+        pass
+    
     def on_flickr_clicked(self,widget):
         self.flickrLayer = FlickrLayer(app=self)
         

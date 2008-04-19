@@ -87,23 +87,32 @@ class ImageLayer(Layer):
         tcolor.r,tcolor.g,tcolor.b = html2rgb(0xEF,0xEF,0xEF)
         tcolor.a = 0.98
         
-        self.importButton = Button(100,35,'Import',fontsize=16,
+        self.importButton = Button(100,35,'Import',fontsize=20,
                                    fontweight=cairo.FONT_WEIGHT_NORMAL,
                                    icolor=icolor,
                                    ocolor=ocolor,
                                    tcolor=tcolor)
-        self.widgetQ.append(WidgetWrapper(self.importButton,self.app_width-300,
-                                          self.app_height-50))
+        self.widgetQ.append(WidgetWrapper(self.importButton,self.app_width-150,
+                                          self.app_height-150))
         self.importButton.register_click_listener(self.App.on_import_clicked)
             
-        self.publishButton = Button(80,30,'Flickr',fontsize=14,
+        self.publishButton = Button(100,35,'Publish',fontsize=20,
+                                   fontweight=cairo.FONT_WEIGHT_NORMAL,
+                                   icolor=icolor,
+                                   ocolor=ocolor,
+                                   tcolor=tcolor)
+        self.widgetQ.append(WidgetWrapper(self.publishButton,self.app_width-150,
+                                          self.app_height-100))
+        self.publishButton.register_click_listener(self.App.on_publish_clicked)
+
+        self.publishButton = Button(100,35,'Quit',fontsize=20,
                                    fontweight=cairo.FONT_WEIGHT_NORMAL,
                                    icolor=icolor,
                                    ocolor=ocolor,
                                    tcolor=tcolor)
         self.widgetQ.append(WidgetWrapper(self.publishButton,self.app_width-150,
                                           self.app_height-50))
-        self.publishButton.register_click_listener(self.App.on_flickr_clicked)
+        self.publishButton.register_click_listener(self.App.on_quit_clicked)
 
         '''
         self.publishButton = Button(80,30,'Picasa',fontsize=14,
