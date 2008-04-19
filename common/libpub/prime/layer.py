@@ -9,6 +9,7 @@ from libpub.prime.widgets.label import Label
 from libpub.prime.widgets.entry import Entry 
 from libpub.prime.widgets.button import Button
 
+import libpub
 
 class Layer:
     
@@ -58,11 +59,9 @@ class Layer:
 class ImageLayer(Layer):
     # App specific members
     background = None
-    images = None
     
-    def __init__(self,app,isVisible=True,images=None):
+    def __init__(self,app,isVisible=True):
         Layer.__init__(self, app=app, isVisible=isVisible)
-        self.images = images
         
         # Background
         if not self.background:
@@ -76,19 +75,38 @@ class ImageLayer(Layer):
             
         self.widgetQ.append(WidgetWrapper(self.background,0,0))
             
+    def upload(self,service):
+        for ww in self.widgetQ.next():
+            if isinstance(ww.widget,PublishrImage):
+                img = ww.widget
+                try:
+                    img.url = service.upload(
+                        filename = img.path,
+                        title = img.title,
+                        description = img.desc,
+                        is_public = True,
+                        tags = img.tags)
+                    if not img.url:
+                        raise Exception('NULL upload URL')
+                except Exception, e: 
+                    libpub.alert('Upload failure: '+str(e))
+                    raise e
         
     def display_images(self,images):
-        import libpub
-        # Images
-        imgw,imgh = get_uniform_fit(len(self.images),
-                                max_x=self.app_width,max_y=self.app_height)
+        if not images or len(images) is 0:
+            return
+        
+        imgw,imgh = get_uniform_fit(len(images),
+                                max_x=self.app_width,
+                                max_y=self.app_height,
+                                max_limit=250)
         i = 0
         
         for (x,y) in get_image_locations(
-                len(self.images),layout=LAYOUT_UNIFORM_OVERLAP,
+                len(images),layout=LAYOUT_UNIFORM_OVERLAP,
                 owidth=imgw,oheight=imgh):
             
-            img = PublishrImage(self.images[i],imgw,imgh, 
+            img = PublishrImage(images[i],imgw,imgh, 
                         X_MARGIN=int(0.05*imgw),Y_MARGIN=int(0.05*imgh))
             
             log.writeln('%s (%s)'%(img.path,img.id_str))
@@ -142,16 +160,6 @@ class ButtonLayer(Layer):
                                           self.app_height-50))
         self.publishButton.register_click_listener(self.App.on_quit_clicked)
 
-        '''
-        self.publishButton = Button(80,30,'Picasa',fontsize=14,
-                                   fontweight=cairo.FONT_WEIGHT_NORMAL,
-                                   icolor=icolor,
-                                   ocolor=ocolor,
-                                   tcolor=tcolor)
-        self.widgetQ.append(WidgetWrapper(self.publishButton,self.app_width-100,
-                                          self.app_height-50))
-        #self.publishButton.register_click_listener(self.App.on_publish_clicked)
-        '''
 
 class InputLayer(Layer):
     background = None
@@ -178,6 +186,7 @@ class InputLayer(Layer):
         
         if not self.widgetQ.hasWidget(self.background):
             self.widgetQ.append(WidgetWrapper(self.background,self.px,self.py))
+            
             
             
     def save_image_info(self):
@@ -343,3 +352,4 @@ class PublishLayer(Layer):
                                           self.cx-login_w/2,self.cy-login_h/2))
         
         self.flickrDoneButton.register_click_listener(self.App.on_flickr_authdone)
+        

@@ -83,22 +83,7 @@ class PublishrApp(App):
         App.__init__(self)
         self.FOLDER_PATH = folder_path
         
-        LIMIT = 50
-        # Get list of images to display
-        if os.path.isdir(self.FOLDER_PATH):
-            files = os.listdir(self.FOLDER_PATH)
-            for f in files:
-                if len(self.images) >= LIMIT:
-                    break
-                
-                if f.lower().endswith('jpg') or  \
-                    f.lower().endswith('jpeg') or  \
-                    f.lower().endswith('xcf') or  \
-                    f.lower().endswith('gif'):
-                        self.images.append(self.FOLDER_PATH+os.sep+f)
-                        
-        self.imageLayer = ImageLayer(app=self,isVisible=True,
-                                         images=self.images)
+        self.imageLayer = ImageLayer(app=self,isVisible=True)
         
         self.layers.append(self.imageLayer)
         
@@ -300,7 +285,12 @@ class PublishrApp(App):
             libpub.prime.canvas.redraw()
             
     def on_flickr_clicked(self,widget):
-        if not self.flickr.has_auth():
+        print 'flickr clicked'
+        if self.flickr.has_auth():
+            self.layers.remove(self.publishLayer)
+            print 'calling upload'
+            self.imageLayer.upload(self.flickr)
+        else:
             self.publishLayer.prompt_flickr_auth_1()
         
     def on_flickr_authorize(self,widget):
@@ -316,6 +306,7 @@ class PublishrApp(App):
             libpub.prime.canvas.fullscreen()
             self.flickr.get_authtoken()
             self.layers.remove(self.publishLayer)
+            self.imageLayer.upload(self.flickr)
         
         
             

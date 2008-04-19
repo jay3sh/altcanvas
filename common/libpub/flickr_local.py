@@ -75,10 +75,8 @@ class FlickrObject:
     frob = None
     flickr = None
     
-    def connect(self):
-        self.flickr = Flickr()
-        
     def __init__(self):
+        self.flickr = Flickr()
         authtoken = libpub.conf.get('FLICKR_TOKEN')
         if authtoken != None:
             self.authtoken = authtoken
@@ -90,7 +88,6 @@ class FlickrObject:
             return False
             
     def get_authurl(self):
-        self.connect()
         # get a frob
         self.frob = self.flickr.auth_getFrob()
             
@@ -121,7 +118,7 @@ class FlickrObject:
         
     def get_photosets(self):
         userinfo = self.flickr.auth_checkToken(auth_token=self.authtoken)
-        self.photosets = self.flickr.photosets_getList(user_id=userInfo.nsid)
+        self.photosets = self.flickr.photosets_getList(user_id=userinfo.nsid)
         if self.photosets == None:
             self.photosets = []
         return self.photosets
@@ -161,9 +158,9 @@ class FlickrObject:
         return url
     
     def upload(self,filename,title,description,is_public,tags,
-                license_id,photoset):
-        self.connect()
+                photoset=None,license_id=0):
         # Upload the photo
+        print 'calling upload'
         imageID = self.flickr.upload(
                 auth_token  = self.authtoken,
                 filename    = filename,
@@ -172,14 +169,17 @@ class FlickrObject:
                 is_public   = is_public,   
                 tags        = tags)
         
+        print str(imageID)
         if imageID == None:
             raise FlickrException('NULL imageID returned')
         
+        print 'setting license'
         self.flickr.photos_licenses_setLicense(
             photo_id=imageID,
-            license_id=licenseID,
+            license_id=license_id,
             auth_token=self.authtoken)
         
+        print 'getting url'
         url = self.getImageUrl(imageID)
         
         if url == None:
@@ -192,12 +192,12 @@ class FlickrObject:
             
         target_set_id = None
         for set in self.photosets:
-            if set['title'] == photoset:
-                target_set_id = set['id']
+            if set.title == photoset:
+                target_set_id = set.id
                 break
             
-        # If user has made the photoset field blank then he doesn't want to
-        # add the photo to any photoset. That's a valid operation.
+        # If user has left the photoset field blank then he doesn't want to
+        # add the photo to any photoset. That's valid.
         if not photoset or photoset.strip() == '':
             return url
             

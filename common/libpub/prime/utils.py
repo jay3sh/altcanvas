@@ -39,13 +39,16 @@ def html2rgb(hr,hg,hb):
         
 (LAYOUT_STEP,LAYOUT_UNIFORM_SPREAD,LAYOUT_UNIFORM_OVERLAP)  = range(3)
 
-def get_uniform_fit(count,max_x,max_y,OVERLAP_FACTOR = 0.9):
+def get_uniform_fit(count,max_x,max_y,
+            OVERLAP_FACTOR = 0.9,max_limit=0):
     if count == 0:
         return (0,0)
     total_area = max_x*max_y
     image_area = total_area/count
     image_area = OVERLAP_FACTOR * image_area
     img_side = int(sqrt(image_area))
+    
+    img_side = min(img_side,max_limit)
     return (img_side,img_side)
 
 def get_image_locations(count,layout=LAYOUT_UNIFORM_SPREAD,
@@ -128,8 +131,8 @@ def get_image_locations(count,layout=LAYOUT_UNIFORM_SPREAD,
         x_count = int(sqrt(count * aspect_ratio))
         y_count = int(count / x_count)+1
         
-        x_num_gaps = x_count - 1
-        y_num_gaps = y_count - 1
+        x_num_gaps = max(x_count - 1,1)
+        y_num_gaps = max(y_count - 1,1)
             
         if randomize:
             positions = randomize_arr(range(count))

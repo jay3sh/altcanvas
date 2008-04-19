@@ -384,9 +384,12 @@ class Flickr:
         rspXML = response.read()
 
         result = XMLNode.parseXML(rspXML)
-        #if self.fail_on_error:
-        #    FlickrAPI.testFailure(result, True)
-        return result
+        
+        if result != None:
+            id = result.photoid[0].elementText
+            return id
+        else:
+            return None
 
     def getFlickrAuthURL(self,frob=None):
         self.app = 'desktop'

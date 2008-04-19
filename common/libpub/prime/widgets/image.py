@@ -48,6 +48,9 @@ class PublishrImage(Image):
     title = None
     desc = None
     tags = None
+    
+    # after upload members
+    url = None
     def __init__(self,path,w,h,X_MARGIN=0,Y_MARGIN=0):
         Image.__init__(self, path, w, h, X_MARGIN, Y_MARGIN)
         
