@@ -105,7 +105,6 @@ class ImageLayer(Layer):
                             raise Exception('NULL upload URL')
                 except Exception, e: 
                     libpub.alert('Upload failure: '+str(e))
-                    raise e
         
     def display_images(self,images):
         num_images = len(images)
@@ -258,6 +257,16 @@ class InputLayer(Layer):
         self.entryTitle.text = image2load.title
         self.entryDesc.text = image2load.desc
         self.entryTags.text = image2load.tags
+        
+    def clear_widgets(self):
+        self.entryDesc.text = ''
+        self.entryDesc.redraw()
+        self.entryTitle.text = ''
+        self.entryTitle.redraw()
+        self.entryTags.text = ''
+        self.entryTags.redraw()
+        self.imageLabel.text = ''
+        self.imageLabel.redraw()
 
     def show_image(self):
         # Detect if incoming image is the same one on the pad

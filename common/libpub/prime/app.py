@@ -110,6 +110,7 @@ class PublishrApp(App):
         if self.inputLayer in self.layers:
             
             self.inputLayer.save_image_info()
+            self.inputLayer.clear_widgets()
             
             ipx = self.px + int(self.app_width/20)
             ipy = self.py + int(self.app_height/3 - 
@@ -146,8 +147,6 @@ class PublishrApp(App):
                 
     def on_image_click(self,image):
             
-        log.writeln('on_image_click - %s'%image.id_str)
-        
         if image.url:
             open_browser(image.url)
             return
@@ -184,6 +183,7 @@ class PublishrApp(App):
         #outGoing
         if self.inputLayer.imageOnPad:
             self.inputLayer.save_image_info()
+            self.inputLayer.clear_widgets()
             pathOut = Path(self.inputLayer.imageOnPad.widget)
             pathOut.add_start(ipx,ipy)
             pathOut.add_stop(self.inputLayer.imageOnPad.x,self.inputLayer.imageOnPad.y)
@@ -194,7 +194,6 @@ class PublishrApp(App):
         self.inputLayer.imageOnPad = self.imageLayer.get_widget(image)
             
         for i in range(NUM_STEPS):
-            log.writeln('on_image_click %d'%i)
             if i == 0:
                 # In first step switch the images from their
                 # existing layer to the destination layer
