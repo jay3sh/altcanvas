@@ -40,9 +40,13 @@ class Image(Widget):
         
         
 if utils.detect_platform() == 'Nokia':
-    TICK_PATH = '/mnt/bluebox/altcanvas/install/tick.png'
+    NOTE_PATH = '/mnt/bluebox/altcanvas/install/note.png'
+    GLOBE_PATH = '/mnt/bluebox/altcanvas/install/globe.png'
 else:
-    TICK_PATH = '/home/jayesh/workspace/altcanvas/install/tick.svg'
+    NOTE_PATH = '/home/jayesh/workspace/altcanvas/install/note.svg'
+    GLOBE_PATH = '/home/jayesh/workspace/altcanvas/install/globe.svg'
+
+note_pixbuf = gtk.gdk.pixbuf_new_from_file(NOTE_PATH)
         
 class PublishrImage(Image):
     title = None
@@ -62,8 +66,8 @@ class PublishrImage(Image):
         if self.title:
             ctx = cairo.Context(self.surface)
             ctx1 = gtk.gdk.CairoContext(ctx)
-            pixbuf = gtk.gdk.pixbuf_new_from_file(TICK_PATH)
-            ctx1.set_source_pixbuf(pixbuf,0,0)
+            ctx1.set_source_pixbuf(note_pixbuf,
+                        self.w-note_pixbuf.get_width()-20,20)
             ctx1.paint()
             
         
