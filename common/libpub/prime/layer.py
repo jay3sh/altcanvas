@@ -73,8 +73,6 @@ class ImageLayer(Layer):
             
             self.background.register_tap_listener(self.App.on_background_tap)
             
-            log.writeln('BG (%s)'%(self.background.id_str))
-            
         self.widgetQ.append(WidgetWrapper(self.background,0,0))
             
     def upload(self,service):
@@ -199,16 +197,20 @@ class ButtonLayer(Layer):
             libpub.prime.canvas.redraw()
             return
             
+        tcolor = RGBA()
+        tcolor.r,tcolor.g,tcolor.b = html2rgb(0xEF,0xEF,0xEF)
+        tcolor.a = 0.70
         if not self.uploadLabel:
             self.uploadLabel = Label(text='%s (%d/%d)'%(msg,done,total),
-                                     fontsize=20,
-                                     w=300)
+                                     fontsize=22,
+                                     fontweight=cairo.FONT_WEIGHT_BOLD,
+                                     w=300,color=tcolor)
         else:
             self.uploadLabel.text = '%s (%d/%d)'%(msg,done,total)
             
-        if self.uploadLabel not in self.widgetQ.widgetQ:
+        if not self.widgetQ.hasWidget(self.uploadLabel):
             self.widgetQ.append(WidgetWrapper(self.uploadLabel,
-                                              self.app_width-450,
+                                              self.app_width-380,
                                               self.app_height-50))
         self.uploadLabel.redraw()
         libpub.prime.canvas.redraw()
