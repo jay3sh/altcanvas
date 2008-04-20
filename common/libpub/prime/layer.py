@@ -157,7 +157,7 @@ class ButtonLayer(Layer):
                                    icolor=icolor,
                                    ocolor=ocolor,
                                    tcolor=tcolor)
-        self.widgetQ.append(WidgetWrapper(self.importButton,self.app_width-150,
+        self.widgetQ.append(WidgetWrapper(self.importButton,self.app_width-120,
                                           self.app_height-150))
         self.importButton.register_click_listener(self.App.on_import_clicked)
             
@@ -166,7 +166,7 @@ class ButtonLayer(Layer):
                                    icolor=icolor,
                                    ocolor=ocolor,
                                    tcolor=tcolor)
-        self.widgetQ.append(WidgetWrapper(self.publishButton,self.app_width-150,
+        self.widgetQ.append(WidgetWrapper(self.publishButton,self.app_width-120,
                                           self.app_height-100))
         self.publishButton.register_click_listener(self.App.on_publish_clicked)
 
@@ -175,7 +175,7 @@ class ButtonLayer(Layer):
                                    icolor=icolor,
                                    ocolor=ocolor,
                                    tcolor=tcolor)
-        self.widgetQ.append(WidgetWrapper(self.publishButton,self.app_width-150,
+        self.widgetQ.append(WidgetWrapper(self.publishButton,self.app_width-120,
                                           self.app_height-50))
         self.publishButton.register_click_listener(self.App.on_quit_clicked)
         

@@ -168,7 +168,6 @@ class FlickrObject:
                 is_public   = is_public,   
                 tags        = tags)
         
-        print str(imageID)
         if imageID == None:
             raise FlickrException('NULL imageID returned')
         
