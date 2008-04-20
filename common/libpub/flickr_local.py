@@ -105,15 +105,19 @@ class FlickrObject:
         return authurl
     
     def get_authtoken(self):
-        userinfo = self.flickr.auth_getToken(frob=self.frob)
+        try:
+            userinfo = self.flickr.auth_getToken(frob=self.frob)
+        except Exception, e:
+            libpub.alert("There was error retrieving Flickr Authentication token.\n"+
+                  "Are you sure, you have authorized this application?\n"+
+                  "Try again!")
+            return False
+            
         self.authtoken = userinfo.token
         if self.authtoken:
             libpub.conf.set('FLICKR_TOKEN',self.authtoken)
             return True
         else:
-            libpub.alert("There was error retrieving Flickr Authentication token.\n"+
-                  "Are you sure, you have authorized this application?\n"+
-                  "Try again!")
             return False
         
     def get_photosets(self):

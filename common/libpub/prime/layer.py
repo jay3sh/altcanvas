@@ -385,10 +385,20 @@ class PublishLayer(Layer):
         self.widgetQ.append(WidgetWrapper(self.picasaButton,
                                       self.cx+login_w/4,self.cy-login_h/4))
 
-    def prompt_flickr_auth_1(self):
+    def clean_widgets(self):
+        # Clean everything except the background
+        # This has to be a 2-pass operation over widgetQ
+        # iterating over the queue and removing widgets from it at
+        # the same time is not well-defined
+        toremove = []
+        for ww in self.widgetQ.next():
+            if ww.widget.id != self.background.id:
+                toremove.append(ww.widget)
+        for w in toremove:
+            self.widgetQ.remove(w)
         
-        self.widgetQ.remove(self.flickrButton)
-        self.widgetQ.remove(self.picasaButton)
+    def prompt_flickr_auth_1(self):
+        self.clean_widgets()
         
         login_w = 275 
         login_h = 35
@@ -403,8 +413,7 @@ class PublishLayer(Layer):
         self.flickrAuthButton.register_click_listener(self.App.on_flickr_authorize)
         
     def prompt_flickr_auth_2(self):
-        if self.widgetQ.hasWidget(self.flickrAuthButton):
-            self.widgetQ.remove(self.flickrAuthButton)
+        self.clean_widgets()
             
         login_w = 100 
         login_h = 35

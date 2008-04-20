@@ -327,7 +327,10 @@ class PublishrApp(App):
     def on_flickr_authdone(self,widget):
         if detect_platform() == 'Nokia':
             libpub.prime.canvas.fullscreen()
-            self.flickr.get_authtoken()
+            
+        success = self.flickr.get_authtoken()
+            
+        if success:
             self.layers.remove(self.publishLayer)
             self.imageLayer.upload(self.flickr)
         

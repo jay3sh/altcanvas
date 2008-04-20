@@ -289,8 +289,8 @@ class Flickr:
             return None
 
         if result['stat'] != 'ok':
-            libpub.alert('[ERROR] Flickr API call failed: %s'%(data))
-            return None
+            #libpub.alert('[ERROR] Flickr API call failed: %s'%(data))
+            raise Exception(data)
         else:
             return result
         
