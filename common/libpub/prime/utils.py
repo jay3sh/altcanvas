@@ -77,6 +77,8 @@ def get_image_locations(count,layout=LAYOUT_UNIFORM_SPREAD,
     
     def randomize_arr(arr):
         l = len(arr)
+        if l is 1:
+            return arr
         for i in range(l):
             pos = random.randint(1,l-1)
             tmp = arr[pos]
