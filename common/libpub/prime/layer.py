@@ -80,14 +80,15 @@ class ImageLayer(Layer):
             if isinstance(ww.widget,PublishrImage):
                 img = ww.widget
                 try:
-                    img.url = service.upload(
-                        filename = img.path,
-                        title = img.title,
-                        description = img.desc,
-                        is_public = True,
-                        tags = img.tags)
-                    if not img.url:
-                        raise Exception('NULL upload URL')
+                    if img.title:
+                        img.url = service.upload(
+                            filename = img.path,
+                            title = img.title,
+                            description = img.desc,
+                            is_public = True,
+                            tags = img.tags)
+                        if not img.url:
+                            raise Exception('NULL upload URL')
                 except Exception, e: 
                     libpub.alert('Upload failure: '+str(e))
                     raise e

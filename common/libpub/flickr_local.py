@@ -160,7 +160,6 @@ class FlickrObject:
     def upload(self,filename,title,description,is_public,tags,
                 photoset=None,license_id=0):
         # Upload the photo
-        print 'calling upload'
         imageID = self.flickr.upload(
                 auth_token  = self.authtoken,
                 filename    = filename,
@@ -173,13 +172,11 @@ class FlickrObject:
         if imageID == None:
             raise FlickrException('NULL imageID returned')
         
-        print 'setting license'
         self.flickr.photos_licenses_setLicense(
             photo_id=imageID,
             license_id=license_id,
             auth_token=self.authtoken)
         
-        print 'getting url'
         url = self.getImageUrl(imageID)
         
         if url == None:
