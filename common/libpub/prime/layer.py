@@ -76,11 +76,23 @@ class ImageLayer(Layer):
         self.widgetQ.append(WidgetWrapper(self.background,0,0))
             
     def upload(self,service):
+        count = 0
+        total = 0
+        
+        for ww in self.widgetQ.next():
+            if isinstance(ww.widget,PublishrImage):
+                if ww.widget.title and not ww.widget.url:
+                    total += 1
+                
+        self.App.refresh_upload_status(count,total)
         for ww in self.widgetQ.next():
             if isinstance(ww.widget,PublishrImage):
                 img = ww.widget
                 try:
+                    # Upload if it's edited and 
+                    # not already uploaded
                     if img.title and not img.url:
+                        count += 1
                         img.url = service.upload(
                             filename = img.path,
                             title = img.title,
@@ -88,6 +100,7 @@ class ImageLayer(Layer):
                             is_public = True,
                             tags = img.tags)
                         img.update_icon()
+                        self.App.refresh_upload_status(count,total)
                         if not img.url:
                             raise Exception('NULL upload URL')
                 except Exception, e: 
@@ -95,17 +108,18 @@ class ImageLayer(Layer):
                     raise e
         
     def display_images(self,images):
-        if not images or len(images) is 0:
+        num_images = len(images)
+        if not images or num_images is 0:
             return
         
-        imgw,imgh = get_uniform_fit(len(images),
+        imgw,imgh = get_uniform_fit(num_images,
                                 max_x=self.app_width,
                                 max_y=self.app_height,
                                 max_limit=250)
         i = 0
         
         for (x,y) in get_image_locations(
-                len(images),layout=LAYOUT_UNIFORM_OVERLAP,
+                num_images,layout=LAYOUT_UNIFORM_OVERLAP,
                 owidth=imgw,oheight=imgh):
             
             img = PublishrImage(images[i],imgw,imgh, 
@@ -116,12 +130,15 @@ class ImageLayer(Layer):
             img.register_click_listener(self.App.on_image_click)
             
             self.widgetQ.append(WidgetWrapper(img,x,y))
-            libpub.prime.canvas.redraw()
+            
+            self.App.refresh_load_status(i+1,num_images)
             
             i = i+1
             
             
 class ButtonLayer(Layer):
+    uploadLabel = None
+    
     def __init__(self,app,image_dim=(0,0),isVisible=True):
         Layer.__init__(self, app=app, isVisible=isVisible)
         # Buttons
@@ -161,6 +178,29 @@ class ButtonLayer(Layer):
         self.widgetQ.append(WidgetWrapper(self.publishButton,self.app_width-150,
                                           self.app_height-50))
         self.publishButton.register_click_listener(self.App.on_quit_clicked)
+        
+    def refresh_status(self,msg,done,total):
+        if total is done:
+            self.widgetQ.remove(self.uploadLabel)
+            self.uploadLabel.text = ''
+            self.uploadLabel.redraw()
+            self.App.adjust_clouds()
+            libpub.prime.canvas.redraw()
+            return
+            
+        if not self.uploadLabel:
+            self.uploadLabel = Label(text='%s (%d/%d)'%(msg,done,total),
+                                     fontsize=20,
+                                     w=300)
+        else:
+            self.uploadLabel.text = '%s (%d/%d)'%(msg,done,total)
+            
+        if self.uploadLabel not in self.widgetQ.widgetQ:
+            self.widgetQ.append(WidgetWrapper(self.uploadLabel,
+                                              self.app_width-450,
+                                              self.app_height-50))
+        self.uploadLabel.redraw()
+        libpub.prime.canvas.redraw()
 
 
 class InputLayer(Layer):

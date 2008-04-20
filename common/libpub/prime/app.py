@@ -288,9 +288,21 @@ class PublishrApp(App):
             self.adjust_clouds()
             libpub.prime.canvas.redraw()
             
+    def refresh_load_status(self,done,total):
+        self.buttonLayer.refresh_status('Loading ',done, total)
+        self.adjust_clouds()
+        libpub.prime.canvas.redraw()
+        
+    def refresh_upload_status(self,done,total):
+        self.buttonLayer.refresh_status('Upload done ',done, total)
+        self.adjust_clouds()
+        libpub.prime.canvas.redraw()
+        
     def on_flickr_clicked(self,widget):
         if self.flickr.has_auth():
             self.layers.remove(self.publishLayer)
+            self.adjust_clouds()
+            libpub.prime.canvas.redraw()
             self.imageLayer.upload(self.flickr)
         else:
             self.publishLayer.prompt_flickr_auth_1()
