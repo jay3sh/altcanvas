@@ -135,6 +135,10 @@ class ImageLayer(Layer):
             
             i = i+1
             
+if libpub.prime.utils.detect_platform() == 'Nokia':
+    IMPORT_PATH = '/mnt/bluebox/altcanvas/install/importBtn.png'
+else:
+    IMPORT_PATH = '/home/jayesh/workspace/altcanvas/install/importBtn.svg'
             
 class ButtonLayer(Layer):
     uploadLabel = None
@@ -152,17 +156,23 @@ class ButtonLayer(Layer):
         tcolor.r,tcolor.g,tcolor.b = html2rgb(0xEF,0xEF,0xEF)
         tcolor.a = 0.98
         
+        '''
+        self.importButton = Image(path=IMPORT_PATH,w=100,h=35)
+        '''
         self.importButton = Button(100,35,'Import',fontsize=20,
-                                   fontweight=cairo.FONT_WEIGHT_NORMAL,
+                                   fontweight=cairo.FONT_WEIGHT_BOLD,
                                    icolor=icolor,
                                    ocolor=ocolor,
                                    tcolor=tcolor)
+        
         self.widgetQ.append(WidgetWrapper(self.importButton,self.app_width-120,
                                           self.app_height-150))
+        
+        
         self.importButton.register_click_listener(self.App.on_import_clicked)
             
         self.publishButton = Button(100,35,'Publish',fontsize=20,
-                                   fontweight=cairo.FONT_WEIGHT_NORMAL,
+                                   fontweight=cairo.FONT_WEIGHT_BOLD,
                                    icolor=icolor,
                                    ocolor=ocolor,
                                    tcolor=tcolor)
@@ -171,7 +181,7 @@ class ButtonLayer(Layer):
         self.publishButton.register_click_listener(self.App.on_publish_clicked)
 
         self.publishButton = Button(100,35,'Quit',fontsize=20,
-                                   fontweight=cairo.FONT_WEIGHT_NORMAL,
+                                   fontweight=cairo.FONT_WEIGHT_BOLD,
                                    icolor=icolor,
                                    ocolor=ocolor,
                                    tcolor=tcolor)

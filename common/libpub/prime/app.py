@@ -258,18 +258,17 @@ class PublishrApp(App):
         fileChooserDlg.destroy()
         
         if path:
-            images = []
             if os.path.isdir(path):
                 files = os.listdir(path)
                 for f in files:
                     if f.lower().endswith('jpg') or  \
                         f.lower().endswith('jpeg') or  \
                         f.lower().endswith('gif'):
-                            images.append(path+os.sep+f)
+                            self.images.append(path+os.sep+f)
             else:
-                images.append(path)
+                self.images.append(path)
             
-            self.imageLayer.display_images(images)
+            self.imageLayer.display_images(self.images)
             
         importButton.reset_focus()
         importButton.enable_pointer_listener()
@@ -279,6 +278,9 @@ class PublishrApp(App):
         gtk.main_quit()
     
     def on_publish_clicked(self,widget):
+        if len(self.images) is 0:
+            return
+        
         if not self.publishLayer:
             self.publishLayer = PublishLayer(app=self)
         
