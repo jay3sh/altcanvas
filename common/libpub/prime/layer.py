@@ -60,6 +60,8 @@ class ImageLayer(Layer):
     # App specific members
     background = None
     
+    total_image_count = 0
+    
     def __init__(self,app,isVisible=True):
         Layer.__init__(self, app=app, isVisible=isVisible)
         
@@ -124,7 +126,7 @@ class ImageLayer(Layer):
             img = PublishrImage(images[i],imgw,imgh, 
                         X_MARGIN=int(0.05*imgw),Y_MARGIN=int(0.05*imgh))
             
-            log.writeln('%s (%s)'%(img.path,img.id_str))
+            self.total_image_count += 1
             
             img.register_click_listener(self.App.on_image_click)
             
