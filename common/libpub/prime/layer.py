@@ -177,7 +177,7 @@ class ButtonLayer(Layer):
                                    tcolor=tcolor)
         self.widgetQ.append(WidgetWrapper(self.publishButton,self.app_width-120,
                                           self.app_height-100))
-        self.publishButton.register_click_listener(self.App.on_publish_clicked)
+        self.publishButton.register_click_listener(self.App.on_flickr_clicked)
 
         self.publishButton = Button(100,35,'Quit',fontsize=20,
                                    fontweight=cairo.FONT_WEIGHT_BOLD,
@@ -190,11 +190,12 @@ class ButtonLayer(Layer):
         
     def refresh_status(self,msg,done,total):
         if total is done:
-            self.widgetQ.remove(self.uploadLabel)
-            self.uploadLabel.text = ''
-            self.uploadLabel.redraw()
-            self.App.adjust_clouds()
-            libpub.prime.canvas.redraw()
+            if self.uploadLabel and self.widgetQ.hasWidget(self.uploadLabel):
+                self.widgetQ.remove(self.uploadLabel)
+                self.uploadLabel.text = ''
+                self.uploadLabel.redraw()
+                self.App.adjust_clouds()
+                libpub.prime.canvas.redraw()
             return
             
         tcolor = RGBA()

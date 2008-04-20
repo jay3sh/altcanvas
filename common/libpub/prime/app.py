@@ -300,13 +300,21 @@ class PublishrApp(App):
         libpub.prime.canvas.redraw()
         
     def on_flickr_clicked(self,widget):
+        if self.imageLayer.total_image_count is 0:
+            return
         if self.flickr.has_auth():
-            self.layers.remove(self.publishLayer)
-            self.adjust_clouds()
-            libpub.prime.canvas.redraw()
+            #self.layers.remove(self.publishLayer)
+            #self.adjust_clouds()
+            #libpub.prime.canvas.redraw()
             self.imageLayer.upload(self.flickr)
         else:
+            if not self.publishLayer:
+                self.publishLayer = PublishLayer(app=self)
+            if self.publishLayer not in self.layers:
+                self.layers.append(self.publishLayer)
             self.publishLayer.prompt_flickr_auth_1()
+            self.adjust_clouds()
+            libpub.prime.canvas.redraw()
         
     def on_flickr_authorize(self,widget):
         if not self.flickr.has_auth():
