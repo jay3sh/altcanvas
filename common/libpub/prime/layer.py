@@ -87,6 +87,7 @@ class ImageLayer(Layer):
                             description = img.desc,
                             is_public = True,
                             tags = img.tags)
+                        img.update_icon()
                         if not img.url:
                             raise Exception('NULL upload URL')
                 except Exception, e: 
