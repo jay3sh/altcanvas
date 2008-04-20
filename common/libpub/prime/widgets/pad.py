@@ -9,7 +9,7 @@ from libpub.prime import utils
 from libpub.prime.utils import RGBA
 
 if utils.detect_platform() == 'Nokia':
-    WALLPAPER_PATH = '/mnt/bluebox/altcanvas/install/altpublishr.png'
+    WALLPAPER_PATH = '/usr/share/altpublishr/icons/altpublishr.png'
 else:
     WALLPAPER_PATH = '/home/jayesh/workspace/altcanvas/install/altpublishr.svg'
 

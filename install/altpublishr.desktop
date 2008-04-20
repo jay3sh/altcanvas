@@ -1,0 +1,6 @@
+[Desktop Entry]
+Version=0.6.0
+Encoding=UTF-8
+Name=AltPublishr
+Exec=/usr/bin/altpublishr.py
+Type=Application

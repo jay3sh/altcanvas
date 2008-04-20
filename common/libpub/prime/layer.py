@@ -134,10 +134,6 @@ class ImageLayer(Layer):
             
             i = i+1
             
-if libpub.prime.utils.detect_platform() == 'Nokia':
-    IMPORT_PATH = '/mnt/bluebox/altcanvas/install/importBtn.png'
-else:
-    IMPORT_PATH = '/home/jayesh/workspace/altcanvas/install/importBtn.svg'
             
 class ButtonLayer(Layer):
     uploadLabel = None

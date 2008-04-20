@@ -49,8 +49,8 @@ class Image(Widget):
         
         
 if utils.detect_platform() == 'Nokia':
-    NOTE_PATH = '/mnt/bluebox/altcanvas/install/note.png'
-    GLOBE_PATH = '/mnt/bluebox/altcanvas/install/globe.png'
+    NOTE_PATH = '/usr/share/altpublishr/icons/note.png'
+    GLOBE_PATH = '/usr/share/altpublishr/icons/globe.png'
 else:
     NOTE_PATH = '/home/jayesh/workspace/altcanvas/install/note.svg'
     GLOBE_PATH = '/home/jayesh/workspace/altcanvas/install/globe.svg'
