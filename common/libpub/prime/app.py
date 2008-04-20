@@ -148,6 +148,10 @@ class PublishrApp(App):
             
         log.writeln('on_image_click - %s'%image.id_str)
         
+        if image.url:
+            open_browser(image.url)
+            return
+        
         if self.inputLayer == None:
             self.inputLayer = InputLayer(app=self,image_dim=(image.w,image.h))
             
@@ -285,10 +289,8 @@ class PublishrApp(App):
             libpub.prime.canvas.redraw()
             
     def on_flickr_clicked(self,widget):
-        print 'flickr clicked'
         if self.flickr.has_auth():
             self.layers.remove(self.publishLayer)
-            print 'calling upload'
             self.imageLayer.upload(self.flickr)
         else:
             self.publishLayer.prompt_flickr_auth_1()
@@ -298,7 +300,7 @@ class PublishrApp(App):
             url = self.flickr.get_authurl()
             if detect_platform() == 'Nokia':
                 libpub.prime.canvas.unfullscreen()
-            open_browser(widget,url[0])
+            open_browser(url[0])
             self.publishLayer.prompt_flickr_auth_2()
             
     def on_flickr_authdone(self,widget):

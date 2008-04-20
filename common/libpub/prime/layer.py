@@ -80,7 +80,7 @@ class ImageLayer(Layer):
             if isinstance(ww.widget,PublishrImage):
                 img = ww.widget
                 try:
-                    if img.title:
+                    if img.title and not img.url:
                         img.url = service.upload(
                             filename = img.path,
                             title = img.title,

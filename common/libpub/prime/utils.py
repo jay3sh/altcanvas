@@ -390,7 +390,7 @@ def draw_rounded_rect(ctx,x,y,w,h,vr=None):
     
     ctx.fill()
     
-def open_browser(widget,url=None):
+def open_browser(url=None):
     if detect_platform() == 'Nokia':
         import libpub
         import osso
