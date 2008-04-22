@@ -38,19 +38,36 @@ class Button(Widget):
                  bcolor=RGBA(),    # border color
                  tcolor=RGBA()):   # text color
         
+        self.fontface = fontface
+        self.fontweight = fontweight
+        self.fontsize = fontsize
+        self.fontangle = fontangle
+        self.icolor = icolor
+        self.ocolor = ocolor
+        self.bcolor = bcolor
+        self.tcolor = tcolor
+        self.text = text
+        
         Widget.__init__(self,w,h)
+        
+        self.redraw()
+        
+        
+    def redraw(self):
+        ocolor = self.ocolor
+        tcolor = self.tcolor
+        w = self.w
+        h = self.h
+        # Draw shape
         self.surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,w,h)
         ctx = cairo.Context(self.surface)
-        
-        # Draw shape
         ctx.set_source_rgba(ocolor.r,ocolor.g,ocolor.b,ocolor.a)
         vr = int(min(w,h)/5)
         utils.draw_rounded_rect(ctx, 0, 0, w, h, vr=vr)
         
         # Draw text
-        self.text = text
-        ctx.select_font_face(fontface,fontangle,fontweight)
-        ctx.set_font_size(fontsize)
+        ctx.select_font_face(self.fontface,self.fontangle,self.fontweight)
+        ctx.set_font_size(self.fontsize)
         x_bearing,y_bearing,width,height,x_adv,y_adv = \
             ctx.text_extents(self.text)
         
