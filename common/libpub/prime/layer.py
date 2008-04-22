@@ -30,6 +30,8 @@ from libpub.prime.widgets.button import Button
 
 import libpub
 
+from threading import Thread
+
 class Layer:
     
     widgetQ = None
@@ -94,6 +96,16 @@ class ImageLayer(Layer):
             
         self.widgetQ.append(WidgetWrapper(self.background,0,0))
             
+            
+    def upload_thread(self,service,filename,title,desc,is_public,tags):
+        url = service.upload(
+            filename = filename,
+            title = title,
+            description = desc,
+            is_public = is_public,
+            tags = tags)
+        return url
+        
     def upload(self,service):
         count = 0
         total = 0
@@ -112,6 +124,13 @@ class ImageLayer(Layer):
                     # not already uploaded
                     if img.title and not img.url:
                         count += 1
+                        
+                        '''
+                        ut = Thread(target=self.upload_thread,
+                                    args=[service,img.path,img.title,img.desc,True,img.tags])
+                        ut.run()
+                        ut.join()
+                        '''
                         img.url = service.upload(
                             filename = img.path,
                             title = img.title,
@@ -194,14 +213,14 @@ class ButtonLayer(Layer):
                                           self.app_height-100))
         self.publishButton.register_click_listener(self.App.on_flickr_clicked)
 
-        self.publishButton = Button(100,35,'Quit',fontsize=20,
+        self.quitButton = Button(100,35,'Quit',fontsize=20,
                                    fontweight=cairo.FONT_WEIGHT_BOLD,
                                    icolor=icolor,
                                    ocolor=ocolor,
                                    tcolor=tcolor)
-        self.widgetQ.append(WidgetWrapper(self.publishButton,self.app_width-120,
+        self.widgetQ.append(WidgetWrapper(self.quitButton,self.app_width-120,
                                           self.app_height-50))
-        self.publishButton.register_click_listener(self.App.on_quit_clicked)
+        self.quitButton.register_click_listener(self.App.on_quit_clicked)
         
     def refresh_status(self,msg,done,total):
         if total is done:
@@ -415,12 +434,12 @@ class PublishLayer(Layer):
     def prompt_flickr_auth_1(self):
         self.clean_widgets()
         
-        login_w = 275 
+        login_w = 325 
         login_h = 35
         self.flickrAuthButton = Button(login_w,login_h,
-                                       'Open Browser to authorize!',
-                                       fontsize=18,
-                                   	   fontweight=cairo.FONT_WEIGHT_NORMAL,
+                                       'Authorize AltCanvas!',
+                                       fontsize=22,
+                                   	   fontweight=cairo.FONT_WEIGHT_BOLD,
                                    	   ocolor=self.ocolor,
                                        tcolor=self.tcolor)
         self.widgetQ.append(WidgetWrapper(self.flickrAuthButton,
@@ -434,8 +453,8 @@ class PublishLayer(Layer):
         login_h = 35
         self.flickrDoneButton = Button(login_w,login_h,
                                        'Done ?!',
-                                       fontsize=18,
-                                   	   fontweight=cairo.FONT_WEIGHT_NORMAL,
+                                       fontsize=22,
+                                   	   fontweight=cairo.FONT_WEIGHT_BOLD,
                                    	   ocolor=self.ocolor,
                                        tcolor=self.tcolor)
         self.widgetQ.append(WidgetWrapper(self.flickrDoneButton,

@@ -85,7 +85,6 @@ class App:
             
 class PublishrApp(App):
     
-    FOLDER_PATH = None
     inputPad = None
     background = None
     bg_ignore_count = 0
@@ -97,24 +96,29 @@ class PublishrApp(App):
     inputLayer = None
     publishLayer = None
     
-    def __init__(self,folder_path):
+    def __init__(self):
         App.__init__(self)
-        self.FOLDER_PATH = folder_path
-        
-        self.imageLayer = ImageLayer(app=self,isVisible=True)
-        
-        self.layers.append(self.imageLayer)
-        
-        self.buttonLayer = ButtonLayer(app=self,isVisible=True)
-        
-        self.layers.append(self.buttonLayer)
-
-        self.adjust_clouds()
-        libpub.prime.canvas.redraw()
         
         # Other initialization
         libpub.start_prime()
         self.flickr = flickr.FlickrObject()
+            
+        
+        self.imageLayer = ImageLayer(app=self,isVisible=True)
+        self.layers.append(self.imageLayer)
+        
+        self.buttonLayer = ButtonLayer(app=self,isVisible=True)
+        self.layers.append(self.buttonLayer)
+
+        if not self.flickr.has_auth():
+            self.buttonLayer.publishButton.text = 'Sign In'
+            self.buttonLayer.publishButton.redraw()
+            
+        self.adjust_clouds()
+        libpub.prime.canvas.redraw()
+        
+        
+            
         
         
     def on_background_tap(self,pad):
@@ -319,8 +323,6 @@ class PublishrApp(App):
         libpub.prime.canvas.redraw()
         
     def on_flickr_clicked(self,widget):
-        if self.imageLayer.total_image_count is 0:
-            return
         if self.flickr.has_auth():
             #self.layers.remove(self.publishLayer)
             #self.adjust_clouds()
@@ -339,19 +341,29 @@ class PublishrApp(App):
         if not self.flickr.has_auth():
             url = self.flickr.get_authurl()
             if detect_platform() == 'Nokia':
-                libpub.prime.canvas.unfullscreen()
+                #libpub.prime.canvas.unfullscreen()
+                libpub.prime.canvas.unmaximize()
             open_browser(url[0])
             self.publishLayer.prompt_flickr_auth_2()
             
     def on_flickr_authdone(self,widget):
-        if detect_platform() == 'Nokia':
-            libpub.prime.canvas.fullscreen()
+        #if detect_platform() == 'Nokia':
+        #    libpub.prime.canvas.fullscreen()
             
         success = self.flickr.get_authtoken()
             
         if success:
             self.layers.remove(self.publishLayer)
-            self.imageLayer.upload(self.flickr)
+            
+            self.buttonLayer.publishButton.text = 'Publish'
+            self.buttonLayer.publishButton.redraw()
+            self.adjust_clouds()
+            libpub.prime.canvas.redraw()
+            
+            #self.imageLayer.upload(self.flickr)
+            #from threading import Thread
+            #ut = Thread(target=self.imageLayer.upload,args=[self.flickr,])
+            #ut.run()
         
         
             
