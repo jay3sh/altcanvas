@@ -6,71 +6,53 @@
 
 #include <pycairo.h>
 
-cairo_surface_t *create_xlib_surface();
-
-static Pycairo_CAPI_t *Pycairo_CAPI;
-
-static Display *dpy=NULL;
-
 /*
-typedef struct {
-    PyObject_HEAD
-    cairo_surface_t *surface;
-    PyObject *base; /* base object used to create surface, or NULL * /
-} PycairoSurface;
-*/
-
-#define PycairoAltXSurface PycairoSurface
-
+ * MACRO definitions
+ */
 
 #define ASSERT(x) \
         if (!(x)) { \
            printf("Assertion failed: %s:%d\n",__FILE__,__LINE__); \
            exit(1); \
         }
+#define PycairoAltXSurface PycairoSurface
+
+/*
+ * Static variables
+ */
+static Pycairo_CAPI_t *Pycairo_CAPI;
+static Display *dpy=NULL;
+
+/*
+ * Private helper function declarations
+ */
+cairo_surface_t *create_altx_surface();
 
 PyObject *
 Alt_PycairoSurface_FromSurface (cairo_surface_t *surface, PyObject *base);
 
+
+/*
+ * Module method definitions
+ */
 static PyObject *
-xlib_surface_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
+altx_surface_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
     cairo_surface_t *surface;
     
-    surface = create_xlib_surface();
+    surface = create_altx_surface();
 
     return Alt_PycairoSurface_FromSurface(surface,NULL);
 }
 
 static PyObject *
-xlib_surface_get_depth (PycairoAltXSurface *o)
-{
-    return PyInt_FromLong (cairo_xlib_surface_get_depth (o->surface));
-}
-
-static PyObject *
-xlib_surface_get_height (PycairoAltXSurface *o)
-{
-    return PyInt_FromLong (cairo_xlib_surface_get_height (o->surface));
-}
-
-static PyObject *
-xlib_surface_get_width (PycairoAltXSurface *o)
-{
-    return PyInt_FromLong (cairo_xlib_surface_get_width (o->surface));
-}
-
-static PyObject *
-xlib_surface_flush(PycairoAltXSurface *o)
+altx_surface_flush(PycairoAltXSurface *o)
 {
     XFlush(dpy);
 }
 
-static PyMethodDef xlib_surface_methods[] = {
-    {"get_depth", (PyCFunction)xlib_surface_get_depth,    METH_NOARGS },
-    {"get_height",(PyCFunction)xlib_surface_get_height,   METH_NOARGS },
-    {"get_width", (PyCFunction)xlib_surface_get_width,    METH_NOARGS },
-    {"flush", (PyCFunction)xlib_surface_flush,    METH_NOARGS },
+static PyMethodDef altx_surface_methods[] = {
+    {"flush", (PyCFunction)altx_surface_flush,    METH_NOARGS },
     {NULL, NULL, 0, NULL},
 };
 
@@ -103,7 +85,7 @@ PyTypeObject PycairoAltXSurface_Type = {
     0,                                  /* tp_weaklistoffset */
     0,                                  /* tp_iter */
     0,                                  /* tp_iternext */
-    xlib_surface_methods,               /* tp_methods */
+    altx_surface_methods,               /* tp_methods */
     0,                                  /* tp_members */
     0,                                  /* tp_getset */
     0, /* &PycairoSurface_Type, */      /* tp_base */
@@ -113,7 +95,7 @@ PyTypeObject PycairoAltXSurface_Type = {
     0,                                  /* tp_dictoffset */
     0,                                  /* tp_init */
     0,                                  /* tp_alloc */
-    (newfunc)xlib_surface_new,          /* tp_new */
+    (newfunc)altx_surface_new,          /* tp_new */
     0,                                  /* tp_free */
     0,                                  /* tp_is_gc */
     0,                                  /* tp_bases */
@@ -172,7 +154,6 @@ Alt_PycairoSurface_FromSurface (cairo_surface_t *surface, PyObject *base)
 
     type = &PycairoAltXSurface_Type;
 
-
     o = type->tp_alloc (type, 0);
 
     if (o == NULL) {
@@ -186,7 +167,7 @@ Alt_PycairoSurface_FromSurface (cairo_surface_t *surface, PyObject *base)
 }
 
 cairo_surface_t *
-create_xlib_surface()
+create_altx_surface()
 {
     Window win,rwin;
     int screen = 0;
@@ -241,7 +222,7 @@ create_xlib_surface()
     Visual *visual = DefaultVisual(dpy,DefaultScreen(dpy));
 
     //XClearWindow(dpy, win);
-    surface = cairo_xlib_surface_create(dpy, win, visual, w,h);
+    surface = cairo_altx_surface_create(dpy, win, visual, w,h);
 
     return surface;
 
@@ -310,7 +291,7 @@ int main(int argc, char *argv[])
     Visual *visual = DefaultVisual(dpy,DefaultScreen(dpy));
 
     XClearWindow(dpy, win);
-    surface = cairo_xlib_surface_create(dpy, win, visual, w,h);
+    surface = cairo_altx_surface_create(dpy, win, visual, w,h);
     cr = cairo_create(surface);
 
     cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
@@ -333,7 +314,6 @@ int main(int argc, char *argv[])
 
     cairo_destroy(cr);
     cairo_surface_destroy(surface);
-
 
 
     XFlush(dpy);
