@@ -46,12 +46,19 @@ altx_surface_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
 }
 
 static PyObject *
+altx_surface_close(PycairoAltXSurface *o)
+{
+    XCloseDisplay(dpy);
+}
+
+static PyObject *
 altx_surface_flush(PycairoAltXSurface *o)
 {
     XFlush(dpy);
 }
 
 static PyMethodDef altx_surface_methods[] = {
+    {"close", (PyCFunction)altx_surface_close,    METH_NOARGS },
     {"flush", (PyCFunction)altx_surface_flush,    METH_NOARGS },
     {NULL, NULL, 0, NULL},
 };
@@ -222,7 +229,7 @@ create_altx_surface()
     Visual *visual = DefaultVisual(dpy,DefaultScreen(dpy));
 
     //XClearWindow(dpy, win);
-    surface = cairo_altx_surface_create(dpy, win, visual, w,h);
+    surface = cairo_xlib_surface_create(dpy, win, visual, w,h);
 
     return surface;
 
