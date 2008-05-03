@@ -309,6 +309,7 @@ class PublishrApp(App):
         if self.publishLayer not in self.layers:
             self.layers.append(self.publishLayer)
             
+            self.publishLayer.opening_layout()
             self.adjust_clouds()
             libpub.prime.canvas.redraw()
             
@@ -324,6 +325,7 @@ class PublishrApp(App):
         
     def on_flickr_clicked(self,widget):
         if self.flickr.has_auth():
+            self.publishLayer.clean_widgets()
             self.layers.remove(self.publishLayer)
             self.adjust_clouds()
             libpub.prime.canvas.redraw()
@@ -339,7 +341,11 @@ class PublishrApp(App):
 
     def on_picasa_clicked(self,widget):
         if self.picasa.has_auth():
-            pass
+            self.publishLayer.clean_widgets()
+            self.layers.remove(self.publishLayer)
+            self.adjust_clouds()
+            libpub.prime.canvas.redraw()
+            self.imageLayer.upload(self.picasa)
         else:
             if not self.publishLayer:
                 self.publishLayer = PublishLayer(app=self)
@@ -363,21 +369,27 @@ class PublishrApp(App):
         if success:
             self.layers.remove(self.publishLayer)
             
-            self.buttonLayer.publishButton.text = 'Publish'
+            self.publishLayer.clean_widgets()
             self.buttonLayer.publishButton.redraw()
             self.adjust_clouds()
             libpub.prime.canvas.redraw()
-            
-            #self.imageLayer.upload(self.flickr)
-            #from threading import Thread
-            #ut = Thread(target=self.imageLayer.upload,args=[self.flickr,])
-            #ut.run()
         
     def on_picasa_authorize(self,widget):
-        self.picasa.login(
+        try:
+            self.picasa.login(
                     self.publishLayer.picasaUsernameEntry.text,
-                    self.publishLayer.picasaPasswordEntry.text)
+                    self.publishLayer.picasaPasswordEntry.text,
+                    save=True)
+            self.publishLayer.clean_widgets()
+        except libpub.gdata.service.BadAuthentication, bae:
+            libpub.alert('Invalid username or password')
+            return
+
         if self.picasa.has_auth():
+            self.layers.remove(self.publishLayer)
+            self.adjust_clouds()
+            libpub.prime.canvas.redraw()
             self.imageLayer.upload(self.picasa)
         
+        self.publishLayer.clean_widgets()
             

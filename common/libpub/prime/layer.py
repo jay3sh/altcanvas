@@ -148,8 +148,7 @@ class ImageLayer(Layer):
                                 title = img.title,
                                 description = img.desc,
                                 is_public = True,
-                                tags = img.tags,
-                                photoset = photoset)
+                                tags = img.tags)
 
                         img.update_icon()
                         self.App.refresh_upload_status(count,total)
@@ -412,30 +411,40 @@ class PublishLayer(Layer):
         self.bcolor.a = 0.98
         self.tcolor.r,self.tcolor.g,self.tcolor.b = html2rgb(0xEF,0xEF,0xEF)
         
-        login_w = 100 
-        login_h = 35
+        self.serviceButtonW = 100 
+        self.serviceButtonH = 35
         self.cx = self.px + pad_w/2
         self.cy = self.py + pad_h/2
             
-        self.flickrButton = Button(login_w,login_h,
+        self.flickrButton = Button(self.serviceButtonW,
+                                  self.serviceButtonH,
                                   'Flickr',
                                   fontsize=18,
                                   fontweight=cairo.FONT_WEIGHT_NORMAL,
                                   ocolor=self.icolor,
                                   tcolor=self.tcolor)
-        self.widgetQ.append(WidgetWrapper(self.flickrButton,
-                                      self.cx-login_w-login_w/4,self.cy-login_h/4))
         self.flickrButton.register_click_listener(self.App.on_flickr_clicked)
     
-        self.picasaButton = Button(login_w,login_h,
+        self.picasaButton = Button(self.serviceButtonW,
+                                   self.serviceButtonH,
                                    'Picasa',
                                    fontsize=18,
                                    fontweight=cairo.FONT_WEIGHT_NORMAL,
                                    ocolor=self.icolor,
                                    tcolor=self.tcolor)
-        self.widgetQ.append(WidgetWrapper(self.picasaButton,
-                                      self.cx+login_w/4,self.cy-login_h/4))
         self.picasaButton.register_click_listener(self.App.on_picasa_clicked)
+
+        self.opening_layout()
+
+    def opening_layout(self):
+        if not self.widgetQ.hasWidget(self.flickrButton):
+            self.widgetQ.append(WidgetWrapper(self.flickrButton,
+                  self.cx-self.serviceButtonW-self.serviceButtonW/4,
+                  self.cy-self.serviceButtonH/4))
+        if not self.widgetQ.hasWidget(self.picasaButton):
+            self.widgetQ.append(WidgetWrapper(self.picasaButton,
+                                      self.cx+self.serviceButtonW/4,
+                                      self.cy-self.serviceButtonH/4))
 
     def clean_widgets(self):
         # Clean everything except the background
@@ -491,31 +500,31 @@ class PublishLayer(Layer):
     def prompt_flickr_auth_1(self):
         self.clean_widgets()
         
-        login_w = 325 
-        login_h = 35
-        self.flickrAuthButton = Button(login_w,login_h,
+        lw = 325 
+        lh = 35
+        self.flickrAuthButton = Button(lw,lh,
                                    'Authorize AltCanvas!',
                                    fontsize=22,
                                    fontweight=cairo.FONT_WEIGHT_BOLD,
                                    ocolor=self.ocolor,
                                    tcolor=self.tcolor)
         self.widgetQ.append(WidgetWrapper(self.flickrAuthButton,
-                                          self.cx-login_w/2,self.cy-login_h/2))
+                                          self.cx-lw/2,self.cy-lh/2))
         self.flickrAuthButton.register_click_listener(self.App.on_flickr_authorize)
         
     def prompt_flickr_auth_2(self):
         self.clean_widgets()
             
-        login_w = 100 
-        login_h = 35
-        self.flickrDoneButton = Button(login_w,login_h,
-                                       'Done ?!',
-                                       fontsize=22,
-                                   	   fontweight=cairo.FONT_WEIGHT_BOLD,
-                                   	   ocolor=self.ocolor,
-                                       tcolor=self.tcolor)
+        lw = 100 
+        lh = 35
+        self.flickrDoneButton = Button(lw,lh,
+                                   'Done ?!',
+                                   fontsize=22,
+                                   fontweight=cairo.FONT_WEIGHT_BOLD,
+                                   ocolor=self.ocolor,
+                                   tcolor=self.tcolor)
         self.widgetQ.append(WidgetWrapper(self.flickrDoneButton,
-                                          self.cx-login_w/2,self.cy-login_h/2))
+                                          self.cx-lw/2,self.cy-lh/2))
         
         self.flickrDoneButton.register_click_listener(self.App.on_flickr_authdone)
         

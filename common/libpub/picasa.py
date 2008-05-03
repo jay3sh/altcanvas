@@ -51,8 +51,13 @@ class PicasawebObject:
             self.picweb.ClientLogin(last_username, last_password) 
             self._has_auth = True
     
-    def login(self,username,password):
+    def login(self,username,password,save=False):
         self.picweb.ClientLogin(username,password)
+        if save:
+            libpub.conf.set('PICASA_LAST_USERNAME',username)
+            encpass = libpub.utils.encrypt(password)
+            libpub.conf.set('PICASA_LAST_PASSWORD',encpass)
+
         self._has_auth = True
         
     def has_auth(self):
