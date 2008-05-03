@@ -211,7 +211,7 @@ class ButtonLayer(Layer):
                                    tcolor=tcolor)
         self.widgetQ.append(WidgetWrapper(self.publishButton,self.app_width-120,
                                           self.app_height-100))
-        self.publishButton.register_click_listener(self.App.on_flickr_clicked)
+        self.publishButton.register_click_listener(self.App.on_publish_clicked)
 
         self.quitButton = Button(100,35,'Quit',fontsize=20,
                                    fontweight=cairo.FONT_WEIGHT_BOLD,

@@ -97,22 +97,11 @@ class Canvas(BaseWindow):
         if self.isLoaded:
             return
         
-        if detect_platform() == 'Nokia':
-            app = PublishrApp('/mnt/bluebox/photos')
-        else:
-            app = PublishrApp('/photos/altimages/jyro')
+        app = PublishrApp()
             
         #app.register_change_listener(self.on_app_change)
         self.appQ.append((app,0,0))
         self.isLoaded = True
-        
-    '''
-    def on_app_change(self,app):
-        # In future we will use app's params to decide if we want
-        # to update or not
-        self.redraw()
-        self.da.window.draw_drawable(self.gc, self.pixmap, 0,0, 0,0, -1,-1)
-    '''
         
     def __redraw(self):
         self.ctx.rectangle(0,0,self.CANVAS_WIDTH,self.CANVAS_HEIGHT)

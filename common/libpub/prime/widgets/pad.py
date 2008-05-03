@@ -21,16 +21,13 @@
 import gtk
 import cairo
 from math import pi as PI
+import libpub
 from libpub.prime.widget import Widget
 import libpub.prime.mask as mask
 from libpub.prime import utils
-
 from libpub.prime.utils import RGBA
 
-if utils.detect_platform() == 'Nokia':
-    WALLPAPER_PATH = '/usr/share/altpublishr/icons/altpublishr.png'
-else:
-    WALLPAPER_PATH = '/home/jayesh/workspace/altcanvas/install/altpublishr.svg'
+WALLPAPER_PATH = libpub.IMAGE_DIR+'/altpublishr.png'
 
 class Pad(Widget):
     (RECT,ROUNDED_RECT) = range(2)

@@ -111,7 +111,7 @@ class PublishrApp(App):
         self.layers.append(self.buttonLayer)
 
         if not self.flickr.has_auth():
-            self.buttonLayer.publishButton.text = 'Sign In'
+            #self.buttonLayer.publishButton.text = 'Sign In'
             self.buttonLayer.publishButton.redraw()
             
         self.adjust_clouds()
@@ -324,9 +324,9 @@ class PublishrApp(App):
         
     def on_flickr_clicked(self,widget):
         if self.flickr.has_auth():
-            #self.layers.remove(self.publishLayer)
-            #self.adjust_clouds()
-            #libpub.prime.canvas.redraw()
+            self.layers.remove(self.publishLayer)
+            self.adjust_clouds()
+            libpub.prime.canvas.redraw()
             self.imageLayer.upload(self.flickr)
         else:
             if not self.publishLayer:
@@ -341,15 +341,11 @@ class PublishrApp(App):
         if not self.flickr.has_auth():
             url = self.flickr.get_authurl()
             if detect_platform() == 'Nokia':
-                #libpub.prime.canvas.unfullscreen()
                 libpub.prime.canvas.unmaximize()
             open_browser(url[0])
             self.publishLayer.prompt_flickr_auth_2()
             
     def on_flickr_authdone(self,widget):
-        #if detect_platform() == 'Nokia':
-        #    libpub.prime.canvas.fullscreen()
-            
         success = self.flickr.get_authtoken()
             
         if success:

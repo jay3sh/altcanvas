@@ -67,12 +67,9 @@ class Image(Widget):
         ctx3.mask_surface(gradient)
         
         
-if utils.detect_platform() == 'Nokia':
-    NOTE_PATH = '/usr/share/altpublishr/icons/note.png'
-    GLOBE_PATH = '/usr/share/altpublishr/icons/globe.png'
-else:
-    NOTE_PATH = '/home/jayesh/workspace/altcanvas/install/note.svg'
-    GLOBE_PATH = '/home/jayesh/workspace/altcanvas/install/globe.svg'
+import libpub
+NOTE_PATH = libpub.IMAGE_DIR+'/note.png'
+GLOBE_PATH = libpub.IMAGE_DIR+'/globe.png'
 
 note_pixbuf = gtk.gdk.pixbuf_new_from_file(NOTE_PATH)
 globe_pixbuf = gtk.gdk.pixbuf_new_from_file(GLOBE_PATH)

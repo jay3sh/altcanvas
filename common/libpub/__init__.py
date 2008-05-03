@@ -33,6 +33,8 @@ SERVER = 'http://www.altcanvas.com/xmlrpc/'
 VERSION = '0.5.0'
 HOSTAPP = '_'
 SERVICE_CHOICE = '_'
+
+IMAGE_DIR = '/home/maemo/sb-maemo/altcanvas/install'
     
 def start(hostapp='_',fnames=None,guiwindow=None):
     global conf,window,filename_list,HOSTAPP
@@ -57,11 +59,12 @@ def start(hostapp='_',fnames=None,guiwindow=None):
     window.show()
     
 def start_prime():
-    global conf,HOSTAPP,VERSION
+    global conf,HOSTAPP,VERSION,IMAGE_DIR
     HOSTAPP = 'Maemo' 
     VERSION = '0.6.0'
     import utils.config
     conf = utils.config.Config()
+
     
         
 LicenseList = [
