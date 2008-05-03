@@ -37,6 +37,7 @@ from libpub.prime.layer import Layer,ImageLayer,InputLayer, \
 
 import libpub
 import libpub.flickr_local as flickr
+import libpub.picasa as picasa
             
 class App:
     
@@ -102,6 +103,7 @@ class PublishrApp(App):
         # Other initialization
         libpub.start_prime()
         self.flickr = flickr.FlickrObject()
+        self.picasa = picasa.PicasawebObject()
             
         
         self.imageLayer = ImageLayer(app=self,isVisible=True)
@@ -300,8 +302,6 @@ class PublishrApp(App):
         gtk.main_quit()
     
     def on_publish_clicked(self,widget):
-        if self.imageLayer.total_image_count is 0:
-            return
         
         if not self.publishLayer:
             self.publishLayer = PublishLayer(app=self)
@@ -336,6 +336,18 @@ class PublishrApp(App):
             self.publishLayer.prompt_flickr_auth_1()
             self.adjust_clouds()
             libpub.prime.canvas.redraw()
+
+    def on_picasa_clicked(self,widget):
+        if self.picasa.has_auth():
+            pass
+        else:
+            if not self.publishLayer:
+                self.publishLayer = PublishLayer(app=self)
+            if self.publishLayer not in self.layers:
+                self.layers.append(self.publishLayer)
+            self.publishLayer.prompt_picasa_auth()
+            self.adjust_clouds()
+            libpub.prime.canvas.redraw()
         
     def on_flickr_authorize(self,widget):
         if not self.flickr.has_auth():
@@ -361,5 +373,11 @@ class PublishrApp(App):
             #ut = Thread(target=self.imageLayer.upload,args=[self.flickr,])
             #ut.run()
         
+    def on_picasa_authorize(self,widget):
+        self.picasa.login(
+                    self.publishLayer.picasaUsernameEntry.text,
+                    self.publishLayer.picasaPasswordEntry.text)
+        if self.picasa.has_auth():
+            self.imageLayer.upload(self.picasa)
         
             

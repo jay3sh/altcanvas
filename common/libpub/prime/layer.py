@@ -124,19 +124,33 @@ class ImageLayer(Layer):
                     # not already uploaded
                     if img.title and not img.url:
                         count += 1
+
+                        # Temp hack
+                        if isinstance(service,
+                                libpub.picasa.PicasawebObject):
+
+                            imgO = service.upload(
+                                filename = img.path,
+                                title = img.title,
+                                summary = img.desc,
+                                tags = img.tags,
+                                album = 'altpublishr')
+
+                            if not imgO:
+                                raise Exception(
+                                    'Unknown Picasa failure')
+                            img.url = imgO.GetHtmlLink().href
+
+                        else:
                         
-                        '''
-                        ut = Thread(target=self.upload_thread,
-                                    args=[service,img.path,img.title,img.desc,True,img.tags])
-                        ut.run()
-                        ut.join()
-                        '''
-                        img.url = service.upload(
-                            filename = img.path,
-                            title = img.title,
-                            description = img.desc,
-                            is_public = True,
-                            tags = img.tags)
+                            img.url = service.upload(
+                                filename = img.path,
+                                title = img.title,
+                                description = img.desc,
+                                is_public = True,
+                                tags = img.tags,
+                                photoset = photoset)
+
                         img.update_icon()
                         self.App.refresh_upload_status(count,total)
                         if not img.url:
@@ -368,6 +382,7 @@ class InputLayer(Layer):
         
 class PublishLayer(Layer):
     flickr = None 
+    icolor = RGBA()
     ocolor = RGBA()
     bcolor = RGBA()
     tcolor = RGBA()
@@ -389,7 +404,9 @@ class PublishLayer(Layer):
         
         self.widgetQ.append(WidgetWrapper(self.background,self.px,self.py))
         
-        self.ocolor.r,self.ocolor.g,self.ocolor.b = html2rgb(0x3F,0x3F,0x3F)
+        self.icolor.r,self.icolor.g,self.icolor.b = html2rgb(0x3F,0x3F,0x3F)
+        self.icolor.a = 1.00
+        self.ocolor.r,self.ocolor.g,self.ocolor.b = html2rgb(0x1F,0x1F,0x1F)
         self.ocolor.a = 1.00
         self.bcolor.r,self.bcolor.g,self.bcolor.b = html2rgb(0xCF,0xCF,0xCF)
         self.bcolor.a = 0.98
@@ -404,7 +421,7 @@ class PublishLayer(Layer):
                                   'Flickr',
                                   fontsize=18,
                                   fontweight=cairo.FONT_WEIGHT_NORMAL,
-                                  ocolor=self.ocolor,
+                                  ocolor=self.icolor,
                                   tcolor=self.tcolor)
         self.widgetQ.append(WidgetWrapper(self.flickrButton,
                                       self.cx-login_w-login_w/4,self.cy-login_h/4))
@@ -414,10 +431,11 @@ class PublishLayer(Layer):
                                    'Picasa',
                                    fontsize=18,
                                    fontweight=cairo.FONT_WEIGHT_NORMAL,
-                                   ocolor=self.ocolor,
+                                   ocolor=self.icolor,
                                    tcolor=self.tcolor)
         self.widgetQ.append(WidgetWrapper(self.picasaButton,
                                       self.cx+login_w/4,self.cy-login_h/4))
+        self.picasaButton.register_click_listener(self.App.on_picasa_clicked)
 
     def clean_widgets(self):
         # Clean everything except the background
@@ -430,6 +448,45 @@ class PublishLayer(Layer):
                 toremove.append(ww.widget)
         for w in toremove:
             self.widgetQ.remove(w)
+
+    def prompt_picasa_auth(self):
+        self.clean_widgets()
+
+        self.picasaUsernameEntry = Entry(
+                            w=300,
+                            num_lines=1,
+                            label='UserName',
+                            icolor=self.icolor,
+                            ocolor=self.ocolor,
+                            tcolor=self.tcolor,
+                            bcolor=self.bcolor
+                        )
+        self.picasaPasswordEntry = Entry(
+                            w=300,
+                            num_lines=1,
+                            label='Password',
+                            icolor=self.icolor,
+                            ocolor=self.ocolor,
+                            tcolor=self.tcolor,
+                            bcolor=self.bcolor
+                        )
+        self.picasaAuthButton = Button(300,30,
+                                    'Login',
+                                    fontsize=18,
+                                    fontweight=cairo.FONT_WEIGHT_BOLD,
+                                    ocolor=self.icolor,
+                                    tcolor=self.tcolor
+                                )
+
+        self.widgetQ.append(WidgetWrapper(self.picasaUsernameEntry,
+                                self.cx-150, self.py+30))
+        self.widgetQ.append(WidgetWrapper(self.picasaPasswordEntry,
+                                self.cx-150, self.py+90))
+        self.widgetQ.append(WidgetWrapper(self.picasaAuthButton,
+                                self.cx-150, self.py+160))
+
+        self.picasaAuthButton.register_click_listener(self.App.on_picasa_authorize)
+
         
     def prompt_flickr_auth_1(self):
         self.clean_widgets()
@@ -437,11 +494,11 @@ class PublishLayer(Layer):
         login_w = 325 
         login_h = 35
         self.flickrAuthButton = Button(login_w,login_h,
-                                       'Authorize AltCanvas!',
-                                       fontsize=22,
-                                   	   fontweight=cairo.FONT_WEIGHT_BOLD,
-                                   	   ocolor=self.ocolor,
-                                       tcolor=self.tcolor)
+                                   'Authorize AltCanvas!',
+                                   fontsize=22,
+                                   fontweight=cairo.FONT_WEIGHT_BOLD,
+                                   ocolor=self.ocolor,
+                                   tcolor=self.tcolor)
         self.widgetQ.append(WidgetWrapper(self.flickrAuthButton,
                                           self.cx-login_w/2,self.cy-login_h/2))
         self.flickrAuthButton.register_click_listener(self.App.on_flickr_authorize)

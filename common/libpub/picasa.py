@@ -87,5 +87,5 @@ class PicasawebObject:
         for tag in tags.split():
             pws.InsertTag(img,tag)
                 
-        return True
+        return img 
     
