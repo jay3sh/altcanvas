@@ -231,7 +231,8 @@ class ButtonLayer(Layer):
                                    icolor=icolor,
                                    ocolor=ocolor,
                                    tcolor=tcolor)
-        self.widgetQ.append(WidgetWrapper(self.quitButton,self.app_width-120,
+        self.widgetQ.append(WidgetWrapper(self.quitButton,
+                                          self.app_width-120,
                                           self.app_height-50))
         self.quitButton.register_click_listener(self.App.on_quit_clicked)
         
@@ -527,6 +528,41 @@ class PublishLayer(Layer):
                                           self.cx-lw/2,self.cy-lh/2))
         
         self.flickrDoneButton.register_click_listener(self.App.on_flickr_authdone)
+
+    def prompt_final_upload(self,service):
+        self.clean_widgets()
+
+        if isinstance(service,libpub.picasa.PicasawebObject):
+            albumLabel = 'Album to upload to'
+            albumList = service.get_albums()
+        else:
+            albumLabel = 'Photoset to upload to'
+
+        self.albumEntry = Entry(
+                            w=200,
+                            num_lines=1,
+                            label=albumLabel,
+                            icolor=self.icolor,
+                            ocolor=self.ocolor,
+                            tcolor=self.tcolor,
+                            bcolor=self.bcolor
+                            )
+        self.albumEntry.text = 'Pick one...'
+
+        lw = 200 
+        lh = 35
+        self.widgetQ.append(WidgetWrapper(self.albumEntry,
+                                          self.cx-lw/2,self.cy-lh/2))
+
+        self.albumDropdown = Image(
+            path=libpub.IMAGE_DIR+'/dropdown.svg',w=40,h=40)
+        self.albumDropdown.data = albumList
+
+        self.widgetQ.append(WidgetWrapper(self.albumDropdown,
+                                    self.cx+lw/2+5,self.cy-40/2))
+        self.albumDropdown.register_click_listener(
+                self.App.on_pick_album)
+
         
 
 class ListPickerLayer(Layer):
@@ -572,6 +608,10 @@ class ListPickerLayer(Layer):
                                 icolor=self.icolor,
                                 tcolor=self.tcolor
                                 )
+            # Hide the album name in button widget
+            btn.data = option
+            btn.register_click_listener(
+                self.App.on_album_picked)
             optionButtons.append(btn)
             xi = ox0
             yi = oy0+i*(self.oh+int(self.fudge_factor*self.oh))

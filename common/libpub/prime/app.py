@@ -33,7 +33,7 @@ from libpub.prime.utils import get_image_locations,get_uniform_fit, \
 from libpub.prime.animation import Path
 from libpub.prime.widgetq import WidgetQueue
 from libpub.prime.layer import Layer,ImageLayer,InputLayer, \
-                                    ButtonLayer, PublishLayer
+                        ButtonLayer, PublishLayer, ListPickerLayer
 
 import libpub
 import libpub.flickr_local as flickr
@@ -48,7 +48,7 @@ class App:
     app_width = 800
     app_height = 480
     
-    def __init__(self):                    
+    def __init__(self):
         # Setup cairo surface and context
         self.surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,
                                           self.app_width,self.app_height)
@@ -164,6 +164,7 @@ class PublishrApp(App):
                 libpub.prime.canvas.redraw()
                 
         if self.publishLayer in self.layers:
+            self.publishLayer.clean_widgets()
             self.layers.remove(self.publishLayer)
             self.adjust_clouds()
             libpub.prime.canvas.redraw()
@@ -341,11 +342,10 @@ class PublishrApp(App):
 
     def on_picasa_clicked(self,widget):
         if self.picasa.has_auth():
-            self.publishLayer.clean_widgets()
-            self.layers.remove(self.publishLayer)
+            self.publishLayer.prompt_final_upload(self.picasa)
             self.adjust_clouds()
             libpub.prime.canvas.redraw()
-            self.imageLayer.upload(self.picasa)
+            #self.imageLayer.upload(self.picasa)
         else:
             if not self.publishLayer:
                 self.publishLayer = PublishLayer(app=self)
@@ -393,3 +393,24 @@ class PublishrApp(App):
         
         self.publishLayer.clean_widgets()
             
+    def on_pick_album(self,widget):
+        albums = widget.data
+
+        # TODO: remove hardcoding
+        ew = 200
+        eh = 35
+        ex = self.app_width/2 - ew/2
+        ey = self.app_height/2 - eh/2
+        self.lplayer = ListPickerLayer(app=self,optionList=albums,
+            entry_dim=(ex,ey,ew,eh))
+
+        self.layers.append(self.lplayer)
+        self.adjust_clouds()
+        libpub.prime.canvas.redraw()
+
+    def on_album_picked(self,widget):
+        self.album_choice = widget.data
+        if self.lplayer in self.layers:
+            self.layers.remove(self.lplayer)
+            self.adjust_clouds()
+            libpub.prime.canvas.redraw()

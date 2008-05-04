@@ -42,6 +42,9 @@ class Widget:
     app = None
     
     surface = None
+
+    # A void* data for event passing mechanism
+    data = None
     
     '''
         "clouds" are the parts of other widgets that cloud

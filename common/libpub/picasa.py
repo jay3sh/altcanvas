@@ -62,6 +62,13 @@ class PicasawebObject:
         
     def has_auth(self):
         return self._has_auth
+
+    def get_albums(self):
+        album_feed = self.picweb.GetUserFeed().entry
+        albums = []
+        for entry in album_feed:
+            albums.append(entry.title.text)
+        return albums
         
     def upload(self,filename,title,summary,tags,album):
         pws = self.picweb
