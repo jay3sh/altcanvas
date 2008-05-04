@@ -528,3 +528,32 @@ class PublishLayer(Layer):
         
         self.flickrDoneButton.register_click_listener(self.App.on_flickr_authdone)
         
+
+class ListPickerLayer(Layer):
+    def __init__(self,app,optionList,entry_dim):
+        Layer.__init__(self, app=app, isVisible=True)
+
+        self.optionList = optionList
+
+        fudge_factor = 0.4
+
+        # unpack entry dimensions
+        (ex,ey,ew,eh) = entry_dim
+
+        ow = 200
+        oh = 30
+        oy0 = int((self.App.app_height - \
+                    (1+fudge_factor)*len(self.optionList)*oh)/2)
+        ox0 = ex + 20
+
+        i = 0
+        optionButtons = []
+        for option in self.optionList:
+            btn = Button(w=ow,h=oh,text=option)
+            optionButtons.append(btn)
+            xi = ox0
+            yi = oy0+i*(oh+int(fudge_factor*oh))
+            self.widgetQ.append(WidgetWrapper(btn,xi,yi))
+            i+=1
+
+    
