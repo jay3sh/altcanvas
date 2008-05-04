@@ -45,7 +45,7 @@ class ScratchApp(gtk.Window):
         #
         # Choose HERE which scratch to draw
         #
-        self.draw_fonts(surface)
+        self.draw_dropdown(surface)
         
         self.ctx.set_source_surface(surface)
         self.ctx.paint()
@@ -55,6 +55,69 @@ class ScratchApp(gtk.Window):
     
     def run(self):
         gtk.main()
+
+    def draw_dropdown(self,surface):
+        ctx = cairo.Context(surface)
+        optionList = ['Jungle trip',
+                      'Lake Tahoe',
+                      'San Francisco',
+                      'Saturday party']
+        w = 200
+        h = 30
+        x0 = 200
+        y0 = 200
+
+        ox0 = x0+100
+        oy0 = y0-100
+        ow = 200
+        oh = 30
+
+        ctx.set_source_rgb(1,1,1)
+        ctx.rectangle(x0,y0,w,h)
+        ctx.fill()
+
+        x0 += 20
+        y0 += 15
+        i = 0
+        ctx.set_source_rgb(0.2,0.2,0.2)
+        for option in optionList:
+            xi = ox0
+            yi = oy0+i*(oh+int(0.3*oh))
+            ctx.rectangle(xi,yi,ow,oh)
+            ctx.fill()
+
+            xb,yb = (x0,y0)
+            ctx.move_to(xb,yb)
+
+            xe,ye = (xi,yi+int(oh/5))
+
+            dx = xe-xb
+            dy = ye-yb
+            x1 = xb
+            y1 = yb+8*dy/10
+            x2 = xe
+            y2 = ye
+
+            ctx.curve_to(x1,y1,x2,y2,xe,ye)
+
+            ctx.line_to(xe,ye+int(3*oh/5))
+
+            xb,yb = (xe,ye+int(3*oh/5))
+            xe,ye = x0,y0
+
+            dx = xe-xb
+            dy = ye-yb
+            x1 = xe
+            y1 = yb+2*dy/10
+            x2 = xe
+            y2 = ye
+
+            ctx.curve_to(x1,y1,x2,y2,xe,ye)
+            
+
+
+            ctx.fill()
+            i+=1
         
     def draw_fonts(self,surface):
         ctx = cairo.Context(surface)
