@@ -530,30 +530,109 @@ class PublishLayer(Layer):
         
 
 class ListPickerLayer(Layer):
+    icolor = RGBA()
+    ocolor = RGBA()
+    bcolor = RGBA()
+    tcolor = RGBA()
     def __init__(self,app,optionList,entry_dim):
         Layer.__init__(self, app=app, isVisible=True)
 
         self.optionList = optionList
 
-        fudge_factor = 0.4
+        self.fudge_factor = 0.4
 
         # unpack entry dimensions
         (ex,ey,ew,eh) = entry_dim
 
-        ow = 200
-        oh = 30
+        self.icolor.r,self.icolor.g,self.icolor.b = \
+            html2rgb(0x3F,0x3F,0x3F)
+        self.icolor.a = 1.00
+        self.ocolor.r,self.ocolor.g,self.ocolor.b = \
+            html2rgb(0x1F,0x1F,0x1F)
+        self.ocolor.a = 1.00
+        self.bcolor.r,self.bcolor.g,self.bcolor.b = \
+            html2rgb(0xCF,0xCF,0xCF)
+        self.bcolor.a = 0.98
+        self.tcolor.r,self.tcolor.g,self.tcolor.b = \
+            html2rgb(0xEF,0xEF,0xEF)
+
+        self.ow = 200
+        self.oh = 30
         oy0 = int((self.App.app_height - \
-                    (1+fudge_factor)*len(self.optionList)*oh)/2)
-        ox0 = ex + 20
+                (1+self.fudge_factor)*len(self.optionList)*self.oh)/2)
+        ox0 = ex + 60
+
+        self.draw_connectors(ex,ey,ox0,oy0,len(self.optionList))
 
         i = 0
         optionButtons = []
         for option in self.optionList:
-            btn = Button(w=ow,h=oh,text=option)
+            btn = Button(w=self.ow,h=self.oh,text=option,
+                                ocolor=self.icolor,
+                                icolor=self.icolor,
+                                tcolor=self.tcolor
+                                )
             optionButtons.append(btn)
             xi = ox0
-            yi = oy0+i*(oh+int(fudge_factor*oh))
+            yi = oy0+i*(self.oh+int(self.fudge_factor*self.oh))
             self.widgetQ.append(WidgetWrapper(btn,xi,yi))
             i+=1
 
+
+    
+    def draw_connectors(self,ex,ey,ox0,oy0,count):
+        from libpub.prime.widget import Widget
+        customWidget = Widget(w=self.App.app_width,
+                            h=self.App.app_height)
+        customWidget.surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,
+                    self.App.app_width,self.App.app_height)
+        ctx = cairo.Context(customWidget.surface)
+
+        ctx.set_source_rgb(self.icolor.r,self.icolor.g,self.icolor.b)
+
+        oh = self.oh
+
+        for i in range(count):
+            xi = ox0
+            yi = oy0+i*(oh+int(self.fudge_factor*oh))
+            x1,y1 = (ex,ey)
+            x2,y2 = (xi,yi+oh/5)
+            x3,y3 = (xi,yi+4*oh/5)
+            # Point 1
+            ctx.move_to(x1,y1)
+    
+            # Point 2
+            xb = x1
+            yb = y1
+            xe = x2
+            ye = y2
+    
+            dx = xe-xb
+            dy = ye-yb
+            px1 = xb
+            py1 = yb+8*dy/10
+            px2 = xe
+            py2 = ye
+    
+            ctx.curve_to(px1,py1,px2,py2,xe,ye)
+    
+            # Point 3
+            ctx.line_to(x3,y3)
+    
+            # Back to Point 1
+            xb,yb = x3,y3
+            xe,ye = x1,y1
+    
+            dx = xe-xb
+            dy = ye-yb
+            px1 = xe
+            py1 = yb+2*dy/10
+            px2 = xe
+            py2 = ye
+    
+            ctx.curve_to(px1,py1,px2,py2,xe,ye)
+    
+            ctx.fill()
+    
+        self.widgetQ.append(WidgetWrapper(customWidget,0,0))
     
