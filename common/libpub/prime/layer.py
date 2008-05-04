@@ -554,12 +554,12 @@ class PublishLayer(Layer):
         self.widgetQ.append(WidgetWrapper(self.albumEntry,
                                           self.cx-lw/2,self.cy-lh/2))
 
-        self.albumDropdown = Image(
-            path=libpub.IMAGE_DIR+'/dropdown.svg',w=40,h=40)
+        from libpub.prime.widgets.button import DropdownButton
+        self.albumDropdown = DropdownButton(w=40,h=40)
         self.albumDropdown.data = albumList
 
         self.widgetQ.append(WidgetWrapper(self.albumDropdown,
-                                    self.cx+lw/2+5,self.cy-40/2))
+                                    self.cx+lw/2+10,self.cy-20+15))
         self.albumDropdown.register_click_listener(
                 self.App.on_pick_album)
 

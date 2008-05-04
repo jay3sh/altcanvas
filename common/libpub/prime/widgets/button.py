@@ -77,3 +77,30 @@ class Button(Widget):
         
         
     
+class DropdownButton(Widget):
+    def __init__(self,w,h):
+        Widget.__init__(self,w,h)
+        self.redraw()
+
+    def redraw(self):
+        from math import pi as PI
+        w = self.w
+        h = self.h
+        r = int(min(w,h)/2)
+        self.surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,w,h)
+        ctx = cairo.Context(self.surface)
+
+        ctx.set_source_rgb(0.2,0.2,0.2)
+        ctx.arc(w/2,h/2,r,0,2*PI)
+        ctx.fill()
+
+        ctx.set_source_rgb(0.8,0.8,0.8)
+        pts = ((w/5,h/4),(4*w/5,h/4),(w/2,3*h/4))
+
+        ctx.move_to(pts[2][0],pts[2][1])
+        for pt in pts:
+            ctx.line_to(pt[0],pt[1])
+        ctx.fill()
+
+
+
