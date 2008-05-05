@@ -533,10 +533,14 @@ class PublishLayer(Layer):
         self.clean_widgets()
 
         if isinstance(service,libpub.picasa.PicasawebObject):
-            albumLabel = 'Album to upload to'
+            albumLabel = 'Album'
             albumList = service.get_albums()
         else:
-            albumLabel = 'Photoset to upload to'
+            albumLabel = 'Photoset'
+
+        def reset_entry(widget):
+            widget.text = ''
+            widget.redraw()
 
         self.albumEntry = Entry(
                             w=200,
@@ -547,7 +551,9 @@ class PublishLayer(Layer):
                             tcolor=self.tcolor,
                             bcolor=self.bcolor
                             )
-        self.albumEntry.text = 'Pick one...'
+        self.albumEntry.text = 'New or Pick one...'
+        self.albumEntry.redraw()
+        self.albumEntry.register_click_listener(reset_entry)
 
         lw = 200 
         lh = 35
@@ -594,9 +600,9 @@ class ListPickerLayer(Layer):
 
         self.ow = 200
         self.oh = 30
-        oy0 = int((self.App.app_height - \
+        oy0 = int((self.App.app_height - 200 -\
                 (1+self.fudge_factor)*len(self.optionList)*self.oh)/2)
-        ox0 = ex + 60
+        ox0 = ex + 75
 
         self.draw_connectors(ex,ey,ox0,oy0,len(self.optionList))
 
