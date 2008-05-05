@@ -96,8 +96,9 @@ class PicasawebObject:
                 filename_or_handle = filename)
             
         # Insert tag
-        for tag in tags.split():
-            pws.InsertTag(img,tag)
+        if tags:
+            for tag in tags.split():
+                pws.InsertTag(img,tag)
                 
         return img 
     

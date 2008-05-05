@@ -120,6 +120,14 @@ class FlickrObject:
         else:
             return False
         
+    def get_photoset_objects(self):
+        userinfo = self.flickr.auth_checkToken(auth_token=self.authtoken)
+        self.photosets = self.flickr.photosets_getList(user_id=userinfo.nsid)
+        if not self.photosets:
+            return []
+
+        return self.photosets
+
     def get_photosets(self):
         userinfo = self.flickr.auth_checkToken(auth_token=self.authtoken)
         self.photosets = self.flickr.photosets_getList(user_id=userinfo.nsid)
@@ -192,14 +200,14 @@ class FlickrObject:
             raise FlickrException('Failed to get URL of uploaded image')
         
         # Find the photoset ID chosen from album drop down
-        self.photosets = self.get_photosets()
+        self.photosets = self.get_photoset_objects()
         if self.photosets == None:
             self.photosets = []
             
         target_set_id = None
-        for set in self.photosets:
-            if set.title == photoset:
-                target_set_id = set.id
+        for pset in self.photosets:
+            if pset.title == photoset:
+                target_set_id = pset.id
                 break
             
         # If user has left the photoset field blank then he doesn't want to
