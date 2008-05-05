@@ -409,7 +409,8 @@ class PublishrApp(App):
         libpub.prime.canvas.redraw()
 
     def on_album_picked(self,widget):
-        self.album_choice = widget.data
+        self.publishLayer.albumEntry.text = widget.data
+        self.publishLayer.albumEntry.redraw()
         if self.lplayer in self.layers:
             self.layers.remove(self.lplayer)
             self.adjust_clouds()
