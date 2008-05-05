@@ -123,9 +123,15 @@ class FlickrObject:
     def get_photosets(self):
         userinfo = self.flickr.auth_checkToken(auth_token=self.authtoken)
         self.photosets = self.flickr.photosets_getList(user_id=userinfo.nsid)
-        if self.photosets == None:
-            self.photosets = []
-        return self.photosets
+        if not self.photosets:
+            return []
+
+        photosetList = []
+        for photoset in self.photosets:
+            photosetList.append(photoset.title)
+
+        return photosetList
+
     
     def createPhotoSet(self,imageID,curalbum):
         photosetID = self.flickr.photosets_create(

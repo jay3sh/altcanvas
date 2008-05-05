@@ -106,7 +106,7 @@ class ImageLayer(Layer):
             tags = tags)
         return url
         
-    def upload(self,service):
+    def upload(self,service,albumName):
         count = 0
         total = 0
         
@@ -134,7 +134,7 @@ class ImageLayer(Layer):
                                 title = img.title,
                                 summary = img.desc,
                                 tags = img.tags,
-                                album = 'altpublishr')
+                                album = albumName)
 
                             if not imgO:
                                 raise Exception(
@@ -148,7 +148,8 @@ class ImageLayer(Layer):
                                 title = img.title,
                                 description = img.desc,
                                 is_public = True,
-                                tags = img.tags)
+                                tags = img.tags,
+                                photoset = albumName)
 
                         img.update_icon()
                         self.App.refresh_upload_status(count,total)
@@ -537,6 +538,7 @@ class PublishLayer(Layer):
             albumList = service.get_albums()
         else:
             albumLabel = 'Photoset'
+            albumList = service.get_photosets()
 
         def reset_entry(widget):
             widget.text = ''
@@ -569,6 +571,17 @@ class PublishLayer(Layer):
         self.albumDropdown.register_click_listener(
                 self.App.on_pick_album)
 
+        self.uploadButton = Button(w=100,h=35,text='Upload!',
+                                icolor=self.icolor,
+                                ocolor=self.icolor,
+                                tcolor=self.tcolor,
+                                bcolor=self.bcolor)
+        self.uploadButton.register_click_listener(
+                self.App.final_upload)
+        self.uploadButton.data = service
+
+        self.widgetQ.append(WidgetWrapper(self.uploadButton,
+                    self.cx-100/2,self.cy-lh/2+60))
         
 
 class ListPickerLayer(Layer):

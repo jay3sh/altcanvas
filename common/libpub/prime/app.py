@@ -326,11 +326,9 @@ class PublishrApp(App):
         
     def on_flickr_clicked(self,widget):
         if self.flickr.has_auth():
-            self.publishLayer.clean_widgets()
-            self.layers.remove(self.publishLayer)
+            self.publishLayer.prompt_final_upload(self.flickr)
             self.adjust_clouds()
             libpub.prime.canvas.redraw()
-            self.imageLayer.upload(self.flickr)
         else:
             if not self.publishLayer:
                 self.publishLayer = PublishLayer(app=self)
@@ -345,7 +343,6 @@ class PublishrApp(App):
             self.publishLayer.prompt_final_upload(self.picasa)
             self.adjust_clouds()
             libpub.prime.canvas.redraw()
-            #self.imageLayer.upload(self.picasa)
         else:
             if not self.publishLayer:
                 self.publishLayer = PublishLayer(app=self)
@@ -367,12 +364,10 @@ class PublishrApp(App):
         success = self.flickr.get_authtoken()
             
         if success:
-            self.layers.remove(self.publishLayer)
-            
-            self.publishLayer.clean_widgets()
-            self.buttonLayer.publishButton.redraw()
+            self.publishLayer.prompt_final_upload(self.picasa)
             self.adjust_clouds()
             libpub.prime.canvas.redraw()
+
         
     def on_picasa_authorize(self,widget):
         try:
@@ -386,12 +381,10 @@ class PublishrApp(App):
             return
 
         if self.picasa.has_auth():
-            self.layers.remove(self.publishLayer)
+            self.publishLayer.prompt_final_upload(self.picasa)
             self.adjust_clouds()
             libpub.prime.canvas.redraw()
-            self.imageLayer.upload(self.picasa)
         
-        self.publishLayer.clean_widgets()
             
     def on_pick_album(self,widget):
         albums = widget.data
@@ -415,3 +408,18 @@ class PublishrApp(App):
             self.layers.remove(self.lplayer)
             self.adjust_clouds()
             libpub.prime.canvas.redraw()
+
+    def final_upload(self,widget):
+        albumName = self.publishLayer.albumEntry.text
+        if albumName == 'New or Pick one...':
+            libpub.alert('Choose a valid album/photoset')
+            return
+
+        self.publishLayer.clean_widgets()
+        self.layers.remove(self.publishLayer)
+        self.adjust_clouds()
+        libpub.prime.canvas.redraw()
+
+        self.imageLayer.upload(
+                widget.data,                        # service
+                albumName)
