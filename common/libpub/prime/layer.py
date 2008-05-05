@@ -634,8 +634,11 @@ class ListPickerLayer(Layer):
                     self.App.app_width,self.App.app_height)
         ctx = cairo.Context(customWidget.surface)
 
-        ctx.set_source_rgb(self.icolor.r,self.icolor.g,self.icolor.b)
+        ctx.rectangle(0,0,self.App.app_width,self.App.app_height)
+        ctx.set_source_rgba(0.1,0.1,0.1,0.5)
+        ctx.fill()
 
+        ctx.set_source_rgb(self.icolor.r,self.icolor.g,self.icolor.b)
         oh = self.oh
 
         for i in range(count):
