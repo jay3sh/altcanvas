@@ -98,6 +98,41 @@ make_maemo_publishr()
 
 }
 
+make_altmaemo_publishr()
+{
+	rm -rf $TMP_BLDDIR
+	mkdir $TMP_BLDDIR
+
+	(
+		cd $TMP_BLDDIR
+		ln -s $SRCDIR/install/alt-setup.py ./setup.py
+		ln -s $SRCDIR/install/bdist_debian.py ./bdist_debian.py
+		ln -s $SRCDIR/common/libpub ./libpub
+		ln -s $SRCDIR/maemo/publishr-prime/publishr.py ./altpublishr.py
+		ln -s $SRCDIR/install/altpublishr.desktop ./altpublishr.desktop
+
+        for img in altpublishr note globe dropdown
+        do
+		    ln -s $SRCDIR/install/$img.png ./$img.png
+        done
+
+		python setup.py bdist_debian || exit
+
+		if ! [ -d $BLDDIR ]; then
+			mkdir $BLDDIR;
+		fi
+
+		mv dist/*.deb $BLDDIR/
+	)
+
+	rm -rf $TMP_BLDDIR
+
+    scp $BLDDIR/altpublishr-maemo*deb root@192.168.1.100:/root/
+
+    ssh root@192.168.1.100 "(dpkg --purge altpublishr-maemo; cd /root/; dpkg -i altpublishr-maemo*deb)"
+
+}
+
 if [ "$1" = "" ]; then
 	usage
 	exit 1
@@ -123,7 +158,7 @@ case $PACKAGE in
 		make_inkscape_publishr;
 		;;
 	"maemo-publishr")
-		make_maemo_publishr;
+		make_altmaemo_publishr;
 		;;
 	"publishr")
 		make_gimp_publishr;
