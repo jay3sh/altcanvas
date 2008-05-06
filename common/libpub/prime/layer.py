@@ -475,6 +475,7 @@ class PublishLayer(Layer):
         self.picasaPasswordEntry = Entry(
                             w=300,
                             num_lines=1,
+                            hide=True,
                             label='Password',
                             icolor=self.icolor,
                             ocolor=self.ocolor,

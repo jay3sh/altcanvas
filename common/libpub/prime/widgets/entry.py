@@ -40,7 +40,7 @@ class Entry(Widget):
         
         return ctx.font_extents()
     
-    def __init__(self,w=0,
+    def __init__(self,w=0,hide=False,
                  num_lines=1,
                  label='',
                  fontface='sans-serif',
@@ -54,6 +54,7 @@ class Entry(Widget):
         
         Widget.__init__(self,w=w,h=0)
         
+        self.hide = hide
         self.num_lines = num_lines
         self.fontsize = fontsize
         self.icolor = icolor
@@ -149,7 +150,12 @@ class Entry(Widget):
         hi = int(1.4*height)
         self.ctx.set_source_rgba(self.tcolor.r,self.tcolor.g,
                                  self.tcolor.b,self.tcolor.a)
-        show_multiline(w,hi,self.ctx,self.text,y_margin)
+        if self.hide:
+            display_text = '*'*len(self.text)
+        else:
+            display_text = self.text
+            
+        show_multiline(w,hi,self.ctx,display_text,y_margin)
         
         
     KEY_BACKSPACE = 65288
