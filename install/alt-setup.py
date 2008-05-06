@@ -12,8 +12,8 @@ setup(name='altpublishr-maemo',
 	scripts=['altpublishr.py',],
     data_files=[
                 ('share/applications/hildon',['altpublishr.desktop']),
-                ('share/altpublishr/icons',['altpublishr.png','note.png','globe.png'])
+                ('share/altpublishr/icons',['altpublishr.png','note.png','globe.png','dropdown.png'])
                 ],
-	packages=['libpub', 'libpub.utils', 'libpub.prime', 'libpub.prime.widgets'],
+	packages=['libpub', 'libpub.utils', 'libpub.prime', 'libpub.prime.widgets','libpub.gdata','libpub.gdata.base','libpub.gdata.photos','libpub.gdata.geo','libpub.gdata.media','libpub.gdata.exif','libpub.atom'],
 	cmdclass={'bdist_debian': bdist_debian.bdist_debian}
 )

@@ -34,7 +34,8 @@ VERSION = '0.5.0'
 HOSTAPP = '_'
 SERVICE_CHOICE = '_'
 
-IMAGE_DIR = '/home/maemo/sb-maemo/altcanvas/install'
+#IMAGE_DIR = '/home/maemo/sb-maemo/altcanvas/install'
+IMAGE_DIR = '/usr/share/altpublishr/icons'
     
 def start(hostapp='_',fnames=None,guiwindow=None):
     global conf,window,filename_list,HOSTAPP
