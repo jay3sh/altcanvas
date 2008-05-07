@@ -4,7 +4,7 @@ from distutils.core import setup
 import bdist_debian
 
 setup(name='altpublishr-maemo',
-	version='0.6',
+	version='0.6.1',
 	description='Photo publishing to Flickr/Picasa from Maemo device',
 	author='Jayesh Salvi',
 	author_email='jayesh@altfrequency.com',

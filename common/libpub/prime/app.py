@@ -364,7 +364,7 @@ class PublishrApp(App):
         success = self.flickr.get_authtoken()
             
         if success:
-            self.publishLayer.prompt_final_upload(self.picasa)
+            self.publishLayer.prompt_final_upload(self.flickr)
             self.adjust_clouds()
             libpub.prime.canvas.redraw()
 
@@ -423,3 +423,20 @@ class PublishrApp(App):
         self.imageLayer.upload(
                 widget.data,                        # service
                 albumName)
+
+    def signOut(self,widget):
+        service = widget.data
+
+        if isinstance(service,libpub.picasa.PicasawebObject):
+            libpub.conf.set('PICASA_LAST_USERNAME',None)
+            libpub.conf.set('PICASA_LAST_PASSWORD',None)
+            self.picasa = picasa.PicasawebObject()
+        else:
+            libpub.conf.set('FLICKR_TOKEN',None)
+            self.flickr = flickr.FlickrObject()
+
+        self.publishLayer.clean_widgets()
+        self.layers.remove(self.publishLayer)
+        self.adjust_clouds()
+        libpub.prime.canvas.redraw()
+

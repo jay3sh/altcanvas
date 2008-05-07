@@ -151,7 +151,7 @@ class Entry(Widget):
         self.ctx.set_source_rgba(self.tcolor.r,self.tcolor.g,
                                  self.tcolor.b,self.tcolor.a)
         if self.hide:
-            display_text = '*'*len(self.text)
+            display_text = '* '*len(self.text)
         else:
             display_text = self.text
             

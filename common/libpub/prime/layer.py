@@ -512,7 +512,7 @@ class PublishLayer(Layer):
                                    ocolor=self.ocolor,
                                    tcolor=self.tcolor)
         self.widgetQ.append(WidgetWrapper(self.flickrAuthButton,
-                                          self.cx-lw/2,self.cy-lh/2))
+                                      self.cx-lw/2,self.cy-lh/2-15))
         self.flickrAuthButton.register_click_listener(self.App.on_flickr_authorize)
         
     def prompt_flickr_auth_2(self):
@@ -527,7 +527,7 @@ class PublishLayer(Layer):
                                    ocolor=self.ocolor,
                                    tcolor=self.tcolor)
         self.widgetQ.append(WidgetWrapper(self.flickrDoneButton,
-                                          self.cx-lw/2,self.cy-lh/2))
+                                      self.cx-lw/2,self.cy-lh/2+15))
         
         self.flickrDoneButton.register_click_listener(self.App.on_flickr_authdone)
 
@@ -554,21 +554,21 @@ class PublishLayer(Layer):
                             tcolor=self.tcolor,
                             bcolor=self.bcolor
                             )
-        self.albumEntry.text = 'New or Pick one...'
+        self.albumEntry.text = 'Type or Pick one...'
         self.albumEntry.redraw()
         self.albumEntry.register_click_listener(reset_entry)
 
-        lw = 200 
+        lw = 225 
         lh = 35
         self.widgetQ.append(WidgetWrapper(self.albumEntry,
-                              self.cx-lw/2,self.cy-lh/2-20))
+                              self.cx-lw/2+20,self.cy-lh/2-20))
 
         from libpub.prime.widgets.button import DropdownButton
         self.albumDropdown = DropdownButton(w=40,h=40)
         self.albumDropdown.data = albumList
 
         self.widgetQ.append(WidgetWrapper(self.albumDropdown,
-                            self.cx+lw/2+10,self.cy-20-5))
+                            self.cx-lw/2-20-10,self.cy-20))
         self.albumDropdown.register_click_listener(
                 self.App.on_pick_album)
 
@@ -583,7 +583,20 @@ class PublishLayer(Layer):
         self.uploadButton.data = service
 
         self.widgetQ.append(WidgetWrapper(self.uploadButton,
-                    self.cx-100/2,self.cy-lh/2+60))
+                    self.cx-120,self.cy-lh/2+60))
+
+        self.signoutButton = Button(w=100,h=40,text='Signout',
+                                fontsize=22,
+                                icolor=self.icolor,
+                                ocolor=self.icolor,
+                                tcolor=self.tcolor,
+                                bcolor=self.bcolor)
+        self.signoutButton.register_click_listener(
+                self.App.signOut)
+        self.signoutButton.data = service
+
+        self.widgetQ.append(WidgetWrapper(self.signoutButton,
+                    self.cx+20,self.cy-lh/2+60))
         
 
 class ListPickerLayer(Layer):
