@@ -482,9 +482,9 @@ class PublishLayer(Layer):
                             tcolor=self.tcolor,
                             bcolor=self.bcolor
                         )
-        self.picasaAuthButton = Button(300,30,
+        self.picasaAuthButton = Button(200,30,
                                     'Login',
-                                    fontsize=18,
+                                    fontsize=22,
                                     fontweight=cairo.FONT_WEIGHT_BOLD,
                                     ocolor=self.icolor,
                                     tcolor=self.tcolor
@@ -495,7 +495,16 @@ class PublishLayer(Layer):
         self.widgetQ.append(WidgetWrapper(self.picasaPasswordEntry,
                                 self.cx-150, self.py+90))
         self.widgetQ.append(WidgetWrapper(self.picasaAuthButton,
-                                self.cx-150, self.py+160))
+                                self.cx-100, self.py+160))
+
+        def toggle_password_hide(widget):
+            if len(widget.text) == 0:
+               return
+            widget.hide = not widget.hide
+            print widget.hide
+
+        self.picasaPasswordEntry.register_tap_listener(
+                                            toggle_password_hide)
 
         self.picasaAuthButton.register_click_listener(self.App.on_picasa_authorize)
 
