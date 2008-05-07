@@ -665,17 +665,12 @@ class ListPickerLayer(Layer):
             ctx.move_to(x1,y1)
     
             # Point 2
-            xb = x1
-            yb = y1
-            xe = x2
-            ye = y2
+            xb,yb = x1,y1
+            xe,ye = x2,y2
     
-            dx = xe-xb
-            dy = ye-yb
-            px1 = xb
-            py1 = yb+8*dy/10
-            px2 = xe
-            py2 = ye
+            dx,dy = xe-xb,ye-yb
+            px1,py1 = xb,yb+8*dy/10
+            px2,py2 = xe,ye
     
             ctx.curve_to(px1,py1,px2,py2,xe,ye)
     
@@ -686,12 +681,9 @@ class ListPickerLayer(Layer):
             xb,yb = x3,y3
             xe,ye = x1,y1
     
-            dx = xe-xb
-            dy = ye-yb
-            px1 = xe
-            py1 = yb+2*dy/10
-            px2 = xe
-            py2 = ye
+            dx,dy = xe-xb,ye-yb
+            px1,py1 = xe,yb+2*dy/10
+            px2,py2 = xe,ye
     
             ctx.curve_to(px1,py1,px2,py2,xe,ye)
     
