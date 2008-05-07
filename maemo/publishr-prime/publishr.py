@@ -159,7 +159,7 @@ class Canvas(BaseWindow):
             state = event.state
         
         self.__ignore_pointer_count += 1
-        self.__ignore_pointer_count %= 3
+        self.__ignore_pointer_count %= 2
         
         if self.__ignore_pointer_count == 0:
             for app in self.appQ:

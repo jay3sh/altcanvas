@@ -392,7 +392,7 @@ class PublishrApp(App):
         # TODO: remove hardcoding
         ew = 200
         eh = 35
-        ex = self.app_width/2 - ew/2
+        ex = self.app_width/2 - ew/2 + 10
         ey = self.app_height/2 - eh/2 + 10
         self.lplayer = ListPickerLayer(app=self,optionList=albums,
             entry_dim=(ex,ey,ew,eh))

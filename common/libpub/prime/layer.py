@@ -206,7 +206,7 @@ class ButtonLayer(Layer):
         '''
         self.importButton = Image(path=IMPORT_PATH,w=100,h=35)
         '''
-        self.importButton = Button(100,35,'Import',fontsize=20,
+        self.importButton = Button(100,35,'Import',fontsize=22,
                                    fontweight=cairo.FONT_WEIGHT_BOLD,
                                    icolor=icolor,
                                    ocolor=ocolor,
@@ -218,7 +218,7 @@ class ButtonLayer(Layer):
         
         self.importButton.register_click_listener(self.App.on_import_clicked)
             
-        self.publishButton = Button(100,35,'Publish',fontsize=20,
+        self.publishButton = Button(100,35,'Publish',fontsize=22,
                                    fontweight=cairo.FONT_WEIGHT_BOLD,
                                    icolor=icolor,
                                    ocolor=ocolor,
@@ -227,7 +227,7 @@ class ButtonLayer(Layer):
                                           self.app_height-100))
         self.publishButton.register_click_listener(self.App.on_publish_clicked)
 
-        self.quitButton = Button(100,35,'Quit',fontsize=20,
+        self.quitButton = Button(100,35,'Quit',fontsize=22,
                                    fontweight=cairo.FONT_WEIGHT_BOLD,
                                    icolor=icolor,
                                    ocolor=ocolor,
@@ -414,14 +414,14 @@ class PublishLayer(Layer):
         self.tcolor.r,self.tcolor.g,self.tcolor.b = html2rgb(0xEF,0xEF,0xEF)
         
         self.serviceButtonW = 100 
-        self.serviceButtonH = 35
+        self.serviceButtonH = 40
         self.cx = self.px + pad_w/2
         self.cy = self.py + pad_h/2
             
         self.flickrButton = Button(self.serviceButtonW,
                                   self.serviceButtonH,
                                   'Flickr',
-                                  fontsize=18,
+                                  fontsize=22,
                                   fontweight=cairo.FONT_WEIGHT_NORMAL,
                                   ocolor=self.icolor,
                                   tcolor=self.tcolor)
@@ -430,7 +430,7 @@ class PublishLayer(Layer):
         self.picasaButton = Button(self.serviceButtonW,
                                    self.serviceButtonH,
                                    'Picasa',
-                                   fontsize=18,
+                                   fontsize=22,
                                    fontweight=cairo.FONT_WEIGHT_NORMAL,
                                    ocolor=self.icolor,
                                    tcolor=self.tcolor)
@@ -561,18 +561,19 @@ class PublishLayer(Layer):
         lw = 200 
         lh = 35
         self.widgetQ.append(WidgetWrapper(self.albumEntry,
-                                          self.cx-lw/2,self.cy-lh/2))
+                              self.cx-lw/2,self.cy-lh/2-20))
 
         from libpub.prime.widgets.button import DropdownButton
         self.albumDropdown = DropdownButton(w=40,h=40)
         self.albumDropdown.data = albumList
 
         self.widgetQ.append(WidgetWrapper(self.albumDropdown,
-                                    self.cx+lw/2+10,self.cy-20+15))
+                            self.cx+lw/2+10,self.cy-20-5))
         self.albumDropdown.register_click_listener(
                 self.App.on_pick_album)
 
-        self.uploadButton = Button(w=100,h=35,text='Upload!',
+        self.uploadButton = Button(w=100,h=40,text='Upload!',
+                                fontsize=22,
                                 icolor=self.icolor,
                                 ocolor=self.icolor,
                                 tcolor=self.tcolor,
@@ -601,7 +602,7 @@ class ListPickerLayer(Layer):
         (ex,ey,ew,eh) = entry_dim
 
         self.icolor.r,self.icolor.g,self.icolor.b = \
-            html2rgb(0x3F,0x3F,0x3F)
+            html2rgb(0xFF,0xFF,0x66)
         self.icolor.a = 1.00
         self.ocolor.r,self.ocolor.g,self.ocolor.b = \
             html2rgb(0x1F,0x1F,0x1F)
@@ -610,13 +611,13 @@ class ListPickerLayer(Layer):
             html2rgb(0xCF,0xCF,0xCF)
         self.bcolor.a = 0.98
         self.tcolor.r,self.tcolor.g,self.tcolor.b = \
-            html2rgb(0xEF,0xEF,0xEF)
+            html2rgb(0x0F,0x0F,0x0F)
 
         self.ow = 200
-        self.oh = 30
+        self.oh = 35
         oy0 = int((self.App.app_height - 200 -\
                 (1+self.fudge_factor)*len(self.optionList)*self.oh)/2)
-        ox0 = ex + 75
+        ox0 = ex + 85
 
         self.draw_connectors(ex,ey,ox0,oy0,len(self.optionList))
 
@@ -624,6 +625,7 @@ class ListPickerLayer(Layer):
         optionButtons = []
         for option in self.optionList:
             btn = Button(w=self.ow,h=self.oh,text=option,
+                                fontsize=22,
                                 ocolor=self.icolor,
                                 icolor=self.icolor,
                                 tcolor=self.tcolor
@@ -649,7 +651,7 @@ class ListPickerLayer(Layer):
         ctx = cairo.Context(customWidget.surface)
 
         ctx.rectangle(0,0,self.App.app_width,self.App.app_height)
-        ctx.set_source_rgba(0.1,0.1,0.1,0.5)
+        ctx.set_source_rgba(0.1,0.1,0.1,0.6)
         ctx.fill()
 
         ctx.set_source_rgb(self.icolor.r,self.icolor.g,self.icolor.b)
@@ -686,6 +688,13 @@ class ListPickerLayer(Layer):
             px2,py2 = xe,ye
     
             ctx.curve_to(px1,py1,px2,py2,xe,ye)
+
+            lingrad = cairo.LinearGradient(x1,y1,x2,y1)
+            lingrad.add_color_stop_rgb(1,
+                self.icolor.r,self.icolor.g,self.icolor.b)
+            lingrad.add_color_stop_rgb(0,
+                self.tcolor.r,self.tcolor.g,self.tcolor.b)
+            ctx.set_source(lingrad)
     
             ctx.fill()
     
