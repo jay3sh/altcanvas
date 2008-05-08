@@ -28,6 +28,8 @@ from libpub.prime.widgets.label import Label
 from libpub.prime.widgets.entry import Entry 
 from libpub.prime.widgets.button import Button
 
+from libpub.prime.widget import Widget
+
 import libpub
 
 from threading import Thread
@@ -501,12 +503,25 @@ class PublishLayer(Layer):
             if len(widget.text) == 0:
                return
             widget.hide = not widget.hide
-            print widget.hide
 
         self.picasaPasswordEntry.register_tap_listener(
                                             toggle_password_hide)
 
-        self.picasaAuthButton.register_click_listener(self.App.on_picasa_authorize)
+        self.picasaAuthButton.register_click_listener(
+                                    self.App.on_picasa_authorize)
+
+        from libpub.prime.widgets.button import QuestionMarkButton
+        self.passwordHelpButton = QuestionMarkButton(w=30,h=30,
+                                    ocolor=self.icolor,
+                                    icolor=self.icolor,
+                                    tcolor=self.tcolor)
+        self.passwordHelpButton.register_click_listener(
+                                    self.App.on_password_help)
+        self.widgetQ.append(WidgetWrapper(self.passwordHelpButton,
+                                self.cx+150+5,self.py+105))
+
+
+        
 
         
     def prompt_flickr_auth_1(self):
@@ -580,6 +595,7 @@ class PublishLayer(Layer):
                             self.cx-lw/2-20-10,self.cy-20))
         self.albumDropdown.register_click_listener(
                 self.App.on_pick_album)
+
 
         self.uploadButton = Button(w=100,h=40,text='Upload!',
                                 fontsize=22,
@@ -665,7 +681,6 @@ class ListPickerLayer(Layer):
 
     
     def draw_connectors(self,ex,ey,ox0,oy0,count):
-        from libpub.prime.widget import Widget
         customWidget = Widget(w=self.App.app_width,
                             h=self.App.app_height)
         customWidget.surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,
@@ -722,3 +737,89 @@ class ListPickerLayer(Layer):
     
         self.widgetQ.append(WidgetWrapper(customWidget,0,0))
     
+class MessageLayer(Layer):
+    icolor = RGBA()
+    ocolor = RGBA()
+    bcolor = RGBA()
+    tcolor = RGBA()
+    def __init__(self,app,focus=None):
+        Layer.__init__(self, app=app, isVisible=True)
+    
+        self.icolor.r,self.icolor.g,self.icolor.b = \
+            html2rgb(0xFF,0xFF,0x66)
+        self.icolor.a = 1.00
+        self.ocolor.r,self.ocolor.g,self.ocolor.b = \
+            html2rgb(0x1F,0x1F,0x1F)
+        self.ocolor.a = 1.00
+        self.bcolor.r,self.bcolor.g,self.bcolor.b = \
+            html2rgb(0xCF,0xCF,0xCF)
+        self.bcolor.a = 0.98
+        self.tcolor.r,self.tcolor.g,self.tcolor.b = \
+            html2rgb(0x0F,0x0F,0x0F)
+
+
+        customWidget = Widget(w=self.App.app_width,
+                            h=self.App.app_height)
+        customWidget.surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,
+                    self.App.app_width,self.App.app_height)
+        ctx = cairo.Context(customWidget.surface)
+        ctx.rectangle(0,0,self.App.app_width,self.App.app_height)
+        ctx.set_source_rgba(0.1,0.1,0.1,0.6)
+        ctx.fill()
+
+        self.widgetQ.append(WidgetWrapper(customWidget,0,0))
+
+        x0,y0 = 250,100
+        w0,h0 = 325,50
+        
+
+        messageBox = Button(w=w0,h=h0,
+                            text='Tap to unhide password',
+                            fontsize=22,
+                            ocolor=self.icolor,
+                            icolor=self.icolor,
+                            tcolor=self.tcolor)
+
+        messageBox.register_tap_listener(self.App.cleanup_message)
+
+        self.widgetQ.append(WidgetWrapper(messageBox,x0,y0))
+
+        if focus:
+            x1,y1 = focus
+            x2,y2 = x0+w0-30,y0+h0
+            x3,y3 = x0+w0-60,y0+h0
+
+            # Point 1
+            ctx.move_to(x1,y1)
+    
+            # Point 2
+            xb,yb = x1,y1
+            xe,ye = x2,y2
+    
+            dx,dy = xe-xb,ye-yb
+            px1,py1 = xb+9*dx/10,yb
+            px2,py2 = xe,ye
+    
+            ctx.curve_to(px1,py1,px2,py2,xe,ye)
+    
+            # Point 3
+            ctx.line_to(x3,y3)
+    
+            # Back to Point 1
+            xb,yb = x3,y3
+            xe,ye = x1,y1
+    
+            dx,dy = xe-xb,ye-yb
+            px1,py1 = xb,yb+9*dy/10
+            px2,py2 = xe,ye
+    
+            ctx.curve_to(px1,py1,px2,py2,xe,ye)
+
+            lingrad = cairo.LinearGradient(x1,y1,x1,y2)
+            lingrad.add_color_stop_rgb(1,
+                self.icolor.r,self.icolor.g,self.icolor.b)
+            lingrad.add_color_stop_rgb(0,
+                self.tcolor.r,self.tcolor.g,self.tcolor.b)
+            ctx.set_source(lingrad)
+    
+            ctx.fill()

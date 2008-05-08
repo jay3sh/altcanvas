@@ -33,7 +33,8 @@ from libpub.prime.utils import get_image_locations,get_uniform_fit, \
 from libpub.prime.animation import Path
 from libpub.prime.widgetq import WidgetQueue
 from libpub.prime.layer import Layer,ImageLayer,InputLayer, \
-                        ButtonLayer, PublishLayer, ListPickerLayer
+                        ButtonLayer, PublishLayer, ListPickerLayer, \
+                        MessageLayer
 
 import libpub
 import libpub.flickr_local as flickr
@@ -440,3 +441,13 @@ class PublishrApp(App):
         self.adjust_clouds()
         libpub.prime.canvas.redraw()
 
+    def on_password_help(self,widget):
+        self.mlayer = MessageLayer(app=self,focus=(400,240))
+        self.layers.append(self.mlayer)
+        self.adjust_clouds()
+        libpub.prime.canvas.redraw()
+        
+    def cleanup_message(self,widget):
+        self.layers.remove(self.mlayer)
+        self.adjust_clouds()
+        libpub.prime.canvas.redraw()

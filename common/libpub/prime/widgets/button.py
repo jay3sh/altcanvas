@@ -66,7 +66,8 @@ class Button(Widget):
         utils.draw_rounded_rect(ctx, 0, 0, w, h, vr=vr)
         
         # Draw text
-        ctx.select_font_face(self.fontface,self.fontangle,self.fontweight)
+        ctx.select_font_face(self.fontface,self.fontangle,
+                                self.fontweight)
         ctx.set_font_size(self.fontsize)
         x_bearing,y_bearing,width,height,x_adv,y_adv = \
             ctx.text_extents(self.text)
@@ -102,5 +103,47 @@ class DropdownButton(Widget):
             ctx.line_to(pt[0],pt[1])
         ctx.fill()
 
+class QuestionMarkButton(Widget):
+    def __init__(self,w,h,
+                 fontface='sans-serif',
+                 fontangle=cairo.FONT_SLANT_NORMAL,
+                 fontweight=cairo.FONT_WEIGHT_NORMAL,
+                 fontsize=20,
+                 icolor=RGBA(),    # in Focus color
+                 ocolor=RGBA(),    # out of Focus color
+                 bcolor=RGBA(),    # border color
+                 tcolor=RGBA()):   # text color
+
+        self.fontface = fontface
+        self.fontweight = fontweight
+        self.fontsize = fontsize
+        self.fontangle = fontangle
+        self.icolor = icolor
+        self.ocolor = ocolor
+        self.bcolor = bcolor
+        self.tcolor = tcolor
+        Widget.__init__(self,w,h)
+        self.redraw()
+
+    def redraw(self):
+        from math import pi as PI
+        w = self.w
+        h = self.h
+        r = int(min(w,h)/2)
+        self.surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,w,h)
+        ctx = cairo.Context(self.surface)
+
+        ctx.set_source_rgba(self.icolor.r,self.icolor.g,
+                                self.icolor.b,self.icolor.a)
+        ctx.arc(w/2,h/2,r,0,2*PI)
+        ctx.fill()
+
+        ctx.select_font_face(self.fontface,self.fontangle,
+                                self.fontweight)
+        ctx.set_font_size(self.fontsize)
+        ctx.set_source_rgba(self.tcolor.r,self.tcolor.g,
+                                self.tcolor.b,self.tcolor.a)
+        ctx.move_to(w/2-5,6+h/2)    #TODO: Hardcoding arghh..
+        ctx.show_text('?')
 
 
