@@ -289,6 +289,7 @@ class PublishrApp(App):
                 for f in files:
                     if f.lower().endswith('jpg') or  \
                         f.lower().endswith('jpeg') or  \
+                        f.lower().endswith('png') or  \
                         f.lower().endswith('gif'):
                             images.append(path+os.sep+f)
             else:

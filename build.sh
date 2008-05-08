@@ -127,9 +127,9 @@ make_altmaemo_publishr()
 
 	rm -rf $TMP_BLDDIR
 
-    scp $BLDDIR/altpublishr-maemo*deb root@192.168.1.100:/root/
+    #scp $BLDDIR/altpublishr-maemo*deb root@192.168.1.100:/root/
 
-    ssh root@192.168.1.100 "(dpkg --purge altpublishr-maemo; cd /root/; dpkg -i altpublishr-maemo*deb)"
+    #ssh root@192.168.1.100 "(dpkg --purge altpublishr-maemo; cd /root/; dpkg -i altpublishr-maemo*deb)"
 
 }
 
