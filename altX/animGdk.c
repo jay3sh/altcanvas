@@ -1,12 +1,20 @@
 #include <gtk/gtk.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <stdlib.h>
 
 #define ASSERT(x) \
         if (!(x)) { \
            printf("Assertion failed: %s:%d\n",__FILE__,__LINE__); \
            exit(1); \
         }
+
+static cairo_surface_t *surface = NULL;
+static cairo_t *ctx = NULL;
+// Create widget surface
+static cairo_surface_t *wsurface = NULL;
+static cairo_t *wctx = NULL;
+static int location=0;
 
 //the global pixmap that will serve as our buffer
 static GdkPixmap *pixmap = NULL;
@@ -34,6 +42,11 @@ gboolean on_window_configure_event(GtkWidget * da, GdkEventConfigure * event, gp
 }
 
 gboolean on_window_expose_event(GtkWidget * da, GdkEventExpose * event, gpointer user_data){
+
+    printf("on_expose\n");
+    cairo_set_source_surface(ctx,wsurface,
+        event->area.x,event->area.y);
+    cairo_paint(ctx);
     gdk_draw_drawable(da->window,
         da->style->fg_gc[GTK_WIDGET_STATE(da)], pixmap,
         // Only copy the area that was exposed.
@@ -128,7 +141,6 @@ gboolean timer_exe(GtkWidget * window){
 
 int main (int argc, char *argv[]){
 
-
     //we need to initialize all these functions so that gtk knows
     //to be thread-aware
     if (!g_thread_supported ()){ g_thread_init(NULL); }
@@ -155,9 +167,7 @@ int main (int argc, char *argv[]){
 
     //(void)g_timeout_add(33, (GSourceFunc)timer_exe, window);
 
-    // Create widget surface
-    cairo_surface_t *wsurface = NULL;
-    cairo_t *wctx = NULL;
+    ctx = gdk_cairo_create(pixmap);
 
     #define SIZE 20
     ASSERT(wsurface = cairo_image_surface_create(
@@ -170,9 +180,10 @@ int main (int argc, char *argv[]){
     cairo_rectangle(wctx,10,10,SIZE,SIZE);
     cairo_fill(wctx);
 
-    int i=0;
-    for(; i<200; i++){
-        gtk_widget_queue_draw_area(window, 0, 0, 500, 500);
+    int width, height;
+    for(; location<200; location++){
+        gdk_drawable_get_size(pixmap, &width, &height);
+        gtk_widget_queue_draw_area(window, 0, 0, width, height);
         usleep(10*1000);
     }
 
