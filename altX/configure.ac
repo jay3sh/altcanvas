@@ -33,9 +33,21 @@ PKG_CHECK_MODULES(PYCAIRO, pycairo >= 1.4)
 if test -n "$export_dynamic"; then                                            
     PYCAIRO_LIBS=`echo $PYCAIRO_LIBS | sed -e "s/$export_dynamic//"`                
 fi                                                                            
-                                                                                
-# Checks for header files ---                                                 
-AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR(could not find Python headers)])     
+
+#GTK
+PKG_CHECK_MODULES(GTK, gtk+-2.0 >= 2.0)
+if test -n "$export_dynamic"; then
+    GTK_LIBS=`echo $GTK_LIBS | sed -e "s/$export_dynamic//"`
+fi
+
+#GThread
+PKG_CHECK_MODULES(GTHREAD, gthread-2.0 >= 2.0)
+if test -n "$export_dynamic"; then
+    GTHREAD_LIBS=`echo $GTHREAD_LIBS | sed -e "s/$export_dynamic//"`
+fi
+
+# Checks for header files ---
+AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR(could not find Python headers)])
 
 
 # Checks for library functions.

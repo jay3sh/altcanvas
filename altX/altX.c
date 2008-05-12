@@ -231,6 +231,11 @@ create_altx_surface()
     //XClearWindow(dpy, win);
     surface = cairo_xlib_surface_create(dpy, win, visual, w,h);
 
+    // EXTRA DEBUG STUFF
+    XDrawLine(dpy, win, gc, 20, 70, 180, 20);
+    XFlush(dpy); 
+    // EXTRA DEBUG STUFF
+    
     return surface;
 
 }
