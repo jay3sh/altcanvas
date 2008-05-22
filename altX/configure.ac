@@ -46,6 +46,13 @@ if test -n "$export_dynamic"; then
     GTHREAD_LIBS=`echo $GTHREAD_LIBS | sed -e "s/$export_dynamic//"`
 fi
 
+#X11
+PKG_CHECK_MODULES(X11, x11 >= 1.1)
+if test -n "$export_dynamic"; then
+    X11_LIBS=`echo $X11_LIBS | sed -e "s/$export_dynamic//"`
+fi
+
+
 # Checks for header files ---
 AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR(could not find Python headers)])
 
