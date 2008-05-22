@@ -17,11 +17,17 @@
         }
 #define PycairoAltXSurface PycairoSurface
 
+#define TRACE_ENTRY \
+    printf("Entering %s\n",__FUNCTION__);
+#define TRACE_EXIT \
+    printf("Exiting %s\n",__FUNCTION__);
+
 /*
  * Static variables
  */
 static Pycairo_CAPI_t *Pycairo_CAPI;
 static Display *dpy=NULL;
+static GC gc=NULL;
 
 /*
  * Private helper function declarations
@@ -38,9 +44,15 @@ Alt_PycairoSurface_FromSurface (cairo_surface_t *surface, PyObject *base);
 static PyObject *
 altx_surface_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
+    TRACE_ENTRY
+    PyObject *obj;
     cairo_surface_t *surface;
+
     
     surface = create_altx_surface();
+
+    //Py_INCREF((PyObject *)dpy);
+    //Py_INCREF((PyObject *)gc);
 
     return Alt_PycairoSurface_FromSurface(surface,NULL);
 }
@@ -48,12 +60,19 @@ altx_surface_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
 static PyObject *
 altx_surface_close(PycairoAltXSurface *o)
 {
+    TRACE_ENTRY
+    //Py_DECREF((PyObject *)dpy);
+    //Py_DECREF((PyObject *)gc);
     XCloseDisplay(dpy);
 }
 
 static PyObject *
 altx_surface_flush(PycairoAltXSurface *o)
 {
+    TRACE_ENTRY
+    //printf("dpy = %p, gc = %p\n",dpy,gc);
+
+    XDrawLine(dpy, win, gc, 30, 80, 180, 20);
     XFlush(dpy);
 }
 
@@ -66,7 +85,7 @@ static PyMethodDef altx_surface_methods[] = {
 PyTypeObject PycairoAltXSurface_Type = {
     PyObject_HEAD_INIT(NULL)
     0,                                  /* ob_size */
-    "altX.XlibSurface",                /* tp_name */
+    "altX.AltXSurface",                /* tp_name */
     sizeof(PycairoAltXSurface),         /* tp_basicsize */
     0,                                  /* tp_itemsize */
     0,                                  /* tp_dealloc */
@@ -122,12 +141,10 @@ static PyMethodDef xpy_methods[] =
 DL_EXPORT(void)
 initaltX(void)
 {
+    TRACE_ENTRY
     PyObject *m;
 
-
     Pycairo_IMPORT;
-
-    m = Py_InitModule("altX", xpy_methods);
 
     /*
     PycairoSurface_Type.tp_base = &PyBaseObject_Type;
@@ -139,6 +156,8 @@ initaltX(void)
     if (PyType_Ready(&PycairoAltXSurface_Type) < 0)
         return;
 
+    m = Py_InitModule("altX", xpy_methods);
+
     Py_INCREF(&PycairoAltXSurface_Type);
 
     PyModule_AddObject(m, "AltXSurface",
@@ -149,6 +168,7 @@ initaltX(void)
 PyObject *
 Alt_PycairoSurface_FromSurface (cairo_surface_t *surface, PyObject *base)
 {
+    TRACE_ENTRY
     PyTypeObject *type = NULL;
     PyObject *o;
 
@@ -176,13 +196,13 @@ Alt_PycairoSurface_FromSurface (cairo_surface_t *surface, PyObject *base)
 cairo_surface_t *
 create_altx_surface()
 {
+    TRACE_ENTRY
     Window win,rwin;
     int screen = 0;
     int w=100, h=100;
     int x=0, y=0;
     Pixmap pix;
     XGCValues gcv;
-    GC gc;
 
 
     ASSERT(dpy = XOpenDisplay(0));
@@ -235,6 +255,10 @@ create_altx_surface()
     XDrawLine(dpy, win, gc, 20, 70, 180, 20);
     XFlush(dpy); 
     // EXTRA DEBUG STUFF
+    //
+
+    //printf("dpy = %p, win = %p, gc = %p, pixmap = %x\n",
+     //   dpy,win,gc,pix);
     
     return surface;
 
