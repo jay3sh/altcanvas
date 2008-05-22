@@ -43,11 +43,41 @@ static PyObject *canvas_run(PyObject *self,PyObject *pArgs)
                 BlackPixel(dpy,screen));
     ASSERT(win);
 
+    XMapWindow(dpy, win);
+
     pix = XCreatePixmap(dpy,
                         win,
                         w,h,
                         DefaultDepth(dpy,screen));
     ASSERT(pix);
+
+    /*
+     * Wait for first MapNotify to draw the initial window
+     */
+    XSelectInput(dpy, win, StructureNotifyMask);
+    while(1)
+    {
+        XEvent event;
+        XNextEvent(dpy,&event);
+        if(event.type == MapNotify){
+            break;
+        }
+    }
+
+    Visual *visual = DefaultVisual(dpy,DefaultScreen(dpy));
+    ASSERT(visual)
+
+    XClearWindow(dpy, win);
+
+    sleep(4);
+    XCloseDisplay(dpy);
+    /*
+    surface = cairo_xlib_surface_create(dpy, win, visual, w,h);
+    ASSERT(surface);
+    ctx = cairo_create(surface);
+    ASSERT(ctx);
+    */
+
     /*
      * Return None
      */
