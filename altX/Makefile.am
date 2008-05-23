@@ -13,13 +13,13 @@ animGdk_SOURCES	= animGdk.c
 lib_LTLIBRARIES     = altX.la canvasX.la
 
 altX_la_LDFLAGS   = -module
-altX_la_LIBADD	= $(CAIRO_LIBS) 
+altX_la_LIBADD	= $(CAIRO_LIBS)
 altX_la_CPPFLAGS	= $(PYTHON_INCLUDES) $(CAIRO_CFLAGS) $(PYCAIRO_CFLAGS)
 #altX_la_CPPFLAGS	= -I/usr/local/include $(CAIRO_CFLAGS) $(PYCAIRO_CFLAGS)
 altX_la_SOURCES   = altX.c
 
 
 canvasX_la_LDFLAGS	= -module
-canvasX_la_LIBADD = $(X11_LIBS)
-canvasX_la_CPPFLAGS = $(PYTHON_INCLUDES)
+canvasX_la_LIBADD = $(X11_LIBS) $(CAIRO_LIBS)
+canvasX_la_CPPFLAGS = $(PYTHON_INCLUDES) $(CAIRO_CFLAGS) $(PYCAIRO_CFLAGS)
 canvasX_la_SOURCES	= canvasX.c
