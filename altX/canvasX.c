@@ -3,6 +3,11 @@
 
 #include <X11/Xlib.h>
 
+#include <cairo.h>
+
+#include <pycairo.h>
+
+
 #define ASSERT(x) \
         if (!(x)) { \
            printf("Assertion failed: %s:%d << %s >>\n", \
@@ -21,9 +26,11 @@ static Pixmap pix;
 static XGCValues gcv;
 static GC gc;
 
+static cairo_surface_t *surface;
+static cairo_t *ctx;
+
 static PyObject *canvas_run(PyObject *self,PyObject *pArgs)
 {
-
     dpy = XOpenDisplay(0);
     ASSERT(dpy);
 
@@ -69,14 +76,13 @@ static PyObject *canvas_run(PyObject *self,PyObject *pArgs)
 
     XClearWindow(dpy, win);
 
-    sleep(4);
-    XCloseDisplay(dpy);
-    /*
+
     surface = cairo_xlib_surface_create(dpy, win, visual, w,h);
     ASSERT(surface);
     ctx = cairo_create(surface);
     ASSERT(ctx);
-    */
+
+    XCloseDisplay(dpy);
 
     /*
      * Return None
@@ -85,9 +91,22 @@ static PyObject *canvas_run(PyObject *self,PyObject *pArgs)
     return Py_None;
 }
 
+static PyObject *canvas_draw(PyObject *self,PyObject *pArgs)
+{
+    PyObject *obj = NULL;
+    PycairoSurface *pysurface = NULL;
+    if(PyArg_ParseTuple(pArgs,"O!",&PycairoSurface_Type,&obj)){
+        ASSERT(pysurface);
+        pysurface = (PycairoSurface *)obj;
+    }
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
 static PyMethodDef canvas_methods[] =
 {
     { "run",canvas_run,METH_VARARGS,NULL},
+    { "draw",canvas_draw,METH_VARARGS,NULL},
     { NULL, NULL, 0, NULL }
 };
 
