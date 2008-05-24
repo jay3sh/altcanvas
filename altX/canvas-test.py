@@ -6,4 +6,5 @@ import canvasX
 
 canvasX.run()
 
+canvasX.draw(2)
 

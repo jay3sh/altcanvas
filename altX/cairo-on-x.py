@@ -21,8 +21,6 @@ ctx.set_source(grad)
 
 ctx.fill()
 
-'''
 sleep(5)
 surface.flush()
-#surface.close()
-'''
+surface.close()

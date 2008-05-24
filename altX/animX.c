@@ -49,15 +49,25 @@ int main(int argc, char *argv[])
     gcv.foreground = WhitePixel(dpy,screen);
     ASSERT(gc = XCreateGC(dpy,pix,GCForeground,&gcv));
 
-    XSelectInput(dpy, win, StructureNotifyMask);
+    XSelectInput(dpy, win, StructureNotifyMask|PointerMotionMask);
 
-    while(1)
+    int keepLooping = 1;
+    while(keepLooping)
     {
+        XMotionEvent *mevent;
         XEvent event;
 
         XNextEvent(dpy, &event);
-        if (event.type == MapNotify)
+        switch(event.type){
+        case MapNotify:
+            printf("MapNotify received\n");
             break;
+        case MotionNotify:
+            mevent = (XMotionEvent *)(&event);
+            printf("MotionNotify received (%d,%d)\n",
+                mevent->x,mevent->y);
+            break;
+        }
     }
 
     /*
@@ -106,9 +116,7 @@ int main(int argc, char *argv[])
         usleep(10*1000);
     }
 
-
     XFlush(dpy);
-
 
     cairo_destroy(wctx);
     cairo_surface_destroy(wsurface);
