@@ -34,7 +34,9 @@ static GC gc;
 static cairo_surface_t *xsurface;
 static cairo_t *xctx;
 
-static PyObject *canvas_run(PyObject *self,PyObject *pArgs)
+static PyObject *motion_handler;
+
+static PyObject *canvas_create(PyObject *self,PyObject *pArgs)
 {
     dpy = XOpenDisplay(0);
     ASSERT(dpy);
@@ -88,12 +90,34 @@ static PyObject *canvas_run(PyObject *self,PyObject *pArgs)
     ASSERT(xctx);
 
 
-    //sleep(2);
-
-
     /*
      * Return None
      */
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject *canvas_run(PyObject *self,PyObject *pArgs)
+{
+    XSelectInput(dpy, win, StructureNotifyMask|PointerMotionMask);
+
+    while(1)
+    {
+        XMotionEvent *mevent;
+        XEvent event;
+
+        XNextEvent(dpy, &event);
+        switch(event.type){
+        case MapNotify:
+            break;
+        case MotionNotify:
+            mevent = (XMotionEvent *)(&event);
+            PyEval_CallFunction(motion_handler,"ii",
+                    mevent->x,mevent->y);
+            break;
+        }
+    }
+
     Py_INCREF(Py_None);
     return Py_None;
 }
@@ -130,11 +154,40 @@ static PyObject *canvas_close(PyObject *self,PyObject *pArgs)
     return Py_None;
 }
 
+static PyObject *canvas_register_key_handler(
+        PyObject *self,PyObject *pArgs)
+{
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject *canvas_register_motion_handler(
+        PyObject *self,PyObject *pArgs)
+{
+    PyObject *obj = NULL;
+
+    if(PyArg_ParseTuple(pArgs,"O!",&PyFunction_Type,&obj))
+    {
+        motion_handler = obj;
+    }
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
 static PyMethodDef canvas_methods[] =
 {
-    { "run",canvas_run,METH_VARARGS,NULL},
-    { "draw",canvas_draw,METH_VARARGS,NULL},
-    { "close",canvas_close,METH_VARARGS,NULL},
+    { "create",
+        canvas_create,METH_VARARGS,NULL},
+    { "run",
+        canvas_run,METH_VARARGS,NULL},
+    { "register_motion_handler",
+        canvas_register_motion_handler,METH_VARARGS,NULL},
+    { "draw",
+        canvas_draw,METH_VARARGS,NULL},
+    { "close",
+        canvas_close,METH_VARARGS,NULL},
     { NULL, NULL, 0, NULL }
 };
 
