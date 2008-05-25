@@ -90,7 +90,6 @@ static PyObject *canvas_run(PyObject *self,PyObject *pArgs)
 
     //sleep(2);
 
-    //XCloseDisplay(dpy);
 
     /*
      * Return None
@@ -103,20 +102,30 @@ static PyObject *canvas_draw(PyObject *self,PyObject *pArgs)
 {
     PyObject *obj = NULL;
     PycairoSurface *pysurface = NULL;
+    int x=0,y=0;
     cairo_surface_t *surface = NULL;
-    if(PyArg_ParseTuple(pArgs,"O!",&PycairoSurface_Type,&obj)){
+    if(PyArg_ParseTuple(pArgs,"O!ii",&PycairoSurface_Type,&obj,&x,&y))
+    {
+        XClearWindow(dpy, win);
         ASSERT(obj);
         pysurface = (PycairoSurface *)obj;
+        ASSERT(pysurface);
         surface = pysurface->surface;
         ASSERT(surface);
         ASSERT(cairo_surface_status(surface) == CAIRO_STATUS_SUCCESS);
-        cairo_set_source_surface(xctx,surface,100,100);
-        //cairo_rectangle(xctx,3,3,5,5);
+        cairo_set_source_surface(xctx,surface,x,y);
         cairo_paint(xctx);
-        //cairo_fill(xctx);
         XFlush(dpy);
     }
 
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject *canvas_close(PyObject *self,PyObject *pArgs)
+{
+    XCloseDisplay(dpy);
+    
     Py_INCREF(Py_None);
     return Py_None;
 }
@@ -125,6 +134,7 @@ static PyMethodDef canvas_methods[] =
 {
     { "run",canvas_run,METH_VARARGS,NULL},
     { "draw",canvas_draw,METH_VARARGS,NULL},
+    { "close",canvas_close,METH_VARARGS,NULL},
     { NULL, NULL, 0, NULL }
 };
 
