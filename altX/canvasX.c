@@ -34,7 +34,7 @@ static GC gc;
 static cairo_surface_t *xsurface;
 static cairo_t *xctx;
 
-static PyObject *motion_handler;
+static PyObject *motion_handler = NULL;
 
 static PyObject *canvas_create(PyObject *self,PyObject *pArgs)
 {
@@ -112,8 +112,10 @@ static PyObject *canvas_run(PyObject *self,PyObject *pArgs)
             break;
         case MotionNotify:
             mevent = (XMotionEvent *)(&event);
-            PyEval_CallFunction(motion_handler,"ii",
+            if(motion_handler){ //TODO better check
+                PyEval_CallFunction(motion_handler,"ii",
                     mevent->x,mevent->y);
+            }
             break;
         }
     }
