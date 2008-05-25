@@ -113,8 +113,10 @@ static PyObject *canvas_run(PyObject *self,PyObject *pArgs)
         case MotionNotify:
             mevent = (XMotionEvent *)(&event);
             if(motion_handler){ //TODO better check
-                PyEval_CallFunction(motion_handler,"ii",
-                    mevent->x,mevent->y);
+                //PyEval_CallFunction(motion_handler,"ii",
+                 //   mevent->x,mevent->y);
+                PyEval_CallMethod(motion_handler,"motion_handler",
+                                    "ii",mevent->x,mevent->y);
             }
             break;
         }
@@ -169,7 +171,7 @@ static PyObject *canvas_register_motion_handler(
 {
     PyObject *obj = NULL;
 
-    if(PyArg_ParseTuple(pArgs,"O!",&PyFunction_Type,&obj))
+    if(PyArg_ParseTuple(pArgs,"O",&obj))
     {
         motion_handler = obj;
     }

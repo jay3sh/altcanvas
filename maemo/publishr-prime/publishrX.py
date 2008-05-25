@@ -11,27 +11,30 @@ import cairo
 from libpub.prime.app import PublishrApp
 
 class Canvas:
+    isLoaded = False
+
     def __init__(self):
         canvasX.create()
 
     def key_handler(self,key):
         pass
 
-    def motion_notify(self,x,y):
-        print '%d,%d'%(x,y)
+    def motion_handler(self,x,y):
+        if self.isLoaded:
+            self.app.dispatch_pointer_event(x,y,True)
 
     def load(self):
         self.app = PublishrApp()
+        canvasX.register_motion_handler(self)
+        self.isLoaded = True
 
     def run(self):
         canvasX.run()
 
     def redraw(self):
-        pass
-
-    def redraw_i(self):
-        self.app.redraw()
-        canvasX.draw(self.app.surface,0,0)
+        if self.isLoaded:
+            self.app.redraw()
+            canvasX.draw(self.app.surface,0,0)
 
     def unload(self):
         canvasX.close()
@@ -42,7 +45,7 @@ if __name__ == '__main__':
     libpub.prime.canvas = canvas
 
     canvas.load()
-    canvas.redraw_i()
+    canvas.redraw()
 
     canvas.run()
     canvas.unload()
