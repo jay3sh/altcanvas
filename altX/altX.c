@@ -72,7 +72,7 @@ altx_surface_flush(PycairoAltXSurface *o)
     TRACE_ENTRY
     //printf("dpy = %p, gc = %p\n",dpy,gc);
 
-    XDrawLine(dpy, win, gc, 30, 80, 180, 20);
+    //XDrawLine(dpy, win, gc, 30, 80, 180, 20);
     XFlush(dpy);
 }
 

@@ -15,6 +15,11 @@
            exit(1); \
         }
 
+#define PRINT_MARK \
+        printf("%s:%d <<%s>>\n",__FILE__,__LINE__,__FUNCTION__);
+
+static Pycairo_CAPI_t *Pycairo_CAPI;
+
 static Window win,rwin;
 static Display *dpy=NULL;
 static int screen=0;
@@ -26,8 +31,8 @@ static Pixmap pix;
 static XGCValues gcv;
 static GC gc;
 
-static cairo_surface_t *surface;
-static cairo_t *ctx;
+static cairo_surface_t *xsurface;
+static cairo_t *xctx;
 
 static PyObject *canvas_run(PyObject *self,PyObject *pArgs)
 {
@@ -77,12 +82,15 @@ static PyObject *canvas_run(PyObject *self,PyObject *pArgs)
     XClearWindow(dpy, win);
 
 
-    surface = cairo_xlib_surface_create(dpy, win, visual, w,h);
-    ASSERT(surface);
-    ctx = cairo_create(surface);
-    ASSERT(ctx);
+    xsurface = cairo_xlib_surface_create(dpy, win, visual, w,h);
+    ASSERT(xsurface);
+    xctx = cairo_create(xsurface);
+    ASSERT(xctx);
 
-    XCloseDisplay(dpy);
+
+    //sleep(2);
+
+    //XCloseDisplay(dpy);
 
     /*
      * Return None
@@ -95,10 +103,20 @@ static PyObject *canvas_draw(PyObject *self,PyObject *pArgs)
 {
     PyObject *obj = NULL;
     PycairoSurface *pysurface = NULL;
+    cairo_surface_t *surface = NULL;
     if(PyArg_ParseTuple(pArgs,"O!",&PycairoSurface_Type,&obj)){
-        ASSERT(pysurface);
+        ASSERT(obj);
         pysurface = (PycairoSurface *)obj;
+        surface = pysurface->surface;
+        ASSERT(surface);
+        ASSERT(cairo_surface_status(surface) == CAIRO_STATUS_SUCCESS);
+        cairo_set_source_surface(xctx,surface,100,100);
+        //cairo_rectangle(xctx,3,3,5,5);
+        cairo_paint(xctx);
+        //cairo_fill(xctx);
+        XFlush(dpy);
     }
+
     Py_INCREF(Py_None);
     return Py_None;
 }
@@ -113,5 +131,7 @@ static PyMethodDef canvas_methods[] =
 DL_EXPORT(void)
 initcanvasX(void)
 {
+    Pycairo_IMPORT;
+
     Py_InitModule("canvasX", canvas_methods);
 }
