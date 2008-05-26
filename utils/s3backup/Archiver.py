@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
+import sys
 import os
+import getopt
 
 class Archiver:
     archive_filename = None
@@ -24,10 +26,43 @@ class Archiver:
     def extract(self):
         os.system('');
         
+def usage():
+    print "Archiver.py [options] <backup_list>"
+    print "Options:"
+    print "        -h --help    this help"
+    print "        -n --name    Name to identify the backup project"
+    print ""
+    print "        backup_list  Comma separated list of files/dirs to backup" 
         
 def main():
-    archiver = Archiver('test.tar','test.snar',['/home/jayesh/workspace/sdlswf' '/home/jayesh/workspace/temp'])
+    try:
+        opts,args = getopt.getopt(sys.argv[1:],"hn:", 
+                        ["help","name="])
+    except getopt.GetoptError:
+        usage()
+        sys.exit(0)
+
+    backup_list = sys.argv[-1]
+    if not opts:
+        usage()
+        sys.exit(0)
+
+    for o,a in opts: 
+        if o in ("-h","--help"):
+            usage()
+            sys.exit()
+        if o in ("-n","--name"):
+            bname = a
+
+    tar_name = bname+".tar"
+    snar_name = bname+".snar"
+
+    '''
+    archiver = Archiver(tar_name,snar_name,
+                ['/home/jayesh/workspace/sdlswf',
+                 '/home/jayesh/workspace/temp'])
     archiver.compress()
+    '''
 
 if __name__ == "__main__":
     main()
