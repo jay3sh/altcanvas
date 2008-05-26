@@ -45,7 +45,7 @@ class ScratchApp(gtk.Window):
         #
         # Choose HERE which scratch to draw
         #
-        self.draw_dropdown(surface)
+        self.draw_scaled(surface)
         
         self.ctx.set_source_surface(surface)
         self.ctx.paint()
@@ -55,6 +55,16 @@ class ScratchApp(gtk.Window):
     
     def run(self):
         gtk.main()
+
+    def draw_scaled(self,surface):
+        ctx = cairo.Context(surface)
+        
+        iSurface = cairo.ImageSurface.create_from_png('/photos/altimages/jyro/lal-kila.png')
+        iCtx = cairo.Context(iSurface)
+        ctx.scale(100.0/iSurface.get_width(),100.0/iSurface.get_height())
+
+        ctx.set_source_surface(iSurface,0,0)
+        ctx.paint()
 
     def draw_dropdown(self,surface):
         ctx = cairo.Context(surface)

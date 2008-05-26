@@ -51,38 +51,20 @@ class Image(Widget):
         else:
             imgSurface = cairo.ImageSurface.create_from_png(self.path)
 
-            imgCtx = cairo.Context(imgSurface)
-            sx = (w-2*self.X_MARGIN)*1.0/imgSurface.get_width()
-            sy = (w-2*self.Y_MARGIN)*1.0/imgSurface.get_height()
-            imgCtx.scale(sx,sy)
+        imgCtx = cairo.Context(imgSurface)
+        sx = (w-2*self.X_MARGIN)*1.0/imgSurface.get_width()
+        sy = (w-2*self.Y_MARGIN)*1.0/imgSurface.get_height()
 
-
-        '''
-        surface1 = cairo.ImageSurface(cairo.FORMAT_ARGB32,w,h)
-        ctx1 = cairo.Context(surface1)
-        
-        ctx2 = gtk.gdk.CairoContext(ctx1)
-        
-        pixbuf = gtk.gdk.pixbuf_new_from_file(self.path)
-        scaled_pixbuf = pixbuf.scale_simple(
-                            w-2*self.X_MARGIN,
-                            h-2*self.Y_MARGIN,gtk.gdk.INTERP_NEAREST)
-        ctx2.set_source_rgb(1,1,1)
-        ctx2.rectangle(0,0,w,h)
-        ctx2.fill()
-        ctx2.set_source_pixbuf(scaled_pixbuf,self.X_MARGIN,self.Y_MARGIN)
-        ctx2.paint()
-        '''
-        
-        # Draw this on a third surface with a gradient
-        gradient = mask.MoonRise(w,h).surface
+        #gradient = mask.MoonRise(w,h).surface
         self.surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,w,h)
         ctx3 = cairo.Context(self.surface)
-        ctx3.set_source_rgb(0,0,0)
+        ctx3.set_source_rgba(1,1,1,0.7)
         ctx3.rectangle(0,0,w,h)
         ctx3.fill()
-        ctx3.set_source_surface(imgSurface)
-        ctx3.mask_surface(gradient)
+        ctx3.scale(sx,sy)
+        ctx3.set_source_surface(imgSurface,self.X_MARGIN/sx,self.Y_MARGIN/sy)
+        #ctx3.mask_surface(gradient)
+        ctx3.paint()
         
         if png_path:
             import os
