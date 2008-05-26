@@ -260,8 +260,7 @@ class PublishrApp(App):
             libpub.prime.canvas.redraw()
         
     def on_import_clicked(self,importButton):
-        print "Not supported yet"
-        return
+        '''
         importButton.disable_pointer_listener()
         import gtk
         if detect_platform() == 'Nokia':
@@ -284,6 +283,8 @@ class PublishrApp(App):
             
         fileChooserDlg.destroy()
         
+        '''
+        path = '/photos/altimages/jyro'
         images = []
         if path:
             if os.path.isdir(path):
@@ -303,8 +304,7 @@ class PublishrApp(App):
         importButton.enable_pointer_listener()
         
     def on_quit_clicked(self,widget):
-        import gtk
-        gtk.main_quit()
+        libpub.prime.canvas.unload()
     
     def on_publish_clicked(self,widget):
         

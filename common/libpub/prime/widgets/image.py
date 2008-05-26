@@ -41,6 +41,23 @@ class Image(Widget):
     def draw_image(self):
         w = self.w
         h = self.h
+
+        png_path = None
+        if not self.path.lower().endswith('png'):
+            from PIL import Image
+            png_path = self.path+'.png'
+            Image.open(self.path).save(png_path)
+            imgSurface = cairo.ImageSurface.create_from_png(png_path)
+        else:
+            imgSurface = cairo.ImageSurface.create_from_png(self.path)
+
+            imgCtx = cairo.Context(imgSurface)
+            sx = (w-2*self.X_MARGIN)*1.0/imgSurface.get_width()
+            sy = (w-2*self.Y_MARGIN)*1.0/imgSurface.get_height()
+            imgCtx.scale(sx,sy)
+
+
+        '''
         surface1 = cairo.ImageSurface(cairo.FORMAT_ARGB32,w,h)
         ctx1 = cairo.Context(surface1)
         
@@ -55,6 +72,7 @@ class Image(Widget):
         ctx2.fill()
         ctx2.set_source_pixbuf(scaled_pixbuf,self.X_MARGIN,self.Y_MARGIN)
         ctx2.paint()
+        '''
         
         # Draw this on a third surface with a gradient
         gradient = mask.MoonRise(w,h).surface
@@ -63,9 +81,12 @@ class Image(Widget):
         ctx3.set_source_rgb(0,0,0)
         ctx3.rectangle(0,0,w,h)
         ctx3.fill()
-        ctx3.set_source_surface(surface1)
+        ctx3.set_source_surface(imgSurface)
         ctx3.mask_surface(gradient)
         
+        if png_path:
+            import os
+            os.remove(png_path)
         
 import libpub
 NOTE_PATH = libpub.IMAGE_DIR+'/note.png'
@@ -85,7 +106,6 @@ class PublishrImage(Image):
         self.title = title
         self.desc = desc
         self.tags = tags
-        
         self.update_icon()
         
         
@@ -94,11 +114,11 @@ class PublishrImage(Image):
         icon = None
         # Image info is edited, mark with a Note icon
         if self.title:
-            icon = note_pixbuf
+            icon = NOTE_PATH
         
         # Image if uploaded, mark with a Web URL icon
         if self.url:
-            icon = globe_pixbuf
+            icon = GLOBE_PATH
              
         if icon:
             iconSurface = cairo.ImageSurface.create_from_png(icon)
