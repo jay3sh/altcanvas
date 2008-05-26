@@ -260,6 +260,8 @@ class PublishrApp(App):
             libpub.prime.canvas.redraw()
         
     def on_import_clicked(self,importButton):
+        print "Not supported yet"
+        return
         importButton.disable_pointer_listener()
         import gtk
         if detect_platform() == 'Nokia':

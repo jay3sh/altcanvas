@@ -71,9 +71,6 @@ import libpub
 NOTE_PATH = libpub.IMAGE_DIR+'/note.png'
 GLOBE_PATH = libpub.IMAGE_DIR+'/globe.png'
 
-note_pixbuf = gtk.gdk.pixbuf_new_from_file(NOTE_PATH)
-globe_pixbuf = gtk.gdk.pixbuf_new_from_file(GLOBE_PATH)
-        
 class PublishrImage(Image):
     title = None
     desc = None
@@ -95,18 +92,20 @@ class PublishrImage(Image):
     def update_icon(self):
         self.draw_image()
         icon = None
+        # Image info is edited, mark with a Note icon
         if self.title:
             icon = note_pixbuf
         
+        # Image if uploaded, mark with a Web URL icon
         if self.url:
             icon = globe_pixbuf
              
         if icon:
+            iconSurface = cairo.ImageSurface.create_from_png(icon)
             ctx = cairo.Context(self.surface)
-            ctx1 = gtk.gdk.CairoContext(ctx)
-            ctx1.set_source_pixbuf(icon,
-                        self.w-icon.get_width()-20,20)
-            ctx1.paint()
+            ctx.set_source_surface(iconSurface,
+                        self.w-iconSurface.get_width()-20,20)
+            ctx.paint()
             
         
     

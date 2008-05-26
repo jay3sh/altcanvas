@@ -82,8 +82,8 @@ class Pad(Widget):
             '''
             
         elif texture == self.WALLPAPER:
-            ctx1 = gtk.gdk.CairoContext(ctx)
-            pixbuf = gtk.gdk.pixbuf_new_from_file(WALLPAPER_PATH)
-            ctx1.set_source_pixbuf(pixbuf,0,0)
-            ctx1.paint()
+            wpSurface = cairo.ImageSurface.create_from_png(WALLPAPER_PATH)
+            ctx.set_source_surface(wpSurface,0,0)
+            ctx.paint()
+
             
