@@ -45,10 +45,13 @@ class AmazonS3:
                         config.get('AWS_SECRET_ACCESS_KEY')) 
 
         if bucket and bucket not in map(lambda x: x.name, self.conn.list_all_my_buckets().entries):
-            print "Bucket %s not found"%bucket
-            print map(lambda x: x.name, self.conn.list_all_my_buckets().entries)
+            print "Bucket %s not found. Creating..."%bucket
+            self.conn.create_bucket(bucket)
             sys.exit(1);
         
+    def delete_bucket(self,bucket):
+        self.conn.delete_bucket(bucket)
+
     def save(self,filepath):
         filename = os.path.basename(filepath)
         file = open(filepath) 
@@ -96,18 +99,21 @@ class AmazonS3:
 
 def usage():
     print "s3backup [option] [filename]"
+    print "Bucket operations:"
     print "        -h --help    this help"
-    print "        -b --bucket  bucket name [default read from config file]"
-    print "        -s --save    save the file to S3 storage"
-    print "        -d --delete  delete the file from S3 storage"
-    print "        -r --restore restore the file from S3 storage"
-    print "        -l --list    list the files stored in given bucket"
+    print "        -b --bucket  bucket-name "
+    print "        -D --deleteb Delete the bucket"
     print "        -a --listall list all buckets"
+    print "File operations:"
+    print "        -s --save    file-name    Save the file to bucket"
+    print "        -d --delete  file-name    Delete the file from bucket"
+    print "        -r --restore file-name    Restore the file from bucket"
+    print "        -l --list    list the files stored in given bucket"
     
 
 def main():
     try:
-        opts,args = getopt.getopt(sys.argv[1:],"hs:r:b:d:la", 
+        opts,args = getopt.getopt(sys.argv[1:],"hs:r:b:d:laD", 
                         ["help","save=","restore=","bucket=","delete=","list","listall"])
     except getopt.GetoptError:
         usage()
@@ -116,9 +122,12 @@ def main():
     savefile = None
     restorefile = None
     deletefile =  None
-    oplist = None
-    oplistall = None
     bucket = None
+    op = None
+
+    if not opts:
+        usage()
+        sys.exit(0)
     
     for o,a in opts: 
         if o in ("-h","--help"):
@@ -126,172 +135,50 @@ def main():
             sys.exit()
         if o in ("-s","--save"):
             savefile = a
+            op = "save"
         if o in ("-r","--restore"):
             restorefile = a
+            op = "restore"
         if o in ("-b","--bucket"):
             bucket = a
+        if o in ("-D","--deleteb"):
+            op = "deleteb"
         if o in ("-l","--list"):
-            oplist = True
+            op = "list"
         if o in ("-d","--delete"):
             deletefile = a
+            op = "delete"
         if o in ("-a","--listall"):
-            oplistall = True
+            op = "listall"
 
-    if oplistall == True:
-        amazonS3 = AmazonS3(None)
-        amazonS3.listall()
-        sys.exit()
-    
     if bucket != None:
         amazonS3 = AmazonS3(bucket)
     else:
-        #TODO: read from config file
-        sys.exit(1)
-        
-    if savefile != None:
+        amazonS3 = AmazonS3(None)
+
+    if op == "listall":
+        amazonS3.listall()
+        sys.exit()
+
+    if op == "deleteb" and bucket != None:
+        amazonS3.delete_bucket(bucket)
+    
+    if op == "save" and savefile != None:
         amazonS3.save(savefile)
         sys.exit()
         
-    if oplist == True:
+    if op == "list":
         amazonS3.list()
         sys.exit()
-
         
-    if deletefile != None:
+    if op == "delete" and  deletefile != None:
         amazonS3.delete(deletefile)
         sys.exit()
         
-    if restorefile != None:
+    if op == "restore" and restorefile != None:
         amazonS3.restore(restorefile)
         sys.exit()
-
-
-     
-    
-    
 
 if __name__ == "__main__":
     main()
 		
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#response = conn.create_bucket(BUCKET_NAME)
-#print response.http_response.status
-
-#buckets = conn.list_all_my_buckets().entries;
-#print map(lambda x: x.name, conn.list_all_my_buckets().entries)
-#print buckets;
-
-'''
-archive_file = open("/home/jayesh/workspace/snapshots/altvideo.2007-05-27-17_27.tar.gz")
-archive_file_data = archive_file.read();
-
-print conn.put(
-        BUCKET_NAME,
-        'backup.tar.gz',
-        S3.S3Object(archive_file_data),
-        { 'Content-Type': 'application/x-gzip' }).http_response.reason
-
-archive_file_data = conn.get(BUCKET_NAME, 'backup.tar.gz').object.data
-archive_file = open("/tmp/backup.tar.gz","w");
-
-archive_file.write(archive_file_data);
-archive_file.close();
-'''
-
-#print map(lambda x: x.key, conn.list_bucket(BUCKET_NAME).entries)
-
-
-#print conn.get(BUCKET_NAME, KEY_NAME).object.data
-
-
-'''
-print '----- creating bucket -----'
-print conn.create_bucket(BUCKET_NAME).http_response.reason
-
-print '----- listing bucket -----'
-print map(lambda x: x.key, conn.list_bucket(BUCKET_NAME).entries)
-
-print '----- putting object (with content type) -----'
-print conn.put(
-        BUCKET_NAME,
-        KEY_NAME,
-        S3.S3Object('this is a test'),
-        { 'Content-Type': 'text/plain' }).http_response.reason
-
-print '----- listing bucket -----'
-print map(lambda x: x.key, conn.list_bucket(BUCKET_NAME).entries)
-
-print '----- getting object -----'
-print conn.get(BUCKET_NAME, KEY_NAME).object.data
-
-print '----- query string auth example -----'
-print "\nTry this url out in your browser (it will only be valid for 60 seconds).\n"
-
-generator = S3.QueryStringAuthGenerator(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, False)
-generator.set_expires_in(60);
-url = generator.get(BUCKET_NAME, KEY_NAME)
-print url
-print '\npress enter> ',
-sys.stdin.readline()
-
-print "\nNow try just the url without the query string arguments.  it should fail.\n"
-print generator.make_bare_url(BUCKET_NAME, KEY_NAME)
-print '\npress enter> ',
-sys.stdin.readline()
-
-
-print '----- putting object with metadata and public read acl -----'
-print conn.put(
-    BUCKET_NAME,
-    KEY_NAME + '-public',
-    S3.S3Object('this is a publicly readable test'),
-    { 'x-amz-acl': 'public-read' , 'Content-Type': 'text/plain' }
-).http_response.reason
-
-print '----- anonymous read test ----'
-print "\nYou should be able to try this in your browser\n"
-public_key = KEY_NAME + '-public'
-print generator.make_bare_url(BUCKET_NAME, public_key)
-print "\npress enter> ",
-sys.stdin.readline()
-
-print "----- getting object's acl -----"
-print conn.get_acl(BUCKET_NAME, KEY_NAME).object.data
-
-print "----- vanity domain example -----"
-print "\nThe bucket can also be specified as part of the domain.  Any vanity domain that is CNAME'd to s3.amazonaws.com is also valid."
-print "Try this url out in your browser (it will only be valid for 60 seconds).\n"
-generator.calling_format = S3.CallingFormat.SUBDOMAIN
-url = generator.get(BUCKET_NAME, KEY_NAME)
-print url
-print "\npress enter> ",
-sys.stdin.readline()
-
-print '----- deleting objects -----'
-print conn.delete(BUCKET_NAME, KEY_NAME).http_response.reason
-print conn.delete(BUCKET_NAME, KEY_NAME + '-public').http_response.reason
-
-print '----- listing bucket -----'
-print map(lambda x: x.key, conn.list_bucket(BUCKET_NAME).entries)
-
-print '----- listing all my buckets -----'
-print map(lambda x: x.name, conn.list_all_my_buckets().entries)
-
-print '----- deleting bucket ------'
-print conn.delete_bucket(BUCKET_NAME).http_response.reason
-'''
