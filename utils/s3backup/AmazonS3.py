@@ -85,20 +85,16 @@ class AmazonS3:
         file.close();
         
     def listall(self): 
-        print "All your buckets:"
-        print "-----------------"
         for bucket in self.conn.list_all_my_buckets().entries:
-            print "- %s"%bucket.name
+            print "%s"%bucket.name
 
     def list(self): 
-        print "%s"%self.bucket
-        print "========"
         for file in map(lambda x: x.key, self.conn.list_bucket(self.bucket).entries):
-            print "   %s"%file
+            print "%s"%file
 
 
 def usage():
-    print "s3backup [option] [filename]"
+    print "AmazonS3.py [option] [filename]"
     print "Bucket operations:"
     print "        -h --help    this help"
     print "        -b --bucket  bucket-name "
