@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(libxpy, 0.1, jayesh@altfrequency.com)
-AC_CONFIG_SRCDIR([altX.c])
+AC_INIT(canvasx, 0.1, jayesh@altfrequency.com)
+AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADER([config.h])
 
 AM_INIT_AUTOMAKE([1.8 foreign])
