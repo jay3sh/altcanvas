@@ -19,6 +19,7 @@ AC_PROG_LIBTOOL
 # Checks for typedefs, structures, and compiler characteristics.
 
 AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([src/Makefile])
 
 AM_PATH_PYTHON(2.5) 
 
