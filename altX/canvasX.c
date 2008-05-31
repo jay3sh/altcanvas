@@ -8,6 +8,29 @@
 #include <pycairo.h>
 
 
+#ifdef HAS_XSP
+#include <X11/extensions/Xsp.h>
+
+/* device specific data */
+#define DEV_X_DELTA 3378
+#define DEV_Y_DELTA 3080
+#define DEV_X_CORRECTION -300
+#define DEV_Y_CORRECTION -454
+
+/**
+   translate raw device coordinates to screen coordinates
+*/
+#define TRANSLATE_RAW_COORDS(x, y) \
+{ \
+  * x += DEV_X_CORRECTION;\
+  * y += DEV_Y_CORRECTION;\
+  * x = xres - (xres * *x) / DEV_X_DELTA;\
+  * y = yres - (yres * *y) / DEV_Y_DELTA;\
+}
+
+#endif /* HAS_XSP */
+
+
 #define ASSERT(x) \
         if (!(x)) { \
            printf("Assertion failed: %s:%d << %s >>\n", \
@@ -99,6 +122,10 @@ static PyObject *canvas_create(PyObject *self,PyObject *pArgs)
 
 static PyObject *canvas_run(PyObject *self,PyObject *pArgs)
 {
+#ifdef HAS_XSP
+    XSPRawTouchscreenEvent xsp_event;
+#endif
+
     XSelectInput(dpy, win, StructureNotifyMask|PointerMotionMask);
 
     while(1)
