@@ -1,7 +1,8 @@
+#!/usr/bin/env python
 
 import sys
-sys.path.append('/home/jayesh/trunk/altcanvas/altX/.libs')
-sys.path.append('/home/jayesh/trunk/altcanvas/common')
+#sys.path.append('/home/jayesh/trunk/altcanvas/altX/.libs')
+#sys.path.append('/home/jayesh/trunk/altcanvas/common')
 import canvasX
 
 

@@ -284,7 +284,8 @@ class PublishrApp(App):
         fileChooserDlg.destroy()
         
         '''
-        path = '/photos/altimages/jyro'
+        #path = '/photos/altimages/jyro'
+        path = '/media/mmc2/photos'
         images = []
         if path:
             if os.path.isdir(path):

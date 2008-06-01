@@ -42,18 +42,22 @@ class Image(Widget):
         w = self.w
         h = self.h
 
+        print (w,h,self.X_MARGIN,self.Y_MARGIN)
         png_path = None
         if not self.path.lower().endswith('png'):
             from PIL import Image
             png_path = self.path+'.png'
-            Image.open(self.path).save(png_path)
+            im = Image.open(self.path)
+            im.thumbnail((w-2*self.X_MARGIN,h-2*self.Y_MARGIN),
+                            Image.ANTIALIAS)
+            im.save(png_path)
             imgSurface = cairo.ImageSurface.create_from_png(png_path)
         else:
             imgSurface = cairo.ImageSurface.create_from_png(self.path)
 
         imgCtx = cairo.Context(imgSurface)
-        sx = (w-2*self.X_MARGIN)*1.0/imgSurface.get_width()
-        sy = (w-2*self.Y_MARGIN)*1.0/imgSurface.get_height()
+        #sx = (w-2*self.X_MARGIN)*1.0/imgSurface.get_width()
+        #sy = (w-2*self.Y_MARGIN)*1.0/imgSurface.get_height()
 
         #gradient = mask.MoonRise(w,h).surface
         self.surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,w,h)
@@ -61,8 +65,8 @@ class Image(Widget):
         ctx3.set_source_rgba(1,1,1,0.7)
         ctx3.rectangle(0,0,w,h)
         ctx3.fill()
-        ctx3.scale(sx,sy)
-        ctx3.set_source_surface(imgSurface,self.X_MARGIN/sx,self.Y_MARGIN/sy)
+        #ctx3.scale(sx,sy)
+        ctx3.set_source_surface(imgSurface,self.X_MARGIN,self.Y_MARGIN)
         #ctx3.mask_surface(gradient)
         ctx3.paint()
         

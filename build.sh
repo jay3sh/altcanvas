@@ -108,7 +108,7 @@ make_altmaemo_publishr()
 		ln -s $SRCDIR/install/alt-setup.py ./setup.py
 		ln -s $SRCDIR/install/bdist_debian.py ./bdist_debian.py
 		ln -s $SRCDIR/common/libpub ./libpub
-		ln -s $SRCDIR/maemo/publishr-prime/publishr.py ./altpublishr.py
+		ln -s $SRCDIR/maemo/publishr-prime/publishrX.py ./altpublishr.py
 		ln -s $SRCDIR/install/altpublishr.desktop ./altpublishr.desktop
 
         for img in altpublishr note globe dropdown
@@ -127,9 +127,9 @@ make_altmaemo_publishr()
 
 	rm -rf $TMP_BLDDIR
 
-    #scp $BLDDIR/altpublishr-maemo*deb root@192.168.1.100:/root/
+    scp $BLDDIR/altpublishr-maemo*deb root@192.168.1.100:/root/
 
-    #ssh root@192.168.1.100 "(dpkg --purge altpublishr-maemo; cd /root/; dpkg -i altpublishr-maemo*deb)"
+    ssh root@192.168.1.100 "(dpkg --purge altpublishr-maemo; cd /root/; dpkg -i altpublishr-maemo*deb)"
 
 }
 
