@@ -133,6 +133,18 @@ make_altmaemo_publishr()
 
 }
 
+make_canvasx()
+{
+    (
+        cd altX;
+        dpkg-buildpackage -rfakeroot
+        scp ../canvasx*deb root@192.168.1.100:/root/
+
+        ssh root@192.168.1.100 \
+        "(dpkg --purge canvasx; cd /root/; dpkg -i canvasx*deb; rm -f canvasx*deb)"
+    )
+}
+
 if [ "$1" = "" ]; then
 	usage
 	exit 1
@@ -164,6 +176,9 @@ case $PACKAGE in
 		make_gimp_publishr;
 		make_inkscape_publishr;
 		make_maemo_publishr;
+        ;;
+    "canvasx")
+        make_canvasx;
 		;;
 esac
 
