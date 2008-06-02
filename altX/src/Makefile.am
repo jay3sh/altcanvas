@@ -20,6 +20,6 @@ lib_LTLIBRARIES     = canvasX.la
 
 
 canvasX_la_LDFLAGS	= -module
-canvasX_la_LIBADD = $(X11_LIBS) $(CAIRO_LIBS)
+canvasX_la_LIBADD = $(X11_LIBS) $(XSP_LIBS) $(CAIRO_LIBS)
 canvasX_la_CPPFLAGS = $(PYTHON_INCLUDES) $(CAIRO_CFLAGS) $(PYCAIRO_CFLAGS)
 canvasX_la_SOURCES	= canvasX.c

@@ -53,6 +53,12 @@ if test -n "$export_dynamic"; then
     X11_LIBS=`echo $X11_LIBS | sed -e "s/$export_dynamic//"`
 fi
 
+#XSP
+PKG_CHECK_MODULES(XSP, xsp >= 1.2.3)
+if test -n "$export_dynamic"; then
+    XSP_LIBS=`echo $XSP_LIBS | sed -e "s/$export_dynamic//"`
+fi
+
 
 # Checks for header files ---
 AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR(could not find Python headers)])

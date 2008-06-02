@@ -26,9 +26,11 @@
 { \
   * x += DEV_X_CORRECTION;\
   * y += DEV_Y_CORRECTION;\
-  * x = xres - (xres * *x) / DEV_X_DELTA;\
-  * y = yres - (yres * *y) / DEV_Y_DELTA;\
+  * x = w - (w * *x) / DEV_X_DELTA;\
+  * y = h - (h * *y) / DEV_Y_DELTA;\
 }
+
+static int xsp_event_base=-1;
 
 #endif /* HAS_XSP */
 
@@ -132,6 +134,18 @@ static PyObject *canvas_create(PyObject *self,PyObject *pArgs)
 
     XClearWindow(dpy, win);
 
+#ifdef HAS_XSP
+    int xsp_error_base=-1;
+    int xsp_major=-1;
+    int xsp_minor=-1;
+    /* get xsp event base */
+    XSPQueryExtension(dpy,
+                    &xsp_event_base,
+                    &xsp_error_base,
+                    &xsp_major,
+                    &xsp_minor);
+    ASSERT(xsp_event_base >= 0);
+#endif
 
     xsurface = cairo_xlib_surface_create(dpy, win, visual, w,h);
     ASSERT(xsurface);
@@ -149,10 +163,12 @@ static PyObject *canvas_create(PyObject *self,PyObject *pArgs)
 static PyObject *canvas_run(PyObject *self,PyObject *pArgs)
 {
 #ifdef HAS_XSP
+    int tx=0,ty=0;
     XSPRawTouchscreenEvent xsp_event;
 #endif
 
-    XSelectInput(dpy, win, StructureNotifyMask|PointerMotionMask);
+    XSelectInput(dpy, win, 
+        StructureNotifyMask | PointerMotionMask | ExposureMask);
 
     while(1)
     {
@@ -171,6 +187,21 @@ static PyObject *canvas_run(PyObject *self,PyObject *pArgs)
                 PyEval_CallMethod(motion_handler,"motion_handler",
                                     "ii",mevent->x,mevent->y);
             }
+            break;
+        default:
+            #ifdef HAS_XSP
+            if(event.type == xsp_event_base){
+                memcpy(&xsp_event, &event,
+                    sizeof(XSPRawTouchscreenEvent));
+            }
+            tx = xsp_event.x;
+            ty = xsp_event.y;
+
+            /* translate raw coordinates */
+            TRANSLATE_RAW_COORDS(&tx, &ty);
+
+            printf("Pressure = %d\n",xsp_event.pressure);
+            #endif
             break;
         }
     }
