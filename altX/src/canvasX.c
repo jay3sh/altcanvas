@@ -1,7 +1,9 @@
 #include <Python.h>
 #include <stdio.h>
 
+#include <X11/X.h>
 #include <X11/Xlib.h>
+#include <X11/Xatom.h>
 
 #include <cairo.h>
 
@@ -61,6 +63,10 @@ static PyObject *motion_handler = NULL;
 
 static PyObject *canvas_create(PyObject *self,PyObject *pArgs)
 {
+    int status = 0;
+    Atom atoms_WINDOW_STATE;
+    Atom atoms_WINDOW_STATE_FULLSCREEN;
+
     dpy = XOpenDisplay(0);
     ASSERT(dpy);
 
@@ -69,6 +75,15 @@ static PyObject *canvas_create(PyObject *self,PyObject *pArgs)
 
     screen = DefaultScreen(dpy);
     ASSERT(screen >= 0);
+
+    atoms_WINDOW_STATE
+        = XInternAtom(dpy, "_NET_WM_STATE",False);
+    ASSERT((atoms_WINDOW_STATE != BadAlloc && 
+            atoms_WINDOW_STATE != BadValue));
+    atoms_WINDOW_STATE_FULLSCREEN
+        = XInternAtom(dpy, "_NET_WM_STATE_FULLSCREEN",False);
+    ASSERT((atoms_WINDOW_STATE_FULLSCREEN != BadAlloc && 
+            atoms_WINDOW_STATE_FULLSCREEN != BadValue));
 
     win = XCreateSimpleWindow(
                 dpy,
@@ -79,6 +94,17 @@ static PyObject *canvas_create(PyObject *self,PyObject *pArgs)
                 BlackPixel(dpy,screen),
                 BlackPixel(dpy,screen));
     ASSERT(win);
+
+    /* Set the wmhints needed for fullscreen */
+    status = XChangeProperty(dpy, win, atoms_WINDOW_STATE, XA_ATOM, 32,
+                    PropModeReplace,
+                    (unsigned char *) &atoms_WINDOW_STATE_FULLSCREEN, 1);
+    ASSERT(status != BadAlloc);
+    ASSERT(status != BadAtom);
+    ASSERT(status != BadMatch);
+    ASSERT(status != BadPixmap);
+    ASSERT(status != BadValue);
+    ASSERT(status != BadWindow);
 
     XMapWindow(dpy, win);
 
