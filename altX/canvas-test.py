@@ -13,6 +13,9 @@ def key_handler(key):
 def motion_notify(x,y):
     print '%d,%d'%(x,y)
 
+def pressure_handler(x,y,pressure):
+    print '%d,%d,%d'%(x,y,pressure)
+
 surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,10,10)
 ctx = cairo.Context(surface)
 ctx.set_source_rgba(1,1,1,0.5)
@@ -25,6 +28,7 @@ if not surface:
 canvasX.create()
 
 canvasX.register_motion_handler(motion_notify)
+canvasX.register_pressure_handler(pressure_handler)
 
 '''
 for i in range(1,200):
