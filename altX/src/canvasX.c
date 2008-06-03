@@ -62,6 +62,7 @@ static cairo_surface_t *xsurface;
 static cairo_t *xctx;
 
 static PyObject *motion_handler = NULL;
+static PyObject *pressure_handler = NULL;
 
 static PyObject *canvas_create(PyObject *self,PyObject *pArgs)
 {
@@ -145,6 +146,8 @@ static PyObject *canvas_create(PyObject *self,PyObject *pArgs)
                     &xsp_major,
                     &xsp_minor);
     ASSERT(xsp_event_base >= 0);
+
+    XSPSetTSRawMode(dpy, True);
 #endif
 
     xsurface = cairo_xlib_surface_create(dpy, win, visual, w,h);
@@ -163,7 +166,7 @@ static PyObject *canvas_create(PyObject *self,PyObject *pArgs)
 static PyObject *canvas_run(PyObject *self,PyObject *pArgs)
 {
 #ifdef HAS_XSP
-    int tx=0,ty=0;
+    int tx=0,ty=0,pressure=0;
     XSPRawTouchscreenEvent xsp_event;
 #endif
 
@@ -188,19 +191,26 @@ static PyObject *canvas_run(PyObject *self,PyObject *pArgs)
                                     "ii",mevent->x,mevent->y);
             }
             break;
+        case KeyPress:
+            exit(0);
+            break;
         default:
             #ifdef HAS_XSP
             if(event.type == xsp_event_base){
                 memcpy(&xsp_event, &event,
                     sizeof(XSPRawTouchscreenEvent));
+                tx = xsp_event.x;
+                ty = xsp_event.y;
+                pressure = xsp_event.pressure;
+
+                /* translate raw coordinates */
+                TRANSLATE_RAW_COORDS(&tx, &ty);
+
+                if(pressure_handler){
+                    PyEval_CallFunction(pressure_handler,
+                        "iii",tx,ty,pressure);
+                }
             }
-            tx = xsp_event.x;
-            ty = xsp_event.y;
-
-            /* translate raw coordinates */
-            TRANSLATE_RAW_COORDS(&tx, &ty);
-
-            printf("Pressure = %d\n",xsp_event.pressure);
             #endif
             break;
         }
@@ -245,7 +255,6 @@ static PyObject *canvas_close(PyObject *self,PyObject *pArgs)
 static PyObject *canvas_register_key_handler(
         PyObject *self,PyObject *pArgs)
 {
-
     Py_INCREF(Py_None);
     return Py_None;
 }
@@ -264,6 +273,20 @@ static PyObject *canvas_register_motion_handler(
     return Py_None;
 }
 
+static PyObject *canvas_register_pressure_handler(
+        PyObject *self,PyObject *pArgs)
+{
+    PyObject *obj = NULL;
+
+    if(PyArg_ParseTuple(pArgs,"O",&obj))
+    {
+        pressure_handler = obj;
+    }
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
 static PyMethodDef canvas_methods[] =
 {
     { "create",
@@ -272,6 +295,8 @@ static PyMethodDef canvas_methods[] =
         canvas_run,METH_VARARGS,NULL},
     { "register_motion_handler",
         canvas_register_motion_handler,METH_VARARGS,NULL},
+    { "register_pressure_handler",
+        canvas_register_pressure_handler,METH_VARARGS,NULL},
     { "draw",
         canvas_draw,METH_VARARGS,NULL},
     { "close",
