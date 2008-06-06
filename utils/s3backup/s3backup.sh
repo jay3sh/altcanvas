@@ -9,10 +9,20 @@ LOG_FILE="$BASE_DIR.$PROJECT.log"
 
 if [ -f $LOG_FILE ]
 then
-    MAX_INCR_BACKUPS=10
+    MAX_INCR_BACKUPS=20
     TOTAL_BACKUPS=`cat $LOG_FILE | wc -l`
     if [ $TOTAL_BACKUPS -gt $MAX_INCR_BACKUPS ]
     then
+
+        # Delete the backups from S3
+        BACKUP_ARCHIVES=`cat ~/.S3backup.altcanvas.log | awk '{printf $1 "\n"}' | awk -F/ '{printf $3 "\n"}'`
+
+        echo "Deleting $BACKUP_ARCHIVES"
+        for ARCHIVE_FILE in $BACKUP_ARCHIVES
+        do
+            AmazonS3.py --bucket $PROJECT --delete $ARCHIVE_FILE
+        done
+
         # Time for full backup
         rm -f $LOG_FILE
     fi
