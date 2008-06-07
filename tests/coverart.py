@@ -43,15 +43,25 @@ class Amazon:
         params['Operation'] = 'ItemSearch'
         params['SearchIndex'] = 'Music'
 
+        kw_str = ''
         for keyword in keywords:
-            kw_str = keyword+"%20"
+            kw_str += keyword+"%20"
         params['Keywords'] = kw_str
 
         url = self.__generate_url(params)
 
         xmlresp = self.__query(url)
         
-        resp = XMLNode().parseXML(xmlresp)
+        try:
+            resp = XMLNode().parseXML(xmlresp)
+        except Exception,e:
+            # XML parsing error
+            print 'XML parsing error'
+            return None
+
+        # If no results are found
+        if 'Item' not in dir(resp.Items[0]):
+            return None
 
         asin_list = []
         for item in resp.Items[0].Item:
@@ -59,62 +69,47 @@ class Amazon:
 
         return asin_list
 
-    def getDetail(self,id):
-        pass
+    def getImages(self,id):
+        if not id:
+            return
+        params = {}
+        params['AssociateTag'] = 'devconn-20'
+        params['Operation'] = 'ItemLookup'
+        params['ItemId'] = id
+        params['ResponseGroup'] = 'ItemAttributes,Images'
 
+        url = self.__generate_url(params)
+        xmlresp = self.__query(url)
 
+        try:
+            resp = XMLNode().parseXML(xmlresp)
+        except Exception,e:
+            # XML parsing error
+            print 'XML parsing error'
+            return None
 
+        if 'ImageSets' not in dir(resp.Items[0].Item[0]):
+            # No images are returned for this product ASIN
+            return []
 
-def getItem(ASIN):
-    url = "http://ecs.amazonaws.com/onca/xml?Service=AWSECommerceService"
-    url += "&AWSAccessKeyId=0FWKGK43D4E0B7DDRK82"
-    url += "&AssociateTag=devconn-20"
-    url += "&Operation=ItemLookup"
-    url += "&ItemId="+ASIN
-    url += "&ResponseGroup=ItemAttributes,Images"
+        imageSets = resp.Items[0].Item[0].ImageSets
 
-    xmlresp = query(url)
+        if not imageSets:
+            return None
 
-    print xmlresp
+        images = []
+        images.append(
+            imageSets[0].ImageSet[0].LargeImage[0].URL[0].elementText)
 
-    resp = XMLNode().parseXML(xmlresp)
-    print resp.Items[0].Item[0].ImageSets[0].ImageSet[0].LargeImage[0].URL[0].elementText
-
-def searchItem(keywords):
-    url = "http://ecs.amazonaws.com/onca/xml?Service=AWSECommerceService"
-    url += "&AWSAccessKeyId=0FWKGK43D4E0B7DDRK82"
-    url += "&AssociateTag=devconn-20"
-    url += "&Operation=ItemSearch"
-    url += "&SearchIndex=Music"
-    url += "&Keywords="
-    for arg in keywords:
-        url += arg+"%20"
-
-    xmlresp = query(url)
-
-    resp = XMLNode().parseXML(xmlresp)
-
-    for item in resp.Items[0].Item:
-        details = getItem(item.ASIN[0].elementText)
-        
-        break
-        '''
-        print item.ASIN[0].elementText
-        if 'Artist' in dir(item.ItemAttributes[0]):
-            sys.stdout.write(
-                item.ItemAttributes[0].Artist[0].elementText)
-        if 'Manufacturer' in dir(item.ItemAttributes[0]):
-            sys.stdout.write( ' - '+
-                item.ItemAttributes[0].Manufacturer[0].elementText)
-        if 'Title' in dir(item.ItemAttributes[0]):
-            sys.stdout.write( ' - '+
-                item.ItemAttributes[0].Title[0].elementText)
-        '''
+        return images
 
 def main():
-    #searchItem(sys.argv[1:])
     amz = Amazon()
-    print amz.search(sys.argv[1:])
+    print sys.argv[1:]
+    for result in amz.search(sys.argv[1:]):
+        print amz.getImages(result)
+
+        
 
 
 if __name__ == '__main__':
