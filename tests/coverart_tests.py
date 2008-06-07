@@ -30,6 +30,8 @@ class TestAmazonGetImages(unittest.TestCase):
     def testGetImages(self):
         for result in sample_results:
             images = self.amazon.getImages(result)
+            self.assert_(images)
+            self.assert_(len(images) > 0)
 
 if __name__ == '__main__':
     for t in [TestAmazonSearch,TestAmazonGetImages]:
