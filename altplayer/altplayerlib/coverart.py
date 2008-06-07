@@ -1,12 +1,9 @@
 #!/usr/bin/env python
 
 
-from libpub.utils.xmlparser import XMLNode
+from altplayerlib.utils import XMLNode
 import sys
 import urllib
-
-
-
 
 class Amazon:
     SERVICE_URL="http://ecs.amazonaws.com/onca/xml"

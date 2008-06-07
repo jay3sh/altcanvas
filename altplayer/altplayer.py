@@ -2,10 +2,11 @@
 
 import sys
 import os
-from id3reader import Reader as id3Reader
-from uniq import unique
-from coverart import Amazon
 import traceback
+
+from altplayerlib.id3reader import Reader as id3Reader
+from altplayerlib.utils import unique
+from altplayerlib.coverart import Amazon
 
 COVERART_DIR='/tmp/coverart'
 
