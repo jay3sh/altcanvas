@@ -16,8 +16,13 @@ def filter_trivial_kw(kw):
     for tkw in trivial_keywords:
         if tkw in kw:
             kw.remove(tkw)
-
     return kw
+
+def normalize(string):
+    string = string.lower().strip()
+    string = string.replace('unknown','')
+    string = string.replace(' ','%20')
+    return string
 
 def main():
     amazon = Amazon()
@@ -26,9 +31,16 @@ def main():
         print "Give me a path"
     else:
         success_count = 0
+        total_count = 0
         for root,dir,files in os.walk(sys.argv[1]):
             for mp3 in files:
                 try:
+                    print mp3
+                    if not mp3.lower().endswith('mp3'):
+                        continue 
+
+                    total_count += 1
+
                     id3 = id3Reader(os.path.join(root,mp3))
 
                     tt2,tpe1,talb,performer,album,title = ( 
@@ -44,12 +56,20 @@ def main():
                     print 'Tags: %s-%s-%s-%s-%s-%s'%(
                         album,performer,title,tt2,tpe1,talb)
 
-                    for tag in (album,performer,title,tt2,tpe1,talb):
+                    for tag in (album,performer,title):
                         if tag:
-                            keywords.append(tag.lower().replace(' ','%20'))
+                            keywords.append(normalize(tag))
 
                     if len(keywords) == 0:
-                        keywords += mp3.lower().split()
+                        songname = mp3.lower().rpartition('.')[0]
+                        songinfo = songname.split('-')
+                        for part in songinfo:
+                            keywords.append(normalize(part))
+
+                    if len(keywords) == 0:
+                        for tag in (tt2,tpe1,talb):
+                            if tag:
+                                keywords.append(normalize(tag))
 
                     keywords = unique(keywords)
                     keywords = filter_trivial_kw(keywords)
@@ -80,7 +100,7 @@ def main():
                     for line in traceback.format_exc().split('\n'):
                         print line
     
-            print 'Success ratio: %d/%d'%(success_count,len(files))
+        print 'Success ratio: %d/%d'%(success_count,total_count)
 
 if __name__ == '__main__':
     main()
