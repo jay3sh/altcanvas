@@ -25,6 +25,7 @@ def main():
     if len(sys.argv) < 2 or '-?' in sys.argv:
         print "Give me a path"
     else:
+        success_count = 0
         for root,dir,files in os.walk(sys.argv[1]):
             for mp3 in files:
                 try:
@@ -40,31 +41,46 @@ def main():
                     )
 
                     keywords = []
+                    print 'Tags: %s-%s-%s-%s-%s-%s'%(
+                        album,performer,title,tt2,tpe1,talb)
+
                     for tag in (album,performer,title,tt2,tpe1,talb):
                         if tag:
-                            keywords += tag.lower().split()
+                            keywords.append(tag.lower().replace(' ','%20'))
+
+                    if len(keywords) == 0:
+                        keywords += mp3.lower().split()
 
                     keywords = unique(keywords)
                     keywords = filter_trivial_kw(keywords)
 
-                    if len(keywords) > 0:
+                    print 'Flat: '+str(keywords)
+
+                    while len(keywords) > 0:
                         results = amazon.search(keywords)
+
+                        # If search fails try with fewer keywords
                         if not results or len(results) <= 0:
-                            #print 'No results found: '+str(keywords)
+                            keywords = keywords[:-1]
                             continue
 
                         images = amazon.getImages(results[0])
 
+                        # If getImage fails try with fewer keywords
                         if not images:
-                            #print 'No images found: '+results[0]
+                            keywords = keywords[:-1]
                             continue
 
-                        print mp3+"\n"+" "*10+" --> "+images[0]
+                        success_count += 1
+                        print 'Success: '+str(keywords)
+                        print " "*10+" --> "+images[0]
+                        break
 
                 except Exception, e:
                     for line in traceback.format_exc().split('\n'):
                         print line
     
+            print 'Success ratio: %d/%d'%(success_count,len(files))
 
 if __name__ == '__main__':
     main()
