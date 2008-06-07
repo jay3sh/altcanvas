@@ -6,17 +6,63 @@ import sys
 import urllib
 
 
-def query(url):
-    instream = urllib.urlopen(url)
 
-    xmlresp = ""
-    for line in instream.readlines():
-        xmlresp += line
 
-    print xmlresp
-    print "-"*100
-    
-    return xmlresp
+class Amazon:
+    SERVICE_URL="http://ecs.amazonaws.com/onca/xml"
+    SERVICE_NAME="AWSECommerceService"
+    AWS_ACCESS_KEY="0FWKGK43D4E0B7DDRK82"
+    def __init__(self):
+        pass
+
+    def __query(self,url):
+        instream = urllib.urlopen(url)
+        xmlresp = ""
+        for line in instream.readlines():
+            xmlresp += line
+        return xmlresp
+        
+    def __generate_url(self,params):
+        url = self.SERVICE_URL
+        params['Service'] = self.SERVICE_NAME
+        params['AWSAccessKeyId'] = self.AWS_ACCESS_KEY
+
+        if len(params.items()) > 0:
+            url += "?"
+
+        for param in params.items():
+            url += "%s=%s&"%param
+
+        return url
+
+    def search(self,keywords):
+        if len(keywords) <= 0:
+            return
+        params = {}
+        params['AssociateTag'] = 'devconn-20'
+        params['Operation'] = 'ItemSearch'
+        params['SearchIndex'] = 'Music'
+
+        for keyword in keywords:
+            kw_str = keyword+"%20"
+        params['Keywords'] = kw_str
+
+        url = self.__generate_url(params)
+
+        xmlresp = self.__query(url)
+        
+        resp = XMLNode().parseXML(xmlresp)
+
+        asin_list = []
+        for item in resp.Items[0].Item:
+            asin_list.append(item.ASIN[0].elementText)
+
+        return asin_list
+
+    def getDetail(self,id):
+        pass
+
+
 
 
 def getItem(ASIN):
@@ -28,6 +74,8 @@ def getItem(ASIN):
     url += "&ResponseGroup=ItemAttributes,Images"
 
     xmlresp = query(url)
+
+    print xmlresp
 
     resp = XMLNode().parseXML(xmlresp)
     print resp.Items[0].Item[0].ImageSets[0].ImageSet[0].LargeImage[0].URL[0].elementText
@@ -64,7 +112,9 @@ def searchItem(keywords):
         '''
 
 def main():
-    searchItem(sys.argv[1:])
+    #searchItem(sys.argv[1:])
+    amz = Amazon()
+    print amz.search(sys.argv[1:])
 
 
 if __name__ == '__main__':
