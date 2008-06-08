@@ -92,11 +92,34 @@ class Amazon:
         imageSets = resp.Items[0].Item[0].ImageSets
 
         if not imageSets:
-            return None
+            return [] 
 
-        images = []
-        images.append(
-            imageSets[0].ImageSet[0].LargeImage[0].URL[0].elementText)
+        images = {}
+
+        if 'SwatchImage' in dir(imageSets[0].ImageSet[0]):
+            images['SwatchImage'] = (
+                imageSets[0].ImageSet[0].SwatchImage[0].URL[0].elementText,
+                imageSets[0].ImageSet[0].SwatchImage[0].Width[0].elementText,
+                imageSets[0].ImageSet[0].SwatchImage[0].Height[0].elementText,
+                )
+        if 'SmallImage' in dir(imageSets[0].ImageSet[0]):
+            images['SmallImage'] = (
+                imageSets[0].ImageSet[0].SmallImage[0].URL[0].elementText,
+                imageSets[0].ImageSet[0].SmallImage[0].Width[0].elementText,
+                imageSets[0].ImageSet[0].SmallImage[0].Height[0].elementText,
+                )
+        if 'MediumImage' in dir(imageSets[0].ImageSet[0]):
+            images['MediumImage'] = (
+                imageSets[0].ImageSet[0].MediumImage[0].URL[0].elementText,
+                imageSets[0].ImageSet[0].MediumImage[0].Width[0].elementText,
+                imageSets[0].ImageSet[0].MediumImage[0].Height[0].elementText,
+                )
+        if 'LargeImage' in dir(imageSets[0].ImageSet[0]):
+            images['LargeImage'] = (
+                imageSets[0].ImageSet[0].LargeImage[0].URL[0].elementText,
+                imageSets[0].ImageSet[0].LargeImage[0].Width[0].elementText,
+                imageSets[0].ImageSet[0].LargeImage[0].Height[0].elementText,
+                )
 
         return images
 
@@ -131,7 +154,6 @@ def scan_music(path):
     for root,dir,files in os.walk(path):
         for mp3 in files:
             try:
-                print mp3
                 if not mp3.lower().endswith('mp3'):
                     continue 
 
@@ -149,8 +171,6 @@ def scan_music(path):
                 )
 
                 keywords = []
-                print 'Tags: %s-%s-%s-%s-%s-%s'%(
-                    album,performer,title,tt2,tpe1,talb)
 
                 #
                 # Use relevant id3 tags first
@@ -176,8 +196,10 @@ def scan_music(path):
                 keywords = unique(keywords)
                 keywords = filter_trivial_kw(keywords)
 
-                print 'Flat: '+str(keywords)
-
+                #
+                # Start the search with all keywords
+                # Keep reducing the number of keywords until we get
+                # at least a single result
                 while len(keywords) > 0:
                     results = amazon.search(keywords)
 
@@ -194,8 +216,7 @@ def scan_music(path):
                         continue
 
                     success_count += 1
-                    print 'Success: '+str(keywords)
-                    print " "*10+" --> "+images[0]
+                    print images['LargeImage']
                     break
 
             except Exception, e:
