@@ -56,16 +56,22 @@ def main():
                     print 'Tags: %s-%s-%s-%s-%s-%s'%(
                         album,performer,title,tt2,tpe1,talb)
 
+                    #
+                    # Use relevant id3 tags first
                     for tag in (album,performer,title):
                         if tag:
                             keywords.append(normalize(tag))
 
+                    #
+                    # Derive keywords from the filename
                     if len(keywords) == 0:
                         songname = mp3.lower().rpartition('.')[0]
                         songinfo = songname.split('-')
                         for part in songinfo:
                             keywords.append(normalize(part))
 
+                    #
+                    # Lastly try miscellaneous id3 tags
                     if len(keywords) == 0:
                         for tag in (tt2,tpe1,talb):
                             if tag:
