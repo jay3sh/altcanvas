@@ -2,6 +2,7 @@
 
 
 from altplayerlib.utils import XMLNode
+from altplayerlib.config import getConfig 
 import sys
 import urllib
 
@@ -148,6 +149,7 @@ def normalize(string):
 
 def scan_music(path):
     amazon = Amazon()
+    config = getConfig()
 
     success_count = 0
     total_count = 0

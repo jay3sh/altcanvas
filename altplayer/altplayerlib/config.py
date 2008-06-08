@@ -3,13 +3,32 @@ import os
 import sys
 
 from utils import XMLNode
+
+
+def getConfig():
+    try:
+        config = Config()
+    except Config,c:
+        config = c
+    return config
     
+#
+# This is a singleton class
+#
 class Config:
+    __single__ = None
+
     map = None
     CONFIG_DIR = os.getenv('HOME')+'/.altplayer'
     COVERART_DIR = CONFIG_DIR+'/covertart'
     CONFIG_FILE = CONFIG_DIR+'/config.xml'
+    DATASTORE_FILE = CONFIG_DIR+'/datastore.xml'
     def __init__(self):
+
+        if Config.__single__:
+            raise Config.__single__
+        Config.__single__ = self
+
         #
         # Check if the configuration directory exists
         try:
