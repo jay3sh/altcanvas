@@ -6,12 +6,26 @@ from utils import XMLNode
     
 class Config:
     map = None
+    CONFIG_DIR = os.getenv('HOME')+'/.altplayer'
+    COVERART_DIR = CONFIG_DIR+'/covertart'
+    CONFIG_FILE = CONFIG_DIR+'/config.xml'
     def __init__(self):
-        self.CONFIG_FILE = None
-        if sys.platform.find('win32') >= 0:
-            self.CONFIG_FILE=os.getenv('USERPROFILE')+'\\.publishr'
-        else:
-            self.CONFIG_FILE=os.getenv('HOME')+'/.publishr'
+        #
+        # Check if the configuration directory exists
+        try:
+            os.stat(self.CONFIG_DIR)
+        except OSError, oe:
+            # Directory doesn't exist, create it
+            os.mkdir(self.CONFIG_DIR)
+
+        #
+        # Check if the coverart directory exists
+        try:
+            os.stat(self.COVERART_DIR)
+        except OSError, oe:
+            # Directory doesn't exist, create it
+            os.mkdir(self.COVERART_DIR)
+
         
         try:
             configf = open(self.CONFIG_FILE,'r')
