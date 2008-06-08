@@ -11,7 +11,7 @@ usage()
 }
 
 
-TMP_BLDDIR=/tmp/publishr-build
+TMP_BLDDIR=/tmp/altcanvas-build
 BLDDIR=`pwd`/packages
 SRCDIR=`pwd`
 PUB_COMMON_DIR=$SRCDIR/common/libpub
@@ -19,6 +19,8 @@ PUB_GIMP_DIR=$SRCDIR/gimp/publishr
 PUB_INKSCAPE_DIR=$SRCDIR/inkscape/publishr
 FILTER="--exclude '.*' --exclude '*.pyc'"
 VERSION=0.5.0
+
+export PYTHON=/usr/bin/python2.5
 
 clean()
 {
@@ -85,7 +87,7 @@ make_maemo_publishr()
 		ln -s $SRCDIR/maemo/publishr/publishr-start.py ./publishr-start.py
 		ln -s $SRCDIR/install/publishr.desktop ./publishr.desktop
 
-		python setup.py bdist_debian || exit
+		$PYTHON setup.py bdist_debian || exit
 
 		if ! [ -d $BLDDIR ]; then
 			mkdir $BLDDIR;
@@ -95,6 +97,34 @@ make_maemo_publishr()
 	)
 
 	#rm -rf $TMP_BLDDIR
+
+}
+
+make_altplayer()
+{
+	rm -rf $TMP_BLDDIR
+	mkdir $TMP_BLDDIR
+
+
+	(
+		cd $TMP_BLDDIR
+
+        ln -s $SRCDIR/altplayer/setup.py ./setup.py
+        ln -s $SRCDIR/install/bdist_debian.py ./bdist_debian.py
+        ln -s $SRCDIR/altplayer/altplayerlib ./altplayerlib
+        ln -s $SRCDIR/altplayer/altplayer.py ./altplayer.py
+        ln -s $SRCDIR/altplayer/altplayer.desktop ./altplayer.desktop
+
+		$PYTHON setup.py bdist_debian || exit
+
+		if ! [ -d $BLDDIR ]; then
+			mkdir $BLDDIR;
+		fi
+
+		mv dist/*.deb $BLDDIR/
+    )
+
+	rm -rf $TMP_BLDDIR
 
 }
 
@@ -116,7 +146,7 @@ make_altmaemo_publishr()
 		    ln -s $SRCDIR/install/$img.png ./$img.png
         done
 
-		python setup.py bdist_debian || exit
+		$PYTHON setup.py bdist_debian || exit
 
 		if ! [ -d $BLDDIR ]; then
 			mkdir $BLDDIR;
@@ -127,9 +157,9 @@ make_altmaemo_publishr()
 
 	rm -rf $TMP_BLDDIR
 
-    scp $BLDDIR/altpublishr-maemo*deb root@192.168.1.100:/root/
+    #scp $BLDDIR/altpublishr-maemo*deb root@192.168.1.100:/root/
 
-    ssh root@192.168.1.100 "(dpkg --purge altpublishr-maemo; cd /root/; dpkg -i altpublishr-maemo*deb)"
+    #ssh root@192.168.1.100 "(dpkg --purge altpublishr-maemo; cd /root/; dpkg -i altpublishr-maemo*deb)"
 
 }
 
@@ -180,5 +210,8 @@ case $PACKAGE in
     "canvasx")
         make_canvasx;
 		;;
+    "altplayer")
+        make_altplayer;
+        ;;
 esac
 
