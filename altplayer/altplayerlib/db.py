@@ -11,12 +11,17 @@ class Record:
     def __getattr__(self,elem):
         if elem is 'fieldnames':
             return self.map.keys()
+        if elem is 'fieldvalues':
+            return self.map.values()
         if elem is 'fieldtypes':
             return map(lambda x: type(x), self.map.values())
         if elem is 'fields':
-            return map(lambda x: (x[0],type(x[1])), self.map.items())
+            #return map(lambda x: (x[0],type(x[1])), self.map.items())
+            return self.map.items()
         if elem in self.map.keys():
             return self.map[elem]
+
+        raise AttributeError("Invalid Attribute '%s'"%elem)
 
 class CoverartRecord(Record):
     pass
@@ -31,19 +36,12 @@ class DB:
     def __init__(self,path):
         self.path = path
 
-        if not os.access(self.path,os.W_OK):
-            self.conn = sqlite3.connect(self.path)
-            self.cur = self.conn.cursor()
-            self.cur.execute("create table coverart (ID INTEGER PRIMARY KEY, filename TEXT, image_url TEXT, image_path TEXT)")
-            self.conn.commit()
-        else:
-            print 'Already found one'
-            self.conn = sqlite3.connect(self.path)
-            self.cur = self.conn.cursor()
+        self.conn = sqlite3.connect(self.path)
+        self.cur = self.conn.cursor()
 
     def put(self,record):
         self.cur.execute("select name from sqlite_master where type='table'")
-        tables = self.cur.fetchall()
+        tables = map(lambda x: x[0],self.cur.fetchall())
 
         tablename = record.__class__.__name__
 
@@ -53,16 +51,33 @@ class DB:
             sql += '(ID INTEGER PRIMARY KEY '
 
             for field in record.fields:
-                sql += ',%s %s'%(field[0],self.SQLITE_TYPES[field[1]])
+                sql += ',%s %s'%(field[0],self.SQLITE_TYPES[type(field[1])])
 
             sql += ')'
-            print sql
 
-        '''
-        self.cur.execute("insert into coverart(filename,image_url,image_path) values(\"%s\",\"%s\",\"%s\")"%(
-                            record['filename'],record['image_url'],record['image_path']))
+            self.cur.execute(sql)
+            self.conn.commit()
+
+        def quote_strings(s):
+            if type(s) == type('string'):
+                return '"'+s+'"'
+            else:
+                return s
+
+        fieldvalues = map(quote_strings,record.fieldvalues)
+
+        # Now insert the record fields into the database
+        sql = 'insert into %s'%tablename
+        sql += '('
+        sql += reduce(lambda x,y: '%s,%s'%(x,y), record.fieldnames)
+        sql += ')'
+        sql += ' values '
+        sql += '('
+        sql += reduce(lambda x,y: '%s,%s'%(x,y), fieldvalues)
+        sql += ')'
+
+        self.cur.execute(sql)
         self.conn.commit()
-        '''
 
     def get(self,record):
         key_str = None
@@ -103,6 +118,6 @@ if __name__ == '__main__':
     #print db.get({'filename': ' isobel.mp3'})
 
     r = CoverartRecord(filename=' isobel.mp3',
-            image_url='http://aws.amazon.com/something.jpg',
-            image_path='/home34343434/.coverart/something.jpg')
+            image_url='http://aws.com/something.jpg',
+            image_path='/home34343/.coverart/something.jpg')
     db.put(r)
