@@ -2,13 +2,18 @@
 import os
 import sqlite3
 
-class CoverartRecord:
-    filename = None
-    image_url = None
-    image_path = None
 
-    def __init__(self,*args):
-        self.filename,self.image_url,self.image_path = args
+class Record:
+    map = None
+    def __init__(self,**kwds):
+        self.map = kwds
+
+    def __getattr__(self,elem):
+        if elem in self.map.keys():
+            return self.map[elem]
+
+class CoverartRecord(Record):
+    pass
 
 class DB:
 
@@ -24,10 +29,7 @@ class DB:
             self.conn = sqlite3.connect(self.path)
             self.cur = self.conn.cursor()
 
-    def add(self,record):
-        #if not isinstance(record,CoverartRecord):
-        #    raise Exception('Wrong record')
-
+    def put(self,record):
         self.cur.execute("insert into coverart(filename,image_url,image_path) values(\"%s\",\"%s\",\"%s\")"%(
                             record['filename'],record['image_url'],record['image_path']))
         self.conn.commit()
@@ -62,10 +64,14 @@ class DB:
 
 
 if __name__ == '__main__':
-    db = DB('/tmp/sample.db')
+    #db = DB('/tmp/sample.db')
     '''
-    db.add({'filename':' isobel.mp3',
+    db.put({'filename':' isobel.mp3',
             'image_url':'http://aws.amazon.com/something.jpg',
             'image_path':'/home34343434/.coverart/something.jpg'})
     '''
-    print db.get({'filename': ' isobel.mp3'})
+    #print db.get({'filename': ' isobel.mp3'})
+    r = CoverartRecord(filename=' isobel.mp3',
+            image_url='http://aws.amazon.com/something.jpg',
+            image_path='/home34343434/.coverart/something.jpg')
+    print r.filename
