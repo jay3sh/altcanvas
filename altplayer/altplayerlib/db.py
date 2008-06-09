@@ -16,12 +16,20 @@ class Record:
         if elem is 'fieldtypes':
             return map(lambda x: type(x), self.map.values())
         if elem is 'fields':
-            #return map(lambda x: (x[0],type(x[1])), self.map.items())
             return self.map.items()
         if elem in self.map.keys():
             return self.map[elem]
 
         raise AttributeError("Invalid Attribute '%s'"%elem)
+
+    def __setattr__(self,elem,value):
+        if type(elem) != type('string'):
+            raise AttributeError("Attribute name has to be a string")
+
+        self.map[elem] = value
+
+
+
 
 class CoverartRecord(Record):
     pass
@@ -80,11 +88,20 @@ class DB:
         self.conn.commit()
 
     def get(self,record):
+        tablename = record.__class__.__name__
+
+        # Get all the field names from table info
+        sql = 'pragma table_info(%s)'%tablename
+
+        self.cur.execute(sql)
+
+        fields = map(lambda x:x[1], self.cur.fetchall())
+        fields = filter(lambda x: x != 'ID',fields)
+
+        return None
         key_str = None
 
-        print record.items()
-
-        for key,value in record.items():
+        for key,value in record.fields():
             if key_str:
                 key_str += ' and '
             else:
@@ -107,7 +124,6 @@ class DB:
         return records
 
 
-
 if __name__ == '__main__':
     db = DB('/tmp/sample.db')
     '''
@@ -115,9 +131,11 @@ if __name__ == '__main__':
             'image_url':'http://aws.amazon.com/something.jpg',
             'image_path':'/home34343434/.coverart/something.jpg'})
     '''
-    #print db.get({'filename': ' isobel.mp3'})
+    print db.get(CoverartRecord(filename='isobel.mp3'))
 
+    '''
     r = CoverartRecord(filename=' isobel.mp3',
             image_url='http://aws.com/something.jpg',
             image_path='/home34343/.coverart/something.jpg')
     db.put(r)
+    '''
