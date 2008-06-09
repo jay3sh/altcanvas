@@ -101,40 +101,33 @@ class DB:
 
         self.cur.execute(sql)
 
-        fields = map(lambda x:x[1], self.cur.fetchall())
-        fields = filter(lambda x: x != 'ID',fields)
+        fieldnames = map(lambda x:x[1], self.cur.fetchall())
+        fieldnames = filter(lambda x: x != 'ID',fieldnames)
 
         sql = 'select '
-        sql += reduce(lambda x,y: '%s,%s'%(x,y), fields)
+        sql += reduce(lambda x,y: '%s,%s'%(x,y), fieldnames)
         sql += ' from '+tablename
         sql += ' where '
 
         fieldvalues = map(self.__quote_strings__,record.fieldvalues)
-        print fieldvalues 
 
-        return None
-        key_str = None
+        # Merge quoted values with respective keys
+        fields = map(None,record.fieldnames,fieldvalues)
 
-        for key,value in record.fields():
-            if key_str:
-                key_str += ' and '
-            else:
-                key_str = ' '
-            key_str += ' %s = \"%s\" '%(key,value)
+        conditions = map(lambda x: '%s = %s'%x , fields)
 
-        sql = "select filename,image_url,image_path from coverart where "+key_str
-
+        condition_str = reduce(lambda x,y: '%s and %s'%(x,y), conditions) 
+        
+        sql += condition_str
 
         self.cur.execute(sql)
 
-        records = []
-        for result in self.cur.fetchall():
-            records.append({
-                'filename':result[0],
-                'image_url':result[1],
-                'image_path':result[2]
-            })
-        return records
+        results = self.cur.fetchall()
+
+        for result in results:
+            keyed_results = map(None,fieldnames,result)
+            print keyed_results
+            
 
 
 if __name__ == '__main__':
