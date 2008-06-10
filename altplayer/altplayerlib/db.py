@@ -23,7 +23,7 @@ class Record:
         raise AttributeError("Invalid Attribute '%s'"%elem)
 
     def __setattr__(self,elem,value):
-        if type(elem) != type('string'):
+        if type(elem) != str:
             raise AttributeError("Attribute name has to be a string")
 
         if self.__dict__.has_key(elem):
@@ -44,9 +44,9 @@ class CoverartRecord(Record):
 
 class DB:
     SQLITE_TYPES = { 
-                        type(0):'INTEGER',
-                        type(1.0):'REAL',
-                        type('string'):'TEXT'
+                        int:'INTEGER',
+                        float:'REAL',
+                        str:'TEXT'
                    }
 
     def __init__(self,path):
@@ -56,7 +56,7 @@ class DB:
         self.cur = self.conn.cursor()
 
     def __quote_strings__(self,s):
-        if type(s) == type('string'):
+        if type(s) == str:
             return '"'+s+'"'
         else:
             return s
@@ -93,7 +93,6 @@ class DB:
         sql += reduce(lambda x,y: '%s,%s'%(x,y), fieldvalues)
         sql += ')'
 
-        return None
         self.cur.execute(sql)
         self.conn.commit()
 
@@ -140,19 +139,16 @@ class DB:
 
 
 if __name__ == '__main__':
-    db = DB('/tmp/sample.db')
-    '''
-    db.put({'filename':' isobel.mp3',
-            'image_url':'http://aws.amazon.com/something.jpg',
-            'image_path':'/home34343434/.coverart/something.jpg'})
-    '''
-    for r in db.get(CoverartRecord(filename=' isobel.mp3')):
-        r.dump()
-        
+    import sys
+    db = DB(sys.argv[1])
 
-    '''
+
     r = CoverartRecord(filename=' isobel.mp3',
             image_url='http://aws.com/something.jpg',
             image_path='/home34343/.coverart/something.jpg')
     db.put(r)
-    '''
+
+
+    for r in db.get(CoverartRecord(filename=' isobel.mp3')):
+        r.dump()
+        
