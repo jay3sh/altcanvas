@@ -62,6 +62,9 @@ class DB:
             return s
 
     def put(self,record):
+        if not record.fieldvalues:
+            raise Exception('Creating empty records is not supported')
+
         self.cur.execute("select name from sqlite_master where type='table'")
         tables = map(lambda x: x[0],self.cur.fetchall())
 
@@ -79,7 +82,6 @@ class DB:
 
             self.cur.execute(sql)
             self.conn.commit()
-
 
         fieldvalues = map(self.__quote_strings__,record.fieldvalues)
 
@@ -105,10 +107,18 @@ class DB:
         self.cur.execute(sql)
 
         fieldnames = map(lambda x:x[1], self.cur.fetchall())
+
+        if not fieldnames:
+            return []
+
         fieldnames = filter(lambda x: x != 'ID',fieldnames)
 
+
         sql = 'select '
-        sql += reduce(lambda x,y: '%s,%s'%(x,y), fieldnames)
+        if fieldnames:
+            sql += reduce(lambda x,y: '%s,%s'%(x,y), fieldnames)
+        else:
+            sql += '*'
         sql += ' from '+tablename
 
         if record.fieldvalues:
@@ -117,7 +127,6 @@ class DB:
 
             fieldvalues = map(self.__quote_strings__,record.fieldvalues)
 
-            # Merge quoted values with respective keys
             fields = map(None,record.fieldnames,fieldvalues)
     
             conditions = map(lambda x: '%s = %s'%x , fields)
