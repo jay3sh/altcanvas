@@ -110,18 +110,21 @@ class DB:
         sql = 'select '
         sql += reduce(lambda x,y: '%s,%s'%(x,y), fieldnames)
         sql += ' from '+tablename
-        sql += ' where '
 
-        fieldvalues = map(self.__quote_strings__,record.fieldvalues)
+        if record.fieldvalues:
 
-        # Merge quoted values with respective keys
-        fields = map(None,record.fieldnames,fieldvalues)
+            sql += ' where '
 
-        conditions = map(lambda x: '%s = %s'%x , fields)
+            fieldvalues = map(self.__quote_strings__,record.fieldvalues)
 
-        condition_str = reduce(lambda x,y: '%s and %s'%(x,y), conditions) 
-        
-        sql += condition_str
+            # Merge quoted values with respective keys
+            fields = map(None,record.fieldnames,fieldvalues)
+    
+            conditions = map(lambda x: '%s = %s'%x , fields)
+    
+            condition_str = reduce(lambda x,y: '%s and %s'%(x,y), conditions) 
+            
+            sql += condition_str
 
         self.cur.execute(sql)
 

@@ -27,7 +27,13 @@ class TestDB(unittest.TestCase):
         results = self.db.get(ContactRecord(name='Tom Hanks'))
         self.assertEquals(len(results),1)
         self.assertEquals(results[0].phone,t1.phone)
+
         results = self.db.get(ContactRecord(salary=1000000.90))
+        self.assertEquals(len(results),2)
+        self.assert_(t1.name in map(lambda x:x.name,results))
+        self.assert_(t2.email in map(lambda x:x.email,results))
+
+        results = self.db.get(ContactRecord())
         self.assertEquals(len(results),2)
         self.assert_(t1.name in map(lambda x:x.name,results))
         self.assert_(t2.email in map(lambda x:x.email,results))
