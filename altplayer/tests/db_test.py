@@ -8,7 +8,7 @@ class TestDB(unittest.TestCase):
     def setUp(self):
         self.db = DB(DB_FILE_NAME)
 
-    def testDB(self):
+    def testDB1(self):
         class ContactRecord(Record):
             pass
         t1 = ContactRecord(name='Tom Hanks',
@@ -37,6 +37,22 @@ class TestDB(unittest.TestCase):
         self.assertEquals(len(results),2)
         self.assert_(t1.name in map(lambda x:x.name,results))
         self.assert_(t2.email in map(lambda x:x.email,results))
+
+    def testDB2(self):
+        class PayrollRecord(Record):
+            pass
+        t = PayrollRecord()
+        self.assertRaises(Exception,self.db.put,t)
+
+        t1 = PayrollRecord(name='Steven Spielberg',
+                            salary=1400000)
+        t2 = PayrollRecord(name='George Lucas ',
+                            salary=1100000)
+        self.db.put(t1)
+        self.db.put(t2)
+
+        results = self.db.get(PayrollRecord())
+        self.assertEquals(len(results),2)
 
     def tearDown(self):
         import os
