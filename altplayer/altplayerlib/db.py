@@ -32,7 +32,11 @@ class Record:
 
         self.__map__[elem] = value
 
-
+    def dump(self):
+        print '<< %s >>'%self.__class__.__name__
+        for k,v in self.__map__.items():
+            print '%s : %s'%(k,v)
+        print ''
 
 
 class CoverartRecord(Record):
@@ -124,10 +128,15 @@ class DB:
 
         results = self.cur.fetchall()
 
+        records = []
         for result in results:
-            keyed_results = map(None,fieldnames,result)
-            print keyed_results
+            r = Record()
+            r.__class__ = record.__class__
+            for key,value in map(None,fieldnames,result):
+                r.__setattr__(str(key),value)
+            records.append(r)
             
+        return records
 
 
 if __name__ == '__main__':
@@ -137,7 +146,9 @@ if __name__ == '__main__':
             'image_url':'http://aws.amazon.com/something.jpg',
             'image_path':'/home34343434/.coverart/something.jpg'})
     '''
-    print db.get(CoverartRecord(filename=' isobel.mp3'))
+    for r in db.get(CoverartRecord(filename=' isobel.mp3')):
+        r.dump()
+        
 
     '''
     r = CoverartRecord(filename=' isobel.mp3',
