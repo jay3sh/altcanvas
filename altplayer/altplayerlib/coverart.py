@@ -176,24 +176,25 @@ def scan_music(path):
 
                 #
                 # Use relevant id3 tags first
-                for tag in (album,performer,title):
-                    if tag:
-                        keywords.append(normalize(tag))
+                keywords += \
+                    map(normalize,filter(lambda x:x,(album,performer,title)))
 
                 #
                 # Derive keywords from the filename
                 if len(keywords) == 0:
-                    songname = mp3.lower().rpartition('.')[0]
-                    songinfo = songname.split('-')
-                    for part in songinfo:
-                        keywords.append(normalize(part))
+                    filename = mp3.lower()
+                    if filename.rfind(os.sep):
+                        songname = filename.rpartition('.')[0]
+                    else:
+                        songname = filename
+
+                    keywords += map(normalize,songname.split('-'))
 
                 #
                 # Lastly try miscellaneous id3 tags
                 if len(keywords) == 0:
-                    for tag in (tt2,tpe1,talb):
-                        if tag:
-                            keywords.append(normalize(tag))
+                    keywords += \
+                        map(normalize,filter(lambda x:x,(tt2,tpe1,talb)))
 
                 keywords = unique(keywords)
                 keywords = filter_trivial_kw(keywords)
