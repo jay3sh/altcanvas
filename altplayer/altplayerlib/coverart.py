@@ -1,10 +1,30 @@
 #!/usr/bin/env python
 
-
-from altplayerlib.utils import XMLNode
-from altplayerlib.config import getConfig 
+from utils import XMLNode
+from config import getConfig 
 import sys
 import urllib
+
+class DynamicObject:
+    __map__ = {}
+    def __init__(self,**kwds):
+        self.__dict__['__map__'] = kwds
+
+    def __getattr__(self,attr):
+        if attr in self.__map__.keys():
+            return self.__map__[attr]
+
+        raise AttributeError("Invalid Attribute '%s'"%attr)
+    
+    def __setattr__(self,attr,value):
+        if type(attr) != str:
+            raise AttributeError("Attribute name has to be a string")
+
+        if self.__dict__.has_key(attr):
+            self.__dict__[attr] = value
+            return
+
+        self.__map__[attr] = value
 
 class Amazon:
     SERVICE_URL="http://ecs.amazonaws.com/onca/xml"
@@ -95,32 +115,28 @@ class Amazon:
         if not imageSets:
             return [] 
 
-        images = {}
+        class Image(DynamicObject):
+            pass
 
-        if 'SwatchImage' in dir(imageSets[0].ImageSet[0]):
-            images['SwatchImage'] = (
-                imageSets[0].ImageSet[0].SwatchImage[0].URL[0].elementText,
-                imageSets[0].ImageSet[0].SwatchImage[0].Width[0].elementText,
-                imageSets[0].ImageSet[0].SwatchImage[0].Height[0].elementText,
-                )
-        if 'SmallImage' in dir(imageSets[0].ImageSet[0]):
-            images['SmallImage'] = (
-                imageSets[0].ImageSet[0].SmallImage[0].URL[0].elementText,
-                imageSets[0].ImageSet[0].SmallImage[0].Width[0].elementText,
-                imageSets[0].ImageSet[0].SmallImage[0].Height[0].elementText,
-                )
-        if 'MediumImage' in dir(imageSets[0].ImageSet[0]):
-            images['MediumImage'] = (
-                imageSets[0].ImageSet[0].MediumImage[0].URL[0].elementText,
-                imageSets[0].ImageSet[0].MediumImage[0].Width[0].elementText,
-                imageSets[0].ImageSet[0].MediumImage[0].Height[0].elementText,
-                )
-        if 'LargeImage' in dir(imageSets[0].ImageSet[0]):
-            images['LargeImage'] = (
-                imageSets[0].ImageSet[0].LargeImage[0].URL[0].elementText,
-                imageSets[0].ImageSet[0].LargeImage[0].Width[0].elementText,
-                imageSets[0].ImageSet[0].LargeImage[0].Height[0].elementText,
-                )
+        
+        imgSetNode = imageSets[0].ImageSet[0]
+
+        images = []
+
+        for imgType in \
+            ['SwatchImage','SmallImage','MediumImage','LargeImage']:
+
+            imgNode = {
+                'SwatchImage':imgSetNode.SwatchImage[0],
+                'SmallImage':imgSetNode.SmallImage[0],
+                'MediumImage':imgSetNode.MediumImage[0],
+                'LargeImage':imgSetNode.LargeImage[0]
+            }[imgType]
+
+            images.append(Image(
+                url=imgNode.URL[0].elementText,
+                w=imgNode.Width[0].elementText,
+                h=imgNode.Height[0].elementText))
 
         return images
 
@@ -130,8 +146,8 @@ class Amazon:
 import os
 import traceback
 
-from altplayerlib.id3reader import Reader as id3Reader
-from altplayerlib.utils import unique
+from id3reader import Reader as id3Reader
+from utils import unique
 
 trivial_keywords = ('to','of','the')
 
