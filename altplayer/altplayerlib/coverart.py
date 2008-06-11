@@ -123,9 +123,9 @@ class Amazon:
 
         images = []
 
-        for imgType in \
-            ['SwatchImage','SmallImage','MediumImage','LargeImage']:
+        imgTypes = filter(lambda x:x.endswith('Image'),dir(imgSetNode))
 
+        for imgType in imgTypes:
             imgNode = {
                 'SwatchImage':imgSetNode.SwatchImage[0],
                 'SmallImage':imgSetNode.SmallImage[0],
@@ -235,7 +235,7 @@ def scan_music(path):
                         continue
 
                     success_count += 1
-                    print images['LargeImage']
+                    print images[0].url
                     break
 
             except Exception, e:

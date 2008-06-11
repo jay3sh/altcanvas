@@ -11,16 +11,19 @@ class Config(Record):
 
 def main():
 
-    if len(sys.argv) < 2 or '-?' in sys.argv:
-        print "Give me a path"
-    else:
-        db = DB(os.getenv('HOME')+'/.altplayer.db')
-        settings = db.get(Config())
-        if not settings:
+    db = DB(os.getenv('HOME')+'/.altplayer.db')
+    settings = db.get(Config())
+    if not settings:
+        if len(sys.argv) < 2:
+            print "Give me a path"
+            sys.exit(0)
+        else:
             db.put(Config(music_store=sys.argv[1]))
 
+    settings = db.get(Config())
+    scan_music(settings[0].music_store)
 
-        settings = db.get(Config())
-        print settings[0].music_store
+
+
 if __name__ == '__main__':
     main()
