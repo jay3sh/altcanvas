@@ -193,9 +193,9 @@ def get_coverart(mp3):
         #
         # Derive keywords from the filename
         if len(keywords) == 0:
-            filename = mp3.lower()
+            filename = mp3.lower().rpartition(os.sep)[-1]
             if filename.rfind(os.sep):
-                songname = filename.rpartition('.')[0]
+                songname = filename.rpartition(os.sep)[0]
             else:
                 songname = filename
 
