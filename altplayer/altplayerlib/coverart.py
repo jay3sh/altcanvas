@@ -123,6 +123,7 @@ class Amazon:
 
         images = []
 
+        # Get the available image types (sizes) available in this XML node
         imgTypes = filter(lambda x:x.endswith('Image'),dir(imgSetNode))
 
         for imgType in imgTypes:
@@ -163,84 +164,90 @@ def normalize(string):
     string = string.replace(' ','%20')
     return string
 
+amazon = Amazon()
+
+def get_coverart(mp3):
+    global amazon
+    try:
+        if not mp3.lower().endswith('mp3'):
+            return 
+
+        id3 = id3Reader(mp3)
+
+        tt2,tpe1,talb,performer,album,title = ( 
+            id3.getValue('TIT2'),
+            id3.getValue('TPE1'),
+            id3.getValue('TALB'),
+            id3.getValue('performer'),
+            id3.getValue('album'),
+            id3.getValue('title')
+        )
+
+        keywords = []
+
+        #
+        # Use relevant id3 tags first
+        keywords += \
+            map(normalize,filter(lambda x:x,(album,performer,title)))
+
+        #
+        # Derive keywords from the filename
+        if len(keywords) == 0:
+            filename = mp3.lower()
+            if filename.rfind(os.sep):
+                songname = filename.rpartition('.')[0]
+            else:
+                songname = filename
+
+            keywords += map(normalize,songname.split('-'))
+
+        #
+        # Lastly try miscellaneous id3 tags
+        if len(keywords) == 0:
+            keywords += \
+                map(normalize,filter(lambda x:x,(tt2,tpe1,talb)))
+
+        keywords = unique(keywords)
+        keywords = filter_trivial_kw(keywords)
+
+        #
+        # Start the search with all keywords
+        # Keep reducing the number of keywords until we get
+        # at least a single result
+        while len(keywords) > 0:
+            results = amazon.search(keywords)
+
+            # If search fails try with fewer keywords
+            if not results or len(results) <= 0:
+                keywords = keywords[:-1]
+                continue
+
+            images = amazon.getImages(results[0])
+
+            # If getImage fails try with fewer keywords
+            if not images:
+                keywords = keywords[:-1]
+                continue
+
+            return images
+
+        return []
+    except Exception, e:
+        for line in traceback.format_exc().split('\n'):
+            print line
+        sys.exit(1)
+    
 def scan_music(path):
-    amazon = Amazon()
-    config = getConfig()
 
     success_count = 0
     total_count = 0
     for root,dir,files in os.walk(path):
         for mp3 in files:
-            try:
-                if not mp3.lower().endswith('mp3'):
-                    continue 
-
-                total_count += 1
-
-                id3 = id3Reader(os.path.join(root,mp3))
-
-                tt2,tpe1,talb,performer,album,title = ( 
-                    id3.getValue('TIT2'),
-                    id3.getValue('TPE1'),
-                    id3.getValue('TALB'),
-                    id3.getValue('performer'),
-                    id3.getValue('album'),
-                    id3.getValue('title')
-                )
-
-                keywords = []
-
-                #
-                # Use relevant id3 tags first
-                keywords += \
-                    map(normalize,filter(lambda x:x,(album,performer,title)))
-
-                #
-                # Derive keywords from the filename
-                if len(keywords) == 0:
-                    filename = mp3.lower()
-                    if filename.rfind(os.sep):
-                        songname = filename.rpartition('.')[0]
-                    else:
-                        songname = filename
-
-                    keywords += map(normalize,songname.split('-'))
-
-                #
-                # Lastly try miscellaneous id3 tags
-                if len(keywords) == 0:
-                    keywords += \
-                        map(normalize,filter(lambda x:x,(tt2,tpe1,talb)))
-
-                keywords = unique(keywords)
-                keywords = filter_trivial_kw(keywords)
-
-                #
-                # Start the search with all keywords
-                # Keep reducing the number of keywords until we get
-                # at least a single result
-                while len(keywords) > 0:
-                    results = amazon.search(keywords)
-
-                    # If search fails try with fewer keywords
-                    if not results or len(results) <= 0:
-                        keywords = keywords[:-1]
-                        continue
-
-                    images = amazon.getImages(results[0])
-
-                    # If getImage fails try with fewer keywords
-                    if not images:
-                        keywords = keywords[:-1]
-                        continue
-
-                    success_count += 1
-                    print images[0].url
-                    break
-
-            except Exception, e:
-                for line in traceback.format_exc().split('\n'):
-                    print line
+            total_count += 1
+            images = get_coverart(os.path.join(root,mp3))
+            if images:
+                success_count += 1
+                print images[0].url
 
     print 'Success ratio: %d/%d'%(success_count,total_count)
 
