@@ -4,6 +4,7 @@ import sys
 import os
 
 import altplayerlib
+from altplayerlib import *
 from altplayerlib.coverart import scan_music
 from altplayerlib.db import DB,Record,getDB
 
@@ -13,9 +14,12 @@ class Config(Record):
 def main():
 
 
-    if not os.access(altplayerlib.CONFIG_DIR,os.W_OK):
+    if not os.access(CONFIG_DIR,os.W_OK):
         # This is the first time 
-        os.mkdir(altplayerlib.CONFIG_DIR)
+        os.mkdir(CONFIG_DIR)
+
+    if not os.access(COVERART_DIR,os.W_OK):
+        os.mkdir(COVERART_DIR)
 
     db = getDB(altplayerlib.DB_PATH)
     config = db.get(Config())
