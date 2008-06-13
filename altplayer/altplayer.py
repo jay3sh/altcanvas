@@ -3,26 +3,35 @@
 import sys
 import os
 
+import altplayerlib
 from altplayerlib.coverart import scan_music
-from altplayerlib.db import DB,Record
+from altplayerlib.db import DB,Record,getDB
 
 class Config(Record):
     pass
 
 def main():
 
-    db = DB(os.getenv('HOME')+'/.altplayer.db')
-    settings = db.get(Config())
-    if not settings:
+
+    if not os.access(altplayerlib.CONFIG_DIR,os.W_OK):
+        # This is the first time 
+        os.mkdir(altplayerlib.CONFIG_DIR)
+
+    db = getDB(altplayerlib.DB_PATH)
+    config = db.get(Config())
+
+    if not config:
         if len(sys.argv) < 2:
-            print "Give me a path"
-            sys.exit(0)
+            print 'Provide path where Music is stored'
+            sys.exit(1)
         else:
-            db.put(Config(music_store=sys.argv[1]))
-
-    settings = db.get(Config())
-    scan_music(settings[0].music_store)
-
+            config = Config(MUSIC_PATH=sys.argv[1])
+            db.put(config)
+            path2scan = sys.argv[1]
+    else:
+        path2scan = config[0].MUSIC_PATH
+        
+    scan_music(path2scan)
 
 
 if __name__ == '__main__':

@@ -42,7 +42,15 @@ class Record:
 class CoverartRecord(Record):
     pass
 
+def getDB(dbfilename):
+    try:
+        db = DB(dbfilename)
+    except DB,d:
+        db = d
+    return db
+
 class DB:
+    __single__ = None
     SQLITE_TYPES = { 
                         int:'INTEGER',
                         float:'REAL',
@@ -50,6 +58,11 @@ class DB:
                    }
 
     def __init__(self,path):
+        if DB.__single__:
+            raise DB.__single__
+
+        DB.__single__ = self
+
         self.path = path
 
         self.conn = sqlite3.connect(self.path)
