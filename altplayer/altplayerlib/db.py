@@ -42,7 +42,7 @@ class Record:
 class CoverartRecord(Record):
     pass
 
-def getDB(dbfilename):
+def getDB(dbfilename=None):
     try:
         db = DB(dbfilename)
     except DB,d:
@@ -54,7 +54,8 @@ class DB:
     SQLITE_TYPES = { 
                         int:'INTEGER',
                         float:'REAL',
-                        str:'TEXT'
+                        str:'TEXT',
+                        unicode:'TEXT'
                    }
 
     def __init__(self,path):
@@ -63,6 +64,8 @@ class DB:
 
         DB.__single__ = self
 
+        if not path:
+            raise Exception("DB Pathname is required")
         self.path = path
 
         self.conn = sqlite3.connect(self.path)
@@ -71,6 +74,8 @@ class DB:
     def __quote_strings__(self,s):
         if type(s) == str:
             return '"'+s+'"'
+        elif type(s) == unicode:
+            return '"'+str(s)+'"'
         else:
             return s
 

@@ -5,6 +5,8 @@ from config import getConfig
 import sys
 import urllib
 
+from altplayerlib.song import Song
+
 class DynamicObject:
     __map__ = {}
     def __init__(self,**kwds):
@@ -244,10 +246,13 @@ def scan_music(path):
     for root,dir,files in os.walk(path):
         for mp3 in files:
             total_count += 1
+            song = Song(os.path.join(root,mp3))
+            '''
             images = get_coverart(os.path.join(root,mp3))
             if images:
                 success_count += 1
                 print images[0].url
+            '''
 
     print 'Success ratio: %d/%d'%(success_count,total_count)
 
