@@ -21,8 +21,12 @@ class Widget(actor):
         self.registerChannel = channel
         self.registerChannel.send((self,10,10,100,100))
 
+        self.evtchl = stackless.channel()
+        stackless.tasklet(self.onClick)()
+
     def onClick(self):
-        print 'clicked'
+        while True:
+            print self.evtchl.receive()
 
     def sendMessages(self,channel):
         for i in range(1,5):
@@ -48,10 +52,9 @@ class Canvas:
         
     def motion_handler(self,x,y):
         def deliever_event(widget):
-            w,x0,y0,w,h = widget
+            wdt,x0,y0,w,h = widget
             if (x>x0 and x<x0+w and y>y0 and y<y0+h):
-                print 'delievering'
-                widget.evtchl.send('CLICK')
+                wdt.evtchl.send('CLICK')
 
         map(deliever_event,self.widget_list)
             
