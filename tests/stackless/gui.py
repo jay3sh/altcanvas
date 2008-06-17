@@ -15,28 +15,14 @@ class actor:
         print args
 
 
-class Canvas():
-    registerChannel = None
-    widgets = []
-    def __init__(self):
-        self.registerChannel = stackless.channel()
-        stackless.tasklet(self.register)()
-
-    def register(self):
-        while True:
-            msg = self.registerChannel.receive()
-            print msg
-
-
 class Widget(actor):
     def __init__(self,channel):
         actor.__init__(self)
         self.registerChannel = channel
-        self.registerChannel.send('Register '+self.__class__.__name__)
-        #stackless.tasklet(self.registerMe)()
+        self.registerChannel.send((self,10,10,100,100))
 
-    def registerMe(self):
-        self.registerChannel.send('Register '+self.__class__.__name__)
+    def onClick(self):
+        print 'clicked'
 
     def sendMessages(self,channel):
         for i in range(1,5):
@@ -45,36 +31,49 @@ class Widget(actor):
             sleep(1)
     
 
-ch1 = stackless.channel()
-def send1():
-    global ch1  
-    for i in range(0,10):
-        ch1.send('msg s1 %d'%i)
+import canvasX
+class Canvas:
+    widget_list = []
+    def __init__(self):
+        self.registerChl = stackless.channel()
+        stackless.tasklet(self.register)()
+        canvasX.create()
+        canvasX.register_motion_handler(self)
 
-def send2():
-    global ch1  
-    for i in range(0,10):
-        ch1.send('msg s2 %d'%i)
+    def register(self):
+        while True:
+            widget = self.registerChl.receive()
+            print widget
+            self.widget_list.append(widget)
+        
+    def motion_handler(self,x,y):
+        def deliever_event(widget):
+            w,x0,y0,w,h = widget
+            if (x>x0 and x<x0+w and y>y0 and y<y0+h):
+                print 'delievering'
+                widget.evtchl.send('CLICK')
 
-def listen1():
-    global ch1  
-    while True:
-        print 'l1: '+ch1.receive()
+        map(deliever_event,self.widget_list)
+            
 
-def listen2():
-    global ch1  
-    while True:
-        print 'l2: '+ch1.receive()
+    def run(self):
+        canvasX.run()
+
 
 if __name__ == '__main__':
-    #canvas = Canvas()
-    #w = Widget(canvas.registerChannel)
 
+    canvas = Canvas()
+
+    w = Widget(canvas.registerChl)
+
+    '''
     stackless.tasklet(send1)()
     stackless.tasklet(send2)()
     stackless.tasklet(listen1)()
     stackless.tasklet(listen2)()
+    '''
     stackless.run()
+    canvas.run()
     
 
     
