@@ -12,7 +12,7 @@ diff -durN stackless-2.5.2-r63812/configure.in stackless-2.5.2-r63812-maemo/conf
  AC_PREREQ(2.59)
 diff -durN stackless-2.5.2-r63812/Makefile.pre.in stackless-2.5.2-r63812-maemo/Makefile.pre.in
 --- stackless-2.5.2-r63812/Makefile.pre.in	2008-01-31 14:00:55.000000000 -0300
-+++ stackless-2.5.2-r63812-maemo/Makefile.pre.in	2008-06-06 01:49:49.000000000 -0300
++++ stackless-2.5.2-r63812-maemo/Makefile.pre.in	2008-06-06 19:17:17.000000000 -0300
 @@ -181,6 +181,8 @@
  PYTHON=		python$(EXE)
  BUILDPYTHON=	python$(BUILDEXE)
@@ -84,7 +84,7 @@ diff -durN stackless-2.5.2-r63812/Makefile.pre.in stackless-2.5.2-r63812-maemo/M
  # Install everything
 -install:	@FRAMEWORKINSTALLFIRST@ altinstall bininstall maninstall @FRAMEWORKINSTALLLAST@
 +#install:	@FRAMEWORKINSTALLFIRST@ altinstall bininstall maninstall @FRAMEWORKINSTALLLAST@
-+install:	bininstall libainstall
++install:	altbininstall libainstall
  
  # Install almost everything without disturbing previous versions
  altinstall:	@FRAMEWORKALTINSTALLFIRST@ altbininstall libinstall inclinstall libainstall \
