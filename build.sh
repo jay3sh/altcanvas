@@ -184,6 +184,7 @@ die()
 make_stackless()
 {
     VANILLA_STACKLESS_ARCHIVE=stackless-252-export.tar.bz2
+    VANILLA_STACKLESS_DIR=stackless-2.5.2-r63812
     VANILLA_STACKLESS_ARCHIVE_URL=http://www.stackless.com/binaries/$VANILLA_STACKLESS_ARCHIVE
     (
         cd stackless;
@@ -193,12 +194,17 @@ make_stackless()
             wget $VANILLA_STACKLESS_ARCHIVE_URL || die "Failed to download stackless"
         fi
 
-        tar xjf stackless-252-export.tar.bz2 || die "Failed to extract stackless archive"
+        echo "Cleaning old source"
+        rm -rf $VANILLA_STACKLESS_DIR
+
+        echo "Extracting vanilla source $VANILLA_STACKLESS_ARCHIVE"
+        tar xjf $VANILLA_STACKLESS_ARCHIVE || die "Failed to extract stackless archive"
 
         patch -p0 < maemo-sb.patch || die "Failed to patch vanilla stackless source"
 
-        cd stackless*
+        cd $VANILLA_STACKLESS_DIR || dir "Failed to change into vanila source dir"
 
+        autoreconf
         ./configure --prefix=/tmp/usr || die "Build (configure) failed"
 
         make || die "Build (make) failed"

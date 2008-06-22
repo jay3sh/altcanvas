@@ -1,3 +1,15 @@
+diff -durN stackless-2.5.2-r63812/configure.in stackless-2.5.2-r63812-maemo/configure.in
+--- stackless-2.5.2-r63812/configure.in	2008-02-18 12:48:02.000000000 -0300
++++ stackless-2.5.2-r63812-maemo/configure.in	2008-06-06 18:41:44.000000000 -0300
+@@ -1,7 +1,7 @@
+ dnl Process this file with autoconf 2.0 or later to make a configure script.
+ 
+ # Set VERSION so we only need to edit in one place (i.e., here)
+-m4_define(PYTHON_VERSION, 2.5)
++m4_define(PYTHON_VERSION, 2.5-stackless)
+ 
+ AC_REVISION($Revision: 60888 $)
+ AC_PREREQ(2.59)
 diff -durN stackless-2.5.2-r63812/Makefile.pre.in stackless-2.5.2-r63812-maemo/Makefile.pre.in
 --- stackless-2.5.2-r63812/Makefile.pre.in	2008-01-31 14:00:55.000000000 -0300
 +++ stackless-2.5.2-r63812-maemo/Makefile.pre.in	2008-06-06 01:49:49.000000000 -0300
