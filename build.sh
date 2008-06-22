@@ -175,6 +175,37 @@ make_canvasx()
     )
 }
 
+die()
+{
+    echo $1
+    exit 1
+}
+
+make_stackless()
+{
+    VANILLA_STACKLESS_ARCHIVE=stackless-252-export.tar.bz2
+    VANILLA_STACKLESS_ARCHIVE_URL=http://www.stackless.com/binaries/$VANILLA_STACKLESS_ARCHIVE
+    (
+        cd stackless;
+        
+        if [ ! -f $VANILLA_STACKLESS_ARCHIVE ]
+        then
+            wget $VANILLA_STACKLESS_ARCHIVE_URL || die "Failed to download stackless"
+        fi
+
+        tar xjf stackless-252-export.tar.bz2 || die "Failed to extract stackless archive"
+
+        patch -p0 < maemo-sb.patch || die "Failed to patch vanilla stackless source"
+
+        cd stackless*
+
+        ./configure --prefix=/tmp/usr || die "Build (configure) failed"
+
+        make || die "Build (make) failed"
+
+    )
+}
+
 if [ "$1" = "" ]; then
 	usage
 	exit 1
@@ -212,6 +243,9 @@ case $PACKAGE in
 		;;
     "altplayer")
         make_altplayer;
+        ;;
+    "stackless")
+        make_stackless;
         ;;
 esac
 

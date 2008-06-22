@@ -1,0 +1,144 @@
+diff -durN stackless-2.5.2-r63812/Makefile.pre.in stackless-2.5.2-r63812-maemo/Makefile.pre.in
+--- stackless-2.5.2-r63812/Makefile.pre.in	2008-01-31 14:00:55.000000000 -0300
++++ stackless-2.5.2-r63812-maemo/Makefile.pre.in	2008-06-06 01:49:49.000000000 -0300
+@@ -181,6 +181,8 @@
+ PYTHON=		python$(EXE)
+ BUILDPYTHON=	python$(BUILDEXE)
+ 
++HOSTPYTHON=	/usr/bin/python2.5
++
+ # === Definitions added by makesetup ===
+ 
+ 
+@@ -350,23 +352,24 @@
+ # Rules
+ 
+ # Default target
+-all:		$(BUILDPYTHON) oldsharedmods sharedmods
++all:		$(BUILDPYTHON) oldsharedmods 
+ 
+ # Build the interpreter
+ $(BUILDPYTHON):	Modules/python.o $(LIBRARY) $(LDLIBRARY)
+ 		$(LINKCC) $(LDFLAGS) $(LINKFORSHARED) -o $@ \
+ 			Modules/python.o \
++			Stackless/platf/switch_arm_thumb_gas.s \
+ 			$(BLDLIBRARY) $(LIBS) $(MODLIBS) $(SYSLIBS) $(LDLAST)
+ 
+ platform: $(BUILDPYTHON)
+-	$(RUNSHARED) ./$(BUILDPYTHON) -E -c 'import sys ; from distutils.util import get_platform ; print get_platform()+"-"+sys.version[0:3]' >platform
++	$(RUNSHARED) $(HOSTPYTHON) -E -c 'import sys ; from distutils.util import get_platform ; print get_platform()+"-"+sys.version[0:3]' >platform
+ 
+ 
+ # Build the shared modules
+ sharedmods: $(BUILDPYTHON)
+ 	case $$MAKEFLAGS in \
+-	*-s*) $(RUNSHARED) CC='$(CC)' LDSHARED='$(BLDSHARED)' OPT='$(OPT)' ./$(BUILDPYTHON) -E $(srcdir)/setup.py -q build;; \
+-	*) $(RUNSHARED) CC='$(CC)' LDSHARED='$(BLDSHARED)' OPT='$(OPT)' ./$(BUILDPYTHON) -E $(srcdir)/setup.py build;; \
++	*-s*) $(RUNSHARED) CC='$(CC)' LDSHARED='$(BLDSHARED)' OPT='$(OPT)' $(HOSTPYTHON) -E $(srcdir)/setup.py -q build;; \
++	*) $(RUNSHARED) CC='$(CC)' LDSHARED='$(BLDSHARED)' OPT='$(OPT)' $(HOSTPYTHON) -E $(srcdir)/setup.py build;; \
+ 	esac
+ 
+ # Build static library
+@@ -615,7 +618,7 @@
+ 
+ TESTOPTS=	-l $(EXTRATESTOPTS)
+ TESTPROG=	$(srcdir)/Lib/test/regrtest.py
+-TESTPYTHON=	$(RUNSHARED) ./$(BUILDPYTHON) -E -tt
++TESTPYTHON=	$(RUNSHARED) $(HOSTPYTHON) -E -tt
+ test:		all platform
+ 		-find $(srcdir)/Lib -name '*.py[co]' -print | xargs rm -f
+ 		-$(TESTPYTHON) $(TESTPROG) $(TESTOPTS)
+@@ -627,7 +630,7 @@
+ 		$(TESTPYTHON) $(TESTPROG) $(TESTOPTS) -uall
+ 
+ teststackless:	all platform
+-		pushd Stackless/unittests; $(RUNSHARED) ../../$(BUILDPYTHON) -E -tt runAll.py; popd
++		pushd Stackless/unittests; $(RUNSHARED) $(HOSTPYTHON) -E -tt runAll.py; popd
+ 
+ #  Run the unitests for both architectures in a Universal build on OSX
+ #  Must be run on an Intel box.
+@@ -639,7 +642,7 @@
+ 		-find $(srcdir)/Lib -name '*.py[co]' -print | xargs rm -f
+ 		-$(TESTPYTHON) $(TESTPROG) $(TESTOPTS) -uall
+ 		$(TESTPYTHON) $(TESTPROG) $(TESTOPTS) -uall
+-		$(RUNSHARED) /usr/libexec/oah/translate ./$(BUILDPYTHON) -E -tt $(TESTPROG) $(TESTOPTS) -uall
++		$(RUNSHARED) /usr/libexec/oah/translate $(HOSTPYTHON) -E -tt $(TESTPROG) $(TESTOPTS) -uall
+ 
+ 
+ # Like testall, but with a single pass only
+@@ -666,7 +669,8 @@
+ 		$(TESTPYTHON) $(TESTPROG) $(MEMTESTOPTS)
+ 
+ # Install everything
+-install:	@FRAMEWORKINSTALLFIRST@ altinstall bininstall maninstall @FRAMEWORKINSTALLLAST@
++#install:	@FRAMEWORKINSTALLFIRST@ altinstall bininstall maninstall @FRAMEWORKINSTALLLAST@
++install:	bininstall libainstall
+ 
+ # Install almost everything without disturbing previous versions
+ altinstall:	@FRAMEWORKALTINSTALLFIRST@ altbininstall libinstall inclinstall libainstall \
+@@ -824,19 +828,19 @@
+ 	done
+ 	$(INSTALL_DATA) $(srcdir)/LICENSE $(DESTDIR)$(LIBDEST)/LICENSE.txt
+ 	PYTHONPATH=$(DESTDIR)$(LIBDEST)  $(RUNSHARED) \
+-		./$(BUILDPYTHON) -Wi -tt $(DESTDIR)$(LIBDEST)/compileall.py \
++		$(HOSTPYTHON) -Wi -tt $(DESTDIR)$(LIBDEST)/compileall.py \
+ 		-d $(LIBDEST) -f \
+ 		-x 'bad_coding|badsyntax|site-packages' $(DESTDIR)$(LIBDEST)
+ 	PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
+-		./$(BUILDPYTHON) -Wi -tt -O $(DESTDIR)$(LIBDEST)/compileall.py \
++		$(HOSTPYTHON) -Wi -tt -O $(DESTDIR)$(LIBDEST)/compileall.py \
+ 		-d $(LIBDEST) -f \
+ 		-x 'bad_coding|badsyntax|site-packages' $(DESTDIR)$(LIBDEST)
+ 	-PYTHONPATH=$(DESTDIR)$(LIBDEST)  $(RUNSHARED) \
+-		./$(BUILDPYTHON) -Wi -t $(DESTDIR)$(LIBDEST)/compileall.py \
++		$(HOSTPYTHON) -Wi -t $(DESTDIR)$(LIBDEST)/compileall.py \
+ 		-d $(LIBDEST)/site-packages -f \
+ 		-x badsyntax $(DESTDIR)$(LIBDEST)/site-packages
+ 	-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
+-		./$(BUILDPYTHON) -Wi -t -O $(DESTDIR)$(LIBDEST)/compileall.py \
++		$(HOSTPYTHON) -Wi -t -O $(DESTDIR)$(LIBDEST)/compileall.py \
+ 		-d $(LIBDEST)/site-packages -f \
+ 		-x badsyntax $(DESTDIR)$(LIBDEST)/site-packages
+ 
+@@ -949,7 +953,7 @@
+ # Install the dynamically loadable modules
+ # This goes into $(exec_prefix)
+ sharedinstall:
+-	$(RUNSHARED) ./$(BUILDPYTHON) -E $(srcdir)/setup.py install \
++	$(RUNSHARED) $(HOSTPYTHON) -E $(srcdir)/setup.py install \
+ 	   	--prefix=$(prefix) \
+ 		--install-scripts=$(BINDIR) \
+ 		--install-platlib=$(DESTSHARED) \
+@@ -1023,7 +1027,7 @@
+ # This installs a few of the useful scripts in Tools/scripts
+ scriptsinstall:
+ 	SRCDIR=$(srcdir) $(RUNSHARED) \
+-	./$(BUILDPYTHON) $(srcdir)/Tools/scripts/setup.py install \
++	$(HOSTPYTHON) $(srcdir)/Tools/scripts/setup.py install \
+ 	--prefix=$(prefix) \
+ 	--install-scripts=$(BINDIR) \
+ 	--root=/$(DESTDIR)
+diff -durN stackless-2.5.2-r63812/Stackless/platf/slp_platformselect.h stackless-2.5.2-r63812-maemo/Stackless/platf/slp_platformselect.h
+--- stackless-2.5.2-r63812/Stackless/platf/slp_platformselect.h	2008-04-10 20:44:19.000000000 -0300
++++ stackless-2.5.2-r63812-maemo/Stackless/platf/slp_platformselect.h	2008-06-05 19:24:06.000000000 -0300
+@@ -22,6 +22,8 @@
+ #include "switch_s390_unix.h"	/* Linux/S390 zSeries (identical) */
+ #elif defined(__GNUC__) && defined(__arm__) && defined(__thumb__)
+ #include "switch_arm_thumb_gcc.h" /* gcc using arm thumb */
++#elif defined(__GNUC__) && defined(__arm__) && defined(__ARMEL__)
++#include "switch_arm_thumb_gcc.h" /* gcc using arm thumb for Maemo ARMEL */
+ #elif defined(__GNUC__) && defined(__arm32__)
+ #include "switch_arm32_gcc.h" /* gcc using arm32 */
+ #elif defined(__GNUC__) && defined(__mips__) && defined(__linux__)
+diff -durN stackless-2.5.2-r63812/Stackless/stackless.h stackless-2.5.2-r63812-maemo/Stackless/stackless.h
+--- stackless-2.5.2-r63812/Stackless/stackless.h	2008-04-10 20:44:19.000000000 -0300
++++ stackless-2.5.2-r63812-maemo/Stackless/stackless.h	2008-06-05 19:26:00.000000000 -0300
+@@ -59,6 +59,8 @@
+ 	/* Linux/S390 zSeries */
+ #elif defined(__GNUC__) && defined(__mips__) && defined(__linux__)
+ 	/* MIPS */
++#elif defined(__GNUC__) && defined(__ARMEL__)
++    /* Nokia Internet tablets - Maemo */
+ #else
+ 	/* no supported platform */
+ #undef STACKLESS
