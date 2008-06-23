@@ -204,7 +204,6 @@ make_stackless()
 
         cd $VANILLA_STACKLESS_DIR || dir "Failed to change into vanila source dir"
 
-        rm configure
         ln -s ../debian ./debian
         ln -s ../autogen.sh ./autogen.sh
 
