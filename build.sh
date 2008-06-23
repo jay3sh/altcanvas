@@ -204,10 +204,15 @@ make_stackless()
 
         cd $VANILLA_STACKLESS_DIR || dir "Failed to change into vanila source dir"
 
-        autoreconf
-        ./configure --prefix=/tmp/usr || die "Build (configure) failed"
+        rm configure
+        ln -s ../debian ./debian
+        ln -s ../autogen.sh ./autogen.sh
 
-        make || die "Build (make) failed"
+        dpkg-buildpackage -rfakeroot
+
+        #autoreconf
+        #./configure --prefix=/tmp/usr || die "Build (configure) failed"
+        #make || die "Build (make) failed"
 
     )
 }
