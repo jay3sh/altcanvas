@@ -1,0 +1,10 @@
+Source: stackless
+Section: user/office
+Priority: optional
+Maintainer: Jayesh Salvi <jayesh@altfrequency.com>
+Build-Depends: debhelper (>= 4.0.0) 
+Standards-Version: 3.6.0
+
+Package: stackless 
+Architecture: armel
+Description: Stackless Python for Maemo
