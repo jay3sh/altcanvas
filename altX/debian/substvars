@@ -1,1 +1,1 @@
-shlibs:Depends=libc6 (>= 2.5.0-1)
+shlibs:Depends=libc6 (>= 2.5.0-1), libcairo2 (>= 1.4.10), libx11-6, libxext6, libxsp0
