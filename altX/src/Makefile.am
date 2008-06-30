@@ -1,10 +1,11 @@
 
 
+bin_PROGRAMS	= animX 
 #bin_PROGRAMS	= animX animGdk
 
-#animX_LDADD	= $(CAIRO_LIBS)
-#animX_CPPFLAGS	= $(CAIRO_CFLAGS)
-#animX_SOURCES	= animX.c
+animX_LDADD	= $(CAIRO_LIBS) $(XEXT_LIBS)
+animX_CPPFLAGS	= $(CAIRO_CFLAGS) $(XEXT_CFLAGS)
+animX_SOURCES	= animX.c
 
 #animGdk_LDADD	= $(GTK_LIBS) $(GTHREAD_LIBS)
 #animGdk_CPPFLAGS= $(GTK_CFLAGS) $(GTHREAD_CFLAGS)

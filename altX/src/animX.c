@@ -4,6 +4,8 @@
 #include <cairo.h>
 #include <cairo-xlib.h>
 
+#include <X11/extensions/Xdbe.h>
+
 #define DECLARE_P(type,var) \
             type* var = NULL;
 
@@ -15,7 +17,7 @@
 
 int main(int argc, char *argv[])
 {
-    Window win,rwin;
+    Window win,rwin,win2;
     Display *dpy=NULL;
     int screen = 0;
     int w=800, h=480;
@@ -61,6 +63,7 @@ int main(int argc, char *argv[])
         switch(event.type){
         case MapNotify:
             printf("MapNotify received\n");
+            keepLooping = 0;
             break;
         case MotionNotify:
             mevent = (XMotionEvent *)(&event);
@@ -89,7 +92,7 @@ int main(int argc, char *argv[])
     DECLARE_P(cairo_surface_t,wsurface)
     DECLARE_P(cairo_t,wctx)
 
-    #define SIZE 20
+    #define SIZE 50
     ASSERT(wsurface = cairo_image_surface_create(
                             CAIRO_FORMAT_ARGB32,
                             SIZE, SIZE));
@@ -106,14 +109,48 @@ int main(int argc, char *argv[])
         exit(0);
     }
 
+    int use_db  = 0;
+
+    if((argc > 1)&&(argv[1][0] == 'Y')){
+        use_db = 1;
+    }
+
+    if(use_db){
+        win2 = XdbeAllocateBackBufferName(dpy,win,XdbeUndefined);
+    } else {
+        win2 = win;
+    }
+
+    XdbeSwapInfo swapinfo;
+    swapinfo.swap_window = win;
+    swapinfo.swap_action = XdbeUndefined;
+
     int i=0;
-    for (; i<200; i++)
+    for (; i<300; i++)
     {
-        XClearWindow(dpy, win);
+
+        if(use_db){
+            XdbeBeginIdiom(dpy);
+        }
+
+        //XFillRectangle(dpy,win2,gc,10+i,10+i,20,20);
+
+        //XClearWindow(dpy, win);
         cairo_set_source_surface(ctx,wsurface,10+i,10+i);
         cairo_paint(ctx);
+
+        if(use_db){
+            XdbeSwapBuffers(dpy,&swapinfo,1);
+        }
+
+        XSync(dpy,0);
+
+        if(use_db){
+            XdbeEndIdiom(dpy);
+        }
+
         XFlush(dpy);
-        usleep(10*1000);
+        usleep(3*1000);
     }
 
     XFlush(dpy);
