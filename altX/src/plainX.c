@@ -4,6 +4,7 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
+#include <X11/Xcms.h>
 
 #define DECLARE_P(type,var) \
             type* var = NULL;
@@ -16,7 +17,7 @@
 
 int main(int argc, char *argv[])
 {
-    Window win,rwin,win2;
+    Window win,rwin,win1,win2;
     Display *dpy=NULL;
     int screen = 0;
     int w=800, h=480;
@@ -28,6 +29,7 @@ int main(int argc, char *argv[])
     GC gc;
     Atom atoms_WINDOW_STATE;
     Atom atoms_WINDOW_STATE_FULLSCREEN;
+    Colormap cm;
 
 
     ASSERT(dpy = XOpenDisplay(NULL));
@@ -83,7 +85,39 @@ int main(int argc, char *argv[])
         }
     }
 
-    XFillRectangle(dpy,win,gc,x,y,w/2,h/2);
+
+
+    GC blackGC,whiteGC,blueGC;
+    XColor col;
+    col.red = 0;
+    col.green = 0;
+    col.blue = 65535;
+    XAllocColor(dpy, DefaultColormap(dpy, screen), &col);
+
+    ASSERT(win1 = XCreateSimpleWindow(dpy,win,
+                                10,10,
+                                50,50,
+                                0,
+                                col.pixel,
+                                col.pixel));
+                                /*
+                                WhitePixel(dpy,screen),
+                                WhitePixel(dpy,screen)));
+                                */
+    gcv.foreground = BlackPixel(dpy, screen);
+    blackGC = XCreateGC(dpy, win1, GCForeground, &gcv);
+    gcv.foreground = WhitePixel(dpy, screen);
+    whiteGC = XCreateGC(dpy, win1, GCForeground, &gcv);
+    col.red = 0;
+    col.green = 0;
+    col.blue = 65535;
+    XAllocColor(dpy, DefaultColormap(dpy, screen), &col);
+    gcv.foreground = col.pixel;
+    blueGC = XCreateGC(dpy, win1, GCForeground, &gcv);
+
+    XFillRectangle(dpy,win1,blueGC,0,0,20,20);
+
+    XMapWindow(dpy,win1);
 
     XFlush(dpy);
 
