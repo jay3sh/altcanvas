@@ -50,6 +50,11 @@ def handleG(g):
     if not g.childNodes:
         print g.toxml()
 
+def handleObj(obj):
+    print '<< -- -- >>'
+    if 'class' in obj.attributes.keys():
+        print obj.toxml()
+
 def handleSVG(svgdoc):
     obj_handlers = {
                     'g':handleG,
@@ -58,6 +63,7 @@ def handleSVG(svgdoc):
                    }
     for obj in obj_handlers.keys():
         for i in svgdoc.getElementsByTagName(obj):
-            obj_handlers[obj](i)
+            #obj_handlers[obj](i)
+            handleObj(i)
 
 handleSVG(dom)
