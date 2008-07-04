@@ -17,7 +17,10 @@ print svgnode.g[0].g[1]['id']
 print svgnode.g[0].elementText
 '''
 
-fd = open('/photos/altimages/cartoons/test2.svg')
+import sys
+
+boilerplate = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
+fd = open('/photos/altimages/cartoons/test1.svg')
 svg_content = ''
 for line in fd:
     svg_content += line
@@ -27,43 +30,38 @@ import xml.dom.minidom
 
 dom = xml.dom.minidom.parseString(svg_content)
 
+class SVGParser:
+    def __init__(self,svgdoc):
+        self.doc = svgdoc
 
-def getText(nodelist):
-    rc = ""
-    for node in nodelist:
-        if node.nodeType == node.TEXT_NODE:
-            rc = rc + node.data
-    return rc
+    def makeSVGBase(self):
+        self.svg_base = boilerplate
+    
+    def createWidget(self,obj):
+        if 'class' in obj.attributes.keys():
+            print obj.toxml()
+    
+    def die(self,msg):
+        print msg
+        sys.exit(1)
+    
+    def parse(self):
+        svg = self.doc.getElementsByTagName('svg')
+        if len(svg) > 1: self.die('svg')
+    
+        defs = self.doc.getElementsByTagName('defs')
+        if len(defs) > 1: self.die('defs')
+    
+        sodipodi = self.doc.getElementsByTagName('sodipodi:namedview')
+        if len(sodipodi) > 1: self.die('sodipodi')
+    
+        metadata = self.doc.getElementsByTagName('metadata')
+        if len(metadata) > 1: self.die('metadata')
+    
+        for obj in ['g','path','rect']:
+            for i in self.doc.getElementsByTagName(obj):
+                self.createWidget(i)
 
-def handlePath(path):
-    print '<< -------- path ------- >>'
-    if not path.childNodes:
-        print path.toxml()
-
-def handleRect(rect):
-    print '<< -------- rect ------- >>'
-    if not rect.childNodes:
-        print rect.toxml()
-
-def handleG(g):
-    print '<< -------- g ------- >>'
-    if not g.childNodes:
-        print g.toxml()
-
-def handleObj(obj):
-    print '<< -- -- >>'
-    if 'class' in obj.attributes.keys():
-        print obj.toxml()
-
-def handleSVG(svgdoc):
-    obj_handlers = {
-                    'g':handleG,
-                    'path':handlePath,
-                    'rect':handleRect
-                   }
-    for obj in obj_handlers.keys():
-        for i in svgdoc.getElementsByTagName(obj):
-            #obj_handlers[obj](i)
-            handleObj(i)
-
-handleSVG(dom)
+if __name__ == '__main__':
+    sp = SVGParser(dom)
+    sp.parse()
