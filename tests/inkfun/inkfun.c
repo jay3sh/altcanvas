@@ -10,21 +10,120 @@
 
 #include <boiler.h>
 
+#include <string.h>
+#include <unistd.h>
+
 #include <libxml/parser.h>
 #include <libxml/tree.h>
+#include <libxml/xmlreader.h>
 #include <librsvg/rsvg.h>
 #include <librsvg/rsvg-cairo.h>
 #include <cairo-xlib.h>
 
 
-struct {
-    
+/*
+ * @class inkObject
+ */
 
-} _inkObject_t;
+struct _inkObject_t{
+    xmlChar *id;
+    unsigned int width;
+    unsigned int height;
+    struct _inkObject_t *next;
+};
 typedef struct _inkObject_t inkObject_t;
+
+inkObject_t *new_inkObject()
+{
+    inkObject_t *p = NULL;
+    ASSERT(p = (inkObject_t *)malloc(sizeof(inkObject_t)))
+    memset(p,0,sizeof(inkObject_t));
+    return p;
+}
+
+void delete_inkObject(inkObject_t *p)
+{
+    if(p){
+        if(p->id) xmlFree(p->id);
+        free(p);
+    }
+}
+
+
+
+
+/*
+ * @class inkGui
+ */
+
+#define XMLSTR_EQUALS(x,y) \
+    !(xmlStrcmp((const xmlChar *)x,(const xmlChar *)y))
+
+struct _inkGui_t{
+    unsigned int width;
+    unsigned int height;
+    inkObject_t *inkObjectList;
+};
+
+typedef struct _inkGui_t inkGui_t;
+
+inkGui_t *new_inkGui(const char *svgfilename)
+{
+    /*
+     * Parse the SVG file
+     */
+    if(!svgfilename) return NULL;
+
+    xmlTextReaderPtr reader = NULL;
+    ASSERT(reader = xmlNewTextReaderFilename(svgfilename))
+
+    int ret = 0;
+    xmlChar *nodeName = NULL;
+    xmlChar *attr = NULL;
+
+    while((ret = xmlTextReaderRead(reader)) == 1)
+    {
+        ASSERT(nodeName = xmlTextReaderLocalName(reader))
+        if(XMLSTR_EQUALS(nodeName,"svg"))
+        {
+            attr = xmlTextReaderGetAttribute(reader,(const xmlChar *)"width");
+            printf("width %s\n",attr);
+            xmlFree(attr);
+            attr = xmlTextReaderGetAttribute(reader,(const xmlChar *)"height");
+            printf("height %s\n",attr);
+            xmlFree(attr);
+        }
+        xmlFree(nodeName);
+
+    }
+
+
+    xmlFreeTextReader(reader);
+    ASSERT(ret == 0)
+
+
+    /* 
+     * Create objects out of parsed SVG XML 
+     */
+    inkGui_t *p = NULL;
+    ASSERT(p= (inkGui_t *)malloc(sizeof(inkGui_t)))
+
+    return p;
+}
+
+void delete_inkGui(inkGui_t *inkGui)
+{
+    if(inkGui){
+        //TODO: cleanup inkObject list
+        free(inkGui);
+    }
+}
 
 BEGIN_MAIN(1,"inkfun <filename>")
 
+    new_inkGui(argv[1]);
+
+#if 0
     xmlDoc *doc = NULL;
     xmlNode *root = NULL;
     char *width_str, *height_str;
@@ -91,7 +190,10 @@ BEGIN_MAIN(1,"inkfun <filename>")
     ASSERT(ictx = cairo_create(isurface))
 
     rsvg_handle_render_cairo_sub(svgHandle,ictx,"#g5261");
+    cairo_set_source_surface(ctx,isurface,0,0);
+    cairo_paint(ctx);
 
+    rsvg_handle_render_cairo_sub(svgHandle,ictx,"#g5266");
     cairo_set_source_surface(ctx,isurface,0,0);
     cairo_paint(ctx);
 
@@ -110,6 +212,7 @@ BEGIN_MAIN(1,"inkfun <filename>")
     usleep(3*1000*1000);
 
     XCloseDisplay(dpy);
+#endif
 
 END_MAIN
 
