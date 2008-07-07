@@ -98,6 +98,7 @@ inkGui_t *new_inkGui(const char *svgfilename)
     ASSERT(reader = xmlNewTextReaderFilename(svgfilename))
 
     int ret = 0;
+    int type = 0;
     xmlChar *nodeName = NULL;
     xmlChar *attr = NULL;
     xmlChar *className = NULL;
@@ -112,8 +113,11 @@ inkGui_t *new_inkGui(const char *svgfilename)
 
     while((ret = xmlTextReaderRead(reader)) == 1)
     {
+        type = xmlTextReaderNodeType (reader);
         ASSERT(nodeName = xmlTextReaderLocalName(reader))
-        if(XML_EQUALS(nodeName,"svg"))
+
+        if(XML_EQUALS(nodeName,"svg") && 
+            (type == XML_READER_TYPE_ELEMENT))
         {
             attr = XML_GETATTR(reader,"width");
             inkGui->width = atoi((char *)attr);
@@ -123,6 +127,12 @@ inkGui_t *new_inkGui(const char *svgfilename)
             xmlFree(attr);
         }
         xmlFree(nodeName);
+
+        /*
+         * If this is not a starting element, ignore it
+         * This avoids the cases at the closing anchor of the node
+         */
+        if (type != XML_READER_TYPE_ELEMENT) continue;
 
         /*
          * Check if this node is an inkObject element
@@ -177,7 +187,6 @@ void delete_inkGui(inkGui_t *inkGui)
             delete_inkObject(inkObject);
             inkObject = tmp;
         }
-        //TODO: cleanup inkObject list
         free(inkGui);
     }
 }
