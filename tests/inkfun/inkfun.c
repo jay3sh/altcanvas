@@ -60,12 +60,6 @@ void delete_inkObject(inkObject_t *p)
     }
 }
 
-void inkObject_create_surface(inkObject_t *p,int w,int h)
-{
-    ASSERT(p->surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,w,h))
-    ASSERT(p->cr = cairo_create(p->surface))
-}
-
 
 
 
@@ -80,6 +74,7 @@ void inkObject_create_surface(inkObject_t *p,int w,int h)
     xmlTextReaderGetAttribute(reader,(const xmlChar *)key)
 
 struct _inkGui_t{
+    RsvgHandle *svgHandle;
     unsigned int width;
     unsigned int height;
     inkObject_t *inkObjectList;
@@ -160,14 +155,29 @@ inkGui_t *new_inkGui(const char *svgfilename)
     ASSERT(ret == 0)
 
 
+
     /* 
-     * Fill the GUI objects with cairo surfaces
+     * Load cairo surfaces from SVG document for each inkObject
      */
+
     inkObject_t *inkObject;
     if(inkGui){
+        rsvg_init();
+        ASSERT(inkGui->svgHandle = 
+            rsvg_handle_new_from_file(svgfilename,NULL))
+
         inkObject = inkGui->inkObjectList;
         while(inkObject) {
-            inkObject_create_surface(inkObject,inkGui->width,inkGui->height);
+            ASSERT(inkObject->surface = 
+                    cairo_image_surface_create(
+                        CAIRO_FORMAT_ARGB32,
+                        inkObject->width,
+                        inkObject->height))
+            ASSERT(inkObject->cr = cairo_create(inkObject->surface))
+            rsvg_handle_render_cairo_sub(
+                                inkGui->svgHandle,
+                                inkObject->cr,
+                                inkObject->id);
             inkObject = inkObject->next;
         }
     }
