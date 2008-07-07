@@ -56,6 +56,10 @@ void delete_inkObject(inkObject_t *p)
     if(p){
         if(p->id) free(p->id);
         if(p->class) free(p->class);
+
+        if(p->cr) cairo_destroy(p->cr);
+        if(p->surface) cairo_surface_destroy(p->surface);
+
         free(p);
     }
 }
@@ -155,12 +159,12 @@ inkGui_t *new_inkGui(const char *svgfilename)
     ASSERT(ret == 0)
 
 
-
     /* 
      * Load cairo surfaces from SVG document for each inkObject
      */
 
     inkObject_t *inkObject;
+    char svg_id[64] = "#";
     if(inkGui){
         rsvg_init();
         ASSERT(inkGui->svgHandle = 
@@ -171,13 +175,17 @@ inkGui_t *new_inkGui(const char *svgfilename)
             ASSERT(inkObject->surface = 
                     cairo_image_surface_create(
                         CAIRO_FORMAT_ARGB32,
-                        inkObject->width,
-                        inkObject->height))
+                        inkGui->width,
+                        inkGui->height))
             ASSERT(inkObject->cr = cairo_create(inkObject->surface))
+
+            svg_id[0] = '#';
+            svg_id[1] = '\0';
+            strncat(svg_id,inkObject->id,64);
             rsvg_handle_render_cairo_sub(
                                 inkGui->svgHandle,
                                 inkObject->cr,
-                                inkObject->id);
+                                svg_id);
             inkObject = inkObject->next;
         }
     }
@@ -189,6 +197,9 @@ void delete_inkGui(inkGui_t *inkGui)
 {
     inkObject_t *inkObject;
     inkObject_t *tmp;
+
+    rsvg_handle_free(inkGui->svgHandle);
+    rsvg_term();
 
     if(inkGui){
         inkObject = inkGui->inkObjectList;
@@ -205,44 +216,13 @@ BEGIN_MAIN(1,"inkfun <filename>")
 
     inkGui_t *inkGui = NULL;
     inkObject_t *inkObject = NULL;
+
     ASSERT(inkGui = new_inkGui(argv[1]))
 
-    inkObject = inkGui->inkObjectList;
-    while(inkObject)
-    {
-        printf("inkObject = %s\n",inkObject->id);
-        inkObject = inkObject->next;
-    }
 
-    delete_inkGui(inkGui);
 
-#if 0
-    xmlDoc *doc = NULL;
-    xmlNode *root = NULL;
-    char *width_str, *height_str;
-    int width,height;
-
-    RsvgHandle *svgHandle = NULL;
-    cairo_surface_t *surface = NULL, *isurface=NULL;
-    cairo_t *ctx = NULL,*ictx=NULL;
-
-    rsvg_init();
-
-    /*
-     * Find width and height of complete image
-     */
-    ASSERT(doc = xmlReadFile(argv[1],NULL,0))
-
-    ASSERT(root = xmlDocGetRootElement(doc))
-
-    ASSERT(width_str = (char*)xmlGetProp(root, (xmlChar*)"width"))
-    width = atoi(width_str);
-    xmlFree(width_str);
-    ASSERT(height_str = (char*)xmlGetProp(root, (xmlChar*)"height"))
-    height = atoi(height_str);
-    xmlFree(height_str);
-
-    printf("Width = %d, Height = %d\n",width,height);
+    cairo_surface_t *surface = NULL;
+    cairo_t *ctx = NULL;
 
     /*
      * Create X surface of the size of complete image
@@ -259,7 +239,7 @@ BEGIN_MAIN(1,"inkfun <filename>")
                     dpy,
                     rwin,
                     0, 0,
-                    width, height,
+                    inkGui->width, inkGui->height,
                     0,
                     WhitePixel(dpy,screen),
                     WhitePixel(dpy,screen)));
@@ -269,43 +249,30 @@ BEGIN_MAIN(1,"inkfun <filename>")
     ASSERT(visual = DefaultVisual(dpy,DefaultScreen(dpy)))
 
     ASSERT(surface =
-        cairo_xlib_surface_create(dpy, win, visual, width,height));
-    ASSERT(ctx =
-        cairo_create(surface));
+        cairo_xlib_surface_create(dpy, win, visual, 
+                    inkGui->width, inkGui->height));
+    ASSERT(ctx = cairo_create(surface));
 
     /* 
-     * Start parsing the doc
+     * Draw inkGui
      */
-    ASSERT(svgHandle = rsvg_handle_new_from_file(argv[1],NULL))
-    
-    ASSERT(isurface = 
-        cairo_image_surface_create(CAIRO_FORMAT_ARGB32,800,640))
-    ASSERT(ictx = cairo_create(isurface))
-
-    rsvg_handle_render_cairo_sub(svgHandle,ictx,"#g5261");
-    cairo_set_source_surface(ctx,isurface,0,0);
-    cairo_paint(ctx);
-
-    rsvg_handle_render_cairo_sub(svgHandle,ictx,"#g5266");
-    cairo_set_source_surface(ctx,isurface,0,0);
-    cairo_paint(ctx);
+    inkObject = inkGui->inkObjectList;
+    while(inkObject)
+    {
+        cairo_set_source_surface(ctx,inkObject->surface,0,0);
+        cairo_paint(ctx);
+        inkObject = inkObject->next;
+    }
 
     XFlush(dpy);
+    fflush(stdout);
 
-    cairo_destroy(ictx);
-    cairo_surface_destroy(isurface);
-
-    cairo_destroy(ctx);
-    cairo_surface_destroy(surface);
-
-    rsvg_handle_free(svgHandle);
     //ASSERT(rsvg_handle_close(svgHandle,NULL));
-    rsvg_term();
 
     usleep(3*1000*1000);
 
+    delete_inkGui(inkGui);
     XCloseDisplay(dpy);
-#endif
 
 END_MAIN
 
