@@ -35,9 +35,12 @@ typedef struct _inkObject_t inkObject_t;
 
 struct _inkObject_t{
     char *id;
+    char *class;
     unsigned int width;
     unsigned int height;
     inkObject_t *next;
+    cairo_surface_t *surface;
+    cairo_t *cr;
 };
 
 inkObject_t *new_inkObject()
@@ -51,9 +54,16 @@ inkObject_t *new_inkObject()
 void delete_inkObject(inkObject_t *p)
 {
     if(p){
-        if(p->id) xmlFree(p->id);
+        if(p->id) free(p->id);
+        if(p->class) free(p->class);
         free(p);
     }
+}
+
+void inkObject_create_surface(inkObject_t *p,int w,int h)
+{
+    ASSERT(p->surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,w,h))
+    ASSERT(p->cr = cairo_create(p->surface))
 }
 
 
@@ -91,6 +101,7 @@ inkGui_t *new_inkGui(const char *svgfilename)
     xmlChar *nodeName = NULL;
     xmlChar *attr = NULL;
     xmlChar *className = NULL;
+    xmlChar *idName = NULL;
 
     /*
      * Create Objects to fill in the parsed SVG data
@@ -121,8 +132,12 @@ inkGui_t *new_inkGui(const char *svgfilename)
         {
             inkObject_t *inkObject = NULL;
             ASSERT(inkObject = new_inkObject())
-            inkObject->id = strndup((char *)className,1024);
+            inkObject->class = strndup((char *)className,1024);
             xmlFree(className);
+
+            idName = XML_GETATTR(reader,"id");
+            inkObject->id = strndup((char *)idName,1024);
+            xmlFree(idName);
 
             /* link the new object in inkGui's inkObject list */
             inkObject->next = inkGui->inkObjectList;
@@ -136,8 +151,16 @@ inkGui_t *new_inkGui(const char *svgfilename)
 
 
     /* 
-     * Create objects out of parsed SVG XML 
+     * Fill the GUI objects with cairo surfaces
      */
+    inkObject_t *inkObject;
+    if(inkGui){
+        inkObject = inkGui->inkObjectList;
+        while(inkObject) {
+            inkObject_create_surface(inkObject,inkGui->width,inkGui->height);
+            inkObject = inkObject->next;
+        }
+    }
 
     return inkGui;
 }
