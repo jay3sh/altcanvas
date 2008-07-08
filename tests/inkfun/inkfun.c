@@ -212,7 +212,65 @@ void delete_inkGui(inkGui_t *inkGui)
     }
 }
 
-BEGIN_MAIN(1,"inkfun <filename>")
+cairo_surface_t *test1(char *svgfilename, const char *objname)
+{
+    int ret = 0;
+    int type;
+    xmlTextReaderPtr reader = NULL;
+    xmlChar *nodeName = NULL;
+    xmlChar *className = NULL;
+    xmlChar *obj_xml = NULL;
+    xmlChar *defs_xml = NULL;
+    ASSERT(reader = xmlNewTextReaderFilename(svgfilename))
+    
+    while((ret = xmlTextReaderRead(reader)) == 1)
+    {
+        type = xmlTextReaderNodeType (reader);
+        ASSERT(nodeName = xmlTextReaderLocalName(reader))
+        if((type == XML_READER_TYPE_ELEMENT))
+        {
+            if(XML_EQUALS(nodeName,"defs")){
+                defs_xml = xmlTextReaderReadOuterXml(reader);
+            }
+
+            if((className = XML_GETATTR(reader,"class"))){
+                xmlChar *idName = NULL;
+
+                idName = XML_GETATTR(reader,"id");
+                if(XML_EQUALS(idName,objname)){
+                    obj_xml = xmlTextReaderReadOuterXml(reader);
+                }
+            }
+        }
+    }
+
+    xmlBuffer *buf = xmlBufferCreate();
+    xmlBufferWriteChar(buf, "<svg>");
+    xmlBufferWriteCHAR(buf, defs_xml);
+    xmlBufferWriteCHAR(buf, obj_xml);
+    xmlBufferWriteChar(buf, "</svg>");
+
+    RsvgHandle *rsvgHandle = rsvg_handle_new_from_data(
+          (guint8 *)xmlBufferContent(buf), xmlBufferLength(buf), NULL);
+
+    xmlFree(buf);
+    RsvgDimensionData rsvgDim;
+    rsvg_handle_get_dimensions(rsvgHandle, &rsvgDim);
+
+    printf("w = %d, h = %d\n",rsvgDim.width,rsvgDim.height);
+    cairo_surface_t *surface;
+    cairo_t *cr;
+    surface = cairo_image_surface_create(
+                        CAIRO_FORMAT_ARGB32,rsvgDim.width,rsvgDim.height);
+                        //CAIRO_FORMAT_ARGB32,800,480);
+    cr = cairo_create(surface);
+    rsvg_handle_render_cairo(rsvgHandle, cr);
+
+    return surface;
+}
+
+BEGIN_MAIN(2,"inkfun <filename>")
+
 
     inkGui_t *inkGui = NULL;
     inkObject_t *inkObject = NULL;
@@ -231,6 +289,9 @@ BEGIN_MAIN(1,"inkfun <filename>")
     Display *dpy=NULL;
     int screen = 0;
     Visual *visual = NULL;
+
+    inkGui->width = 800;
+    inkGui->height = 480;
 
     ASSERT(dpy = XOpenDisplay(0));
     ASSERT(rwin = DefaultRootWindow(dpy));
@@ -253,6 +314,13 @@ BEGIN_MAIN(1,"inkfun <filename>")
                     inkGui->width, inkGui->height));
     ASSERT(ctx = cairo_create(surface));
 
+    cairo_surface_t *isurface = NULL;
+    isurface = test1(argv[1],argv[2]);
+
+        cairo_set_source_surface(ctx,isurface,0,0);
+        cairo_paint(ctx);
+
+    # if 0
     /* 
      * Draw inkGui
      */
@@ -263,6 +331,8 @@ BEGIN_MAIN(1,"inkfun <filename>")
         cairo_paint(ctx);
         inkObject = inkObject->next;
     }
+
+    #endif
 
     XFlush(dpy);
     fflush(stdout);
