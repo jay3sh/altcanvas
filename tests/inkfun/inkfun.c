@@ -25,6 +25,12 @@
 #include <librsvg/rsvg-cairo.h>
 #include <cairo-xlib.h>
 
+#define XML_EQUALS(x,y) \
+    !(xmlStrcmp((const xmlChar *)x,(const xmlChar *)y))
+
+#define XML_GETATTR(reader,key) \
+    xmlTextReaderGetAttribute(reader,(const xmlChar *)key)
+
 
 /*
  * @class inkObject
@@ -43,11 +49,69 @@ struct _inkObject_t{
     cairo_t *cr;
 };
 
-inkObject_t *new_inkObject()
+inkObject_t *
+new_inkObject(
+    xmlChar *defs_xml,
+    xmlChar *obj_xml)
 {
+    printf("Inside new_inkObject: %s\n",obj_xml);
+    /* manipulate obj_xml */
+    xmlTextReader *reader = NULL;
+    char *x_str = NULL;
+    char *y_str = NULL;
+    double x=0,y=0;
+    int ret = 0;
+    xmlChar *tmpName = NULL;
+    ASSERT(reader = xmlReaderForMemory((const char *)obj_xml,
+                                strlen((char *)obj_xml),
+                                NULL,NULL,0))
+    while((ret = xmlTextReaderRead(reader)) == 1){
+        ASSERT(tmpName = xmlTextReaderLocalName(reader))
+        if(XML_EQUALS(tmpName,"rect"))
+        {
+            xmlNode *tree = xmlTextReaderExpand(reader);
+            /*
+            char *attr = NULL;
+            int attr_count = xmlTextReaderAttributeCount(reader);
+            int i=0;
+            for(; i<attr_count; i++){
+                attr = xmlTextReaderGetAttributeNo(reader,i);
+                if(XML_EQUALS(attr,"x")){
+                } else if(XML_EQUALS(attr,"y")){
+                } else {
+                    printf("%s\n",(char *)attr);
+                }
+            }
+            */
+            printf("node %s\n",(char *)tmpName);
+            ASSERT(x_str = (char *)XML_GETATTR(reader,"x"))
+            ASSERT(y_str = (char *)XML_GETATTR(reader,"y"))
+            x = atof(x_str);
+            y = atof(y_str);
+            printf("x = %f, y = %f \n",x,y);
+        }
+    }
+
+
+    /* Create object */
     inkObject_t *p = NULL;
     ASSERT(p = (inkObject_t *)malloc(sizeof(inkObject_t)))
     memset(p,0,sizeof(inkObject_t));
+
+    /*
+    xmlBuffer *buf = xmlBufferCreate();
+    xmlBufferWriteChar(buf, "<svg>");
+    xmlBufferWriteCHAR(buf, defs_xml);
+    xmlBufferWriteCHAR(buf, obj_xml);
+    xmlBufferWriteChar(buf, "</svg>");
+
+    RsvgHandle *rsvgHandle = rsvg_handle_new_from_data(
+          (guint8 *)xmlBufferContent(buf), xmlBufferLength(buf), NULL);
+    xmlFree(buf);
+    RsvgDimensionData rsvgDim;
+    rsvg_handle_get_dimensions(rsvgHandle, &rsvgDim);
+    */
+
     return p;
 }
 
@@ -70,12 +134,6 @@ void delete_inkObject(inkObject_t *p)
 /*
  * @class inkGui
  */
-
-#define XML_EQUALS(x,y) \
-    !(xmlStrcmp((const xmlChar *)x,(const xmlChar *)y))
-
-#define XML_GETATTR(reader,key) \
-    xmlTextReaderGetAttribute(reader,(const xmlChar *)key)
 
 struct _inkGui_t{
     RsvgHandle *svgHandle;
@@ -110,6 +168,9 @@ inkGui_t *new_inkGui(const char *svgfilename)
     ASSERT(inkGui= (inkGui_t *)malloc(sizeof(inkGui_t)))
     memset(inkGui,0,sizeof(inkGui_t));
 
+    xmlChar *defs_xml = NULL;
+    xmlChar *obj_xml = NULL;
+
     while((ret = xmlTextReaderRead(reader)) == 1)
     {
         type = xmlTextReaderNodeType (reader);
@@ -125,6 +186,12 @@ inkGui_t *new_inkGui(const char *svgfilename)
             inkGui->height = atoi((char *)attr);
             xmlFree(attr);
         }
+
+        if(XML_EQUALS(nodeName,"defs") && 
+            (type == XML_READER_TYPE_ELEMENT))
+        {
+            ASSERT(defs_xml = xmlTextReaderReadOuterXml(reader))
+        }
         xmlFree(nodeName);
 
         /*
@@ -139,8 +206,10 @@ inkGui_t *new_inkGui(const char *svgfilename)
          */
         if((className = XML_GETATTR(reader,"class")))
         {
+            ASSERT(obj_xml = xmlTextReaderReadOuterXml(reader))
+
             inkObject_t *inkObject = NULL;
-            ASSERT(inkObject = new_inkObject())
+            ASSERT(inkObject = new_inkObject(defs_xml,obj_xml))
             inkObject->class = strndup((char *)className,1024);
             xmlFree(className);
 
@@ -264,20 +333,54 @@ cairo_surface_t *test1(char *svgfilename, const char *objname)
                         CAIRO_FORMAT_ARGB32,rsvgDim.width,rsvgDim.height);
                         //CAIRO_FORMAT_ARGB32,800,480);
     cr = cairo_create(surface);
+    cairo_set_source_rgb(cr,0.6,0.9,0.8);
+    cairo_rectangle(cr,0,0,rsvgDim.width,rsvgDim.height);
+    cairo_fill(cr);
     rsvg_handle_render_cairo(rsvgHandle, cr);
 
     return surface;
 }
 
+xmlChar *
+eat_xy(xmlChar *str)
+{
+    char *mod_str = NULL;
+    char *tmp = NULL;
+    ASSERT(mod_str = malloc(sizeof(char)*xmlStrlen(str)))
+    ASSERT(tmp = malloc(sizeof(char)*xmlStrlen(str)))
+    xmlNode *node=NULL;
+    xmlDoc *doc = xmlParseMemory((const char *)str,xmlStrlen(str));
+    for(node=doc->children; node!=NULL; node=node->next){
+        sprintf(mod_str,"<%s",(char *)node->name);
+        xmlAttr *attrs = node->properties;
+        xmlAttr *attr=NULL;
+        for(attr = attrs; attr != NULL; attr=attr->next){
+            if(strcmp((char *)attr->name,"x")){
+                sprintf(tmp,"\n%s=%s",
+                    (char *)attr->name,
+                    (char *)xmlGetProp(node,attr->name));
+                strncat(mod_str,tmp,strlen(tmp));
+            }
+        }
+        strcat(mod_str,"/>");
+    }
+
+    xmlBuffer* xbuf = xmlBufferCreate();
+    xmlBufferCCat(xbuf,mod_str);
+    return xmlBufferContent(xbuf);
+
+}
+
 BEGIN_MAIN(2,"inkfun <filename>")
 
+    printf("answer = %s\n",
+        eat_xy("<rect x=\"3434.34343\"\ny=\"4545.432434\"\n/>"));
+    exit(0);
 
     inkGui_t *inkGui = NULL;
     inkObject_t *inkObject = NULL;
 
     ASSERT(inkGui = new_inkGui(argv[1]))
-
-
 
     cairo_surface_t *surface = NULL;
     cairo_t *ctx = NULL;
@@ -290,8 +393,6 @@ BEGIN_MAIN(2,"inkfun <filename>")
     int screen = 0;
     Visual *visual = NULL;
 
-    inkGui->width = 800;
-    inkGui->height = 480;
 
     ASSERT(dpy = XOpenDisplay(0));
     ASSERT(rwin = DefaultRootWindow(dpy));
@@ -314,13 +415,14 @@ BEGIN_MAIN(2,"inkfun <filename>")
                     inkGui->width, inkGui->height));
     ASSERT(ctx = cairo_create(surface));
 
+    /*
     cairo_surface_t *isurface = NULL;
     isurface = test1(argv[1],argv[2]);
 
         cairo_set_source_surface(ctx,isurface,0,0);
         cairo_paint(ctx);
+    */
 
-    # if 0
     /* 
      * Draw inkGui
      */
@@ -332,7 +434,6 @@ BEGIN_MAIN(2,"inkfun <filename>")
         inkObject = inkObject->next;
     }
 
-    #endif
 
     XFlush(dpy);
     fflush(stdout);
