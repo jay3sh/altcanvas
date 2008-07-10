@@ -356,25 +356,35 @@ eat_xy(xmlChar *str)
         xmlAttr *attr=NULL;
         for(attr = attrs; attr != NULL; attr=attr->next){
             if(strcmp((char *)attr->name,"x")){
+                xmlChar *prop = xmlGetProp(node,attr->name);
                 sprintf(tmp,"\n%s=%s",
                     (char *)attr->name,
-                    (char *)xmlGetProp(node,attr->name));
+                    (char *)prop);
+                xmlFree(prop);
                 strncat(mod_str,tmp,strlen(tmp));
             }
         }
         strcat(mod_str,"/>");
     }
 
+    free(tmp);
+    xmlFreeDoc(doc);
     xmlBuffer* xbuf = xmlBufferCreate();
     xmlBufferCCat(xbuf,mod_str);
-    return xmlBufferContent(xbuf);
+    free(mod_str);
+    return xbuf;
 
 }
 
 BEGIN_MAIN(2,"inkfun <filename>")
 
-    printf("answer = %s\n",
-        eat_xy("<rect x=\"3434.34343\"\ny=\"4545.432434\"\n/>"));
+    xmlBuffer *xbuf = 
+        eat_xy("<rect x=\"3434.34343\"\ny=\"4545.432434\"\n/>");
+    xmlChar *answer = 
+            xmlBufferContent(xbuf);
+    printf("answer = %s\n",(char *)answer);
+
+    xmlBufferFree(xbuf);
     exit(0);
 
     inkGui_t *inkGui = NULL;
