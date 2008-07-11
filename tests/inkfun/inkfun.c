@@ -32,7 +32,7 @@
     xmlTextReaderGetAttribute(reader,(const xmlChar *)key)
 
 xmlBuffer *
-extract_location(xmlChar *str, double *loc_x, double *loc_y);
+extract_location(xmlChar *str, xmlChar **id,double *loc_x, double *loc_y);
 
 /*
  * @class inkObject
@@ -49,6 +49,7 @@ struct _inkObject_t{
     inkObject_t *next;
     cairo_surface_t *surface;
     cairo_t *cr;
+    RsvgHandle *rsvgHandle;
 };
 
 inkObject_t *
@@ -57,50 +58,36 @@ new_inkObject(
     xmlChar *obj_xml)
 {
     /* manipulate obj_xml */
-    xmlTextReader *reader = NULL;
     xmlChar *core_obj_xml = NULL;
     xmlBuffer *xbuf = NULL;
     double x=0,y=0;
-    int ret = 0;
-    xmlChar *tmpName = NULL;
 
     /* Create object */
     inkObject_t *p = NULL;
     ASSERT(p = (inkObject_t *)malloc(sizeof(inkObject_t)))
     memset(p,0,sizeof(inkObject_t));
 
-    ASSERT(reader = xmlReaderForMemory((const char *)obj_xml,
-                                strlen((char *)obj_xml),
-                                NULL,NULL,0))
-    while((ret = xmlTextReaderRead(reader)) == 1){
-        ASSERT(tmpName = xmlTextReaderLocalName(reader))
-        if(XML_EQUALS(tmpName,"rect"))
-        {
-            ASSERT(xbuf = extract_location(obj_xml,&x,&y));
-            ASSERT(core_obj_xml = xmlBufferContent(xbuf))
+    xmlChar *idName = NULL;
+    ASSERT(xbuf = extract_location(obj_xml,&idName,&x,&y))
+    ASSERT(core_obj_xml = xmlBufferContent(xbuf))
 
-            xmlChar *idName = NULL;
-            idName = XML_GETATTR(reader,"id");
-            p->id = strndup((char *)idName,1024);
-            printf("p->id = %s\n",idName);
-            xmlFree(idName);
-        }
-    }
+    p->id = strndup((char *)idName,1024);
+    xmlFree(idName);
 
     xmlBuffer *buf = xmlBufferCreate();
     xmlBufferWriteChar(buf, "<svg>");
     xmlBufferWriteCHAR(buf, defs_xml);
-    xmlBufferWriteCHAR(buf, obj_xml);
+    xmlBufferWriteCHAR(buf, core_obj_xml);
     xmlBufferWriteChar(buf, "</svg>");
 
-    printf("buf for svg = %s\n",xmlBufferContent(buf));
-
-    RsvgHandle *rsvgHandle = rsvg_handle_new_from_data(
-          (guint8 *)xmlBufferContent(buf), xmlBufferLength(buf), NULL);
-    ASSERT(rsvgHandle);
+    xmlChar *bufc = xmlBufferContent(buf);
+    p->rsvgHandle = rsvg_handle_new_from_data(
+          (guint8 *)bufc, xmlBufferLength(buf), NULL);
+    xmlFree(bufc);
+    ASSERT(p->rsvgHandle);
 
     RsvgDimensionData rsvgDim;
-    rsvg_handle_get_dimensions(rsvgHandle, &rsvgDim);
+    rsvg_handle_get_dimensions(p->rsvgHandle, &rsvgDim);
 
     xmlFree(buf);
     xmlBufferFree(xbuf);
@@ -119,7 +106,7 @@ new_inkObject(
     svg_id[1] = '\0';
     strncat(svg_id,p->id,64);
     rsvg_handle_render_cairo_sub(
-                        rsvgHandle,
+                        p->rsvgHandle,
                         p->cr,
                         svg_id);
     return p;
@@ -134,6 +121,9 @@ void delete_inkObject(inkObject_t *p)
         if(p->cr) cairo_destroy(p->cr);
         if(p->surface) cairo_surface_destroy(p->surface);
 
+        if(p->rsvgHandle) {
+            //rsvg_handle_close(p->rsvgHandle,NULL);
+        }
         free(p);
     }
 }
@@ -169,7 +159,6 @@ inkGui_t *new_inkGui(const char *svgfilename)
     xmlChar *nodeName = NULL;
     xmlChar *attr = NULL;
     xmlChar *className = NULL;
-    xmlChar *idName = NULL;
 
     /*
      * Create Objects to fill in the parsed SVG data
@@ -224,6 +213,7 @@ inkGui_t *new_inkGui(const char *svgfilename)
             ASSERT(inkObject = new_inkObject(defs_xml,obj_xml))
             inkObject->class = strndup((char *)className,1024);
             xmlFree(className);
+            xmlFree(obj_xml);
 
 
             /* link the new object in inkGui's inkObject list */
@@ -233,6 +223,7 @@ inkGui_t *new_inkGui(const char *svgfilename)
 
     }
 
+    if(defs_xml) xmlFree(defs_xml);
     xmlFreeTextReader(reader);
     ASSERT(ret == 0)
 
@@ -352,7 +343,7 @@ cairo_surface_t *test1(char *svgfilename, const char *objname)
 }
 
 xmlBuffer *
-extract_location(xmlChar *str, double *loc_x, double *loc_y)
+extract_location(xmlChar *str, xmlChar **id,double *loc_x, double *loc_y)
 {
     char *mod_str = NULL;
     char *tmp = NULL;
@@ -360,7 +351,8 @@ extract_location(xmlChar *str, double *loc_x, double *loc_y)
     ASSERT(tmp = malloc(sizeof(char)*xmlStrlen(str)))
     xmlNode *node=NULL;
     xmlDoc *doc = xmlParseMemory((const char *)str,xmlStrlen(str));
-    for(node=doc->children; node!=NULL; node=node->next){
+    for(node=doc->children; node!=NULL; node=node->next)
+    {
         sprintf(mod_str,"<%s",(char *)node->name);
         xmlAttr *attrs = node->properties;
         xmlAttr *attr=NULL;
@@ -370,7 +362,7 @@ extract_location(xmlChar *str, double *loc_x, double *loc_y)
                 ASSERT(x_str = xmlGetProp(node,attr->name));
                 *loc_x = atof((const char *)x_str);
                 xmlFree(x_str);
-                sprintf(tmp,"\n%s=%d",
+                sprintf(tmp," %s=\"%d\"",
                     (char *)attr->name,0);
                 strncat(mod_str,tmp,strlen(tmp));
             } else if(!strcmp((char *)attr->name,"y")){
@@ -378,12 +370,14 @@ extract_location(xmlChar *str, double *loc_x, double *loc_y)
                 ASSERT(y_str = xmlGetProp(node,attr->name));
                 *loc_y = atof((const char *)y_str);
                 xmlFree(y_str);
-                sprintf(tmp,"\n%s=%d",
+                sprintf(tmp," %s=\"%d\"",
                     (char *)attr->name,0);
                 strncat(mod_str,tmp,strlen(tmp));
+            } else if(!strcmp((char *)attr->name,"id")){
+                *id = xmlGetProp(node,attr->name);
             } else {
                 xmlChar *prop = xmlGetProp(node,attr->name);
-                sprintf(tmp,"\n%s=%s",
+                sprintf(tmp," %s=\"%s\"",
                     (char *)attr->name,
                     (char *)prop);
                 xmlFree(prop);
@@ -402,7 +396,7 @@ extract_location(xmlChar *str, double *loc_x, double *loc_y)
 
 }
 
-BEGIN_MAIN(2,"inkfun <filename>")
+BEGIN_MAIN(1,"inkfun <filename>")
 
     /*
     double x,y;
@@ -481,6 +475,9 @@ BEGIN_MAIN(2,"inkfun <filename>")
     //ASSERT(rsvg_handle_close(svgHandle,NULL));
 
     usleep(3*1000*1000);
+
+    cairo_destroy(ctx);
+    cairo_surface_destroy(surface);
 
     delete_inkGui(inkGui);
     XCloseDisplay(dpy);
