@@ -31,6 +31,8 @@
 #define XML_GETATTR(reader,key) \
     xmlTextReaderGetAttribute(reader,(const xmlChar *)key)
 
+xmlBuffer *
+extract_location(xmlChar *str, double *loc_x, double *loc_y);
 
 /*
  * @class inkObject
@@ -54,14 +56,19 @@ new_inkObject(
     xmlChar *defs_xml,
     xmlChar *obj_xml)
 {
-    printf("Inside new_inkObject: %s\n",obj_xml);
     /* manipulate obj_xml */
     xmlTextReader *reader = NULL;
-    char *x_str = NULL;
-    char *y_str = NULL;
+    xmlChar *core_obj_xml = NULL;
+    xmlBuffer *xbuf = NULL;
     double x=0,y=0;
     int ret = 0;
     xmlChar *tmpName = NULL;
+
+    /* Create object */
+    inkObject_t *p = NULL;
+    ASSERT(p = (inkObject_t *)malloc(sizeof(inkObject_t)))
+    memset(p,0,sizeof(inkObject_t));
+
     ASSERT(reader = xmlReaderForMemory((const char *)obj_xml,
                                 strlen((char *)obj_xml),
                                 NULL,NULL,0))
@@ -69,49 +76,52 @@ new_inkObject(
         ASSERT(tmpName = xmlTextReaderLocalName(reader))
         if(XML_EQUALS(tmpName,"rect"))
         {
-            xmlNode *tree = xmlTextReaderExpand(reader);
-            /*
-            char *attr = NULL;
-            int attr_count = xmlTextReaderAttributeCount(reader);
-            int i=0;
-            for(; i<attr_count; i++){
-                attr = xmlTextReaderGetAttributeNo(reader,i);
-                if(XML_EQUALS(attr,"x")){
-                } else if(XML_EQUALS(attr,"y")){
-                } else {
-                    printf("%s\n",(char *)attr);
-                }
-            }
-            */
-            printf("node %s\n",(char *)tmpName);
-            ASSERT(x_str = (char *)XML_GETATTR(reader,"x"))
-            ASSERT(y_str = (char *)XML_GETATTR(reader,"y"))
-            x = atof(x_str);
-            y = atof(y_str);
-            printf("x = %f, y = %f \n",x,y);
+            ASSERT(xbuf = extract_location(obj_xml,&x,&y));
+            ASSERT(core_obj_xml = xmlBufferContent(xbuf))
+
+            xmlChar *idName = NULL;
+            idName = XML_GETATTR(reader,"id");
+            p->id = strndup((char *)idName,1024);
+            printf("p->id = %s\n",idName);
+            xmlFree(idName);
         }
     }
 
-
-    /* Create object */
-    inkObject_t *p = NULL;
-    ASSERT(p = (inkObject_t *)malloc(sizeof(inkObject_t)))
-    memset(p,0,sizeof(inkObject_t));
-
-    /*
     xmlBuffer *buf = xmlBufferCreate();
     xmlBufferWriteChar(buf, "<svg>");
     xmlBufferWriteCHAR(buf, defs_xml);
     xmlBufferWriteCHAR(buf, obj_xml);
     xmlBufferWriteChar(buf, "</svg>");
 
+    printf("buf for svg = %s\n",xmlBufferContent(buf));
+
     RsvgHandle *rsvgHandle = rsvg_handle_new_from_data(
           (guint8 *)xmlBufferContent(buf), xmlBufferLength(buf), NULL);
-    xmlFree(buf);
+    ASSERT(rsvgHandle);
+
     RsvgDimensionData rsvgDim;
     rsvg_handle_get_dimensions(rsvgHandle, &rsvgDim);
-    */
 
+    xmlFree(buf);
+    xmlBufferFree(xbuf);
+
+    printf("inkObject w=%d,h=%d\n",rsvgDim.width,rsvgDim.height);
+    /* Create cairo surface from SVG node */
+    ASSERT(p->surface = 
+            cairo_image_surface_create(
+                CAIRO_FORMAT_ARGB32,
+                rsvgDim.width,
+                rsvgDim.height))
+    ASSERT(p->cr = cairo_create(p->surface))
+
+    char svg_id[64] = "#";
+    svg_id[0] = '#';
+    svg_id[1] = '\0';
+    strncat(svg_id,p->id,64);
+    rsvg_handle_render_cairo_sub(
+                        rsvgHandle,
+                        p->cr,
+                        svg_id);
     return p;
 }
 
@@ -168,6 +178,8 @@ inkGui_t *new_inkGui(const char *svgfilename)
     ASSERT(inkGui= (inkGui_t *)malloc(sizeof(inkGui_t)))
     memset(inkGui,0,sizeof(inkGui_t));
 
+    rsvg_init();
+
     xmlChar *defs_xml = NULL;
     xmlChar *obj_xml = NULL;
 
@@ -213,9 +225,6 @@ inkGui_t *new_inkGui(const char *svgfilename)
             inkObject->class = strndup((char *)className,1024);
             xmlFree(className);
 
-            idName = XML_GETATTR(reader,"id");
-            inkObject->id = strndup((char *)idName,1024);
-            xmlFree(idName);
 
             /* link the new object in inkGui's inkObject list */
             inkObject->next = inkGui->inkObjectList;
@@ -232,10 +241,10 @@ inkGui_t *new_inkGui(const char *svgfilename)
      * Load cairo surfaces from SVG document for each inkObject
      */
 
+    /*
     inkObject_t *inkObject;
     char svg_id[64] = "#";
     if(inkGui){
-        rsvg_init();
         ASSERT(inkGui->svgHandle = 
             rsvg_handle_new_from_file(svgfilename,NULL))
 
@@ -258,6 +267,7 @@ inkGui_t *new_inkGui(const char *svgfilename)
             inkObject = inkObject->next;
         }
     }
+    */
 
     return inkGui;
 }
@@ -341,8 +351,8 @@ cairo_surface_t *test1(char *svgfilename, const char *objname)
     return surface;
 }
 
-xmlChar *
-eat_xy(xmlChar *str)
+xmlBuffer *
+extract_location(xmlChar *str, double *loc_x, double *loc_y)
 {
     char *mod_str = NULL;
     char *tmp = NULL;
@@ -355,7 +365,23 @@ eat_xy(xmlChar *str)
         xmlAttr *attrs = node->properties;
         xmlAttr *attr=NULL;
         for(attr = attrs; attr != NULL; attr=attr->next){
-            if(strcmp((char *)attr->name,"x")){
+            if(!strcmp((char *)attr->name,"x")){
+                xmlChar *x_str = NULL;
+                ASSERT(x_str = xmlGetProp(node,attr->name));
+                *loc_x = atof((const char *)x_str);
+                xmlFree(x_str);
+                sprintf(tmp,"\n%s=%d",
+                    (char *)attr->name,0);
+                strncat(mod_str,tmp,strlen(tmp));
+            } else if(!strcmp((char *)attr->name,"y")){
+                xmlChar *y_str = NULL;
+                ASSERT(y_str = xmlGetProp(node,attr->name));
+                *loc_y = atof((const char *)y_str);
+                xmlFree(y_str);
+                sprintf(tmp,"\n%s=%d",
+                    (char *)attr->name,0);
+                strncat(mod_str,tmp,strlen(tmp));
+            } else {
                 xmlChar *prop = xmlGetProp(node,attr->name);
                 sprintf(tmp,"\n%s=%s",
                     (char *)attr->name,
@@ -378,14 +404,18 @@ eat_xy(xmlChar *str)
 
 BEGIN_MAIN(2,"inkfun <filename>")
 
+    /*
+    double x,y;
     xmlBuffer *xbuf = 
-        eat_xy("<rect x=\"3434.34343\"\ny=\"4545.432434\"\n/>");
+        extract_location("<rect x=\"3434.34343\"\ny=\"4545.432434\"\n/>",&x,&y);
     xmlChar *answer = 
             xmlBufferContent(xbuf);
     printf("answer = %s\n",(char *)answer);
+    printf("got x = %f, y= %f\n",x,y);
 
     xmlBufferFree(xbuf);
     exit(0);
+    */
 
     inkGui_t *inkGui = NULL;
     inkObject_t *inkObject = NULL;
