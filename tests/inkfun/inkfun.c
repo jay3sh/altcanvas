@@ -252,65 +252,6 @@ void delete_inkGui(inkGui_t *inkGui)
     }
 }
 
-cairo_surface_t *test1(char *svgfilename, const char *objname)
-{
-    int ret = 0;
-    int type;
-    xmlTextReaderPtr reader = NULL;
-    xmlChar *nodeName = NULL;
-    xmlChar *className = NULL;
-    xmlChar *obj_xml = NULL;
-    xmlChar *defs_xml = NULL;
-    ASSERT(reader = xmlNewTextReaderFilename(svgfilename))
-    
-    while((ret = xmlTextReaderRead(reader)) == 1)
-    {
-        type = xmlTextReaderNodeType (reader);
-        ASSERT(nodeName = xmlTextReaderLocalName(reader))
-        if((type == XML_READER_TYPE_ELEMENT))
-        {
-            if(XML_EQUALS(nodeName,"defs")){
-                defs_xml = xmlTextReaderReadOuterXml(reader);
-            }
-
-            if((className = XML_GETATTR(reader,"class"))){
-                xmlChar *idName = NULL;
-
-                idName = XML_GETATTR(reader,"id");
-                if(XML_EQUALS(idName,objname)){
-                    obj_xml = xmlTextReaderReadOuterXml(reader);
-                }
-            }
-        }
-    }
-
-    xmlBuffer *buf = xmlBufferCreate();
-    xmlBufferWriteChar(buf, "<svg>");
-    xmlBufferWriteCHAR(buf, defs_xml);
-    xmlBufferWriteCHAR(buf, obj_xml);
-    xmlBufferWriteChar(buf, "</svg>");
-
-    RsvgHandle *rsvgHandle = rsvg_handle_new_from_data(
-          (guint8 *)xmlBufferContent(buf), xmlBufferLength(buf), NULL);
-
-    xmlFree(buf);
-    RsvgDimensionData rsvgDim;
-    rsvg_handle_get_dimensions(rsvgHandle, &rsvgDim);
-
-    printf("w = %d, h = %d\n",rsvgDim.width,rsvgDim.height);
-    cairo_surface_t *surface;
-    cairo_t *cr;
-    surface = cairo_image_surface_create(
-                        CAIRO_FORMAT_ARGB32,rsvgDim.width,rsvgDim.height);
-    cr = cairo_create(surface);
-    cairo_set_source_rgb(cr,0.6,0.9,0.8);
-    cairo_rectangle(cr,0,0,rsvgDim.width,rsvgDim.height);
-    cairo_fill(cr);
-    rsvg_handle_render_cairo(rsvgHandle, cr);
-
-    return surface;
-}
-
 xmlBuffer *
 extract_location(xmlChar *str, xmlChar **id,double *loc_x, double *loc_y)
 {
