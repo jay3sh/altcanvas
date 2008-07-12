@@ -44,6 +44,8 @@ typedef struct _inkObject_t inkObject_t;
 struct _inkObject_t{
     char *id;
     char *class;
+    unsigned int x;
+    unsigned int y;
     unsigned int width;
     unsigned int height;
     inkObject_t *next;
@@ -51,6 +53,7 @@ struct _inkObject_t{
     cairo_t *cr;
     RsvgHandle *rsvgHandle;
 };
+
 
 inkObject_t *
 new_inkObject(
@@ -71,8 +74,10 @@ new_inkObject(
     ASSERT(xbuf = extract_location(obj_xml,&idName,&x,&y))
     ASSERT(core_obj_xml = xmlBufferContent(xbuf))
 
-    p->id = strndup((char *)idName,1024);
+    p->id = strndup((const char *)idName,64);
     xmlFree(idName);
+    p->x = (unsigned int)x;
+    p->y = (unsigned int)y;
 
     xmlBuffer *buf = xmlBufferCreate();
     xmlBufferWriteChar(buf, "<svg>");
@@ -92,7 +97,6 @@ new_inkObject(
     xmlFree(buf);
     xmlBufferFree(xbuf);
 
-    printf("inkObject w=%d,h=%d\n",rsvgDim.width,rsvgDim.height);
     /* Create cairo surface from SVG node */
     ASSERT(p->surface = 
             cairo_image_surface_create(
@@ -122,7 +126,7 @@ void delete_inkObject(inkObject_t *p)
         if(p->surface) cairo_surface_destroy(p->surface);
 
         if(p->rsvgHandle) {
-            //rsvg_handle_close(p->rsvgHandle,NULL);
+            rsvg_handle_free(p->rsvgHandle);
         }
         free(p);
     }
@@ -227,39 +231,6 @@ inkGui_t *new_inkGui(const char *svgfilename)
     xmlFreeTextReader(reader);
     ASSERT(ret == 0)
 
-
-    /* 
-     * Load cairo surfaces from SVG document for each inkObject
-     */
-
-    /*
-    inkObject_t *inkObject;
-    char svg_id[64] = "#";
-    if(inkGui){
-        ASSERT(inkGui->svgHandle = 
-            rsvg_handle_new_from_file(svgfilename,NULL))
-
-        inkObject = inkGui->inkObjectList;
-        while(inkObject) {
-            ASSERT(inkObject->surface = 
-                    cairo_image_surface_create(
-                        CAIRO_FORMAT_ARGB32,
-                        inkGui->width,
-                        inkGui->height))
-            ASSERT(inkObject->cr = cairo_create(inkObject->surface))
-
-            svg_id[0] = '#';
-            svg_id[1] = '\0';
-            strncat(svg_id,inkObject->id,64);
-            rsvg_handle_render_cairo_sub(
-                                inkGui->svgHandle,
-                                inkObject->cr,
-                                svg_id);
-            inkObject = inkObject->next;
-        }
-    }
-    */
-
     return inkGui;
 }
 
@@ -268,7 +239,6 @@ void delete_inkGui(inkGui_t *inkGui)
     inkObject_t *inkObject;
     inkObject_t *tmp;
 
-    rsvg_handle_free(inkGui->svgHandle);
     rsvg_term();
 
     if(inkGui){
@@ -332,7 +302,6 @@ cairo_surface_t *test1(char *svgfilename, const char *objname)
     cairo_t *cr;
     surface = cairo_image_surface_create(
                         CAIRO_FORMAT_ARGB32,rsvgDim.width,rsvgDim.height);
-                        //CAIRO_FORMAT_ARGB32,800,480);
     cr = cairo_create(surface);
     cairo_set_source_rgb(cr,0.6,0.9,0.8);
     cairo_rectangle(cr,0,0,rsvgDim.width,rsvgDim.height);
@@ -398,21 +367,9 @@ extract_location(xmlChar *str, xmlChar **id,double *loc_x, double *loc_y)
 
 BEGIN_MAIN(1,"inkfun <filename>")
 
-    /*
-    double x,y;
-    xmlBuffer *xbuf = 
-        extract_location("<rect x=\"3434.34343\"\ny=\"4545.432434\"\n/>",&x,&y);
-    xmlChar *answer = 
-            xmlBufferContent(xbuf);
-    printf("answer = %s\n",(char *)answer);
-    printf("got x = %f, y= %f\n",x,y);
-
-    xmlBufferFree(xbuf);
-    exit(0);
-    */
-
     inkGui_t *inkGui = NULL;
-    inkObject_t *inkObject = NULL;
+    inkObject_t *inkO = NULL;
+
 
     ASSERT(inkGui = new_inkGui(argv[1]))
 
@@ -449,23 +406,15 @@ BEGIN_MAIN(1,"inkfun <filename>")
                     inkGui->width, inkGui->height));
     ASSERT(ctx = cairo_create(surface));
 
-    /*
-    cairo_surface_t *isurface = NULL;
-    isurface = test1(argv[1],argv[2]);
-
-        cairo_set_source_surface(ctx,isurface,0,0);
-        cairo_paint(ctx);
-    */
-
     /* 
      * Draw inkGui
      */
-    inkObject = inkGui->inkObjectList;
-    while(inkObject)
+    inkO = inkGui->inkObjectList;
+    while(inkO)
     {
-        cairo_set_source_surface(ctx,inkObject->surface,0,0);
+        cairo_set_source_surface(ctx,inkO->surface,inkO->x,inkO->y);
         cairo_paint(ctx);
-        inkObject = inkObject->next;
+        inkO = inkO->next;
     }
 
 
