@@ -70,8 +70,6 @@ void __cyg_profile_func_exit( void *this, void *callsite )
 }
 
 
-
-
 RsvgHandle *
 rsvg_handle_from_file(const char *filename)
 {
@@ -107,6 +105,21 @@ rsvg_handle_from_file(const char *filename)
     return handle;
 }
 
+void get_node_dimensions(
+    RsvgHandle *handle, const char *id,double *w, double *h)
+{
+    RsvgNode *childNode = NULL;
+
+    ASSERT(id)    
+    ASSERT(handle)    
+    ASSERT(childNode = rsvg_defs_lookup (handle->priv->defs, id))
+
+    gchar *nodeType = childNode->type->str;
+    if(!strcmp(nodeType,"g")){
+        
+    }
+}
+
 void
 get_rect_node_dimensions(
     RsvgHandle *handle, const char *id,double *w, double *h)
@@ -116,6 +129,7 @@ get_rect_node_dimensions(
     ASSERT(id)    
     ASSERT(handle)    
     ASSERT(childNode = rsvg_defs_lookup (handle->priv->defs, id))
+    printf("node type = %s\n",childNode->type->str);
 
     RsvgNodeRect *rectNode = NULL;
     rectNode = (RsvgNodeRect *)childNode;
@@ -192,12 +206,13 @@ int main(int argc, char *argv[])
     double nw=0.,nh=0.;
     cairo_surface_t *node_surface = NULL;
     cairo_t *node_cr = NULL;
-    get_rect_node_dimensions(handle,argv[2],&nw,&nh);
+    //get_rect_node_dimensions(handle,argv[2],&nw,&nh);
 
     printf("%s dims = %f x %f\n",argv[2],nw,nh);
     ASSERT(node_surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, (int)nw, (int)nh))
     ASSERT(node_cr = cairo_create(node_surface))
-    rsvg_handle_render_cairo_sub(handle,node_cr,argv[2]);
+    //rsvg_handle_render_cairo_sub(handle,node_cr,argv[2]);
+    rsvg_handle_calc_cairo_sub(handle,node_cr,argv[2]);
 
     cairo_set_source_surface(ctx,node_surface,0,0);
     cairo_paint(ctx);
