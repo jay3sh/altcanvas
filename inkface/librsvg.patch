@@ -4961,9 +4961,17 @@ diff -durN librsvg-2.22.1-my/moz-plugin/Makefile.in librsvg-2.22.1/moz-plugin/Ma
  # Tell versions [3.59,3.63) of GNU make to not export all variables.
  # Otherwise a system limit (for SysV at least) may be exceeded.
 diff -durN librsvg-2.22.1-my/rsvg-base.c librsvg-2.22.1/rsvg-base.c
---- librsvg-2.22.1-my/rsvg-base.c	2008-08-03 23:50:33.000000000 -0700
+--- librsvg-2.22.1-my/rsvg-base.c	2008-08-06 00:11:58.000000000 -0700
 +++ librsvg-2.22.1/rsvg-base.c	2008-02-24 07:44:58.000000000 -0800
-@@ -139,7 +139,6 @@
+@@ -51,7 +51,6 @@
+ #include "rsvg-path.h"
+ #include "rsvg-paint-server.h"
+ 
+-int function_depth=0;
+ /*
+  * This is configurable at runtime
+  */
+@@ -140,7 +139,6 @@
  static void
  rsvg_standard_element_start (RsvgHandle * ctx, const char *name, RsvgPropertyBag * atts)
  {
@@ -4971,7 +4979,7 @@ diff -durN librsvg-2.22.1-my/rsvg-base.c librsvg-2.22.1/rsvg-base.c
  
      /*replace this stuff with a hash for fast reading! */
      RsvgNode *newnode = NULL;
-@@ -260,7 +259,7 @@
+@@ -261,7 +259,7 @@
  
      if (newnode) {
          newnode->type = g_string_new (name);
@@ -4980,7 +4988,7 @@ diff -durN librsvg-2.22.1-my/rsvg-base.c librsvg-2.22.1/rsvg-base.c
          rsvg_node_set_atts (newnode, ctx, atts);
          rsvg_defs_register_memory (ctx->priv->defs, newnode);
          if (ctx->priv->currentnode) {
-@@ -1336,32 +1335,6 @@
+@@ -1337,32 +1335,6 @@
  }
  
  /**
@@ -5013,7 +5021,7 @@ diff -durN librsvg-2.22.1-my/rsvg-base.c librsvg-2.22.1/rsvg-base.c
   * rsvg_handle_get_dimensions
   * @handle: A #RsvgHandle
   * @dimension_data: A place to store the SVG's size
-@@ -1694,22 +1667,6 @@
+@@ -1695,21 +1667,6 @@
  }
  
  void
@@ -5025,7 +5033,6 @@ diff -durN librsvg-2.22.1-my/rsvg-base.c librsvg-2.22.1/rsvg-base.c
 -    bpath_def = rsvg_parse_path (d);
 -    rsvg_bpath_def_art_finish (bpath_def);
 -
--    printf("<<%s>> %s:%d \n",__FUNCTION__,__FILE__,__LINE__);
 -    ctx->render->calc_path (ctx, bpath_def);
 -    //rsvg_render_markers (bpath_def, ctx);
 -
@@ -5037,7 +5044,7 @@ diff -durN librsvg-2.22.1-my/rsvg-base.c librsvg-2.22.1/rsvg-base.c
  {
      /* todo: store and use the bpath higher up */
 diff -durN librsvg-2.22.1-my/rsvg-cairo-draw.c librsvg-2.22.1/rsvg-cairo-draw.c
---- librsvg-2.22.1-my/rsvg-cairo-draw.c	2008-08-03 22:44:41.000000000 -0700
+--- librsvg-2.22.1-my/rsvg-cairo-draw.c	2008-08-05 23:49:13.000000000 -0700
 +++ librsvg-2.22.1/rsvg-cairo-draw.c	2008-02-24 06:42:20.000000000 -0800
 @@ -518,95 +518,6 @@
      }
@@ -5046,6 +5053,7 @@ diff -durN librsvg-2.22.1-my/rsvg-cairo-draw.c librsvg-2.22.1/rsvg-cairo-draw.c
 -void 
 -rsvg_cairo_calc_path (RsvgDrawingCtx * ctx, const RsvgBpathDef * bpath_def)
 -{
+-    TRACE_ENTER
 -    RsvgCairoRender *render = (RsvgCairoRender *) ctx->render;
 -    RsvgState *state = rsvg_state_current (ctx);
 -    cairo_t *cr;
@@ -5054,8 +5062,7 @@ diff -durN librsvg-2.22.1-my/rsvg-cairo-draw.c librsvg-2.22.1/rsvg-cairo-draw.c
 -    int need_tmpbuf = 0;
 -    RsvgBbox bbox;
 -
--    printf("<<%s>>before- bbox.{x,y,w,h} = %f,%f,%f,%f\n",
--                __FUNCTION__,
+-    LOG("before- bbox.{x,y,w,h} = %f,%f,%f,%f\n",
 -                render->bbox.x,render->bbox.y,
 -                render->bbox.w,render->bbox.h);
 -    if (state->fill == NULL && state->stroke == NULL)
@@ -5125,11 +5132,11 @@ diff -durN librsvg-2.22.1-my/rsvg-cairo-draw.c librsvg-2.22.1/rsvg-cairo-draw.c
 -
 -    rsvg_bbox_insert (&render->bbox, &bbox);
 -
--    printf("<<%s>>after- bbox.{x,y,w,h} = %f,%f,%f,%f\n",
--                __FUNCTION__,
+-    LOG("after- bbox.{x,y,w,h} = %f,%f,%f,%f\n",
 -                render->bbox.x,render->bbox.y,
 -                render->bbox.w,render->bbox.h);
 -
+-    TRACE_EXIT
 -}
 -
  void
@@ -5171,7 +5178,7 @@ diff -durN librsvg-2.22.1-my/rsvg-cairo-draw.h librsvg-2.22.1/rsvg-cairo-draw.h
  						     const RsvgBpathDef * path);
  void		 rsvg_cairo_render_image	    (RsvgDrawingCtx *ctx, const GdkPixbuf * img, 
 diff -durN librsvg-2.22.1-my/rsvg-cairo-render.c librsvg-2.22.1/rsvg-cairo-render.c
---- librsvg-2.22.1-my/rsvg-cairo-render.c	2008-08-03 22:58:08.000000000 -0700
+--- librsvg-2.22.1-my/rsvg-cairo-render.c	2008-08-06 01:17:24.000000000 -0700
 +++ librsvg-2.22.1/rsvg-cairo-render.c	2008-01-19 08:44:52.000000000 -0800
 @@ -57,7 +57,6 @@
      cairo_render->super.render_pango_layout = rsvg_cairo_render_pango_layout;
@@ -5204,12 +5211,13 @@ diff -durN librsvg-2.22.1-my/rsvg-cairo-render.c librsvg-2.22.1/rsvg-cairo-rende
      draw->state = NULL;
  
      /* should this be G_ALLOC_ONLY? */
-@@ -210,44 +200,6 @@
+@@ -210,52 +200,8 @@
   * Since: 2.14
   */
  void
 -rsvg_handle_calc_cairo_sub (RsvgHandle * handle, cairo_t * cr, const char *id)
 -{
+-    TRACE_ENTER
 -    RsvgDrawingCtx *draw;
 -    RsvgNode *drawsub = NULL;
 -
@@ -5221,17 +5229,14 @@ diff -durN librsvg-2.22.1-my/rsvg-cairo-render.c librsvg-2.22.1/rsvg-cairo-rende
 -    draw = rsvg_cairo_new_drawing_ctx (cr, handle);
 -    if (!draw)
 -        return;
--    printf("<<%s>> draw(x,y,w,h) = %f,%f,%f,%f\n",__FUNCTION__,
--            draw->vb.x,draw->vb.y,draw->vb.w,draw->vb.h);
 -
--    printf("id = %s\n",id);
+-    LOG("id = %s\n",id);
 -    if (id && *id)
 -        drawsub = rsvg_defs_lookup (handle->priv->defs, id);
 -
 -    while (drawsub != NULL) {
 -        draw->drawsub_stack = g_slist_prepend (draw->drawsub_stack, drawsub);
 -        drawsub = drawsub->parent;
--        printf("drawsub = %p\n",drawsub);
 -    }
 -
 -    rsvg_state_push (draw);
@@ -5239,45 +5244,77 @@ diff -durN librsvg-2.22.1-my/rsvg-cairo-render.c librsvg-2.22.1/rsvg-cairo-rende
 -
 -    rsvg_node_calc ((RsvgNode *) handle->priv->treebase, draw, 0);
 -
+-    RsvgCairoRender *render = (RsvgCairoRender *) draw->render;
+-    LOG("bbox.{x,y,w,h} = %f,%f,%f,%f\n",
+-                render->bbox.x,render->bbox.y,
+-                render->bbox.w,render->bbox.h);
+-
 -    cairo_restore (cr);
 -    rsvg_state_pop (draw);
 -    rsvg_drawing_ctx_free (draw);
 -
+-    TRACE_EXIT
 -}
 -
 -void
  rsvg_handle_render_cairo_sub (RsvgHandle * handle, cairo_t * cr, const char *id)
  {
+-    TRACE_ENTER
+-
      RsvgDrawingCtx *draw;
-@@ -261,17 +213,13 @@
-     draw = rsvg_cairo_new_drawing_ctx (cr, handle);
+     RsvgNode *drawsub = NULL;
+ 
+@@ -268,7 +214,6 @@
      if (!draw)
          return;
--    printf("<<%s>> draw(x,y,w,h) = %f,%f,%f,%f\n",__FUNCTION__,
--            draw->vb.x,draw->vb.y,draw->vb.w,draw->vb.h);
  
 -    printf("id = %s\n",id);
      if (id && *id)
          drawsub = rsvg_defs_lookup (handle->priv->defs, id);
  
-     while (drawsub != NULL) {
-         draw->drawsub_stack = g_slist_prepend (draw->drawsub_stack, drawsub);
-         drawsub = drawsub->parent;
--        printf("drawsub = %p\n",drawsub);
-     }
+@@ -285,8 +230,6 @@
+     cairo_restore (cr);
+     rsvg_state_pop (draw);
+     rsvg_drawing_ctx_free (draw);
+-
+-    TRACE_EXIT
+ }
  
-     rsvg_state_push (draw);
-diff -durN librsvg-2.22.1-my/rsvg-css.c librsvg-2.22.1/rsvg-css.c
---- librsvg-2.22.1-my/rsvg-css.c	2008-07-26 14:36:31.000000000 -0700
-+++ librsvg-2.22.1/rsvg-css.c	2007-04-23 15:45:56.000000000 -0700
-@@ -200,7 +200,6 @@
- double
- _rsvg_css_normalize_length (const RsvgLength * in, RsvgDrawingCtx * ctx, char dir)
- {
--    printf("<<%s>> factor = %c\n",in->factor);
-     if (in->factor == '\0')
-         return in->length;
-     else if (in->factor == 'p') {
+ /**
+diff -durN librsvg-2.22.1-my/rsvg-defs.h librsvg-2.22.1/rsvg-defs.h
+--- librsvg-2.22.1-my/rsvg-defs.h	2008-08-06 00:10:00.000000000 -0700
++++ librsvg-2.22.1/rsvg-defs.h	2007-04-23 15:45:56.000000000 -0700
+@@ -42,30 +42,5 @@
+ void	     rsvg_defs_register_name	(RsvgDefs * defs, const char *name, RsvgNode * val);
+ void	     rsvg_defs_register_memory	(RsvgDefs * defs, RsvgNode * val);
+ 
+-extern int function_depth;
+-#define PRINT_FUNCTION_DEPTH \
+-    { \
+-        int cc=0; \
+-        for(; cc<function_depth; cc++){ \
+-            printf(" "); \
+-        } \
+-    }
+-
+-#define TRACE_ENTER \
+-    function_depth+=2; \
+-    PRINT_FUNCTION_DEPTH \
+-    printf("<< %s\n",__FUNCTION__); 
+-
+-#define TRACE_EXIT \
+-    PRINT_FUNCTION_DEPTH \
+-    printf(">> %s\n",__FUNCTION__); \
+-    function_depth-=2;
+-
+-#define LOG(...) \
+-    function_depth+=2; \
+-    PRINT_FUNCTION_DEPTH \
+-    function_depth-=2; \
+-	printf(__VA_ARGS__);
+-
+ G_END_DECLS
+ #endif
 diff -durN librsvg-2.22.1-my/rsvg.h librsvg-2.22.1/rsvg.h
 --- librsvg-2.22.1-my/rsvg.h	2008-07-12 14:16:14.000000000 -0700
 +++ librsvg-2.22.1/rsvg.h	2007-04-23 15:45:56.000000000 -0700
@@ -5310,14 +5347,15 @@ diff -durN librsvg-2.22.1-my/rsvg-private.h librsvg-2.22.1/rsvg-private.h
  };
  
 diff -durN librsvg-2.22.1-my/rsvg-shapes.c librsvg-2.22.1/rsvg-shapes.c
---- librsvg-2.22.1-my/rsvg-shapes.c	2008-08-03 23:50:21.000000000 -0700
+--- librsvg-2.22.1-my/rsvg-shapes.c	2008-08-05 23:47:59.000000000 -0700
 +++ librsvg-2.22.1/rsvg-shapes.c	2007-04-23 15:45:56.000000000 -0700
-@@ -49,21 +49,6 @@
+@@ -49,22 +49,6 @@
  }
  
  static void
 -rsvg_node_path_calc (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 -{
+-    TRACE_ENTER
 -    RsvgNodePath *path = (RsvgNodePath *) self;
 -    if (!path->d)
 -        return;
@@ -5325,16 +5363,16 @@ diff -durN librsvg-2.22.1-my/rsvg-shapes.c librsvg-2.22.1/rsvg-shapes.c
 -    rsvg_state_reinherit_top (ctx, self->state, dominate);
 -
 -
--    printf("<<%s>> %s:%d \n",__FUNCTION__,__FILE__,__LINE__);
 -    rsvg_calc_path (ctx, path->d);
 -    
+-    TRACE_EXIT
 -}
 -
 -static void
  rsvg_node_path_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
  {
      RsvgNodePath *path = (RsvgNodePath *) self;
-@@ -107,7 +92,6 @@
+@@ -108,7 +92,6 @@
      path->d = NULL;
      path->super.free = rsvg_node_path_free;
      path->super.draw = rsvg_node_path_draw;
@@ -5342,12 +5380,13 @@ diff -durN librsvg-2.22.1-my/rsvg-shapes.c librsvg-2.22.1/rsvg-shapes.c
      path->super.set_atts = rsvg_node_path_set_atts;
  
      return &path->super;
-@@ -148,43 +132,6 @@
+@@ -149,45 +132,6 @@
  }
  
  static void
 -_rsvg_node_poly_calc (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 -{
+-    TRACE_ENTER
 -    RsvgNodePoly *poly = (RsvgNodePoly *) self;
 -    gsize i;
 -    GString *d;
@@ -5380,18 +5419,20 @@ diff -durN librsvg-2.22.1-my/rsvg-shapes.c librsvg-2.22.1/rsvg-shapes.c
 -    rsvg_calc_path (ctx, d->str);
 -
 -    g_string_free (d, TRUE);
+-    TRACE_EXIT
 -}
 -
 -static void
  _rsvg_node_poly_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
  {
      RsvgNodePoly *poly = (RsvgNodePoly *) self;
-@@ -294,36 +241,6 @@
+@@ -297,38 +241,6 @@
  }
  
  static void
 -_rsvg_node_line_calc (RsvgNode * overself, RsvgDrawingCtx * ctx, int dominate)
 -{
+-    TRACE_ENTER
 -    GString *d;
 -    char buf[G_ASCII_DTOSTR_BUF_SIZE];
 -    RsvgNodeLine *self = (RsvgNodeLine *) overself;
@@ -5417,13 +5458,14 @@ diff -durN librsvg-2.22.1-my/rsvg-shapes.c librsvg-2.22.1/rsvg-shapes.c
 -
 -    g_string_free (d, TRUE);
 -
+-    TRACE_EXIT
 -}
 -
 -static void
  _rsvg_node_line_draw (RsvgNode * overself, RsvgDrawingCtx * ctx, int dominate)
  {
      GString *d;
-@@ -359,7 +276,6 @@
+@@ -364,7 +276,6 @@
      line = g_new (RsvgNodeLine, 1);
      _rsvg_node_init (&line->super);
      line->super.draw = _rsvg_node_line_draw;
@@ -5431,7 +5473,7 @@ diff -durN librsvg-2.22.1-my/rsvg-shapes.c librsvg-2.22.1/rsvg-shapes.c
      line->super.set_atts = _rsvg_node_line_set_atts;
      line->x1 = line->x2 = line->y1 = line->y2 = _rsvg_css_parse_length ("0");
      return &line->super;
-@@ -408,133 +324,7 @@
+@@ -413,133 +324,8 @@
  }
  
  static void
@@ -5442,7 +5484,6 @@ diff -durN librsvg-2.22.1-my/rsvg-shapes.c librsvg-2.22.1/rsvg-shapes.c
 -    RsvgNodeRect *rect = (RsvgNodeRect *) self;
 -    char buf[G_ASCII_DTOSTR_BUF_SIZE];
 -
--    printf("--> rect = %p\n",rect);
 -    relative = 0;
 -    if(relative) {
 -        x = _rsvg_css_normalize_length (&rect->x, ctx, 'h');
@@ -5455,7 +5496,6 @@ diff -durN librsvg-2.22.1-my/rsvg-shapes.c librsvg-2.22.1/rsvg-shapes.c
 -    rx = _rsvg_css_normalize_length (&rect->rx, ctx, 'h');
 -    ry = _rsvg_css_normalize_length (&rect->ry, ctx, 'v');
 -
--    printf("rect x,y,w,h,rx,ry = %f,%f,%f,%f,%f,%f\n",x,y,w,h,rx,ry);
 -    if (rect->got_rx)
 -        rx = rx;
 -    else
@@ -5564,9 +5604,11 @@ diff -durN librsvg-2.22.1-my/rsvg-shapes.c librsvg-2.22.1/rsvg-shapes.c
 -_rsvg_node_rect_calc (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 +_rsvg_node_rect_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
  {
+-    TRACE_ENTER
      double x, y, w, h, rx, ry;
      GString *d = NULL;
-@@ -648,18 +438,10 @@
+     RsvgNodeRect *rect = (RsvgNodeRect *) self;
+@@ -652,19 +438,10 @@
      g_string_append (d, " Z");
  
      rsvg_state_reinherit_top (ctx, self->state, dominate);
@@ -5574,19 +5616,20 @@ diff -durN librsvg-2.22.1-my/rsvg-shapes.c librsvg-2.22.1/rsvg-shapes.c
 +    rsvg_render_path (ctx, d->str);
      g_string_free (d, TRUE);
 -
- }
- 
+-    TRACE_EXIT
+-}
+-
 -static void
 -_rsvg_node_rect_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 -{
 -    _rsvg_node_rect_draw_impl(self,ctx,dominate,1);
--}
--
+ }
+ 
 -
  RsvgNode *
  rsvg_new_rect (void)
  {
-@@ -667,7 +449,6 @@
+@@ -672,7 +449,6 @@
      rect = g_new (RsvgNodeRect, 1);
      _rsvg_node_init (&rect->super);
      rect->super.draw = _rsvg_node_rect_draw;
@@ -5594,12 +5637,13 @@ diff -durN librsvg-2.22.1-my/rsvg-shapes.c librsvg-2.22.1/rsvg-shapes.c
      rect->super.set_atts = _rsvg_node_rect_set_atts;
      rect->x = rect->y = rect->w = rect->h = rect->rx = rect->ry = _rsvg_css_parse_length ("0");
      rect->got_rx = rect->got_ry = FALSE;
-@@ -706,89 +487,6 @@
+@@ -711,91 +487,6 @@
  }
  
  static void
 -_rsvg_node_circle_calc (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 -{
+-    TRACE_ENTER
 -    GString *d = NULL;
 -    RsvgNodeCircle *circle = (RsvgNodeCircle *) self;
 -    char buf[G_ASCII_DTOSTR_BUF_SIZE];
@@ -5678,13 +5722,14 @@ diff -durN librsvg-2.22.1-my/rsvg-shapes.c librsvg-2.22.1/rsvg-shapes.c
 -
 -    g_string_free (d, TRUE);
 -
+-    TRACE_EXIT
 -}
 -
 -static void
  _rsvg_node_circle_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
  {
      GString *d = NULL;
-@@ -877,7 +575,6 @@
+@@ -884,7 +575,6 @@
      circle = g_new (RsvgNodeCircle, 1);
      _rsvg_node_init (&circle->super);
      circle->super.draw = _rsvg_node_circle_draw;
@@ -5692,12 +5737,13 @@ diff -durN librsvg-2.22.1-my/rsvg-shapes.c librsvg-2.22.1/rsvg-shapes.c
      circle->super.set_atts = _rsvg_node_circle_set_atts;
      circle->cx = circle->cy = circle->r = _rsvg_css_parse_length ("0");
      return &circle->super;
-@@ -917,88 +614,6 @@
+@@ -924,90 +614,6 @@
  }
  
  static void
 -_rsvg_node_ellipse_calc (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 -{
+-    TRACE_ENTER
 -    RsvgNodeEllipse *ellipse = (RsvgNodeEllipse *) self;
 -    GString *d = NULL;
 -    char buf[G_ASCII_DTOSTR_BUF_SIZE];
@@ -5775,13 +5821,14 @@ diff -durN librsvg-2.22.1-my/rsvg-shapes.c librsvg-2.22.1/rsvg-shapes.c
 -    rsvg_calc_path (ctx, d->str);
 -    g_string_free (d, TRUE);
 -
+-    TRACE_EXIT
 -}
 -
 -static void
  _rsvg_node_ellipse_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
  {
      RsvgNodeEllipse *ellipse = (RsvgNodeEllipse *) self;
-@@ -1086,7 +701,6 @@
+@@ -1095,7 +701,6 @@
      ellipse = g_new (RsvgNodeEllipse, 1);
      _rsvg_node_init (&ellipse->super);
      ellipse->super.draw = _rsvg_node_ellipse_draw;
@@ -5790,14 +5837,15 @@ diff -durN librsvg-2.22.1-my/rsvg-shapes.c librsvg-2.22.1/rsvg-shapes.c
      ellipse->cx = ellipse->cy = ellipse->rx = ellipse->ry = _rsvg_css_parse_length ("0");
      return &ellipse->super;
 diff -durN librsvg-2.22.1-my/rsvg-structure.c librsvg-2.22.1/rsvg-structure.c
---- librsvg-2.22.1-my/rsvg-structure.c	2008-08-04 00:06:52.000000000 -0700
+--- librsvg-2.22.1-my/rsvg-structure.c	2008-08-06 00:55:07.000000000 -0700
 +++ librsvg-2.22.1/rsvg-structure.c	2008-02-24 07:28:18.000000000 -0800
-@@ -34,33 +34,6 @@
+@@ -34,38 +34,8 @@
  #include <stdio.h>
  
  void
 -rsvg_node_calc (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 -{
+-    TRACE_ENTER
 -    RsvgState *state;
 -    GSList *stacksave;
 -
@@ -5806,27 +5854,31 @@ diff -durN librsvg-2.22.1-my/rsvg-structure.c librsvg-2.22.1/rsvg-structure.c
 -    stacksave = ctx->drawsub_stack;
 -    if (stacksave) {
 -        if (stacksave->data != self){
+-            TRACE_EXIT
 -            return;
 -        }
 -        ctx->drawsub_stack = stacksave->next;
 -    }
 -    if (!state->visible){
+-        TRACE_EXIT
 -        return;
 -    }
 -
 -    gchar *nodeType = self->type->str;
--    printf("nodeType = %s\n",nodeType);
--    printf("<<%s>> %s:%d \n",__FUNCTION__,__FILE__,__LINE__);
+-    LOG("nodeType = %s\n",nodeType);
 -    self->calc (self, ctx, dominate);
--    printf("<<%s>> %s:%d \n",__FUNCTION__,__FILE__,__LINE__);
 -    ctx->drawsub_stack = stacksave;
 -
+-    TRACE_EXIT
 -}
 -void
  rsvg_node_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
  {
+-    TRACE_ENTER
      RsvgState *state;
-@@ -70,17 +43,13 @@
+     GSList *stacksave;
+ 
+@@ -73,18 +43,15 @@
  
      stacksave = ctx->drawsub_stack;
      if (stacksave) {
@@ -5841,12 +5893,13 @@ diff -durN librsvg-2.22.1-my/rsvg-structure.c librsvg-2.22.1/rsvg-structure.c
          return;
 -    }
  
--    printf("--> <<%s>> self = %p self->draw = %p\n",
--            __FUNCTION__,self,self->draw);
      self->draw (self, ctx, dominate);
      ctx->drawsub_stack = stacksave;
+-    TRACE_EXIT
  }
-@@ -104,42 +73,15 @@
+ 
+ /* generic function for drawing all of the children of a particular node */
+@@ -106,46 +73,15 @@
          rsvg_pop_discrete_layer (ctx);
  }
  
@@ -5854,6 +5907,7 @@ diff -durN librsvg-2.22.1-my/rsvg-structure.c librsvg-2.22.1/rsvg-structure.c
 -void
 -_rsvg_node_calc_children (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 -{
+-    TRACE_ENTER
 -    guint i;
 -    if (dominate != -1) {
 -        rsvg_state_reinherit_top (ctx, self->state, dominate);
@@ -5867,19 +5921,22 @@ diff -durN librsvg-2.22.1-my/rsvg-structure.c librsvg-2.22.1/rsvg-structure.c
 -    }
 -    if (dominate != -1)
 -        rsvg_pop_discrete_layer (ctx);
+-    TRACE_EXIT
 -}
 -
  /* generic function that doesn't draw anything at all */
  static void
  _rsvg_node_draw_nothing (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
  {
--    printf("<<%s>> %s:%d \n",__FUNCTION__,__FILE__,__LINE__);
+-    TRACE_ENTER
+-    TRACE_EXIT
 -}
 -
 -static void
 -_rsvg_node_calc_nothing (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 -{
--    printf("<<%s>> %s:%d \n",__FUNCTION__,__FILE__,__LINE__);
+-    TRACE_ENTER
+-    TRACE_EXIT
  }
  
  static void
@@ -5889,15 +5946,15 @@ diff -durN librsvg-2.22.1-my/rsvg-structure.c librsvg-2.22.1/rsvg-structure.c
  }
  
  void
-@@ -151,7 +93,6 @@
+@@ -157,7 +93,6 @@
      rsvg_state_init (self->state);
      self->free = _rsvg_node_free;
      self->draw = _rsvg_node_draw_nothing;
--    self->calc = _rsvg_node_draw_nothing;
+-    self->calc = _rsvg_node_calc_nothing;
      self->set_atts = _rsvg_node_dont_set_atts;
      self->type = NULL;
  }
-@@ -201,7 +142,6 @@
+@@ -207,7 +142,6 @@
      group = g_new (RsvgNodeGroup, 1);
      _rsvg_node_init (&group->super);
      group->super.draw = _rsvg_node_draw_children;
@@ -5905,13 +5962,14 @@ diff -durN librsvg-2.22.1-my/rsvg-structure.c librsvg-2.22.1/rsvg-structure.c
      group->super.set_atts = rsvg_node_group_set_atts;
      return &group->super;
  }
-@@ -304,76 +244,6 @@
+@@ -310,77 +244,6 @@
      }
  
  }
 -static void
 -rsvg_node_svg_calc (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 -{
+-    TRACE_ENTER
 -    RsvgNodeSvg *sself;
 -    RsvgState *state;
 -    gdouble affine[6], affine_old[6], affine_new[6];
@@ -5919,7 +5977,6 @@ diff -durN librsvg-2.22.1-my/rsvg-structure.c librsvg-2.22.1/rsvg-structure.c
 -    double nx, ny, nw, nh;
 -    sself = (RsvgNodeSvg *) self;
 -
--    printf("--> <<%s>> self = %p\n",__FUNCTION__,self);
 -    nx = _rsvg_css_normalize_length (&sself->x, ctx, 'h');
 -    ny = _rsvg_css_normalize_length (&sself->y, ctx, 'v');
 -    nw = _rsvg_css_normalize_length (&sself->w, ctx, 'h');
@@ -5970,7 +6027,7 @@ diff -durN librsvg-2.22.1-my/rsvg-structure.c librsvg-2.22.1/rsvg-structure.c
 -    }
 -
 -    for (i = 0; i < self->children->len; i++) {
--        printf("child %d\n",i);
+-        LOG("child %d\n",i);
 -        rsvg_state_push (ctx);
 -        rsvg_node_calc (g_ptr_array_index (self->children, i), ctx, 0);
 -        rsvg_state_pop (ctx);
@@ -5978,11 +6035,12 @@ diff -durN librsvg-2.22.1-my/rsvg-structure.c librsvg-2.22.1/rsvg-structure.c
 -
 -    rsvg_pop_discrete_layer (ctx);
 -    _rsvg_pop_view_box (ctx);
+-    TRACE_EXIT
 -}
  
  static void
  rsvg_node_svg_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
-@@ -385,7 +255,6 @@
+@@ -392,7 +255,6 @@
      double nx, ny, nw, nh;
      sself = (RsvgNodeSvg *) self;
  
@@ -5990,7 +6048,7 @@ diff -durN librsvg-2.22.1-my/rsvg-structure.c librsvg-2.22.1/rsvg-structure.c
      nx = _rsvg_css_normalize_length (&sself->x, ctx, 'h');
      ny = _rsvg_css_normalize_length (&sself->y, ctx, 'v');
      nw = _rsvg_css_normalize_length (&sself->w, ctx, 'h');
-@@ -436,7 +305,6 @@
+@@ -443,7 +305,6 @@
      }
  
      for (i = 0; i < self->children->len; i++) {
@@ -5998,7 +6056,7 @@ diff -durN librsvg-2.22.1-my/rsvg-structure.c librsvg-2.22.1/rsvg-structure.c
          rsvg_state_push (ctx);
          rsvg_node_draw (g_ptr_array_index (self->children, i), ctx, 0);
          rsvg_state_pop (ctx);
-@@ -494,7 +362,6 @@
+@@ -501,7 +362,6 @@
      svg->w = _rsvg_css_parse_length ("100%");
      svg->h = _rsvg_css_parse_length ("100%");
      svg->super.draw = rsvg_node_svg_draw;
@@ -6006,7 +6064,7 @@ diff -durN librsvg-2.22.1-my/rsvg-structure.c librsvg-2.22.1/rsvg-structure.c
      svg->super.set_atts = rsvg_node_svg_set_atts;
      return &svg->super;
  }
-@@ -589,7 +456,6 @@
+@@ -596,7 +456,6 @@
      group = g_new (RsvgNodeGroup, 1);
      _rsvg_node_init (&group->super);
      group->super.draw = _rsvg_node_draw_nothing;
@@ -6762,7 +6820,7 @@ diff -durN librsvg-2.22.1-my/update-index.sh librsvg-2.22.1/update-index.sh
 -cscope -R -b
 -
 diff -durN librsvg-2.22.1-my/x11-rsvg.c librsvg-2.22.1/x11-rsvg.c
---- librsvg-2.22.1-my/x11-rsvg.c	2008-08-04 22:42:32.000000000 -0700
+--- librsvg-2.22.1-my/x11-rsvg.c	2008-08-06 00:12:00.000000000 -0700
 +++ librsvg-2.22.1/x11-rsvg.c	1969-12-31 16:00:00.000000000 -0800
 @@ -1,224 +0,0 @@
 -#include "rsvg.h"
@@ -6986,6 +7044,6 @@ diff -durN librsvg-2.22.1-my/x11-rsvg.c librsvg-2.22.1/x11-rsvg.c
 -
 -    XFlush(dpy);
 -
--    sleep(4);
+-    sleep(1);
 -    rsvg_term ();
 -}
