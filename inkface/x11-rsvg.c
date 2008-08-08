@@ -195,30 +195,28 @@ int main(int argc, char *argv[])
                         dpy, win, visual, dim.width,dim.height));
     ASSERT(ctx = cairo_create(surface));
 
-    /*
-    if(argc == 3){
-        rsvg_handle_render_cairo_sub(handle,ctx,argv[2]);
-    } else {
-        rsvg_handle_render_cairo(handle, ctx);
-    }
-    */
 
     double nw=0.,nh=0.;
     cairo_surface_t *node_surface = NULL;
+    /*
     cairo_t *node_cr = NULL;
     //get_rect_node_dimensions(handle,argv[2],&nw,&nh);
 
-    printf("%s dims = %f x %f\n",argv[2],nw,nh);
     ASSERT(node_surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, (int)nw, (int)nh))
     ASSERT(node_cr = cairo_create(node_surface))
     //rsvg_handle_render_cairo_sub(handle,node_cr,argv[2]);
     rsvg_handle_calc_cairo_sub(handle,node_cr,argv[2]);
+    */
+
+    node_surface = get_piece_surface(handle,argv[2]);
 
     cairo_set_source_surface(ctx,node_surface,0,0);
     cairo_paint(ctx);
 
     XFlush(dpy);
 
-    sleep(4);
+    sleep(1);
+
+    cairo_surface_destroy(node_surface);
     rsvg_term ();
 }
