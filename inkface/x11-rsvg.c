@@ -140,8 +140,82 @@ get_rect_node_dimensions(
     return;
 }
 
+
+void test1(void)
+{
+    #define W_WIDTH 800
+    #define W_HEIGHT 480
+
+    Window win,rwin;
+    Display *dpy=NULL;
+    int screen = 0;
+    int w=800, h=480;
+    int x=0, y=0;
+    Pixmap pix;
+    XGCValues gcv;
+    GC gc;
+
+    ASSERT(dpy = XOpenDisplay(0));
+
+    ASSERT(rwin = DefaultRootWindow(dpy));
+    screen = DefaultScreen(dpy);
+
+    ASSERT(win = XCreateSimpleWindow(
+                    dpy,
+                    rwin,
+                    x, y,
+                    W_WIDTH,W_HEIGHT,
+                    0,
+                    BlackPixel(dpy,screen),
+                    BlackPixel(dpy,screen)));
+
+    XClearWindow(dpy,win);
+    XMapWindow(dpy, win);
+
+    cairo_surface_t *surface = NULL;
+    cairo_t *cr = NULL;
+    Visual *visual = DefaultVisual(dpy,DefaultScreen(dpy));
+    ASSERT(visual)
+
+    ASSERT(surface = cairo_xlib_surface_create(
+                        dpy, win, visual, W_WIDTH,W_HEIGHT));
+    ASSERT(cr = cairo_create(surface));
+
+
+    cairo_surface_t *source_surface = NULL;
+    cairo_t *source_cr = NULL;
+    ASSERT(source_surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, W_WIDTH, W_HEIGHT))
+    ASSERT(source_cr = cairo_create(source_surface))
+
+    //cairo_rectangle(source_cr,20,20,50,50);
+    //cairo_clip(source_cr);
+
+    cairo_set_source_rgb(source_cr,0.8,0.4,0.9);
+    cairo_rectangle(source_cr,20,20,100,100);
+    cairo_stroke(source_cr);
+
+
+    cairo_set_source_surface(source_cr,source_surface,0,0);
+    cairo_translate(source_cr,0,200);
+    cairo_paint(source_cr);
+
+    //double x1,x2,y1,y2;
+    //cairo_clip_extents(source_cr,&x1,&y1,&x2,&y2);
+    //printf("clip %f,%f,%f,%f\n",x1,y1,x2,y2);
+
+    cairo_set_source_surface(cr,source_surface,0,0);
+    cairo_paint(cr);
+
+
+    XFlush(dpy);
+
+    sleep(1);
+
+}
+
 int main(int argc, char *argv[])
 {
+
     Window win,rwin;
     Display *dpy=NULL;
     int screen = 0;
@@ -208,10 +282,17 @@ int main(int argc, char *argv[])
     rsvg_handle_calc_cairo_sub(handle,node_cr,argv[2]);
     */
 
+    int node_w=0,node_h=0;
     node_surface = get_piece_surface(handle,argv[2]);
 
+    node_w = cairo_image_surface_get_width(node_surface);
+    node_h = cairo_image_surface_get_height(node_surface);
     cairo_set_source_surface(ctx,node_surface,0,0);
     cairo_paint(ctx);
+
+    cairo_set_source_rgb(ctx,1,1,1);
+    cairo_rectangle(ctx,0,0,node_w,node_h);
+    cairo_stroke(ctx);
 
     XFlush(dpy);
 
