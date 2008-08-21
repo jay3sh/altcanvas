@@ -206,11 +206,9 @@ void test1(void)
     cairo_set_source_surface(cr,source_surface,0,0);
     cairo_paint(cr);
 
-
     XFlush(dpy);
 
     sleep(1);
-
 }
 
 int main(int argc, char *argv[])
@@ -283,21 +281,47 @@ int main(int argc, char *argv[])
     */
 
     int node_w=0,node_h=0;
-    node_surface = get_piece_surface(handle,argv[2]);
 
-    node_w = cairo_image_surface_get_width(node_surface);
-    node_h = cairo_image_surface_get_height(node_surface);
-    cairo_set_source_surface(ctx,node_surface,0,0);
-    cairo_paint(ctx);
+    int x_pos=0;
+    int y_pos=0;
 
+    GList *fkeys = rsvg_get_ids(handle->priv->defs);
+    GList *tmp_fkeys = fkeys;
+    char elemName[32];
+    while(fkeys){
+        if(fkeys->data){
+            memset(elemName,0,32);
+            strncpy(elemName,"#",1);
+            strncat(elemName,fkeys->data,30);
+            node_surface = get_piece_surface(handle,elemName);
+            cairo_set_source_surface(ctx,node_surface,x_pos,y_pos);
+            cairo_paint(ctx);
+        }
+        g_free(fkeys->data);
+        fkeys = fkeys->next;
+
+        x_pos += 50;
+        y_pos += 50*(x_pos/480);
+        x_pos %= 480;
+    }
+    g_list_free(tmp_fkeys);
+
+
+    //node_w = cairo_image_surface_get_width(node_surface);
+    //node_h = cairo_image_surface_get_height(node_surface);
+    //cairo_set_source_surface(ctx,node_surface,0,0);
+    //cairo_paint(ctx);
+
+    /*
     cairo_set_source_rgb(ctx,1,1,1);
     cairo_rectangle(ctx,0,0,node_w,node_h);
     cairo_stroke(ctx);
+    */
 
     XFlush(dpy);
 
-    sleep(1);
+    sleep(5);
 
-    cairo_surface_destroy(node_surface);
+    //cairo_surface_destroy(node_surface);
     rsvg_term ();
 }

@@ -3741,8 +3741,29 @@ diff -durN librsvg-2.22.1-my/gtk-engine/Makefile.in librsvg-2.22.1/gtk-engine/Ma
  
  # Tell versions [3.59,3.63) of GNU make to not export all variables.
  # Otherwise a system limit (for SysV at least) may be exceeded.
+diff -durN librsvg-2.22.1-my/inkface.h librsvg-2.22.1/inkface.h
+--- librsvg-2.22.1-my/inkface.h	2008-08-20 23:01:19.000000000 -0700
++++ librsvg-2.22.1/inkface.h	1969-12-31 16:00:00.000000000 -0800
+@@ -1,16 +0,0 @@
+-
+-#ifndef __INKFACE_H__
+-#define __INKFACE_H__
+-
+-struct _Element{
+-    cairo_surface_t *surface;
+-    int x;
+-    int y;
+-    int w;
+-    int h;
+-};
+-
+-typedef struct _Element Element;
+-
+-
+-#endif /*__INKFACE_H__ */
+Binary files librsvg-2.22.1-my/.inkface.h.swp and librsvg-2.22.1/.inkface.h.swp differ
 diff -durN librsvg-2.22.1-my/librsvg.def librsvg-2.22.1/librsvg.def
---- librsvg-2.22.1-my/librsvg.def	2008-08-06 22:25:55.000000000 -0700
+--- librsvg-2.22.1-my/librsvg.def	2008-08-20 00:38:20.000000000 -0700
 +++ librsvg-2.22.1/librsvg.def	2007-04-23 15:45:56.000000000 -0700
 @@ -15,7 +15,6 @@
  rsvg_handle_get_base_uri
@@ -3752,7 +3773,7 @@ diff -durN librsvg-2.22.1-my/librsvg.def librsvg-2.22.1/librsvg.def
  rsvg_handle_get_title
  rsvg_handle_get_desc
  rsvg_handle_get_metadata
-@@ -29,10 +28,8 @@
+@@ -29,11 +28,8 @@
  rsvg_pixbuf_from_file_at_zoom_with_max
  rsvg_handle_render_cairo
  rsvg_handle_render_cairo_sub
@@ -3763,6 +3784,7 @@ diff -durN librsvg-2.22.1-my/librsvg.def librsvg-2.22.1/librsvg.def
  _rsvg_register_types
  rsvg_pixbuf_from_data_with_size_data
 -rsvg_defs_lookup
+-rsvg_get_ids
 diff -durN librsvg-2.22.1-my/librsvg-enum-types.c librsvg-2.22.1/librsvg-enum-types.c
 --- librsvg-2.22.1-my/librsvg-enum-types.c	1969-12-31 16:00:00.000000000 -0800
 +++ librsvg-2.22.1/librsvg-enum-types.c	2008-02-20 07:25:33.000000000 -0800
@@ -9422,12 +9444,14 @@ diff -durN librsvg-2.22.1-my/rsvg-cairo-draw.h librsvg-2.22.1/rsvg-cairo-draw.h
  						     const RsvgBpathDef * path);
  void		 rsvg_cairo_render_image	    (RsvgDrawingCtx *ctx, const GdkPixbuf * img, 
 diff -durN librsvg-2.22.1-my/rsvg-cairo-render.c librsvg-2.22.1/rsvg-cairo-render.c
---- librsvg-2.22.1-my/rsvg-cairo-render.c	2008-08-16 19:05:40.000000000 -0700
+--- librsvg-2.22.1-my/rsvg-cairo-render.c	2008-08-20 23:01:57.000000000 -0700
 +++ librsvg-2.22.1/rsvg-cairo-render.c	2008-01-19 08:44:52.000000000 -0800
-@@ -37,12 +37,6 @@
+@@ -37,14 +37,6 @@
  #include "rsvg-styles.h"
  #include "rsvg-structure.h"
  
+-#include "inkface.h"
+-
 -void
 -rsvg_handle_render_cairo_sub_mod(
 -    RsvgHandle *handle,
@@ -9437,7 +9461,7 @@ diff -durN librsvg-2.22.1-my/rsvg-cairo-render.c librsvg-2.22.1/rsvg-cairo-rende
  static void
  rsvg_cairo_render_free (RsvgRender * self)
  {
-@@ -63,7 +57,6 @@
+@@ -65,7 +57,6 @@
      cairo_render->super.render_pango_layout = rsvg_cairo_render_pango_layout;
      cairo_render->super.render_image = rsvg_cairo_render_image;
      cairo_render->super.render_path = rsvg_cairo_render_path;
@@ -9445,7 +9469,7 @@ diff -durN librsvg-2.22.1-my/rsvg-cairo-render.c librsvg-2.22.1/rsvg-cairo-rende
      cairo_render->super.pop_discrete_layer = rsvg_cairo_pop_discrete_layer;
      cairo_render->super.push_discrete_layer = rsvg_cairo_push_discrete_layer;
      cairo_render->super.add_clipping_rect = rsvg_cairo_add_clipping_rect;
-@@ -115,106 +108,6 @@
+@@ -117,106 +108,6 @@
  }
  
  static RsvgDrawingCtx *
@@ -9552,7 +9576,7 @@ diff -durN librsvg-2.22.1-my/rsvg-cairo-render.c librsvg-2.22.1/rsvg-cairo-rende
  rsvg_cairo_new_drawing_ctx (cairo_t * cr, RsvgHandle * handle)
  {
      RsvgDimensionData data;
-@@ -230,25 +123,11 @@
+@@ -232,25 +123,11 @@
  
      draw = g_new (RsvgDrawingCtx, 1);
  
@@ -9578,7 +9602,7 @@ diff -durN librsvg-2.22.1-my/rsvg-cairo-render.c librsvg-2.22.1/rsvg-cairo-rende
      rsvg_cairo_transformed_image_bounding_box (&cairo_transform,
                                                 data.width, data.height,
                                                 &bbx0, &bby0, &bbx1, &bby1);
-@@ -262,8 +141,6 @@
+@@ -264,8 +141,6 @@
      render->offset_x = bbx0;
      render->offset_y = bby0;
  
@@ -9587,7 +9611,7 @@ diff -durN librsvg-2.22.1-my/rsvg-cairo-render.c librsvg-2.22.1/rsvg-cairo-rende
      draw->state = NULL;
  
      /* should this be G_ALLOC_ONLY? */
-@@ -310,71 +187,6 @@
+@@ -312,71 +187,6 @@
      return draw;
  }
  
@@ -9659,7 +9683,7 @@ diff -durN librsvg-2.22.1-my/rsvg-cairo-render.c librsvg-2.22.1/rsvg-cairo-rende
  /**
   * rsvg_handle_render_cairo_sub
   * @handle: A RsvgHandle
-@@ -387,101 +199,9 @@
+@@ -389,101 +199,9 @@
   *
   * Since: 2.14
   */
@@ -9761,7 +9785,7 @@ diff -durN librsvg-2.22.1-my/rsvg-cairo-render.c librsvg-2.22.1/rsvg-cairo-rende
      RsvgDrawingCtx *draw;
      RsvgNode *drawsub = NULL;
  
-@@ -510,8 +230,6 @@
+@@ -512,8 +230,6 @@
      cairo_restore (cr);
      rsvg_state_pop (draw);
      rsvg_drawing_ctx_free (draw);
@@ -9771,13 +9795,54 @@ diff -durN librsvg-2.22.1-my/rsvg-cairo-render.c librsvg-2.22.1/rsvg-cairo-rende
  
  /**
 Binary files librsvg-2.22.1-my/.rsvg-cairo-render.c.swp and librsvg-2.22.1/.rsvg-cairo-render.c.swp differ
+diff -durN librsvg-2.22.1-my/rsvg-defs.c librsvg-2.22.1/rsvg-defs.c
+--- librsvg-2.22.1-my/rsvg-defs.c	2008-08-19 00:37:05.000000000 -0700
++++ librsvg-2.22.1/rsvg-defs.c	2007-04-23 15:45:56.000000000 -0700
+@@ -70,35 +70,6 @@
+     self->base_uri = base_uri;
+ }
+ 
+-void *
+-rsvg_get_ids(const RsvgDefs *defs)
+-{
+-    TRACE_ENTER
+-    GList *keys = NULL;
+-    GList *fkeys = NULL;
+-    keys = g_hash_table_get_keys(defs->hash);
+-
+-    if(!keys)
+-        return NULL;
+-
+-    fkeys = g_list_alloc();
+-
+-    while(keys)
+-    {
+-        int is_g = !strncmp("g",keys->data,1);
+-        int is_rect = !strncmp("rect",keys->data,4);
+-        int is_path = !strncmp("path",keys->data,4);
+-
+-        if(is_g || is_rect || is_path){
+-            fkeys = g_list_append(fkeys,strdup(keys->data));
+-        }
+-        keys = keys->next;
+-    }
+-
+-    TRACE_EXIT
+-    return fkeys;
+-}
+-
+ static int
+ rsvg_defs_load_extern (const RsvgDefs * defs, const char *name)
+ {
 diff -durN librsvg-2.22.1-my/rsvg-defs.h librsvg-2.22.1/rsvg-defs.h
---- librsvg-2.22.1-my/rsvg-defs.h	2008-08-06 00:10:00.000000000 -0700
+--- librsvg-2.22.1-my/rsvg-defs.h	2008-08-19 00:35:18.000000000 -0700
 +++ librsvg-2.22.1/rsvg-defs.h	2007-04-23 15:45:56.000000000 -0700
-@@ -42,30 +42,5 @@
+@@ -42,32 +42,5 @@
  void	     rsvg_defs_register_name	(RsvgDefs * defs, const char *name, RsvgNode * val);
  void	     rsvg_defs_register_memory	(RsvgDefs * defs, RsvgNode * val);
  
+-void *svg_get_ids(const RsvgDefs *defs);
+-
 -extern int function_depth;
 -#define PRINT_FUNCTION_DEPTH \
 -    { \
@@ -9837,32 +9902,28 @@ diff -durN librsvg-2.22.1-my/rsvg-private.h librsvg-2.22.1/rsvg-private.h
  };
  
 diff -durN librsvg-2.22.1-my/rsvg-shapes.c librsvg-2.22.1/rsvg-shapes.c
---- librsvg-2.22.1-my/rsvg-shapes.c	2008-08-05 23:47:59.000000000 -0700
+--- librsvg-2.22.1-my/rsvg-shapes.c	2008-08-17 21:14:01.000000000 -0700
 +++ librsvg-2.22.1/rsvg-shapes.c	2007-04-23 15:45:56.000000000 -0700
-@@ -49,22 +49,6 @@
+@@ -49,18 +49,6 @@
  }
  
  static void
 -rsvg_node_path_calc (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 -{
--    TRACE_ENTER
 -    RsvgNodePath *path = (RsvgNodePath *) self;
 -    if (!path->d)
 -        return;
 -
 -    rsvg_state_reinherit_top (ctx, self->state, dominate);
 -
--
 -    rsvg_calc_path (ctx, path->d);
--    
--    TRACE_EXIT
 -}
 -
 -static void
  rsvg_node_path_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
  {
      RsvgNodePath *path = (RsvgNodePath *) self;
-@@ -108,7 +92,6 @@
+@@ -104,7 +92,6 @@
      path->d = NULL;
      path->super.free = rsvg_node_path_free;
      path->super.draw = rsvg_node_path_draw;
@@ -9870,92 +9931,90 @@ diff -durN librsvg-2.22.1-my/rsvg-shapes.c librsvg-2.22.1/rsvg-shapes.c
      path->super.set_atts = rsvg_node_path_set_atts;
  
      return &path->super;
-@@ -149,45 +132,6 @@
+@@ -144,8 +131,8 @@
+ 
  }
  
- static void
+-GString *
+-_rsvg_node_poly_to_path(RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
++static void
++_rsvg_node_poly_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
+ {
+     RsvgNodePoly *poly = (RsvgNodePoly *) self;
+     gsize i;
+@@ -175,29 +162,6 @@
+     if (!poly->is_polyline)
+         g_string_append (d, " Z");
+ 
+-    return d;
+-}
+-
+-static void
 -_rsvg_node_poly_calc (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 -{
--    TRACE_ENTER
--    RsvgNodePoly *poly = (RsvgNodePoly *) self;
--    gsize i;
--    GString *d;
--    char buf[G_ASCII_DTOSTR_BUF_SIZE];
+-    GString *d = NULL;
 -
--    /* represent as a "moveto, lineto*, close" path */
--    if (poly->pointlist_len < 2)
--        return;
--
--    d = g_string_new (NULL);
--
--    /*      "M %f %f " */
--    g_string_append (d, " M ");
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), poly->pointlist[0]));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), poly->pointlist[1]));
--
--    /* "L %f %f " */
--    for (i = 2; i < poly->pointlist_len; i += 2) {
--        g_string_append (d, " L ");
--        g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), poly->pointlist[i]));
--        g_string_append_c (d, ' ');
--        g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), poly->pointlist[i + 1]));
--    }
--
--    if (!poly->is_polyline)
--        g_string_append (d, " Z");
+-    d = _rsvg_node_poly_to_path(self,ctx,dominate);
 -
 -    rsvg_state_reinherit_top (ctx, self->state, dominate);
 -    rsvg_calc_path (ctx, d->str);
 -
 -    g_string_free (d, TRUE);
--    TRACE_EXIT
 -}
 -
 -static void
- _rsvg_node_poly_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
- {
-     RsvgNodePoly *poly = (RsvgNodePoly *) self;
-@@ -297,38 +241,6 @@
+-_rsvg_node_poly_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
+-{
+-    GString *d = NULL;
+-
+-    d = _rsvg_node_poly_to_path(self,ctx,dominate);
+-
+     rsvg_state_reinherit_top (ctx, self->state, dominate);
+     rsvg_render_path (ctx, d->str);
+ 
+@@ -276,8 +240,8 @@
+     }
  }
  
- static void
+-GString *
+-_rsvg_node_line_to_path (RsvgNode * overself, RsvgDrawingCtx * ctx, int dominate)
++static void
++_rsvg_node_line_draw (RsvgNode * overself, RsvgDrawingCtx * ctx, int dominate)
+ {
+     GString *d;
+     char buf[G_ASCII_DTOSTR_BUF_SIZE];
+@@ -299,30 +263,6 @@
+     g_string_append (d, g_ascii_dtostr (buf, sizeof (buf),
+                                         _rsvg_css_normalize_length (&self->y2, ctx, 'v')));
+ 
+-    return d;
+-}
+-
+-static void
 -_rsvg_node_line_calc (RsvgNode * overself, RsvgDrawingCtx * ctx, int dominate)
 -{
--    TRACE_ENTER
--    GString *d;
--    char buf[G_ASCII_DTOSTR_BUF_SIZE];
--    RsvgNodeLine *self = (RsvgNodeLine *) overself;
+-    GString *d = NULL;
 -
--    /* emulate a line using a path */
--    /* ("M %f %f L %f %f", x1, y1, x2, y2) */
--    d = g_string_new ("M ");
--
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf),
--                                        _rsvg_css_normalize_length (&self->x1, ctx, 'h')));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf),
--                                        _rsvg_css_normalize_length (&self->y1, ctx, 'v')));
--    g_string_append (d, " L ");
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf),
--                                        _rsvg_css_normalize_length (&self->x2, ctx, 'h')));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf),
--                                        _rsvg_css_normalize_length (&self->y2, ctx, 'v')));
+-    d = _rsvg_node_line_to_path(overself,ctx,dominate);
 -
 -    rsvg_state_reinherit_top (ctx, overself->state, dominate);
 -    rsvg_calc_path (ctx, d->str);
 -
 -    g_string_free (d, TRUE);
 -
--    TRACE_EXIT
 -}
 -
 -static void
- _rsvg_node_line_draw (RsvgNode * overself, RsvgDrawingCtx * ctx, int dominate)
- {
-     GString *d;
-@@ -364,7 +276,6 @@
+-_rsvg_node_line_draw (RsvgNode * overself, RsvgDrawingCtx * ctx, int dominate)
+-{
+-    GString *d = NULL;
+-
+-    d = _rsvg_node_line_to_path(overself,ctx,dominate);
+-
+     rsvg_state_reinherit_top (ctx, overself->state, dominate);
+     rsvg_render_path (ctx, d->str);
+ 
+@@ -336,7 +276,6 @@
      line = g_new (RsvgNodeLine, 1);
      _rsvg_node_init (&line->super);
      line->super.draw = _rsvg_node_line_draw;
@@ -9963,163 +10022,53 @@ diff -durN librsvg-2.22.1-my/rsvg-shapes.c librsvg-2.22.1/rsvg-shapes.c
      line->super.set_atts = _rsvg_node_line_set_atts;
      line->x1 = line->x2 = line->y1 = line->y2 = _rsvg_css_parse_length ("0");
      return &line->super;
-@@ -413,133 +324,8 @@
+@@ -384,8 +323,8 @@
+     }
  }
  
- static void
--_rsvg_node_rect_draw_impl (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate,int relative)
--{
--    double x, y, w, h, rx, ry;
--    GString *d = NULL;
--    RsvgNodeRect *rect = (RsvgNodeRect *) self;
--    char buf[G_ASCII_DTOSTR_BUF_SIZE];
--
--    relative = 0;
--    if(relative) {
--        x = _rsvg_css_normalize_length (&rect->x, ctx, 'h');
--        y = _rsvg_css_normalize_length (&rect->y, ctx, 'v');
--    } else {
--        x = y = 0.;
--    }
--    w = _rsvg_css_normalize_length (&rect->w, ctx, 'h');
--    h = _rsvg_css_normalize_length (&rect->h, ctx, 'v');
--    rx = _rsvg_css_normalize_length (&rect->rx, ctx, 'h');
--    ry = _rsvg_css_normalize_length (&rect->ry, ctx, 'v');
--
--    if (rect->got_rx)
--        rx = rx;
--    else
--        rx = ry;
--    if (rect->got_ry)
--        ry = ry;
--    else
--        ry = rx;
--
--    if (rx > fabs (w / 2.))
--        rx = fabs (w / 2.);
--    if (ry > fabs (h / 2.))
--        ry = fabs (h / 2.);
--
--    if (rx == 0)
--        ry = 0;
--    else if (ry == 0)
--        rx = 0;
--
--    /* emulate a rect using a path */
--    d = g_string_new ("M ");
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), x + rx));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), y));
--
--    g_string_append (d, " H ");
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), x + w - rx));
--
--    g_string_append (d, " A");
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), rx));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), ry));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), 0.));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), 0.));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), 1.));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), x + w));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), y + ry));
--
--    g_string_append (d, " V ");
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), y + h - ry));
--
--    g_string_append (d, " A");
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), rx));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), ry));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), 0.));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), 0.));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), 1.));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), x + w - rx));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), y + h));
--
--    g_string_append (d, " H ");
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), x + rx));
--
--    g_string_append (d, " A");
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), rx));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), ry));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), 0.));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), 0.));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), 1.));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), x));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), y + h - ry));
--
--    g_string_append (d, " V ");
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), y + ry));
--
--    g_string_append (d, " A");
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), rx));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), ry));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), 0.));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), 0.));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), 1.));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), x + rx));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), y));
--
--    g_string_append (d, " Z");
--
--    rsvg_state_reinherit_top (ctx, self->state, dominate);
--    rsvg_render_path (ctx, d->str);
--    g_string_free (d, TRUE);
--}
--
--static void
--_rsvg_node_rect_calc (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
+-GString *
+-_rsvg_node_rect_to_path(RsvgNode *self, RsvgDrawingCtx *ctx, int dominate)
++static void
 +_rsvg_node_rect_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
  {
--    TRACE_ENTER
      double x, y, w, h, rx, ry;
      GString *d = NULL;
-     RsvgNodeRect *rect = (RsvgNodeRect *) self;
-@@ -652,19 +438,10 @@
+@@ -498,34 +437,11 @@
+ 
      g_string_append (d, " Z");
  
-     rsvg_state_reinherit_top (ctx, self->state, dominate);
--    rsvg_calc_path (ctx, d->str);
-+    rsvg_render_path (ctx, d->str);
-     g_string_free (d, TRUE);
--
--    TRACE_EXIT
+-    return d;
 -}
 -
 -static void
 -_rsvg_node_rect_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 -{
--    _rsvg_node_rect_draw_impl(self,ctx,dominate,1);
+-    GString *d = NULL;
+-
+-    d = _rsvg_node_rect_to_path(self,ctx,dominate);
+-
+     rsvg_state_reinherit_top (ctx, self->state, dominate);
+     rsvg_render_path (ctx, d->str);
+     g_string_free (d, TRUE);
  }
  
+-static void
+-_rsvg_node_rect_calc (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
+-{
+-    GString *d = NULL;
+-
+-    d = _rsvg_node_rect_to_path(self,ctx,dominate);
+-
+-    rsvg_state_reinherit_top (ctx, self->state, dominate);
+-    rsvg_calc_path (ctx, d->str);
+-    g_string_free (d, TRUE);
+-}
+-
 -
  RsvgNode *
  rsvg_new_rect (void)
  {
-@@ -672,7 +449,6 @@
+@@ -533,7 +449,6 @@
      rect = g_new (RsvgNodeRect, 1);
      _rsvg_node_init (&rect->super);
      rect->super.draw = _rsvg_node_rect_draw;
@@ -10127,99 +10076,48 @@ diff -durN librsvg-2.22.1-my/rsvg-shapes.c librsvg-2.22.1/rsvg-shapes.c
      rect->super.set_atts = _rsvg_node_rect_set_atts;
      rect->x = rect->y = rect->w = rect->h = rect->rx = rect->ry = _rsvg_css_parse_length ("0");
      rect->got_rx = rect->got_ry = FALSE;
-@@ -711,91 +487,6 @@
+@@ -571,8 +486,8 @@
+     }
  }
  
- static void
+-GString *
+-_rsvg_node_circle_to_path(RsvgNode *self, RsvgDrawingCtx *ctx, int dominate)
++static void
++_rsvg_node_circle_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
+ {
+     GString *d = NULL;
+     RsvgNodeCircle *circle = (RsvgNodeCircle *) self;
+@@ -647,29 +562,6 @@
+ 
+     g_string_append (d, " Z");
+ 
+-    return d;
+-}
+-
+-static void
 -_rsvg_node_circle_calc (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 -{
--    TRACE_ENTER
 -    GString *d = NULL;
--    RsvgNodeCircle *circle = (RsvgNodeCircle *) self;
--    char buf[G_ASCII_DTOSTR_BUF_SIZE];
--    double cx, cy, r;
 -
--    cx = _rsvg_css_normalize_length (&circle->cx, ctx, 'h');
--    cy = _rsvg_css_normalize_length (&circle->cy, ctx, 'v');
--    r = _rsvg_css_normalize_length (&circle->r, ctx, 'o');
--
--    if (r <= 0)
--        return;
--
--    /* approximate a circle using 4 bezier curves */
--
--    d = g_string_new ("M ");
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cx + r));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cy));
--
--    g_string_append (d, " C ");
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cx + r));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cy + r * RSVG_ARC_MAGIC));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cx + r * RSVG_ARC_MAGIC));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cy + r));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cx));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cy + r));
--
--    g_string_append (d, " C ");
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cx - r * RSVG_ARC_MAGIC));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cy + r));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cx - r));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cy + r * RSVG_ARC_MAGIC));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cx - r));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cy));
--
--    g_string_append (d, " C ");
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cx - r));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cy - r * RSVG_ARC_MAGIC));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cx - r * RSVG_ARC_MAGIC));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cy - r));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cx));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cy - r));
--
--    g_string_append (d, " C ");
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cx + r * RSVG_ARC_MAGIC));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cy - r));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cx + r));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cy - r * RSVG_ARC_MAGIC));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cx + r));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cy));
--
--    g_string_append (d, " Z");
+-    d = _rsvg_node_circle_to_path(self,ctx,dominate);
 -
 -    rsvg_state_reinherit_top (ctx, self->state, dominate);
 -    rsvg_calc_path (ctx, d->str);
 -
 -    g_string_free (d, TRUE);
--
--    TRACE_EXIT
 -}
 -
 -static void
- _rsvg_node_circle_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
- {
-     GString *d = NULL;
-@@ -884,7 +575,6 @@
+-_rsvg_node_circle_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
+-{
+-    GString *d = NULL;
+-
+-    d = _rsvg_node_circle_to_path(self,ctx,dominate);
+-
+     rsvg_state_reinherit_top (ctx, self->state, dominate);
+     rsvg_render_path (ctx, d->str);
+ 
+@@ -683,7 +575,6 @@
      circle = g_new (RsvgNodeCircle, 1);
      _rsvg_node_init (&circle->super);
      circle->super.draw = _rsvg_node_circle_draw;
@@ -10227,98 +10125,47 @@ diff -durN librsvg-2.22.1-my/rsvg-shapes.c librsvg-2.22.1/rsvg-shapes.c
      circle->super.set_atts = _rsvg_node_circle_set_atts;
      circle->cx = circle->cy = circle->r = _rsvg_css_parse_length ("0");
      return &circle->super;
-@@ -924,90 +614,6 @@
+@@ -722,8 +613,8 @@
+     }
  }
  
- static void
+-GString *
+-_rsvg_node_ellipse_to_path(RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
++static void
++_rsvg_node_ellipse_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
+ {
+     RsvgNodeEllipse *ellipse = (RsvgNodeEllipse *) self;
+     GString *d = NULL;
+@@ -798,28 +689,6 @@
+ 
+     g_string_append (d, " Z");
+ 
+-    return d;
+-}
+-
+-static void
 -_rsvg_node_ellipse_calc (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 -{
--    TRACE_ENTER
--    RsvgNodeEllipse *ellipse = (RsvgNodeEllipse *) self;
 -    GString *d = NULL;
--    char buf[G_ASCII_DTOSTR_BUF_SIZE];
--    double cx, cy, rx, ry;
 -
--    cx = _rsvg_css_normalize_length (&ellipse->cx, ctx, 'h');
--    cy = _rsvg_css_normalize_length (&ellipse->cy, ctx, 'v');
--    rx = _rsvg_css_normalize_length (&ellipse->rx, ctx, 'h');
--    ry = _rsvg_css_normalize_length (&ellipse->ry, ctx, 'v');
--
--    if (rx <= 0 || ry <= 0)
--        return;
--    /* approximate an ellipse using 4 bezier curves */
--
--    d = g_string_new ("M ");
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cx + rx));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cy));
--
--    g_string_append (d, " C ");
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cx + rx));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cy - RSVG_ARC_MAGIC * ry));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cx + RSVG_ARC_MAGIC * rx));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cy - ry));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cx));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cy - ry));
--
--    g_string_append (d, " C ");
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cx - RSVG_ARC_MAGIC * rx));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cy - ry));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cx - rx));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cy - RSVG_ARC_MAGIC * ry));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cx - rx));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cy));
--
--    g_string_append (d, " C ");
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cx - rx));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cy + RSVG_ARC_MAGIC * ry));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cx - RSVG_ARC_MAGIC * rx));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cy + ry));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cx));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cy + ry));
--
--    g_string_append (d, " C ");
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cx + RSVG_ARC_MAGIC * rx));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cy + ry));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cx + rx));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cy + RSVG_ARC_MAGIC * ry));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cx + rx));
--    g_string_append_c (d, ' ');
--    g_string_append (d, g_ascii_dtostr (buf, sizeof (buf), cy));
--
--    g_string_append (d, " Z");
+-    d = _rsvg_node_ellipse_to_path(self,ctx,dominate);
 -
 -    rsvg_state_reinherit_top (ctx, self->state, dominate);
 -    rsvg_calc_path (ctx, d->str);
 -    g_string_free (d, TRUE);
--
--    TRACE_EXIT
 -}
 -
 -static void
- _rsvg_node_ellipse_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
- {
-     RsvgNodeEllipse *ellipse = (RsvgNodeEllipse *) self;
-@@ -1095,7 +701,6 @@
+-_rsvg_node_ellipse_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
+-{
+-    GString *d = NULL;
+-
+-    d = _rsvg_node_ellipse_to_path(self,ctx,dominate);
+-
+     rsvg_state_reinherit_top (ctx, self->state, dominate);
+     rsvg_render_path (ctx, d->str);
+     g_string_free (d, TRUE);
+@@ -832,7 +701,6 @@
      ellipse = g_new (RsvgNodeEllipse, 1);
      _rsvg_node_init (&ellipse->super);
      ellipse->super.draw = _rsvg_node_ellipse_draw;
@@ -10327,15 +10174,14 @@ diff -durN librsvg-2.22.1-my/rsvg-shapes.c librsvg-2.22.1/rsvg-shapes.c
      ellipse->cx = ellipse->cy = ellipse->rx = ellipse->ry = _rsvg_css_parse_length ("0");
      return &ellipse->super;
 diff -durN librsvg-2.22.1-my/rsvg-structure.c librsvg-2.22.1/rsvg-structure.c
---- librsvg-2.22.1-my/rsvg-structure.c	2008-08-16 11:29:08.000000000 -0700
+--- librsvg-2.22.1-my/rsvg-structure.c	2008-08-17 21:16:13.000000000 -0700
 +++ librsvg-2.22.1/rsvg-structure.c	2008-02-24 07:28:18.000000000 -0800
-@@ -34,38 +34,8 @@
+@@ -34,30 +34,6 @@
  #include <stdio.h>
  
  void
 -rsvg_node_calc (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 -{
--    TRACE_ENTER
 -    RsvgState *state;
 -    GSList *stacksave;
 -
@@ -10344,72 +10190,48 @@ diff -durN librsvg-2.22.1-my/rsvg-structure.c librsvg-2.22.1/rsvg-structure.c
 -    stacksave = ctx->drawsub_stack;
 -    if (stacksave) {
 -        if (stacksave->data != self){
--            TRACE_EXIT
 -            return;
 -        }
 -        ctx->drawsub_stack = stacksave->next;
 -    }
 -    if (!state->visible){
--        TRACE_EXIT
 -        return;
 -    }
 -
 -    gchar *nodeType = self->type->str;
--    LOG("nodeType = %s\n",nodeType);
 -    self->calc (self, ctx, dominate);
 -    ctx->drawsub_stack = stacksave;
--
--    TRACE_EXIT
 -}
+-
 -void
  rsvg_node_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
  {
--    TRACE_ENTER
      RsvgState *state;
-     GSList *stacksave;
- 
-@@ -73,27 +43,21 @@
+@@ -67,14 +43,12 @@
  
      stacksave = ctx->drawsub_stack;
      if (stacksave) {
 -        if (stacksave->data != self){
--            TRACE_EXIT
 +        if (stacksave->data != self)
              return;
 -        }
          ctx->drawsub_stack = stacksave->next;
      }
 -    if (!state->visible){
--        TRACE_EXIT
 +    if (!state->visible)
          return;
 -    }
  
      self->draw (self, ctx, dominate);
      ctx->drawsub_stack = stacksave;
--    TRACE_EXIT
+@@ -99,25 +73,6 @@
+         rsvg_pop_discrete_layer (ctx);
  }
  
- /* generic function for drawing all of the children of a particular node */
- void
- _rsvg_node_draw_children (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
- {
--    TRACE_ENTER
-     guint i;
-     if (dominate != -1) {
-         rsvg_state_reinherit_top (ctx, self->state, dominate);
-@@ -107,50 +71,17 @@
-     }
-     if (dominate != -1)
-         rsvg_pop_discrete_layer (ctx);
--    TRACE_EXIT
--}
--
 -/* generic function for drawing all of the children of a particular node */
 -void
 -_rsvg_node_calc_children (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 -{
--    TRACE_ENTER
 -    guint i;
 -    if (dominate != -1) {
 -        rsvg_state_reinherit_top (ctx, self->state, dominate);
@@ -10423,33 +10245,24 @@ diff -durN librsvg-2.22.1-my/rsvg-structure.c librsvg-2.22.1/rsvg-structure.c
 -    }
 -    if (dominate != -1)
 -        rsvg_pop_discrete_layer (ctx);
--    TRACE_EXIT
- }
- 
+-}
+-
  /* generic function that doesn't draw anything at all */
  static void
  _rsvg_node_draw_nothing (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
- {
--    TRACE_ENTER
--    TRACE_EXIT
--}
--
--static void
--_rsvg_node_calc_nothing (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
--{
--    TRACE_ENTER
--    TRACE_EXIT
+@@ -125,11 +80,6 @@
  }
  
  static void
+-_rsvg_node_calc_nothing (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
+-{
+-}
+-
+-static void
  _rsvg_node_dont_set_atts (RsvgNode * node, RsvgHandle * ctx, RsvgPropertyBag * atts)
  {
--    TRACE_ENTER
--    TRACE_EXIT
  }
- 
- void
-@@ -162,7 +93,6 @@
+@@ -143,7 +93,6 @@
      rsvg_state_init (self->state);
      self->free = _rsvg_node_free;
      self->draw = _rsvg_node_draw_nothing;
@@ -10457,7 +10270,7 @@ diff -durN librsvg-2.22.1-my/rsvg-structure.c librsvg-2.22.1/rsvg-structure.c
      self->set_atts = _rsvg_node_dont_set_atts;
      self->type = NULL;
  }
-@@ -212,7 +142,6 @@
+@@ -193,7 +142,6 @@
      group = g_new (RsvgNodeGroup, 1);
      _rsvg_node_init (&group->super);
      group->super.draw = _rsvg_node_draw_children;
@@ -10465,24 +10278,14 @@ diff -durN librsvg-2.22.1-my/rsvg-structure.c librsvg-2.22.1/rsvg-structure.c
      group->super.set_atts = rsvg_node_group_set_atts;
      return &group->super;
  }
-@@ -251,7 +180,6 @@
- static void
- rsvg_node_use_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
- {
--    TRACE_ENTER
-     RsvgNodeUse *use = (RsvgNodeUse *) self;
-     RsvgNode *child;
-     RsvgState *state;
-@@ -314,84 +242,12 @@
+@@ -294,75 +242,7 @@
          if (symbol->vbox.active)
              _rsvg_pop_view_box (ctx);
      }
--    TRACE_EXIT
 -}
 -static void
 -rsvg_node_svg_calc (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 -{
--    TRACE_ENTER
 -    RsvgNodeSvg *sself;
 -    RsvgState *state;
 -    gdouble affine[6], affine_old[6], affine_new[6];
@@ -10501,7 +10304,7 @@ diff -durN librsvg-2.22.1-my/rsvg-structure.c librsvg-2.22.1/rsvg-structure.c
 -
 -    for (i = 0; i < 6; i++)
 -        affine_old[i] = state->affine[i];
--
+ 
 -    if (sself->vbox.active) {
 -        double x = nx, y = ny, w = nw, h = nh;
 -        rsvg_preserve_aspect_ratio (sself->preserve_aspect_ratio,
@@ -10545,20 +10348,13 @@ diff -durN librsvg-2.22.1-my/rsvg-structure.c librsvg-2.22.1/rsvg-structure.c
 -        rsvg_node_calc (g_ptr_array_index (self->children, i), ctx, 0);
 -        rsvg_state_pop (ctx);
 -    }
- 
+-
 -    rsvg_pop_discrete_layer (ctx);
 -    _rsvg_pop_view_box (ctx);
--    TRACE_EXIT
  }
  
  static void
- rsvg_node_svg_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
- {
--    TRACE_ENTER
-     RsvgNodeSvg *sself;
-     RsvgState *state;
-     gdouble affine[6], affine_old[6], affine_new[6];
-@@ -449,7 +305,6 @@
+@@ -425,7 +305,6 @@
      }
  
      for (i = 0; i < self->children->len; i++) {
@@ -10566,15 +10362,7 @@ diff -durN librsvg-2.22.1-my/rsvg-structure.c librsvg-2.22.1/rsvg-structure.c
          rsvg_state_push (ctx);
          rsvg_node_draw (g_ptr_array_index (self->children, i), ctx, 0);
          rsvg_state_pop (ctx);
-@@ -457,7 +312,6 @@
- 
-     rsvg_pop_discrete_layer (ctx);
-     _rsvg_pop_view_box (ctx);
--    TRACE_EXIT
- }
- 
- static void
-@@ -508,7 +362,6 @@
+@@ -483,7 +362,6 @@
      svg->w = _rsvg_css_parse_length ("100%");
      svg->h = _rsvg_css_parse_length ("100%");
      svg->super.draw = rsvg_node_svg_draw;
@@ -10582,7 +10370,7 @@ diff -durN librsvg-2.22.1-my/rsvg-structure.c librsvg-2.22.1/rsvg-structure.c
      svg->super.set_atts = rsvg_node_svg_set_atts;
      return &svg->super;
  }
-@@ -603,7 +456,6 @@
+@@ -578,7 +456,6 @@
      group = g_new (RsvgNodeGroup, 1);
      _rsvg_node_init (&group->super);
      group->super.draw = _rsvg_node_draw_nothing;
@@ -10590,22 +10378,6 @@ diff -durN librsvg-2.22.1-my/rsvg-structure.c librsvg-2.22.1/rsvg-structure.c
      group->super.set_atts = rsvg_node_group_set_atts;
      return &group->super;
  }
-@@ -611,7 +463,6 @@
- static void
- _rsvg_node_switch_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
- {
--    TRACE_ENTER
-     guint i;
- 
-     rsvg_state_reinherit_top (ctx, self->state, dominate);
-@@ -631,7 +482,6 @@
-     }
- 
-     rsvg_pop_discrete_layer (ctx);
--    TRACE_EXIT
- }
- 
- RsvgNode *
 diff -durN librsvg-2.22.1-my/test-display.c librsvg-2.22.1/test-display.c
 --- librsvg-2.22.1-my/test-display.c	2008-07-12 14:55:40.000000000 -0700
 +++ librsvg-2.22.1/test-display.c	2008-02-24 08:28:01.000000000 -0800
@@ -11354,9 +11126,9 @@ diff -durN librsvg-2.22.1-my/update-index.sh librsvg-2.22.1/update-index.sh
 -cscope -R -b
 -
 diff -durN librsvg-2.22.1-my/x11-rsvg.c librsvg-2.22.1/x11-rsvg.c
---- librsvg-2.22.1-my/x11-rsvg.c	2008-08-16 16:22:47.000000000 -0700
+--- librsvg-2.22.1-my/x11-rsvg.c	2008-08-20 21:52:41.000000000 -0700
 +++ librsvg-2.22.1/x11-rsvg.c	1969-12-31 16:00:00.000000000 -0800
-@@ -1,303 +0,0 @@
+@@ -1,327 +0,0 @@
 -#include "rsvg.h"
 -#include "rsvg-cairo.h"
 -#include "rsvg-cairo-draw.h"
@@ -11565,11 +11337,9 @@ diff -durN librsvg-2.22.1-my/x11-rsvg.c librsvg-2.22.1/x11-rsvg.c
 -    cairo_set_source_surface(cr,source_surface,0,0);
 -    cairo_paint(cr);
 -
--
 -    XFlush(dpy);
 -
 -    sleep(1);
--
 -}
 -
 -int main(int argc, char *argv[])
@@ -11642,21 +11412,47 @@ diff -durN librsvg-2.22.1-my/x11-rsvg.c librsvg-2.22.1/x11-rsvg.c
 -    */
 -
 -    int node_w=0,node_h=0;
--    node_surface = get_piece_surface(handle,argv[2]);
 -
--    node_w = cairo_image_surface_get_width(node_surface);
--    node_h = cairo_image_surface_get_height(node_surface);
--    cairo_set_source_surface(ctx,node_surface,0,0);
--    cairo_paint(ctx);
+-    int x_pos=0;
+-    int y_pos=0;
 -
+-    GList *fkeys = rsvg_get_ids(handle->priv->defs);
+-    GList *tmp_fkeys = fkeys;
+-    char elemName[32];
+-    while(fkeys){
+-        if(fkeys->data){
+-            memset(elemName,0,32);
+-            strncpy(elemName,"#",1);
+-            strncat(elemName,fkeys->data,30);
+-            node_surface = get_piece_surface(handle,elemName);
+-            cairo_set_source_surface(ctx,node_surface,x_pos,y_pos);
+-            cairo_paint(ctx);
+-        }
+-        g_free(fkeys->data);
+-        fkeys = fkeys->next;
+-
+-        x_pos += 50;
+-        y_pos += 50*(x_pos/480);
+-        x_pos %= 480;
+-    }
+-    g_list_free(tmp_fkeys);
+-
+-
+-    //node_w = cairo_image_surface_get_width(node_surface);
+-    //node_h = cairo_image_surface_get_height(node_surface);
+-    //cairo_set_source_surface(ctx,node_surface,0,0);
+-    //cairo_paint(ctx);
+-
+-    /*
 -    cairo_set_source_rgb(ctx,1,1,1);
 -    cairo_rectangle(ctx,0,0,node_w,node_h);
 -    cairo_stroke(ctx);
+-    */
 -
 -    XFlush(dpy);
 -
--    sleep(1);
+-    sleep(5);
 -
--    cairo_surface_destroy(node_surface);
+-    //cairo_surface_destroy(node_surface);
 -    rsvg_term ();
 -}
