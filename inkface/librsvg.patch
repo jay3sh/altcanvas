@@ -3742,28 +3742,30 @@ diff -durN librsvg-2.22.1-my/gtk-engine/Makefile.in librsvg-2.22.1/gtk-engine/Ma
  # Tell versions [3.59,3.63) of GNU make to not export all variables.
  # Otherwise a system limit (for SysV at least) may be exceeded.
 diff -durN librsvg-2.22.1-my/inkface.h librsvg-2.22.1/inkface.h
---- librsvg-2.22.1-my/inkface.h	2008-08-20 23:01:19.000000000 -0700
+--- librsvg-2.22.1-my/inkface.h	2008-08-23 15:17:53.000000000 -0700
 +++ librsvg-2.22.1/inkface.h	1969-12-31 16:00:00.000000000 -0800
-@@ -1,16 +0,0 @@
+@@ -1,19 +0,0 @@
 -
 -#ifndef __INKFACE_H__
 -#define __INKFACE_H__
 -
 -struct _Element{
+-    cairo_t *cr;
 -    cairo_surface_t *surface;
 -    int x;
 -    int y;
 -    int w;
 -    int h;
+-    int order;
+-    char name[16];
 -};
 -
 -typedef struct _Element Element;
 -
 -
 -#endif /*__INKFACE_H__ */
-Binary files librsvg-2.22.1-my/.inkface.h.swp and librsvg-2.22.1/.inkface.h.swp differ
 diff -durN librsvg-2.22.1-my/librsvg.def librsvg-2.22.1/librsvg.def
---- librsvg-2.22.1-my/librsvg.def	2008-08-20 00:38:20.000000000 -0700
+--- librsvg-2.22.1-my/librsvg.def	2008-08-20 23:32:39.000000000 -0700
 +++ librsvg-2.22.1/librsvg.def	2007-04-23 15:45:56.000000000 -0700
 @@ -15,7 +15,6 @@
  rsvg_handle_get_base_uri
@@ -3777,7 +3779,7 @@ diff -durN librsvg-2.22.1-my/librsvg.def librsvg-2.22.1/librsvg.def
  rsvg_pixbuf_from_file_at_zoom_with_max
  rsvg_handle_render_cairo
  rsvg_handle_render_cairo_sub
--get_piece_surface
+-get_element
  rsvg_handle_get_type
  _rsvg_size_callback
  _rsvg_acquire_xlink_href_resource
@@ -9444,24 +9446,18 @@ diff -durN librsvg-2.22.1-my/rsvg-cairo-draw.h librsvg-2.22.1/rsvg-cairo-draw.h
  						     const RsvgBpathDef * path);
  void		 rsvg_cairo_render_image	    (RsvgDrawingCtx *ctx, const GdkPixbuf * img, 
 diff -durN librsvg-2.22.1-my/rsvg-cairo-render.c librsvg-2.22.1/rsvg-cairo-render.c
---- librsvg-2.22.1-my/rsvg-cairo-render.c	2008-08-20 23:01:57.000000000 -0700
+--- librsvg-2.22.1-my/rsvg-cairo-render.c	2008-08-23 15:21:31.000000000 -0700
 +++ librsvg-2.22.1/rsvg-cairo-render.c	2008-01-19 08:44:52.000000000 -0800
-@@ -37,14 +37,6 @@
+@@ -37,8 +37,6 @@
  #include "rsvg-styles.h"
  #include "rsvg-structure.h"
  
 -#include "inkface.h"
 -
--void
--rsvg_handle_render_cairo_sub_mod(
--    RsvgHandle *handle,
--    RsvgDrawingCtx *dctx, 
--    RsvgNode *piece_node);
--
  static void
  rsvg_cairo_render_free (RsvgRender * self)
  {
-@@ -65,7 +57,6 @@
+@@ -59,7 +57,6 @@
      cairo_render->super.render_pango_layout = rsvg_cairo_render_pango_layout;
      cairo_render->super.render_image = rsvg_cairo_render_image;
      cairo_render->super.render_path = rsvg_cairo_render_path;
@@ -9469,40 +9465,37 @@ diff -durN librsvg-2.22.1-my/rsvg-cairo-render.c librsvg-2.22.1/rsvg-cairo-rende
      cairo_render->super.pop_discrete_layer = rsvg_cairo_pop_discrete_layer;
      cairo_render->super.push_discrete_layer = rsvg_cairo_push_discrete_layer;
      cairo_render->super.add_clipping_rect = rsvg_cairo_add_clipping_rect;
-@@ -117,106 +108,6 @@
+@@ -111,64 +108,6 @@
  }
  
  static RsvgDrawingCtx *
--rsvg_cairo_new_drawing_ctx_mod (cairo_t *cr, int X, int Y, int W, int H, RsvgHandle * handle)
+-rsvg_cairo_new_drawing_ctx_mod (Element *element, RsvgHandle * handle)
 -{
--    TRACE_ENTER
 -    RsvgDrawingCtx *dctx;
 -    RsvgState *state;
 -    RsvgCairoRender *render;
 -    cairo_matrix_t cairo_transform;
--    RsvgDimensionData data;
 -    double affine[6], bbx0, bby0, bbx1, bby1;
+-
+-    element->surface = cairo_image_surface_create(
+-        CAIRO_FORMAT_ARGB32,element->w,element->h);
+-
+-    element->cr = cairo_create(element->surface);
 -
 -    dctx = g_new (RsvgDrawingCtx, 1);
 -
--    rsvg_handle_get_dimensions (handle, &data);
--    if (data.width == 0 || data.height == 0)
--        return NULL;
--
--
--    cairo_get_matrix (cr, &cairo_transform);
+-    cairo_get_matrix (element->cr, &cairo_transform);
 -
 -    rsvg_cairo_transformed_image_bounding_box (&cairo_transform,
--                                                W,H,
--                                               &bbx0, &bby0, &bbx1, &bby1);
--    render = rsvg_cairo_render_new (cr, bbx1 - bbx0, bby1 - bby0);
+-                                                element->w,element->h,
+-                                                &bbx0, &bby0, &bbx1, &bby1);
+-
+-    render = rsvg_cairo_render_new (element->cr, bbx1 - bbx0, bby1 - bby0);
 -
 -    if(!render)
 -        return NULL;
 -
 -    dctx->render = (RsvgRender *)render;
--    //render->offset_x = bbx0;
--    //render->offset_y = bby0;
 -
 -    dctx->state = NULL;
 -
@@ -9513,61 +9506,22 @@ diff -durN librsvg-2.22.1-my/rsvg-cairo-render.c librsvg-2.22.1/rsvg-cairo-rende
 -    dctx->base_uri = g_strdup (handle->priv->base_uri);
 -    dctx->dpi_x = handle->priv->dpi_x;
 -    dctx->dpi_y = handle->priv->dpi_y;
--    //dctx->vb.w = data.em;
--    //dctx->vb.h = data.ex;
 -    dctx->pango_context = NULL;
 -    dctx->drawsub_stack = NULL;
 -
 -    rsvg_state_push (dctx);
 -    state = rsvg_state_current (dctx);
 -
--    /* apply cairo transformation to our affine transform */
--    /*
--    affine[0] = cairo_transform.xx;
--    affine[1] = cairo_transform.yx;
--    affine[2] = cairo_transform.xy;
--    affine[3] = cairo_transform.yy;
--    affine[4] = cairo_transform.x0;
--    affine[5] = cairo_transform.y0;
--    _rsvg_affine_multiply (state->affine, affine, state->affine);
--    */
--
--    /* scale according to size set by size_func callback */
--    /*
--    affine[0] = W / data.em;
--    affine[1] = 0;
--    affine[2] = 0;
--    affine[3] = H / data.ex;
--    affine[4] = 0;
--    affine[5] = 0;
--    _rsvg_affine_multiply (state->affine, affine, state->affine);
--    */
--
--    /* adjust transform so that the corner of the bounding box above is
--     * at (0,0) - we compensate for this in _set_rsvg_affine() in
--     * rsvg-cairo-render.c and a few other places */
--    /*
--    state->affine[4] -= render->offset_x;
--    state->affine[5] -= render->offset_y;
--    */
--
--    LOG("translate %d,%d\n",X,Y);
 -    affine[0] = 1;
 -    affine[1] = 0;
 -    affine[2] = 0;
 -    affine[3] = 1;
--    affine[4] = -X;
--    affine[5] = -Y;
+-    affine[4] = -element->x;
+-    affine[5] = -element->y;
 -    _rsvg_affine_multiply (state->affine, affine, state->affine);
--    /*
--    cairo_matrix_t xlat_mat;
--    cairo_matrix_init_translate(&xlat_mat,-X,-Y);
--    cairo_set_matrix(cr,&xlat_mat);
--    */
 -
 -    rsvg_bbox_init (&((RsvgCairoRender *) dctx->render)->bbox, state->affine);
 -
--    TRACE_EXIT
 -    return dctx;
 -}
 -
@@ -9576,7 +9530,7 @@ diff -durN librsvg-2.22.1-my/rsvg-cairo-render.c librsvg-2.22.1/rsvg-cairo-rende
  rsvg_cairo_new_drawing_ctx (cairo_t * cr, RsvgHandle * handle)
  {
      RsvgDimensionData data;
-@@ -232,25 +123,11 @@
+@@ -184,25 +123,11 @@
  
      draw = g_new (RsvgDrawingCtx, 1);
  
@@ -9602,16 +9556,16 @@ diff -durN librsvg-2.22.1-my/rsvg-cairo-render.c librsvg-2.22.1/rsvg-cairo-rende
      rsvg_cairo_transformed_image_bounding_box (&cairo_transform,
                                                 data.width, data.height,
                                                 &bbx0, &bby0, &bbx1, &bby1);
-@@ -264,8 +141,6 @@
+@@ -216,8 +141,6 @@
      render->offset_x = bbx0;
      render->offset_y = bby0;
  
--    printf("<<%s>> (%f,%f) (%f,%f)\n",__FUNCTION__,bbx0,bby0,bbx1,bby1);
+-    LOG("(%f,%f) (%f,%f)\n",bbx0,bby0,bbx1,bby1);
 -
      draw->state = NULL;
  
      /* should this be G_ALLOC_ONLY? */
-@@ -312,71 +187,6 @@
+@@ -264,116 +187,21 @@
      return draw;
  }
  
@@ -9647,53 +9601,12 @@ diff -durN librsvg-2.22.1-my/rsvg-cairo-render.c librsvg-2.22.1/rsvg-cairo-rende
 -
 -}
 -
--cairo_surface_t *
--get_piece_surface_1(RsvgHandle *handle, const char *id)
+-void
+-get_element(RsvgHandle *handle, Element *element)
 -{
--    TRACE_ENTER
--    RsvgDrawingCtx *ctx;
--    RsvgNode *drawsub = NULL;
--
--    g_return_if_fail (handle != NULL);
--
--    if (!handle->priv->finished)
--        return;
--
--    if (id && *id)
--        drawsub = rsvg_defs_lookup (handle->priv->defs, id);
--
--    cairo_surface_t *tmp_surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,800,480);
--    cairo_t *tmp_cr = cairo_create(tmp_surface);
--    ctx = rsvg_cairo_new_drawing_ctx (tmp_cr, handle);
--
--    RsvgCairoRender *render;
--
--    render = rsvg_cairo_render_new(tmp_cr,800,480);
--    ctx->render = (RsvgRender *)render;
--
--    rsvg_state_push (ctx);
--    rsvg_node_draw (drawsub, ctx, 0);
--    rsvg_state_pop (ctx);
--
--    rsvg_render_free (ctx->render);
--
--    return tmp_surface;
--}
--
- /**
-  * rsvg_handle_render_cairo_sub
-  * @handle: A RsvgHandle
-@@ -389,101 +199,9 @@
-  *
-  * Since: 2.14
-  */
--cairo_surface_t *
--get_piece_surface(RsvgHandle *handle, const char *id)
--{
--    TRACE_ENTER
 -    RsvgDrawingCtx *draw;
 -    RsvgNode *drawsub = NULL;
--    RsvgNode *piece_node = NULL;
+-    RsvgNode *element_node = NULL;
 -
 -    g_return_if_fail (handle != NULL);
 -
@@ -9701,21 +9614,29 @@ diff -durN librsvg-2.22.1-my/rsvg-cairo-render.c librsvg-2.22.1/rsvg-cairo-rende
 -        return;
 -
 -    /* CALC */
--    cairo_surface_t *tmp_surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,0,0);
+-    cairo_surface_t *tmp_surface = cairo_image_surface_create(
+-        CAIRO_FORMAT_ARGB32,0,0);
 -    cairo_t *tmp_cr = cairo_create(tmp_surface);
 -    draw = rsvg_cairo_new_drawing_ctx (tmp_cr, handle);
 -    if (!draw)
 -        return;
 -
--    g_return_if_fail (id != NULL);
+-    g_return_if_fail (element->name != NULL);
 -
--    if (id && *id)
--        drawsub = rsvg_defs_lookup (handle->priv->defs, id);
+-    if (element->name && *element->name)
+-        drawsub = rsvg_defs_lookup (handle->priv->defs, element->name);
+-
+-    /* Get the order of the element */
+-    if(drawsub)
+-        element->order = drawsub->state->order;
+-    else
+-        printf("%s:%d] drawsub is NULL\n",__FILE__,__LINE__);
 -
 -    while (drawsub != NULL) {
 -        draw->drawsub_stack = g_slist_prepend (draw->drawsub_stack, drawsub);
 -        drawsub = drawsub->parent;
 -    }
+-
 -
 -    rsvg_state_push (draw);
 -    cairo_save (tmp_cr);
@@ -9726,57 +9647,45 @@ diff -durN librsvg-2.22.1-my/rsvg-cairo-render.c librsvg-2.22.1/rsvg-cairo-rende
 -    rsvg_state_pop (draw);
 -
 -    RsvgCairoRender *render = (RsvgCairoRender *) draw->render;
--    cairo_t *cr = render->cr;
--    LOG("bbox.{x,y,w,h} = %f,%f,%f,%f\n",
--                render->bbox.x,render->bbox.y,
--                render->bbox.w,render->bbox.h);
+-
+-    element->x = render->bbox.x;
+-    element->y = render->bbox.y;
+-    element->w = render->bbox.w;
+-    element->h = render->bbox.h;
 -
 -    /* DRAW */
--    int pc_w = render->bbox.w;
--    int pc_h = render->bbox.h;
--    int pc_x = render->bbox.x;
--    int pc_y = render->bbox.y;
--    //int pc_w = 800;
--    //int pc_h = 480;
--    cairo_surface_t *piece_surface = 
--        cairo_image_surface_create(CAIRO_FORMAT_ARGB32,
--                                        pc_w,pc_h);
--
--    cairo_t *piece_cr = cairo_create(piece_surface);
 -
 -    RsvgDrawingCtx *dctx;
--    dctx = rsvg_cairo_new_drawing_ctx_mod(piece_cr,
--                                            pc_x,pc_y,
--                                            pc_w,pc_h,
--                                            handle);
--    //dctx = rsvg_cairo_new_drawing_ctx(piece_cr,handle);
+-    dctx = rsvg_cairo_new_drawing_ctx_mod(element,handle);
 -
--    if (id && *id)
--        piece_node = rsvg_defs_lookup (handle->priv->defs, id);
+-    if (element->name && *element->name)
+-        element_node = rsvg_defs_lookup (handle->priv->defs, element->name);
 -
--    /*
--    while (piece_node != NULL) {
--        dctx->drawsub_stack = 
--            g_slist_prepend (dctx->drawsub_stack, piece_node);
--        piece_node = piece_node->parent;
--    }
--    */
+-    rsvg_state_push(dctx);
+-    cairo_save(element->cr);
 -
--    rsvg_state_push (dctx);
--    cairo_save (piece_cr);
+-    rsvg_node_draw(element_node, dctx, 0);
 -
--    rsvg_node_draw (piece_node, dctx, 0);
+-    cairo_restore(element->cr);
+-    rsvg_state_pop(dctx);
 -
--    cairo_restore (piece_cr);
--    rsvg_state_pop (dctx);
+-    rsvg_drawing_ctx_free(draw);
 -
--    rsvg_drawing_ctx_free (draw);
--
--    TRACE_EXIT
--    return piece_surface;
 -}
 -
 -
++/**
++ * rsvg_handle_render_cairo_sub
++ * @handle: A RsvgHandle
++ * @cr: A Cairo renderer
++ * @id: An element's id within the SVG, or %NULL to render the whole SVG. For
++ * example, if you have a layer called "layer1" that you wish to render, pass 
++ * "##layer1" as the id.
++ *
++ * Draws a subset of a SVG to a Cairo surface
++ *
++ * Since: 2.14
++ */
  void
  rsvg_handle_render_cairo_sub (RsvgHandle * handle, cairo_t * cr, const char *id)
  {
@@ -9785,7 +9694,7 @@ diff -durN librsvg-2.22.1-my/rsvg-cairo-render.c librsvg-2.22.1/rsvg-cairo-rende
      RsvgDrawingCtx *draw;
      RsvgNode *drawsub = NULL;
  
-@@ -512,8 +230,6 @@
+@@ -402,8 +230,6 @@
      cairo_restore (cr);
      rsvg_state_pop (draw);
      rsvg_drawing_ctx_free (draw);
@@ -9794,15 +9703,14 @@ diff -durN librsvg-2.22.1-my/rsvg-cairo-render.c librsvg-2.22.1/rsvg-cairo-rende
  }
  
  /**
-Binary files librsvg-2.22.1-my/.rsvg-cairo-render.c.swp and librsvg-2.22.1/.rsvg-cairo-render.c.swp differ
 diff -durN librsvg-2.22.1-my/rsvg-defs.c librsvg-2.22.1/rsvg-defs.c
---- librsvg-2.22.1-my/rsvg-defs.c	2008-08-19 00:37:05.000000000 -0700
+--- librsvg-2.22.1-my/rsvg-defs.c	2008-08-23 16:50:56.000000000 -0700
 +++ librsvg-2.22.1/rsvg-defs.c	2007-04-23 15:45:56.000000000 -0700
-@@ -70,35 +70,6 @@
+@@ -70,33 +70,6 @@
      self->base_uri = base_uri;
  }
  
--void *
+-GList *
 -rsvg_get_ids(const RsvgDefs *defs)
 -{
 -    TRACE_ENTER
@@ -9813,8 +9721,6 @@ diff -durN librsvg-2.22.1-my/rsvg-defs.c librsvg-2.22.1/rsvg-defs.c
 -    if(!keys)
 -        return NULL;
 -
--    fkeys = g_list_alloc();
--
 -    while(keys)
 -    {
 -        int is_g = !strncmp("g",keys->data,1);
@@ -9822,7 +9728,7 @@ diff -durN librsvg-2.22.1-my/rsvg-defs.c librsvg-2.22.1/rsvg-defs.c
 -        int is_path = !strncmp("path",keys->data,4);
 -
 -        if(is_g || is_rect || is_path){
--            fkeys = g_list_append(fkeys,strdup(keys->data));
+-            fkeys = g_list_prepend(fkeys,strdup(keys->data));
 -        }
 -        keys = keys->next;
 -    }
@@ -9834,14 +9740,15 @@ diff -durN librsvg-2.22.1-my/rsvg-defs.c librsvg-2.22.1/rsvg-defs.c
  static int
  rsvg_defs_load_extern (const RsvgDefs * defs, const char *name)
  {
+Binary files librsvg-2.22.1-my/.rsvg-defs.c.swp and librsvg-2.22.1/.rsvg-defs.c.swp differ
 diff -durN librsvg-2.22.1-my/rsvg-defs.h librsvg-2.22.1/rsvg-defs.h
---- librsvg-2.22.1-my/rsvg-defs.h	2008-08-19 00:35:18.000000000 -0700
+--- librsvg-2.22.1-my/rsvg-defs.h	2008-08-23 15:37:18.000000000 -0700
 +++ librsvg-2.22.1/rsvg-defs.h	2007-04-23 15:45:56.000000000 -0700
-@@ -42,32 +42,5 @@
+@@ -42,42 +42,5 @@
  void	     rsvg_defs_register_name	(RsvgDefs * defs, const char *name, RsvgNode * val);
  void	     rsvg_defs_register_memory	(RsvgDefs * defs, RsvgNode * val);
  
--void *svg_get_ids(const RsvgDefs *defs);
+-GList *rsvg_get_ids(const RsvgDefs *defs);
 -
 -extern int function_depth;
 -#define PRINT_FUNCTION_DEPTH \
@@ -9851,6 +9758,8 @@ diff -durN librsvg-2.22.1-my/rsvg-defs.h librsvg-2.22.1/rsvg-defs.h
 -            printf(" "); \
 -        } \
 -    }
+-
+-#ifdef INKFACE_DEBUG
 -
 -#define TRACE_ENTER \
 -    function_depth+=2; \
@@ -9867,6 +9776,14 @@ diff -durN librsvg-2.22.1-my/rsvg-defs.h librsvg-2.22.1/rsvg-defs.h
 -    PRINT_FUNCTION_DEPTH \
 -    function_depth-=2; \
 -	printf(__VA_ARGS__);
+-
+-#else /* INKFACE_DEBUG */
+-
+-#define TRACE_ENTER
+-#define TRACE_EXIT
+-#define LOG
+-
+-#endif /* INKFACE_DEBUG */
 -
  G_END_DECLS
  #endif
@@ -10378,6 +10295,36 @@ diff -durN librsvg-2.22.1-my/rsvg-structure.c librsvg-2.22.1/rsvg-structure.c
      group->super.set_atts = rsvg_node_group_set_atts;
      return &group->super;
  }
+diff -durN librsvg-2.22.1-my/rsvg-styles.c librsvg-2.22.1/rsvg-styles.c
+--- librsvg-2.22.1-my/rsvg-styles.c	2008-08-23 12:39:36.000000000 -0700
++++ librsvg-2.22.1/rsvg-styles.c	2008-02-24 08:12:45.000000000 -0800
+@@ -1276,14 +1276,6 @@
+     gboolean found = FALSE;
+     GString *klazz_list = NULL;
+ 
+-    /*
+-     * Extract the order attribute and store is as part of state
+-     */
+-    const char *value;
+-    if ((value = rsvg_property_bag_lookup (atts, "order"))) {
+-        state->order = atoi(value);
+-    }
+-
+     /* Try to properly support all of the following, including inheritance:
+      * *
+      * #id
+diff -durN librsvg-2.22.1-my/rsvg-styles.h librsvg-2.22.1/rsvg-styles.h
+--- librsvg-2.22.1-my/rsvg-styles.h	2008-08-23 12:36:22.000000000 -0700
++++ librsvg-2.22.1/rsvg-styles.h	2008-02-24 08:00:45.000000000 -0800
+@@ -134,8 +134,6 @@
+     double affine[6];
+     double personal_affine[6];
+ 
+-    guint16 order;              /* Order to draw */
+-
+     RsvgFilter *filter;
+     void *mask;
+     void *clip_path_ref;
 diff -durN librsvg-2.22.1-my/test-display.c librsvg-2.22.1/test-display.c
 --- librsvg-2.22.1-my/test-display.c	2008-07-12 14:55:40.000000000 -0700
 +++ librsvg-2.22.1/test-display.c	2008-02-24 08:28:01.000000000 -0800
@@ -11126,9 +11073,9 @@ diff -durN librsvg-2.22.1-my/update-index.sh librsvg-2.22.1/update-index.sh
 -cscope -R -b
 -
 diff -durN librsvg-2.22.1-my/x11-rsvg.c librsvg-2.22.1/x11-rsvg.c
---- librsvg-2.22.1-my/x11-rsvg.c	2008-08-20 21:52:41.000000000 -0700
+--- librsvg-2.22.1-my/x11-rsvg.c	2008-08-23 16:55:38.000000000 -0700
 +++ librsvg-2.22.1/x11-rsvg.c	1969-12-31 16:00:00.000000000 -0800
-@@ -1,327 +0,0 @@
+@@ -1,353 +0,0 @@
 -#include "rsvg.h"
 -#include "rsvg-cairo.h"
 -#include "rsvg-cairo-draw.h"
@@ -11145,9 +11092,12 @@ diff -durN librsvg-2.22.1-my/x11-rsvg.c librsvg-2.22.1/x11-rsvg.c
 -typedef struct _RsvgNodeRect RsvgNodeRect;
 -
 -#include "stdlib.h"
+-#include "string.h"
 -
 -#include <cairo.h>
 -#include <cairo-xlib.h>
+-
+-#include <inkface.h>
 -
 -
 -#define ASSERT(x) \
@@ -11342,6 +11292,18 @@ diff -durN librsvg-2.22.1-my/x11-rsvg.c librsvg-2.22.1/x11-rsvg.c
 -    sleep(1);
 -}
 -
+-gint
+-compare_element(
+-    gconstpointer a, 
+-    gconstpointer b,
+-    gpointer user_data)
+-{
+-    Element *eA=NULL,*eB=NULL;
+-    eA = (Element *)a;
+-    eB = (Element *)b;
+-    return(eA->order - eB->order);
+-}
+-
 -int main(int argc, char *argv[])
 -{
 -
@@ -11353,6 +11315,7 @@ diff -durN librsvg-2.22.1-my/x11-rsvg.c librsvg-2.22.1/x11-rsvg.c
 -    Pixmap pix;
 -    XGCValues gcv;
 -    GC gc;
+-    char *elemChoice = NULL;
 -
 -
 -    if(argc < 2){
@@ -11367,6 +11330,10 @@ diff -durN librsvg-2.22.1-my/x11-rsvg.c librsvg-2.22.1/x11-rsvg.c
 -    rsvg_init ();
 -
 -    ASSERT(handle = rsvg_handle_from_file(argv[1]));
+-
+-    if(argc == 3){
+-        elemChoice = argv[2];
+-    }
 -
 -    RsvgDimensionData dim;
 -    rsvg_handle_get_dimensions(handle,&dim);
@@ -11399,60 +11366,66 @@ diff -durN librsvg-2.22.1-my/x11-rsvg.c librsvg-2.22.1/x11-rsvg.c
 -    ASSERT(ctx = cairo_create(surface));
 -
 -
--    double nw=0.,nh=0.;
 -    cairo_surface_t *node_surface = NULL;
--    /*
--    cairo_t *node_cr = NULL;
--    //get_rect_node_dimensions(handle,argv[2],&nw,&nh);
 -
--    ASSERT(node_surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, (int)nw, (int)nh))
--    ASSERT(node_cr = cairo_create(node_surface))
--    //rsvg_handle_render_cairo_sub(handle,node_cr,argv[2]);
--    rsvg_handle_calc_cairo_sub(handle,node_cr,argv[2]);
--    */
+-    GList *eidList = rsvg_get_ids(handle->priv->defs);
+-    GList *head_eidList = eidList;
 -
--    int node_w=0,node_h=0;
+-    GList *elemList = NULL;
+-    Element *element = NULL;
 -
--    int x_pos=0;
--    int y_pos=0;
+-    while(eidList){
+-            /*
+-            if(elemChoice){
+-                if(strcmp(elemChoice,eidList->data)){
+-                    printf("Skipping %s\n",eidList->data);
+-                    g_free(eidList->data);
+-                    eidList = eidList->next;
+-                    continue;
+-                }
+-            }
+-            */
 -
--    GList *fkeys = rsvg_get_ids(handle->priv->defs);
--    GList *tmp_fkeys = fkeys;
--    char elemName[32];
--    while(fkeys){
--        if(fkeys->data){
--            memset(elemName,0,32);
--            strncpy(elemName,"#",1);
--            strncat(elemName,fkeys->data,30);
--            node_surface = get_piece_surface(handle,elemName);
--            cairo_set_source_surface(ctx,node_surface,x_pos,y_pos);
--            cairo_paint(ctx);
--        }
--        g_free(fkeys->data);
--        fkeys = fkeys->next;
+-        ASSERT(eidList->data);
 -
--        x_pos += 50;
--        y_pos += 50*(x_pos/480);
--        x_pos %= 480;
+-        element = (Element *)g_malloc(sizeof(Element));
+-        memset(element,0,sizeof(Element));
+-        strncpy(element->name,"#",1);
+-        strncat(element->name,eidList->data,30);
+-
+-        get_element(handle,element);
+-
+-        elemList = g_list_prepend(elemList,element);
+-
+-            /*
+-            printf("%d] Drawing %s\n",element.order,eidList->data);
+-            */
+-        g_free(eidList->data);
+-        eidList = eidList->next;
 -    }
--    g_list_free(tmp_fkeys);
+-    g_list_free(head_eidList);
 -
 -
--    //node_w = cairo_image_surface_get_width(node_surface);
--    //node_h = cairo_image_surface_get_height(node_surface);
--    //cairo_set_source_surface(ctx,node_surface,0,0);
--    //cairo_paint(ctx);
+-    GList *elem = g_list_sort(elemList,compare_element);
+-    while(elem)
+-    {
+-        Element *element = (Element *)elem->data;
 -
--    /*
--    cairo_set_source_rgb(ctx,1,1,1);
--    cairo_rectangle(ctx,0,0,node_w,node_h);
--    cairo_stroke(ctx);
--    */
+-        ASSERT(element);
+-
+-        cairo_set_source_surface(ctx,element->surface,element->x,element->y);
+-        cairo_paint(ctx);
+-        cairo_surface_destroy(element->surface);
+-
+-        g_free(elem->data);
+-
+-        elem = elem->next;
+-    }
+-    g_list_free(elemList);
 -
 -    XFlush(dpy);
 -
--    sleep(5);
+-    sleep(3);
 -
--    //cairo_surface_destroy(node_surface);
 -    rsvg_term ();
 -}

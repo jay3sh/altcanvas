@@ -14,9 +14,12 @@ struct _RsvgNodeRect {
 typedef struct _RsvgNodeRect RsvgNodeRect;
 
 #include "stdlib.h"
+#include "string.h"
 
 #include <cairo.h>
 #include <cairo-xlib.h>
+
+#include <inkface.h>
 
 
 #define ASSERT(x) \
@@ -211,6 +214,18 @@ void test1(void)
     sleep(1);
 }
 
+gint
+compare_element(
+    gconstpointer a, 
+    gconstpointer b,
+    gpointer user_data)
+{
+    Element *eA=NULL,*eB=NULL;
+    eA = (Element *)a;
+    eB = (Element *)b;
+    return(eA->order - eB->order);
+}
+
 int main(int argc, char *argv[])
 {
 
@@ -222,6 +237,7 @@ int main(int argc, char *argv[])
     Pixmap pix;
     XGCValues gcv;
     GC gc;
+    char *elemChoice = NULL;
 
 
     if(argc < 2){
@@ -236,6 +252,10 @@ int main(int argc, char *argv[])
     rsvg_init ();
 
     ASSERT(handle = rsvg_handle_from_file(argv[1]));
+
+    if(argc == 3){
+        elemChoice = argv[2];
+    }
 
     RsvgDimensionData dim;
     rsvg_handle_get_dimensions(handle,&dim);
@@ -268,60 +288,66 @@ int main(int argc, char *argv[])
     ASSERT(ctx = cairo_create(surface));
 
 
-    double nw=0.,nh=0.;
     cairo_surface_t *node_surface = NULL;
-    /*
-    cairo_t *node_cr = NULL;
-    //get_rect_node_dimensions(handle,argv[2],&nw,&nh);
 
-    ASSERT(node_surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, (int)nw, (int)nh))
-    ASSERT(node_cr = cairo_create(node_surface))
-    //rsvg_handle_render_cairo_sub(handle,node_cr,argv[2]);
-    rsvg_handle_calc_cairo_sub(handle,node_cr,argv[2]);
-    */
+    GList *eidList = rsvg_get_ids(handle->priv->defs);
+    GList *head_eidList = eidList;
 
-    int node_w=0,node_h=0;
+    GList *elemList = NULL;
+    Element *element = NULL;
 
-    int x_pos=0;
-    int y_pos=0;
+    while(eidList){
+            /*
+            if(elemChoice){
+                if(strcmp(elemChoice,eidList->data)){
+                    printf("Skipping %s\n",eidList->data);
+                    g_free(eidList->data);
+                    eidList = eidList->next;
+                    continue;
+                }
+            }
+            */
 
-    GList *fkeys = rsvg_get_ids(handle->priv->defs);
-    GList *tmp_fkeys = fkeys;
-    char elemName[32];
-    while(fkeys){
-        if(fkeys->data){
-            memset(elemName,0,32);
-            strncpy(elemName,"#",1);
-            strncat(elemName,fkeys->data,30);
-            node_surface = get_piece_surface(handle,elemName);
-            cairo_set_source_surface(ctx,node_surface,x_pos,y_pos);
-            cairo_paint(ctx);
-        }
-        g_free(fkeys->data);
-        fkeys = fkeys->next;
+        ASSERT(eidList->data);
 
-        x_pos += 50;
-        y_pos += 50*(x_pos/480);
-        x_pos %= 480;
+        element = (Element *)g_malloc(sizeof(Element));
+        memset(element,0,sizeof(Element));
+        strncpy(element->name,"#",1);
+        strncat(element->name,eidList->data,30);
+
+        get_element(handle,element);
+
+        elemList = g_list_prepend(elemList,element);
+
+            /*
+            printf("%d] Drawing %s\n",element.order,eidList->data);
+            */
+        g_free(eidList->data);
+        eidList = eidList->next;
     }
-    g_list_free(tmp_fkeys);
+    g_list_free(head_eidList);
 
 
-    //node_w = cairo_image_surface_get_width(node_surface);
-    //node_h = cairo_image_surface_get_height(node_surface);
-    //cairo_set_source_surface(ctx,node_surface,0,0);
-    //cairo_paint(ctx);
+    GList *elem = g_list_sort(elemList,compare_element);
+    while(elem)
+    {
+        Element *element = (Element *)elem->data;
 
-    /*
-    cairo_set_source_rgb(ctx,1,1,1);
-    cairo_rectangle(ctx,0,0,node_w,node_h);
-    cairo_stroke(ctx);
-    */
+        ASSERT(element);
+
+        cairo_set_source_surface(ctx,element->surface,element->x,element->y);
+        cairo_paint(ctx);
+        cairo_surface_destroy(element->surface);
+
+        g_free(elem->data);
+
+        elem = elem->next;
+    }
+    g_list_free(elemList);
 
     XFlush(dpy);
 
-    sleep(5);
+    sleep(3);
 
-    //cairo_surface_destroy(node_surface);
     rsvg_term ();
 }
