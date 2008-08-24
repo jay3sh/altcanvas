@@ -1276,19 +1276,6 @@ rsvg_parse_style_attrs (RsvgHandle * ctx,
     gboolean found = FALSE;
     GString *klazz_list = NULL;
 
-    /*
-     * Extract the order attribute and store is as part of state
-     */
-    const char *value;
-    if ((value = rsvg_property_bag_lookup (atts, "order"))) {
-        state->order = atoi(value);
-    }
-    state->transient = FALSE;
-    if ((value = rsvg_property_bag_lookup (atts, "transient"))) {
-        if(!strncasecmp(value,"true",4)){
-            state->transient = TRUE;
-        }
-    }
 
     /* Try to properly support all of the following, including inheritance:
      * *

@@ -29,6 +29,8 @@
 #include "rsvg.h"
 #include "rsvg-bpath-util.h"
 
+#include "inkface.h"
+
 #include <libxml/SAX.h>
 #include <libxml/xmlmemory.h>
 #include <pango/pango.h>
@@ -255,6 +257,7 @@ struct _RsvgPropertyBag {
 
 struct _RsvgNode {
     RsvgState *state;
+    InkfaceState *istate;
     RsvgNode *parent;
     GString *type;
     GPtrArray *children;

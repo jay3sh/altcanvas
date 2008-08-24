@@ -274,10 +274,10 @@ inkface_get_element(RsvgHandle *handle, Element *element)
 
     /* Get the order of the element */
     if(drawsub) {
-        element->order = drawsub->state->order;
-        element->transient = drawsub->state->transient;
+        element->order = drawsub->istate->order;
+        element->transient = drawsub->istate->transient;
     } else {
-        printf("%s:%d] drawsub is NULL\n",__FILE__,__LINE__);
+        printf("[%s:%d] drawsub is NULL\n",__FILE__,__LINE__);
     }
 
     while (drawsub != NULL) {

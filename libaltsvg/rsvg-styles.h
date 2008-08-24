@@ -134,10 +134,6 @@ struct _RsvgState {
     double affine[6];
     double personal_affine[6];
 
-    guint16 order;              /* Order to draw */
-    gboolean transient;         /* If transient, it will be visible 
-                                   only programmatically */
-
     RsvgFilter *filter;
     void *mask;
     void *clip_path_ref;
@@ -257,6 +253,8 @@ void rsvg_parse_cssbuffer   (RsvgHandle * ctx, const char *buff, size_t buflen);
 
 void rsvg_parse_style_attrs (RsvgHandle * ctx, RsvgState * state, const char *tag,
                              const char *klazz, const char *id, RsvgPropertyBag * atts);
+
+void inkface_parse_attrs (RsvgNode *self, RsvgPropertyBag *atts);
 
 gdouble rsvg_viewport_percentage    (gdouble width, gdouble height);
 gdouble rsvg_dpi_percentage	    (RsvgHandle * ctx);

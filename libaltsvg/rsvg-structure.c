@@ -138,6 +138,7 @@ _rsvg_node_init (RsvgNode * self)
 	self->parent = NULL;
     self->children = g_ptr_array_new ();
     self->state = g_new (RsvgState, 1);
+    self->istate = g_new (InkfaceState, 1);
     rsvg_state_init (self->state);
     self->free = _rsvg_node_free;
     self->draw = _rsvg_node_draw_nothing;
@@ -181,6 +182,7 @@ rsvg_node_group_set_atts (RsvgNode * self, RsvgHandle * ctx, RsvgPropertyBag * a
         }
 
         rsvg_parse_style_attrs (ctx, self->state, "g", klazz, id, atts);
+        inkface_parse_attrs (self, atts);
     }
 }
 
@@ -463,6 +465,7 @@ rsvg_node_svg_set_atts (RsvgNode * self, RsvgHandle * ctx, RsvgPropertyBag * att
             rsvg_defs_register_name (ctx->priv->defs, value, &svg->super);
         }
         rsvg_parse_style_attrs (ctx, self->state, "svg", klazz, id, atts);
+        inkface_parse_attrs (self, atts);
     }
 }
 
@@ -509,6 +512,7 @@ rsvg_node_use_set_atts (RsvgNode * self, RsvgHandle * ctx, RsvgPropertyBag * att
         if ((value = rsvg_property_bag_lookup (atts, "xlink:href")))
             rsvg_defs_add_resolver (ctx->priv->defs, &use->link, value);
         rsvg_parse_style_attrs (ctx, self->state, "use", klazz, id, atts);
+        inkface_parse_attrs (self, atts);
     }
 
 }
@@ -549,6 +553,7 @@ rsvg_node_symbol_set_atts (RsvgNode * self, RsvgHandle * ctx, RsvgPropertyBag * 
             symbol->preserve_aspect_ratio = rsvg_css_parse_aspect_ratio (value);
 
         rsvg_parse_style_attrs (ctx, self->state, "symbol", klazz, id, atts);
+        inkface_parse_attrs (self, atts);
     }
 
 }
@@ -612,4 +617,25 @@ rsvg_new_switch (void)
     group->super.draw = _rsvg_node_switch_draw;
     group->super.set_atts = rsvg_node_group_set_atts;
     return &group->super;
+}
+
+void
+inkface_parse_attrs(RsvgNode *self, RsvgPropertyBag *atts)
+{
+    /*
+     * Extract the order attribute and store is as part of state
+     */
+    const char *value;
+    if ((value = rsvg_property_bag_lookup (atts, "order"))) {
+        self->istate->order = atoi(value);
+    }
+    self->istate->transient = FALSE;
+    if ((value = rsvg_property_bag_lookup (atts, "transient"))) {
+        if(!strncasecmp(value,"true",4)){
+            self->istate->transient = TRUE;
+        }
+    }
+    if ((value = rsvg_property_bag_lookup (atts, "onMouseOver"))) {
+    }
+
 }

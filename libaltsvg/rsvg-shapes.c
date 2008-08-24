@@ -92,6 +92,7 @@ rsvg_node_path_set_atts (RsvgNode * self, RsvgHandle * ctx, RsvgPropertyBag * at
         }
 
         rsvg_parse_style_attrs (ctx, self->state, "path", klazz, id, atts);
+        inkface_parse_attrs (self, atts);
     }
 }
 
@@ -140,6 +141,7 @@ _rsvg_node_poly_set_atts (RsvgNode * self, RsvgHandle * ctx, RsvgPropertyBag * a
 
         rsvg_parse_style_attrs (ctx, self->state, (poly->is_polyline ? "polyline" : "polygon"),
                                 klazz, id, atts);
+        inkface_parse_attrs (self, atts);
     }
 
 }
@@ -273,6 +275,7 @@ _rsvg_node_line_set_atts (RsvgNode * self, RsvgHandle * ctx, RsvgPropertyBag * a
         }
 
         rsvg_parse_style_attrs (ctx, self->state, "line", klazz, id, atts);
+        inkface_parse_attrs (self, atts);
     }
 }
 
@@ -381,6 +384,7 @@ _rsvg_node_rect_set_atts (RsvgNode * self, RsvgHandle * ctx, RsvgPropertyBag * a
         }
 
         rsvg_parse_style_attrs (ctx, self->state, "rect", klazz, id, atts);
+        inkface_parse_attrs (self, atts);
     }
 }
 
@@ -568,6 +572,7 @@ _rsvg_node_circle_set_atts (RsvgNode * self, RsvgHandle * ctx, RsvgPropertyBag *
         }
 
         rsvg_parse_style_attrs (ctx, self->state, "circle", klazz, id, atts);
+        inkface_parse_attrs (self, atts);
     }
 }
 
@@ -719,6 +724,7 @@ _rsvg_node_ellipse_set_atts (RsvgNode * self, RsvgHandle * ctx, RsvgPropertyBag 
         }
 
         rsvg_parse_style_attrs (ctx, self->state, "ellipse", klazz, id, atts);
+        inkface_parse_attrs (self, atts);
     }
 }
 
