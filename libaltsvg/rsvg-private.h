@@ -199,6 +199,7 @@ struct RsvgRender {
     void	     (*render_pango_layout)	(RsvgDrawingCtx * ctx, PangoLayout *layout, 
 						 double x, double y);
     void	     (*render_path)		(RsvgDrawingCtx * ctx, const RsvgBpathDef * path);
+    void	     (*calc_path)		(RsvgDrawingCtx * ctx, const RsvgBpathDef * path);
     void	     (*render_image)		(RsvgDrawingCtx * ctx, const GdkPixbuf * pixbuf,
 						 double x, double y, double w, double h);
     void	     (*pop_discrete_layer)	(RsvgDrawingCtx * ctx);
@@ -259,6 +260,7 @@ struct _RsvgNode {
     GPtrArray *children;
     void (*free) (RsvgNode * self);
     void (*draw) (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate);
+    void (*calc) (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate);
     void (*set_atts) (RsvgNode * self, RsvgHandle * ctx, RsvgPropertyBag *);
 };
 

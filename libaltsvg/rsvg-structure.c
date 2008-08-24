@@ -34,6 +34,30 @@
 #include <stdio.h>
 
 void
+rsvg_node_calc (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
+{
+    RsvgState *state;
+    GSList *stacksave;
+
+    state = self->state;
+
+    stacksave = ctx->drawsub_stack;
+    if (stacksave) {
+        if (stacksave->data != self){
+            return;
+        }
+        ctx->drawsub_stack = stacksave->next;
+    }
+    if (!state->visible){
+        return;
+    }
+
+    gchar *nodeType = self->type->str;
+    self->calc (self, ctx, dominate);
+    ctx->drawsub_stack = stacksave;
+}
+
+void
 rsvg_node_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 {
     RsvgState *state;
@@ -73,9 +97,33 @@ _rsvg_node_draw_children (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
         rsvg_pop_discrete_layer (ctx);
 }
 
+/* generic function for drawing all of the children of a particular node */
+void
+_rsvg_node_calc_children (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
+{
+    guint i;
+    if (dominate != -1) {
+        rsvg_state_reinherit_top (ctx, self->state, dominate);
+
+        rsvg_push_discrete_layer (ctx);
+    }
+    for (i = 0; i < self->children->len; i++) {
+        rsvg_state_push (ctx);
+        rsvg_node_calc (g_ptr_array_index (self->children, i), ctx, 0);
+        rsvg_state_pop (ctx);
+    }
+    if (dominate != -1)
+        rsvg_pop_discrete_layer (ctx);
+}
+
 /* generic function that doesn't draw anything at all */
 static void
 _rsvg_node_draw_nothing (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
+{
+}
+
+static void
+_rsvg_node_calc_nothing (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 {
 }
 
@@ -93,6 +141,7 @@ _rsvg_node_init (RsvgNode * self)
     rsvg_state_init (self->state);
     self->free = _rsvg_node_free;
     self->draw = _rsvg_node_draw_nothing;
+    self->calc = _rsvg_node_calc_nothing;
     self->set_atts = _rsvg_node_dont_set_atts;
     self->type = NULL;
 }
@@ -142,6 +191,7 @@ rsvg_new_group (void)
     group = g_new (RsvgNodeGroup, 1);
     _rsvg_node_init (&group->super);
     group->super.draw = _rsvg_node_draw_children;
+    group->super.calc = _rsvg_node_calc_children;
     group->super.set_atts = rsvg_node_group_set_atts;
     return &group->super;
 }
@@ -242,7 +292,74 @@ rsvg_node_use_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
         if (symbol->vbox.active)
             _rsvg_pop_view_box (ctx);
     }
+}
+static void
+rsvg_node_svg_calc (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
+{
+    RsvgNodeSvg *sself;
+    RsvgState *state;
+    gdouble affine[6], affine_old[6], affine_new[6];
+    guint i;
+    double nx, ny, nw, nh;
+    sself = (RsvgNodeSvg *) self;
 
+    nx = _rsvg_css_normalize_length (&sself->x, ctx, 'h');
+    ny = _rsvg_css_normalize_length (&sself->y, ctx, 'v');
+    nw = _rsvg_css_normalize_length (&sself->w, ctx, 'h');
+    nh = _rsvg_css_normalize_length (&sself->h, ctx, 'v');
+
+    rsvg_state_reinherit_top (ctx, self->state, dominate);
+
+    state = rsvg_state_current (ctx);
+
+    for (i = 0; i < 6; i++)
+        affine_old[i] = state->affine[i];
+
+    if (sself->vbox.active) {
+        double x = nx, y = ny, w = nw, h = nh;
+        rsvg_preserve_aspect_ratio (sself->preserve_aspect_ratio,
+                                    sself->vbox.w, sself->vbox.h, &w, &h, &x, &y);
+        affine[0] = w / sself->vbox.w;
+        affine[1] = 0;
+        affine[2] = 0;
+        affine[3] = h / sself->vbox.h;
+        affine[4] = x - sself->vbox.x * w / sself->vbox.w;
+        affine[5] = y - sself->vbox.y * h / sself->vbox.h;
+        _rsvg_affine_multiply (state->affine, affine, state->affine);
+        _rsvg_push_view_box (ctx, sself->vbox.w, sself->vbox.h);
+    } else {
+        affine[0] = 1;
+        affine[1] = 0;
+        affine[2] = 0;
+        affine[3] = 1;
+        affine[4] = nx;
+        affine[5] = ny;
+        _rsvg_affine_multiply (state->affine, affine, state->affine);
+        _rsvg_push_view_box (ctx, nw, nh);
+    }
+    for (i = 0; i < 6; i++)
+        affine_new[i] = state->affine[i];
+
+    rsvg_push_discrete_layer (ctx);
+
+    /* Bounding box addition must be AFTER the discrete layer push, 
+       which must be AFTER the transformation happens. */
+    if (!state->overflow && self->parent) {
+        for (i = 0; i < 6; i++)
+            state->affine[i] = affine_old[i];
+        rsvg_add_clipping_rect (ctx, nx, ny, nw, nh);
+        for (i = 0; i < 6; i++)
+            state->affine[i] = affine_new[i];
+    }
+
+    for (i = 0; i < self->children->len; i++) {
+        rsvg_state_push (ctx);
+        rsvg_node_calc (g_ptr_array_index (self->children, i), ctx, 0);
+        rsvg_state_pop (ctx);
+    }
+
+    rsvg_pop_discrete_layer (ctx);
+    _rsvg_pop_view_box (ctx);
 }
 
 static void
@@ -362,6 +479,7 @@ rsvg_new_svg (void)
     svg->w = _rsvg_css_parse_length ("100%");
     svg->h = _rsvg_css_parse_length ("100%");
     svg->super.draw = rsvg_node_svg_draw;
+    svg->super.calc = rsvg_node_svg_calc;
     svg->super.set_atts = rsvg_node_svg_set_atts;
     return &svg->super;
 }
@@ -456,6 +574,7 @@ rsvg_new_defs ()
     group = g_new (RsvgNodeGroup, 1);
     _rsvg_node_init (&group->super);
     group->super.draw = _rsvg_node_draw_nothing;
+    group->super.calc = _rsvg_node_calc_nothing;
     group->super.set_atts = rsvg_node_group_set_atts;
     return &group->super;
 }

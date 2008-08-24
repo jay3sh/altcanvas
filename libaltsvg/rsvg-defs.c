@@ -70,6 +70,31 @@ rsvg_defs_set_base_uri (RsvgDefs * self, gchar * base_uri)
     self->base_uri = base_uri;
 }
 
+GList *
+inkface_get_element_ids(const RsvgDefs *defs)
+{
+    GList *keys = NULL;
+    GList *fkeys = NULL;
+    keys = g_hash_table_get_keys(defs->hash);
+
+    if(!keys)
+        return NULL;
+
+    while(keys)
+    {
+        int is_g = !strncmp("g",keys->data,1);
+        int is_rect = !strncmp("rect",keys->data,4);
+        int is_path = !strncmp("path",keys->data,4);
+
+        if(is_g || is_rect || is_path){
+            fkeys = g_list_prepend(fkeys,strdup(keys->data));
+        }
+        keys = keys->next;
+    }
+
+    return fkeys;
+}
+
 static int
 rsvg_defs_load_extern (const RsvgDefs * defs, const char *name)
 {

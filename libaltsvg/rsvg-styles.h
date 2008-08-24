@@ -134,6 +134,8 @@ struct _RsvgState {
     double affine[6];
     double personal_affine[6];
 
+    guint16 order;              /* Order to draw */
+
     RsvgFilter *filter;
     void *mask;
     void *clip_path_ref;

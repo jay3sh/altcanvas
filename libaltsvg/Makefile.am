@@ -7,7 +7,7 @@ endif
 SUBDIRS = . moz-plugin gdk-pixbuf-loader gtk-engine data tests doc
 
 lib_LTLIBRARIES = librsvg-2.la
-bin_PROGRAMS = rsvg-convert $(target_rsvg_view)
+bin_PROGRAMS = rsvg-convert $(target_rsvg_view) inkface
 noinst_PROGRAMS = test-performance
 
 man_MANS = rsvg.1
@@ -114,6 +114,12 @@ rsvg_view_SOURCES = 		\
 rsvg_view_LDFLAGS =
 rsvg_view_DEPENDENCIES = $(DEPS)
 rsvg_view_LDADD = $(GTK_LIBS) $(GDK_X11_LIBS) $(libm) $(LDADDS)
+
+inkface_SOURCES = \
+	inkface.c
+inkface_LDFLAGS =
+inkface_DEPENDENCIES = $(DEPS)
+inkface_LDADD = $(GDK_X11_LIBS) $(LDADDS)
 
 EXTRA_DIST =				\
 	MAINTAINERS			\

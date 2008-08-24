@@ -1667,6 +1667,20 @@ rsvg_push_discrete_layer (RsvgDrawingCtx * ctx)
 }
 
 void
+rsvg_calc_path (RsvgDrawingCtx * ctx, const char *d)
+{
+    /* todo: store and use the bpath higher up */
+    RsvgBpathDef *bpath_def;
+
+    bpath_def = rsvg_parse_path (d);
+    rsvg_bpath_def_art_finish (bpath_def);
+
+    ctx->render->calc_path (ctx, bpath_def);
+
+    rsvg_bpath_def_free (bpath_def);
+}
+
+void
 rsvg_render_path (RsvgDrawingCtx * ctx, const char *d)
 {
     /* todo: store and use the bpath higher up */

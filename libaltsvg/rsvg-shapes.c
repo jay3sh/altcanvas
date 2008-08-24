@@ -49,6 +49,18 @@ rsvg_node_path_free (RsvgNode * self)
 }
 
 static void
+rsvg_node_path_calc (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
+{
+    RsvgNodePath *path = (RsvgNodePath *) self;
+    if (!path->d)
+        return;
+
+    rsvg_state_reinherit_top (ctx, self->state, dominate);
+
+    rsvg_calc_path (ctx, path->d);
+}
+
+static void
 rsvg_node_path_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 {
     RsvgNodePath *path = (RsvgNodePath *) self;
@@ -92,6 +104,7 @@ rsvg_new_path (void)
     path->d = NULL;
     path->super.free = rsvg_node_path_free;
     path->super.draw = rsvg_node_path_draw;
+    path->super.calc = rsvg_node_path_calc;
     path->super.set_atts = rsvg_node_path_set_atts;
 
     return &path->super;
@@ -131,8 +144,8 @@ _rsvg_node_poly_set_atts (RsvgNode * self, RsvgHandle * ctx, RsvgPropertyBag * a
 
 }
 
-static void
-_rsvg_node_poly_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
+GString *
+_rsvg_node_poly_to_path(RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 {
     RsvgNodePoly *poly = (RsvgNodePoly *) self;
     gsize i;
@@ -161,6 +174,29 @@ _rsvg_node_poly_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 
     if (!poly->is_polyline)
         g_string_append (d, " Z");
+
+    return d;
+}
+
+static void
+_rsvg_node_poly_calc (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
+{
+    GString *d = NULL;
+
+    d = _rsvg_node_poly_to_path(self,ctx,dominate);
+
+    rsvg_state_reinherit_top (ctx, self->state, dominate);
+    rsvg_calc_path (ctx, d->str);
+
+    g_string_free (d, TRUE);
+}
+
+static void
+_rsvg_node_poly_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
+{
+    GString *d = NULL;
+
+    d = _rsvg_node_poly_to_path(self,ctx,dominate);
 
     rsvg_state_reinherit_top (ctx, self->state, dominate);
     rsvg_render_path (ctx, d->str);
@@ -240,8 +276,8 @@ _rsvg_node_line_set_atts (RsvgNode * self, RsvgHandle * ctx, RsvgPropertyBag * a
     }
 }
 
-static void
-_rsvg_node_line_draw (RsvgNode * overself, RsvgDrawingCtx * ctx, int dominate)
+GString *
+_rsvg_node_line_to_path (RsvgNode * overself, RsvgDrawingCtx * ctx, int dominate)
 {
     GString *d;
     char buf[G_ASCII_DTOSTR_BUF_SIZE];
@@ -263,6 +299,30 @@ _rsvg_node_line_draw (RsvgNode * overself, RsvgDrawingCtx * ctx, int dominate)
     g_string_append (d, g_ascii_dtostr (buf, sizeof (buf),
                                         _rsvg_css_normalize_length (&self->y2, ctx, 'v')));
 
+    return d;
+}
+
+static void
+_rsvg_node_line_calc (RsvgNode * overself, RsvgDrawingCtx * ctx, int dominate)
+{
+    GString *d = NULL;
+
+    d = _rsvg_node_line_to_path(overself,ctx,dominate);
+
+    rsvg_state_reinherit_top (ctx, overself->state, dominate);
+    rsvg_calc_path (ctx, d->str);
+
+    g_string_free (d, TRUE);
+
+}
+
+static void
+_rsvg_node_line_draw (RsvgNode * overself, RsvgDrawingCtx * ctx, int dominate)
+{
+    GString *d = NULL;
+
+    d = _rsvg_node_line_to_path(overself,ctx,dominate);
+
     rsvg_state_reinherit_top (ctx, overself->state, dominate);
     rsvg_render_path (ctx, d->str);
 
@@ -276,6 +336,7 @@ rsvg_new_line (void)
     line = g_new (RsvgNodeLine, 1);
     _rsvg_node_init (&line->super);
     line->super.draw = _rsvg_node_line_draw;
+    line->super.calc = _rsvg_node_line_calc;
     line->super.set_atts = _rsvg_node_line_set_atts;
     line->x1 = line->x2 = line->y1 = line->y2 = _rsvg_css_parse_length ("0");
     return &line->super;
@@ -323,8 +384,8 @@ _rsvg_node_rect_set_atts (RsvgNode * self, RsvgHandle * ctx, RsvgPropertyBag * a
     }
 }
 
-static void
-_rsvg_node_rect_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
+GString *
+_rsvg_node_rect_to_path(RsvgNode *self, RsvgDrawingCtx *ctx, int dominate)
 {
     double x, y, w, h, rx, ry;
     GString *d = NULL;
@@ -437,10 +498,33 @@ _rsvg_node_rect_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 
     g_string_append (d, " Z");
 
+    return d;
+}
+
+static void
+_rsvg_node_rect_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
+{
+    GString *d = NULL;
+
+    d = _rsvg_node_rect_to_path(self,ctx,dominate);
+
     rsvg_state_reinherit_top (ctx, self->state, dominate);
     rsvg_render_path (ctx, d->str);
     g_string_free (d, TRUE);
 }
+
+static void
+_rsvg_node_rect_calc (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
+{
+    GString *d = NULL;
+
+    d = _rsvg_node_rect_to_path(self,ctx,dominate);
+
+    rsvg_state_reinherit_top (ctx, self->state, dominate);
+    rsvg_calc_path (ctx, d->str);
+    g_string_free (d, TRUE);
+}
+
 
 RsvgNode *
 rsvg_new_rect (void)
@@ -449,6 +533,7 @@ rsvg_new_rect (void)
     rect = g_new (RsvgNodeRect, 1);
     _rsvg_node_init (&rect->super);
     rect->super.draw = _rsvg_node_rect_draw;
+    rect->super.calc = _rsvg_node_rect_calc;
     rect->super.set_atts = _rsvg_node_rect_set_atts;
     rect->x = rect->y = rect->w = rect->h = rect->rx = rect->ry = _rsvg_css_parse_length ("0");
     rect->got_rx = rect->got_ry = FALSE;
@@ -486,8 +571,8 @@ _rsvg_node_circle_set_atts (RsvgNode * self, RsvgHandle * ctx, RsvgPropertyBag *
     }
 }
 
-static void
-_rsvg_node_circle_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
+GString *
+_rsvg_node_circle_to_path(RsvgNode *self, RsvgDrawingCtx *ctx, int dominate)
 {
     GString *d = NULL;
     RsvgNodeCircle *circle = (RsvgNodeCircle *) self;
@@ -562,6 +647,29 @@ _rsvg_node_circle_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 
     g_string_append (d, " Z");
 
+    return d;
+}
+
+static void
+_rsvg_node_circle_calc (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
+{
+    GString *d = NULL;
+
+    d = _rsvg_node_circle_to_path(self,ctx,dominate);
+
+    rsvg_state_reinherit_top (ctx, self->state, dominate);
+    rsvg_calc_path (ctx, d->str);
+
+    g_string_free (d, TRUE);
+}
+
+static void
+_rsvg_node_circle_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
+{
+    GString *d = NULL;
+
+    d = _rsvg_node_circle_to_path(self,ctx,dominate);
+
     rsvg_state_reinherit_top (ctx, self->state, dominate);
     rsvg_render_path (ctx, d->str);
 
@@ -575,6 +683,7 @@ rsvg_new_circle (void)
     circle = g_new (RsvgNodeCircle, 1);
     _rsvg_node_init (&circle->super);
     circle->super.draw = _rsvg_node_circle_draw;
+    circle->super.calc = _rsvg_node_circle_calc;
     circle->super.set_atts = _rsvg_node_circle_set_atts;
     circle->cx = circle->cy = circle->r = _rsvg_css_parse_length ("0");
     return &circle->super;
@@ -613,8 +722,8 @@ _rsvg_node_ellipse_set_atts (RsvgNode * self, RsvgHandle * ctx, RsvgPropertyBag 
     }
 }
 
-static void
-_rsvg_node_ellipse_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
+GString *
+_rsvg_node_ellipse_to_path(RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 {
     RsvgNodeEllipse *ellipse = (RsvgNodeEllipse *) self;
     GString *d = NULL;
@@ -689,6 +798,28 @@ _rsvg_node_ellipse_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 
     g_string_append (d, " Z");
 
+    return d;
+}
+
+static void
+_rsvg_node_ellipse_calc (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
+{
+    GString *d = NULL;
+
+    d = _rsvg_node_ellipse_to_path(self,ctx,dominate);
+
+    rsvg_state_reinherit_top (ctx, self->state, dominate);
+    rsvg_calc_path (ctx, d->str);
+    g_string_free (d, TRUE);
+}
+
+static void
+_rsvg_node_ellipse_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
+{
+    GString *d = NULL;
+
+    d = _rsvg_node_ellipse_to_path(self,ctx,dominate);
+
     rsvg_state_reinherit_top (ctx, self->state, dominate);
     rsvg_render_path (ctx, d->str);
     g_string_free (d, TRUE);
@@ -701,6 +832,7 @@ rsvg_new_ellipse (void)
     ellipse = g_new (RsvgNodeEllipse, 1);
     _rsvg_node_init (&ellipse->super);
     ellipse->super.draw = _rsvg_node_ellipse_draw;
+    ellipse->super.calc = _rsvg_node_ellipse_calc;
     ellipse->super.set_atts = _rsvg_node_ellipse_set_atts;
     ellipse->cx = ellipse->cy = ellipse->rx = ellipse->ry = _rsvg_css_parse_length ("0");
     return &ellipse->super;

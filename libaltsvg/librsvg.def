@@ -33,3 +33,5 @@ _rsvg_size_callback
 _rsvg_acquire_xlink_href_resource
 _rsvg_register_types
 rsvg_pixbuf_from_data_with_size_data
+inkface_get_element
+inkface_get_element_ids

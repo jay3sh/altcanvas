@@ -518,6 +518,85 @@ rsvg_cairo_render_pango_layout (RsvgDrawingCtx * ctx, PangoLayout * layout, doub
     }
 }
 
+void 
+rsvg_cairo_calc_path (RsvgDrawingCtx * ctx, const RsvgBpathDef * bpath_def)
+{
+    RsvgCairoRender *render = (RsvgCairoRender *) ctx->render;
+    RsvgState *state = rsvg_state_current (ctx);
+    cairo_t *cr;
+    RsvgBpath *bpath;
+    int i;
+    int need_tmpbuf = 0;
+    RsvgBbox bbox;
+
+    if (state->fill == NULL && state->stroke == NULL)
+        return;
+
+    need_tmpbuf = ((state->fill != NULL) && (state->stroke != NULL) && state->opacity != 0xff)
+        || state->clip_path_ref || state->mask || state->filter
+        || (state->comp_op != RSVG_COMP_OP_SRC_OVER);
+
+    if (need_tmpbuf)
+        rsvg_cairo_push_discrete_layer (ctx);
+
+    cr = render->cr;
+
+	_rsvg_cairo_set_shape_antialias (cr, state->shape_rendering_type);
+
+    _set_rsvg_affine (render, state->affine);
+
+    cairo_set_line_width (cr, _rsvg_css_normalize_length (&state->stroke_width, ctx, 'h'));
+    cairo_set_miter_limit (cr, state->miter_limit);
+    cairo_set_line_cap (cr, (cairo_line_cap_t) state->cap);
+    cairo_set_line_join (cr, (cairo_line_join_t) state->join);
+    cairo_set_dash (cr, state->dash.dash, state->dash.n_dash,
+                    _rsvg_css_normalize_length (&state->dash.offset, ctx, 'o'));
+
+    for (i = 0; i < bpath_def->n_bpath; i++) {
+        bpath = &bpath_def->bpath[i];
+
+        switch (bpath->code) {
+        case RSVG_MOVETO:
+            cairo_close_path (cr);
+            /* fall-through */
+        case RSVG_MOVETO_OPEN:
+            cairo_move_to (cr, bpath->x3, bpath->y3);
+            break;
+        case RSVG_CURVETO:
+            cairo_curve_to (cr, bpath->x1, bpath->y1, bpath->x2, bpath->y2, bpath->x3, bpath->y3);
+            break;
+        case RSVG_LINETO:
+            cairo_line_to (cr, bpath->x3, bpath->y3);
+            break;
+        case RSVG_END:
+            break;
+        }
+    }
+
+    rsvg_bbox_init (&bbox, state->affine);
+
+    if (state->fill != NULL) {
+        RsvgBbox fb;
+        rsvg_bbox_init (&fb, state->affine);
+        cairo_fill_extents (cr, &fb.x, &fb.y, &fb.w, &fb.h);
+        fb.w -= fb.x;
+        fb.h -= fb.y;
+        fb.virgin = 0;
+        rsvg_bbox_insert (&bbox, &fb);
+    }
+    if (state->stroke != NULL) {
+        RsvgBbox sb;
+        rsvg_bbox_init (&sb, state->affine);
+        cairo_stroke_extents (cr, &sb.x, &sb.y, &sb.w, &sb.h);
+        sb.w -= sb.x;
+        sb.h -= sb.y;
+        sb.virgin = 0;
+        rsvg_bbox_insert (&bbox, &sb);
+    }
+
+    rsvg_bbox_insert (&render->bbox, &bbox);
+
+}
 void
 rsvg_cairo_render_path (RsvgDrawingCtx * ctx, const RsvgBpathDef * bpath_def)
 {

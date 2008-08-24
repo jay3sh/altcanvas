@@ -37,6 +37,8 @@
 #include "rsvg-styles.h"
 #include "rsvg-structure.h"
 
+#include "inkface.h"
+
 static void
 rsvg_cairo_render_free (RsvgRender * self)
 {
@@ -57,6 +59,7 @@ rsvg_cairo_render_new (cairo_t * cr, double width, double height)
     cairo_render->super.render_pango_layout = rsvg_cairo_render_pango_layout;
     cairo_render->super.render_image = rsvg_cairo_render_image;
     cairo_render->super.render_path = rsvg_cairo_render_path;
+    cairo_render->super.calc_path = rsvg_cairo_calc_path;
     cairo_render->super.pop_discrete_layer = rsvg_cairo_pop_discrete_layer;
     cairo_render->super.push_discrete_layer = rsvg_cairo_push_discrete_layer;
     cairo_render->super.add_clipping_rect = rsvg_cairo_add_clipping_rect;
@@ -105,6 +108,63 @@ static void rsvg_cairo_transformed_image_bounding_box (
     t = y00  > y01 ? y00  : y01;
     t = t > y10 ? t : y10;
     *y1 = ceil (t > y11 ? t : y11);
+}
+
+static RsvgDrawingCtx *
+rsvg_cairo_new_drawing_ctx_mod (Element *element, RsvgHandle * handle)
+{
+    RsvgDrawingCtx *dctx;
+    RsvgState *state;
+    RsvgCairoRender *render;
+    cairo_matrix_t cairo_transform;
+    double affine[6], bbx0, bby0, bbx1, bby1;
+
+    element->surface = cairo_image_surface_create(
+        CAIRO_FORMAT_ARGB32,element->w,element->h);
+
+    element->cr = cairo_create(element->surface);
+
+    dctx = g_new (RsvgDrawingCtx, 1);
+
+    cairo_get_matrix (element->cr, &cairo_transform);
+
+    rsvg_cairo_transformed_image_bounding_box (&cairo_transform,
+                                                element->w,element->h,
+                                                &bbx0, &bby0, &bbx1, &bby1);
+
+    render = rsvg_cairo_render_new (element->cr, bbx1 - bbx0, bby1 - bby0);
+
+    if(!render)
+        return NULL;
+
+    dctx->render = (RsvgRender *)render;
+
+    dctx->state = NULL;
+
+    /* should this be G_ALLOC_ONLY? */
+    dctx->state_allocator = g_mem_chunk_create (RsvgState, 256, G_ALLOC_AND_FREE);
+
+    dctx->defs = handle->priv->defs;
+    dctx->base_uri = g_strdup (handle->priv->base_uri);
+    dctx->dpi_x = handle->priv->dpi_x;
+    dctx->dpi_y = handle->priv->dpi_y;
+    dctx->pango_context = NULL;
+    dctx->drawsub_stack = NULL;
+
+    rsvg_state_push (dctx);
+    state = rsvg_state_current (dctx);
+
+    affine[0] = 1;
+    affine[1] = 0;
+    affine[2] = 0;
+    affine[3] = 1;
+    affine[4] = -element->x;
+    affine[5] = -element->y;
+    _rsvg_affine_multiply (state->affine, affine, state->affine);
+
+    rsvg_bbox_init (&((RsvgCairoRender *) dctx->render)->bbox, state->affine);
+
+    return dctx;
 }
 
 static RsvgDrawingCtx *
@@ -185,6 +245,78 @@ rsvg_cairo_new_drawing_ctx (cairo_t * cr, RsvgHandle * handle)
     rsvg_bbox_init (&((RsvgCairoRender *) draw->render)->bbox, state->affine);
 
     return draw;
+}
+
+void
+inkface_get_element(RsvgHandle *handle, Element *element)
+{
+    RsvgDrawingCtx *draw;
+    RsvgNode *drawsub = NULL;
+    RsvgNode *element_node = NULL;
+
+    g_return_if_fail (handle != NULL);
+
+    if (!handle->priv->finished)
+        return;
+
+    /* CALC */
+    cairo_surface_t *tmp_surface = cairo_image_surface_create(
+        CAIRO_FORMAT_ARGB32,0,0);
+    cairo_t *tmp_cr = cairo_create(tmp_surface);
+    draw = rsvg_cairo_new_drawing_ctx (tmp_cr, handle);
+    if (!draw)
+        return;
+
+    g_return_if_fail (element->name != NULL);
+
+    if (element->name && *element->name)
+        drawsub = rsvg_defs_lookup (handle->priv->defs, element->name);
+
+    /* Get the order of the element */
+    if(drawsub)
+        element->order = drawsub->state->order;
+    else
+        printf("%s:%d] drawsub is NULL\n",__FILE__,__LINE__);
+
+    while (drawsub != NULL) {
+        draw->drawsub_stack = g_slist_prepend (draw->drawsub_stack, drawsub);
+        drawsub = drawsub->parent;
+    }
+
+
+    rsvg_state_push (draw);
+    cairo_save (tmp_cr);
+
+    rsvg_node_calc ((RsvgNode *) handle->priv->treebase, draw, 0);
+
+    cairo_restore (tmp_cr);
+    rsvg_state_pop (draw);
+
+    RsvgCairoRender *render = (RsvgCairoRender *) draw->render;
+
+    element->x = render->bbox.x;
+    element->y = render->bbox.y;
+    element->w = render->bbox.w;
+    element->h = render->bbox.h;
+
+    /* DRAW */
+
+    RsvgDrawingCtx *dctx;
+    dctx = rsvg_cairo_new_drawing_ctx_mod(element,handle);
+
+    if (element->name && *element->name)
+        element_node = rsvg_defs_lookup (handle->priv->defs, element->name);
+
+    rsvg_state_push(dctx);
+    cairo_save(element->cr);
+
+    rsvg_node_draw(element_node, dctx, 0);
+
+    cairo_restore(element->cr);
+    rsvg_state_pop(dctx);
+
+    rsvg_drawing_ctx_free(draw);
+
 }
 
 /**
