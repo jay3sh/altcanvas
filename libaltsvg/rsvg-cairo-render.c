@@ -273,10 +273,12 @@ inkface_get_element(RsvgHandle *handle, Element *element)
         drawsub = rsvg_defs_lookup (handle->priv->defs, element->name);
 
     /* Get the order of the element */
-    if(drawsub)
+    if(drawsub) {
         element->order = drawsub->state->order;
-    else
+        element->transient = drawsub->state->transient;
+    } else {
         printf("%s:%d] drawsub is NULL\n",__FILE__,__LINE__);
+    }
 
     while (drawsub != NULL) {
         draw->drawsub_stack = g_slist_prepend (draw->drawsub_stack, drawsub);

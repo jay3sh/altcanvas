@@ -135,6 +135,8 @@ struct _RsvgState {
     double personal_affine[6];
 
     guint16 order;              /* Order to draw */
+    gboolean transient;         /* If transient, it will be visible 
+                                   only programmatically */
 
     RsvgFilter *filter;
     void *mask;

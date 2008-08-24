@@ -219,6 +219,9 @@ int main(int argc, char *argv[])
 
         ASSERT(element);
 
+        if(element->transient)
+            goto next;
+
         if(!strncmp(element->name,"#rect7058",9)){
             // Use this element surface as mask
             int cover_w=1,cover_h=1;
@@ -253,9 +256,9 @@ int main(int argc, char *argv[])
         }
         cairo_surface_destroy(element->surface);
 
-        g_free(elem->data);
-
-        elem = elem->next;
+        next:
+            g_free(elem->data);
+            elem = elem->next;
     }
     g_list_free(elemList);
 
