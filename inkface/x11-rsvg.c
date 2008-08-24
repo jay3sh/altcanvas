@@ -217,8 +217,7 @@ void test1(void)
 gint
 compare_element(
     gconstpointer a, 
-    gconstpointer b,
-    gpointer user_data)
+    gconstpointer b)
 {
     Element *eA=NULL,*eB=NULL;
     eA = (Element *)a;
@@ -335,8 +334,38 @@ int main(int argc, char *argv[])
 
         ASSERT(element);
 
-        cairo_set_source_surface(ctx,element->surface,element->x,element->y);
-        cairo_paint(ctx);
+        if(!strncmp(element->name,"#rect7058",9)){
+            // Use this element surface as mask
+            int cover_w=1,cover_h=1;
+
+            cairo_surface_t *cover_surface =
+                cairo_image_surface_create_from_png(
+                "/photos/inkfun/corrs.png");
+            cover_w = cairo_image_surface_get_width(cover_surface);
+            cover_h = cairo_image_surface_get_height(cover_surface);
+            cairo_save(ctx);
+            cairo_scale(ctx,
+                        element->w*1./cover_w,
+                        element->h*1./cover_h);
+            cairo_set_source_surface(ctx,
+                        cover_surface, 
+                        element->x*cover_w*1./element->w,
+                        element->y*cover_h*1./element->h);
+            
+            cairo_paint(ctx);
+            cairo_restore(ctx);
+
+            // apply the mask
+            cairo_set_source_rgb(ctx,0,0,0);
+            cairo_mask_surface(ctx,element->surface,
+                        element->x,
+                        element->y);
+            cairo_fill(ctx);
+        } else {
+            cairo_set_source_surface(ctx,
+                element->surface,element->x,element->y);
+            cairo_paint(ctx);
+        }
         cairo_surface_destroy(element->surface);
 
         g_free(elem->data);
