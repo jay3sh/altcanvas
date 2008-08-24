@@ -245,6 +245,7 @@ void rsvg_state_reinherit   (RsvgState * dst, const RsvgState * src);
 void rsvg_state_dominate    (RsvgState * dst, const RsvgState * src);
 void rsvg_state_override    (RsvgState * dst, const RsvgState * src);
 void rsvg_state_finalize    (RsvgState * state);
+void inkface_state_finalize    (InkfaceState * state);
 
 void rsvg_parse_style_pairs (RsvgHandle * ctx, RsvgState * state, RsvgPropertyBag * atts);
 void rsvg_parse_style_pair  (RsvgHandle * ctx, RsvgState * state, const char *key, const char *val);

@@ -154,6 +154,10 @@ _rsvg_node_finalize (RsvgNode * self)
         rsvg_state_finalize (self->state);
         g_free (self->state);
     }
+    if (self->istate != NULL) {
+        inkface_istate_finalize (self->istate);
+        g_free (self->istate);
+    }
     if (self->children != NULL)
         g_ptr_array_free (self->children, TRUE);
     if (self->type != NULL)
@@ -638,4 +642,10 @@ inkface_parse_attrs(RsvgNode *self, RsvgPropertyBag *atts)
     if ((value = rsvg_property_bag_lookup (atts, "onMouseOver"))) {
     }
 
+}
+
+void
+inkface_istate_finalize (InkfaceState *istate)
+{
+    (void)istate;    
 }
