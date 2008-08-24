@@ -1,0 +1,269 @@
+<refentry id="rsvg-GdkPixbuf">
+<refmeta>
+<refentrytitle role="top_of_page">Rendering SVGs with GdkPixbuf</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>RSVG Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>Rendering SVGs with GdkPixbuf</refname>
+<refpurpose><para>
+How to render SVGs into GdkPixbufs, for easy use in GTK+ applications
+</para></refpurpose>
+<!--[<xref linkend="desc" endterm="desc.title"/>]-->
+</refnamediv>
+
+<refsynopsisdiv role="synopsis">
+<title role="synopsis.title">Synopsis</title>
+
+<synopsis>
+
+
+
+<link linkend="GdkPixbuf">GdkPixbuf</link>*          <link linkend="rsvg-handle-get-pixbuf">rsvg_handle_get_pixbuf</link>              (<link linkend="RsvgHandle">RsvgHandle</link> *handle);
+<link linkend="GdkPixbuf">GdkPixbuf</link>*          <link linkend="rsvg-handle-get-pixbuf-sub">rsvg_handle_get_pixbuf_sub</link>          (<link linkend="RsvgHandle">RsvgHandle</link> *handle,
+                                                         const <link linkend="char">char</link> *id);
+<link linkend="GdkPixbuf">GdkPixbuf</link>*          <link linkend="rsvg-pixbuf-from-file">rsvg_pixbuf_from_file</link>               (const <link linkend="gchar">gchar</link> *file_name,
+                                                         <link linkend="GError">GError</link> **error);
+<link linkend="GdkPixbuf">GdkPixbuf</link>*          <link linkend="rsvg-pixbuf-from-file-at-zoom">rsvg_pixbuf_from_file_at_zoom</link>       (const <link linkend="gchar">gchar</link> *file_name,
+                                                         <link linkend="double">double</link> x_zoom,
+                                                         <link linkend="double">double</link> y_zoom,
+                                                         <link linkend="GError">GError</link> **error);
+<link linkend="GdkPixbuf">GdkPixbuf</link>*          <link linkend="rsvg-pixbuf-from-file-at-size">rsvg_pixbuf_from_file_at_size</link>       (const <link linkend="gchar">gchar</link> *file_name,
+                                                         <link linkend="gint">gint</link> width,
+                                                         <link linkend="gint">gint</link> height,
+                                                         <link linkend="GError">GError</link> **error);
+<link linkend="GdkPixbuf">GdkPixbuf</link>*          <link linkend="rsvg-pixbuf-from-file-at-max-size">rsvg_pixbuf_from_file_at_max_size</link>   (const <link linkend="gchar">gchar</link> *file_name,
+                                                         <link linkend="gint">gint</link> max_width,
+                                                         <link linkend="gint">gint</link> max_height,
+                                                         <link linkend="GError">GError</link> **error);
+<link linkend="GdkPixbuf">GdkPixbuf</link>*          <link linkend="rsvg-pixbuf-from-file-at-zoom-with-max">rsvg_pixbuf_from_file_at_zoom_with_max</link>
+                                                        (const <link linkend="gchar">gchar</link> *file_name,
+                                                         <link linkend="double">double</link> x_zoom,
+                                                         <link linkend="double">double</link> y_zoom,
+                                                         <link linkend="gint">gint</link> max_width,
+                                                         <link linkend="gint">gint</link> max_height,
+                                                         <link linkend="GError">GError</link> **error);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+
+
+
+
+<refsect1 role="desc">
+<title role="desc.title">Description</title>
+<para>
+GdkPixbuf is a library for image loading and manipulation. It is part of the cross-platform GTK+ widget toolkit.
+</para>
+</refsect1>
+
+<refsect1 role="details">
+<title role="details.title">Details</title>
+<refsect2>
+<title><anchor id="rsvg-handle-get-pixbuf" role="function"/>rsvg_handle_get_pixbuf ()</title>
+<indexterm><primary>rsvg_handle_get_pixbuf</primary></indexterm><programlisting><link linkend="GdkPixbuf">GdkPixbuf</link>*          rsvg_handle_get_pixbuf              (<link linkend="RsvgHandle">RsvgHandle</link> *handle);</programlisting>
+<para>
+Returns the pixbuf loaded by <link linkend="handle"><type>handle</type></link>.  The pixbuf returned will be reffed, so
+the caller of this function must assume that ref.  If insufficient data has
+been read to create the pixbuf, or an error occurred in loading, then <link linkend="NULL:CAPS"><literal>NULL</literal></link>
+will be returned.  Note that the pixbuf may not be complete until
+<parameter>rsvg_handle_close</parameter> has been called.</para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>handle</parameter>&nbsp;:</term>
+<listitem><simpara> An <link linkend="RsvgHandle"><type>RsvgHandle</type></link>
+</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&nbsp;:</term><listitem><simpara> the pixbuf loaded by <link linkend="handle"><type>handle</type></link>, or <link linkend="NULL:CAPS"><literal>NULL</literal></link>.
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="rsvg-handle-get-pixbuf-sub" role="function" condition="since:2.14"/>rsvg_handle_get_pixbuf_sub ()</title>
+<indexterm role="2.14"><primary>rsvg_handle_get_pixbuf_sub</primary></indexterm><programlisting><link linkend="GdkPixbuf">GdkPixbuf</link>*          rsvg_handle_get_pixbuf_sub          (<link linkend="RsvgHandle">RsvgHandle</link> *handle,
+                                                         const <link linkend="char">char</link> *id);</programlisting>
+<para>
+Returns the pixbuf loaded by <link linkend="handle"><type>handle</type></link>.  The pixbuf returned will be reffed, so
+the caller of this function must assume that ref.  If insufficient data has
+been read to create the pixbuf, or an error occurred in loading, then <link linkend="NULL:CAPS"><literal>NULL</literal></link>
+will be returned.  Note that the pixbuf may not be complete until
+<parameter>rsvg_handle_close</parameter> has been called.</para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>handle</parameter>&nbsp;:</term>
+<listitem><simpara> An <link linkend="RsvgHandle"><type>RsvgHandle</type></link>
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>id</parameter>&nbsp;:</term>
+<listitem><simpara> The id of an element inside the SVG, or <link linkend="NULL:CAPS"><literal>NULL</literal></link> to render the whole SVG. For
+example, if you have a layer called "layer1" that you wish to render, pass 
+"#<link linkend="layer1"><type>layer1</type></link>" as the id.
+</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&nbsp;:</term><listitem><simpara> the pixbuf loaded by <link linkend="handle"><type>handle</type></link>, or <link linkend="NULL:CAPS"><literal>NULL</literal></link>.
+
+</simpara></listitem></varlistentry>
+</variablelist><para role="since">Since  2.14
+</para></refsect2>
+<refsect2>
+<title><anchor id="rsvg-pixbuf-from-file" role="function" condition="deprecated:Set up a cairo matrix and use rsvg_handle_new_from_file() + rsvg_handle_render_cairo() instead."/>rsvg_pixbuf_from_file ()</title>
+<indexterm role="deprecated"><primary>rsvg_pixbuf_from_file</primary></indexterm><programlisting><link linkend="GdkPixbuf">GdkPixbuf</link>*          rsvg_pixbuf_from_file               (const <link linkend="gchar">gchar</link> *file_name,
+                                                         <link linkend="GError">GError</link> **error);</programlisting>
+<warning><para><literal>rsvg_pixbuf_from_file</literal> is deprecated and should not be used in newly-written code. Set up a cairo matrix and use <link linkend="rsvg-handle-new-from-file"><function>rsvg_handle_new_from_file()</function></link> + <link linkend="rsvg-handle-render-cairo"><function>rsvg_handle_render_cairo()</function></link> instead.</para></warning>
+<para>
+Loads a new <link linkend="GdkPixbuf"><type>GdkPixbuf</type></link> from <parameter>file_name</parameter> and returns it.  The caller must
+assume the reference to the reurned pixbuf. If an error occurred, <parameter>error</parameter> is
+set and <link linkend="NULL:CAPS"><literal>NULL</literal></link> is returned.</para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>file_name</parameter>&nbsp;:</term>
+<listitem><simpara> A file name
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>error</parameter>&nbsp;:</term>
+<listitem><simpara> return location for errors
+</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&nbsp;:</term><listitem><simpara> A newly allocated <link linkend="GdkPixbuf"><type>GdkPixbuf</type></link>, or <link linkend="NULL:CAPS"><literal>NULL</literal></link>
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="rsvg-pixbuf-from-file-at-zoom" role="function" condition="deprecated:Set up a cairo matrix and use rsvg_handle_new_from_file() + rsvg_handle_render_cairo() instead."/>rsvg_pixbuf_from_file_at_zoom ()</title>
+<indexterm role="deprecated"><primary>rsvg_pixbuf_from_file_at_zoom</primary></indexterm><programlisting><link linkend="GdkPixbuf">GdkPixbuf</link>*          rsvg_pixbuf_from_file_at_zoom       (const <link linkend="gchar">gchar</link> *file_name,
+                                                         <link linkend="double">double</link> x_zoom,
+                                                         <link linkend="double">double</link> y_zoom,
+                                                         <link linkend="GError">GError</link> **error);</programlisting>
+<warning><para><literal>rsvg_pixbuf_from_file_at_zoom</literal> is deprecated and should not be used in newly-written code. Set up a cairo matrix and use <link linkend="rsvg-handle-new-from-file"><function>rsvg_handle_new_from_file()</function></link> + <link linkend="rsvg-handle-render-cairo"><function>rsvg_handle_render_cairo()</function></link> instead.</para></warning>
+<para>
+Loads a new <link linkend="GdkPixbuf"><type>GdkPixbuf</type></link> from <parameter>file_name</parameter> and returns it.  This pixbuf is scaled
+from the size indicated by the file by a factor of <parameter>x_zoom</parameter> and <parameter>y_zoom</parameter>.  The
+caller must assume the reference to the returned pixbuf. If an error
+occurred, <parameter>error</parameter> is set and <link linkend="NULL:CAPS"><literal>NULL</literal></link> is returned.</para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>file_name</parameter>&nbsp;:</term>
+<listitem><simpara> A file name
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>x_zoom</parameter>&nbsp;:</term>
+<listitem><simpara> The horizontal zoom factor
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>y_zoom</parameter>&nbsp;:</term>
+<listitem><simpara> The vertical zoom factor
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>error</parameter>&nbsp;:</term>
+<listitem><simpara> return location for errors
+</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&nbsp;:</term><listitem><simpara> A newly allocated <link linkend="GdkPixbuf"><type>GdkPixbuf</type></link>, or <link linkend="NULL:CAPS"><literal>NULL</literal></link>
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="rsvg-pixbuf-from-file-at-size" role="function" condition="deprecated:Set up a cairo matrix and use rsvg_handle_new_from_file() + rsvg_handle_render_cairo() instead."/>rsvg_pixbuf_from_file_at_size ()</title>
+<indexterm role="deprecated"><primary>rsvg_pixbuf_from_file_at_size</primary></indexterm><programlisting><link linkend="GdkPixbuf">GdkPixbuf</link>*          rsvg_pixbuf_from_file_at_size       (const <link linkend="gchar">gchar</link> *file_name,
+                                                         <link linkend="gint">gint</link> width,
+                                                         <link linkend="gint">gint</link> height,
+                                                         <link linkend="GError">GError</link> **error);</programlisting>
+<warning><para><literal>rsvg_pixbuf_from_file_at_size</literal> is deprecated and should not be used in newly-written code. Set up a cairo matrix and use <link linkend="rsvg-handle-new-from-file"><function>rsvg_handle_new_from_file()</function></link> + <link linkend="rsvg-handle-render-cairo"><function>rsvg_handle_render_cairo()</function></link> instead.</para></warning>
+<para>
+Loads a new <link linkend="GdkPixbuf"><type>GdkPixbuf</type></link> from <parameter>file_name</parameter> and returns it.  This pixbuf is scaled
+from the size indicated to the new size indicated by <parameter>width</parameter> and <parameter>height</parameter>.  If
+either of these are -1, then the default size of the image being loaded is
+used.  The caller must assume the reference to the returned pixbuf. If an
+error occurred, <parameter>error</parameter> is set and <link linkend="NULL:CAPS"><literal>NULL</literal></link> is returned.</para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>file_name</parameter>&nbsp;:</term>
+<listitem><simpara> A file name
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>width</parameter>&nbsp;:</term>
+<listitem><simpara> The new width, or -1
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>height</parameter>&nbsp;:</term>
+<listitem><simpara> The new height, or -1
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>error</parameter>&nbsp;:</term>
+<listitem><simpara> return location for errors
+</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&nbsp;:</term><listitem><simpara> A newly allocated <link linkend="GdkPixbuf"><type>GdkPixbuf</type></link>, or <link linkend="NULL:CAPS"><literal>NULL</literal></link>
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="rsvg-pixbuf-from-file-at-max-size" role="function" condition="deprecated:Set up a cairo matrix and use rsvg_handle_new_from_file() + rsvg_handle_render_cairo() instead."/>rsvg_pixbuf_from_file_at_max_size ()</title>
+<indexterm role="deprecated"><primary>rsvg_pixbuf_from_file_at_max_size</primary></indexterm><programlisting><link linkend="GdkPixbuf">GdkPixbuf</link>*          rsvg_pixbuf_from_file_at_max_size   (const <link linkend="gchar">gchar</link> *file_name,
+                                                         <link linkend="gint">gint</link> max_width,
+                                                         <link linkend="gint">gint</link> max_height,
+                                                         <link linkend="GError">GError</link> **error);</programlisting>
+<warning><para><literal>rsvg_pixbuf_from_file_at_max_size</literal> is deprecated and should not be used in newly-written code. Set up a cairo matrix and use <link linkend="rsvg-handle-new-from-file"><function>rsvg_handle_new_from_file()</function></link> + <link linkend="rsvg-handle-render-cairo"><function>rsvg_handle_render_cairo()</function></link> instead.</para></warning>
+<para>
+Loads a new <link linkend="GdkPixbuf"><type>GdkPixbuf</type></link> from <parameter>file_name</parameter> and returns it.  This pixbuf is uniformly
+scaled so that the it fits into a rectangle of size max_width * max_height. The
+caller must assume the reference to the returned pixbuf. If an error occurred,
+<parameter>error</parameter> is set and <link linkend="NULL:CAPS"><literal>NULL</literal></link> is returned.</para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>file_name</parameter>&nbsp;:</term>
+<listitem><simpara> A file name
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>max_width</parameter>&nbsp;:</term>
+<listitem><simpara> The requested max width
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>max_height</parameter>&nbsp;:</term>
+<listitem><simpara> The requested max heigh
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>error</parameter>&nbsp;:</term>
+<listitem><simpara> return location for errors
+</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&nbsp;:</term><listitem><simpara> A newly allocated <link linkend="GdkPixbuf"><type>GdkPixbuf</type></link>, or <link linkend="NULL:CAPS"><literal>NULL</literal></link>
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+<refsect2>
+<title><anchor id="rsvg-pixbuf-from-file-at-zoom-with-max" role="function" condition="deprecated:Set up a cairo matrix and use rsvg_handle_new_from_file() + rsvg_handle_render_cairo() instead."/>rsvg_pixbuf_from_file_at_zoom_with_max ()</title>
+<indexterm role="deprecated"><primary>rsvg_pixbuf_from_file_at_zoom_with_max</primary></indexterm><programlisting><link linkend="GdkPixbuf">GdkPixbuf</link>*          rsvg_pixbuf_from_file_at_zoom_with_max
+                                                        (const <link linkend="gchar">gchar</link> *file_name,
+                                                         <link linkend="double">double</link> x_zoom,
+                                                         <link linkend="double">double</link> y_zoom,
+                                                         <link linkend="gint">gint</link> max_width,
+                                                         <link linkend="gint">gint</link> max_height,
+                                                         <link linkend="GError">GError</link> **error);</programlisting>
+<warning><para><literal>rsvg_pixbuf_from_file_at_zoom_with_max</literal> is deprecated and should not be used in newly-written code. Set up a cairo matrix and use <link linkend="rsvg-handle-new-from-file"><function>rsvg_handle_new_from_file()</function></link> + <link linkend="rsvg-handle-render-cairo"><function>rsvg_handle_render_cairo()</function></link> instead.</para></warning>
+<para>
+Loads a new <link linkend="GdkPixbuf"><type>GdkPixbuf</type></link> from <parameter>file_name</parameter> and returns it.  This pixbuf is scaled
+from the size indicated by the file by a factor of <parameter>x_zoom</parameter> and <parameter>y_zoom</parameter>. If the
+resulting pixbuf would be larger than max_width/max_heigh it is uniformly scaled
+down to fit in that rectangle. The caller must assume the reference to the
+returned pixbuf. If an error occurred, <parameter>error</parameter> is set and <link linkend="NULL:CAPS"><literal>NULL</literal></link> is returned.</para>
+<para>
+
+</para><variablelist role="params">
+<varlistentry><term><parameter>file_name</parameter>&nbsp;:</term>
+<listitem><simpara> A file name
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>x_zoom</parameter>&nbsp;:</term>
+<listitem><simpara> The horizontal zoom factor
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>y_zoom</parameter>&nbsp;:</term>
+<listitem><simpara> The vertical zoom factor
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>max_width</parameter>&nbsp;:</term>
+<listitem><simpara> The requested max width
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>max_height</parameter>&nbsp;:</term>
+<listitem><simpara> The requested max heigh
+</simpara></listitem></varlistentry>
+<varlistentry><term><parameter>error</parameter>&nbsp;:</term>
+<listitem><simpara> return location for errors
+</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&nbsp;:</term><listitem><simpara> A newly allocated <link linkend="GdkPixbuf"><type>GdkPixbuf</type></link>, or <link linkend="NULL:CAPS"><literal>NULL</literal></link>
+</simpara></listitem></varlistentry>
+</variablelist></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

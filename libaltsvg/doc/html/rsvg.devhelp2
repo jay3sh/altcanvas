@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE book PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "">
+<book xmlns="http://www.devhelp.net/book" title="RSVG Reference Manual" link="index.html" author="" name="rsvg" version="2">
+  <chapters>
+    <sub name="RSVG Overview" link="rsvg.html"/>
+    <sub name="&#10;Using RSVG&#10;" link="pt02.html">
+      <sub name="Core API" link="rsvg-Core-API.html"/>
+    </sub>
+    <sub name="&#10;Using RSVG with Cairo&#10;" link="pt03.html">
+      <sub name="Cairo" link="rsvg-Cairo.html"/>
+    </sub>
+    <sub name="&#10;Using RSVG with GdkPixbuf&#10;" link="pt04.html">
+      <sub name="Rendering SVGs with GdkPixbuf" link="rsvg-GdkPixbuf.html"/>
+    </sub>
+    <sub name="" link="ix01.html"/>
+  </chapters>
+  <functions>
+    <keyword type="enum" name="enum RsvgError" link="rsvg-Core-API.html#RsvgError"/>
+    <keyword type="macro" name="RSVG_ERROR" link="rsvg-Core-API.html#RSVG-ERROR:CAPS"/>
+    <keyword type="function" name="rsvg_error_quark ()" link="rsvg-Core-API.html#rsvg-error-quark"/>
+    <keyword type="function" name="rsvg_init ()" link="rsvg-Core-API.html#rsvg-init" since="2.9"/>
+    <keyword type="function" name="rsvg_term ()" link="rsvg-Core-API.html#rsvg-term" since="2.9"/>
+    <keyword type="function" name="rsvg_set_default_dpi ()" link="rsvg-Core-API.html#rsvg-set-default-dpi" since="2.8"/>
+    <keyword type="function" name="rsvg_set_default_dpi_x_y ()" link="rsvg-Core-API.html#rsvg-set-default-dpi-x-y" since="2.8"/>
+    <keyword type="function" name="rsvg_handle_new ()" link="rsvg-Core-API.html#rsvg-handle-new"/>
+    <keyword type="function" name="rsvg_handle_free ()" link="rsvg-Core-API.html#rsvg-handle-free" deprecated="Use g_object_unref() instead."/>
+    <keyword type="function" name="rsvg_handle_set_dpi ()" link="rsvg-Core-API.html#rsvg-handle-set-dpi" since="2.8"/>
+    <keyword type="function" name="rsvg_handle_set_dpi_x_y ()" link="rsvg-Core-API.html#rsvg-handle-set-dpi-x-y" since="2.8"/>
+    <keyword type="function" name="rsvg_handle_write ()" link="rsvg-Core-API.html#rsvg-handle-write"/>
+    <keyword type="function" name="rsvg_handle_close ()" link="rsvg-Core-API.html#rsvg-handle-close"/>
+    <keyword type="function" name="rsvg_handle_new_from_data ()" link="rsvg-Core-API.html#rsvg-handle-new-from-data" since="2.14"/>
+    <keyword type="function" name="rsvg_handle_new_from_file ()" link="rsvg-Core-API.html#rsvg-handle-new-from-file" since="2.14"/>
+    <keyword type="struct" name="RsvgDimensionData" link="rsvg-Core-API.html#RsvgDimensionData"/>
+    <keyword type="function" name="RsvgSizeFunc ()" link="rsvg-Core-API.html#RsvgSizeFunc" deprecated="Set up a cairo matrix and use rsvg_handle_render_cairo() instead."/>
+    <keyword type="function" name="rsvg_handle_set_size_callback ()" link="rsvg-Core-API.html#rsvg-handle-set-size-callback" deprecated="Set up a cairo matrix and use rsvg_handle_render_cairo() instead."/>
+    <keyword type="function" name="rsvg_handle_get_base_uri ()" link="rsvg-Core-API.html#rsvg-handle-get-base-uri" since="2.9 (really present in 2.8 as well)"/>
+    <keyword type="function" name="rsvg_handle_set_base_uri ()" link="rsvg-Core-API.html#rsvg-handle-set-base-uri" since="2.9"/>
+    <keyword type="function" name="rsvg_handle_get_title ()" link="rsvg-Core-API.html#rsvg-handle-get-title" since="2.4"/>
+    <keyword type="function" name="rsvg_handle_get_desc ()" link="rsvg-Core-API.html#rsvg-handle-get-desc" since="2.4"/>
+    <keyword type="function" name="rsvg_handle_get_dimensions ()" link="rsvg-Core-API.html#rsvg-handle-get-dimensions" since="2.14"/>
+    <keyword type="function" name="rsvg_handle_render_cairo ()" link="rsvg-Cairo.html#rsvg-handle-render-cairo" since="2.14"/>
+    <keyword type="function" name="rsvg_handle_render_cairo_sub ()" link="rsvg-Cairo.html#rsvg-handle-render-cairo-sub" since="2.14"/>
+    <keyword type="function" name="rsvg_handle_get_pixbuf ()" link="rsvg-GdkPixbuf.html#rsvg-handle-get-pixbuf"/>
+    <keyword type="function" name="rsvg_handle_get_pixbuf_sub ()" link="rsvg-GdkPixbuf.html#rsvg-handle-get-pixbuf-sub" since="2.14"/>
+    <keyword type="function" name="rsvg_pixbuf_from_file ()" link="rsvg-GdkPixbuf.html#rsvg-pixbuf-from-file" deprecated="Set up a cairo matrix and use rsvg_handle_new_from_file() + rsvg_handle_render_cairo() instead."/>
+    <keyword type="function" name="rsvg_pixbuf_from_file_at_zoom ()" link="rsvg-GdkPixbuf.html#rsvg-pixbuf-from-file-at-zoom" deprecated="Set up a cairo matrix and use rsvg_handle_new_from_file() + rsvg_handle_render_cairo() instead."/>
+    <keyword type="function" name="rsvg_pixbuf_from_file_at_size ()" link="rsvg-GdkPixbuf.html#rsvg-pixbuf-from-file-at-size" deprecated="Set up a cairo matrix and use rsvg_handle_new_from_file() + rsvg_handle_render_cairo() instead."/>
+    <keyword type="function" name="rsvg_pixbuf_from_file_at_max_size ()" link="rsvg-GdkPixbuf.html#rsvg-pixbuf-from-file-at-max-size" deprecated="Set up a cairo matrix and use rsvg_handle_new_from_file() + rsvg_handle_render_cairo() instead."/>
+    <keyword type="function" name="rsvg_pixbuf_from_file_at_zoom_with_max ()" link="rsvg-GdkPixbuf.html#rsvg-pixbuf-from-file-at-zoom-with-max" deprecated="Set up a cairo matrix and use rsvg_handle_new_from_file() + rsvg_handle_render_cairo() instead."/>
+  </functions>
+</book>
