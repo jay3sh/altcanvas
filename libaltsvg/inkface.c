@@ -135,6 +135,10 @@ int main(int argc, char *argv[])
     XGCValues gcv;
     GC gc;
     char *elemChoice = NULL;
+    int xsp_event_base=-1;
+    int xsp_error_base=-1;
+    int xsp_major=-1;
+    int xsp_minor=-1;
 
 
     if(argc < 2){
@@ -157,7 +161,9 @@ int main(int argc, char *argv[])
     RsvgDimensionData dim;
     rsvg_handle_get_dimensions(handle,&dim);
 
-
+    /*
+     * Create X window of the size of the image
+     */
     ASSERT(dpy = XOpenDisplay(0));
 
     ASSERT(rwin = DefaultRootWindow(dpy));
@@ -184,8 +190,9 @@ int main(int argc, char *argv[])
                         dpy, win, visual, dim.width,dim.height));
     ASSERT(ctx = cairo_create(surface));
 
-
-    cairo_surface_t *node_surface = NULL;
+    /*
+     * Create Element objects from the loaded SVG
+     */
 
     GList *eidList = inkface_get_element_ids(handle->priv->defs);
     GList *head_eidList = eidList;
@@ -212,7 +219,11 @@ int main(int argc, char *argv[])
     g_list_free(head_eidList);
 
 
-    GList *elem = g_list_sort(elemList,compare_element);
+    /*
+     * Draw the sorted list of Elements
+     */
+    GList *sortedElemList = g_list_sort(elemList,compare_element);
+    GList *elem = sortedElemList;
     while(elem)
     {
         Element *element = (Element *)elem->data;
@@ -264,7 +275,46 @@ int main(int argc, char *argv[])
 
     XFlush(dpy);
 
-    sleep(3);
+    /*
+     * Setup the event listening
+     */
+    XSelectInput(dpy, win, StructureNotifyMask);
+    XSelectInput(dpy, win, StructureNotifyMask|PointerMotionMask);
+    while(1)
+    {
+        XMotionEvent *mevent;
+        XEvent event;
+        XNextEvent(dpy,&event);
+        switch(event.type){
+        case MapNotify:
+            break;
+        case MotionNotify:
+            mevent = (XMotionEvent *)(&event);
+            /*
+             * Trigger the events in decreasing "order" of the elements
+             */
+            GList *elem = g_list_last(sortedElemList);
+            while(elem){
+                Element *el = (Element *)(elem->data);
+                if(el->transient){
+                    elem = elem->prev;
+                    continue;
+                }
+                if((mevent->x > el->x) &&
+                    (mevent->y > el->y) &&
+                    (mevent->x < (el->x+el->w)) &&
+                    (mevent->y < (el->y+el->h)))
+                {
+                    printf("%s under mouse\n",el->name);
+                }
+                elem = elem->prev;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
 
     rsvg_term ();
 
