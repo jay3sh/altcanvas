@@ -13,6 +13,7 @@ struct _RsvgNodeRect {
 
 typedef struct _RsvgNodeRect RsvgNodeRect;
 
+#include "config.h"
 #include "stdlib.h"
 #include "string.h"
 
@@ -20,6 +21,12 @@ typedef struct _RsvgNodeRect RsvgNodeRect;
 #include <cairo-xlib.h>
 
 #include <inkface.h>
+
+#include <sys/time.h>
+#include <time.h>
+#include "pthread.h"
+#include "errno.h"
+
 
 
 #define ASSERT(x) \
@@ -76,6 +83,55 @@ void __cyg_profile_func_exit( void *this, void *callsite )
 #endif
 
 
+pthread_mutex_t mutex;
+pthread_cond_t cond;
+static gboolean dirty = TRUE;
+
+void
+paint(void *arg)
+{
+    if(dirty){
+    }
+
+    dirty = FALSE;
+}
+
+void 
+painter_thread(void *arg)
+{
+    int rc=0;
+    struct timespec timeout;
+    struct timeval curtime;
+
+    while(1)
+    {
+        ASSERT(!gettimeofday(&curtime,NULL))
+    
+        timeout.tv_sec = curtime.tv_sec;
+        timeout.tv_nsec = curtime.tv_usec * 1000;
+        timeout.tv_nsec += (40 * 1000000L);
+        timeout.tv_sec += timeout.tv_nsec/1000000000L;
+        timeout.tv_nsec %= 1000000000L;
+    
+        rc=pthread_cond_timedwait(&cond,&mutex,&timeout);
+    
+        if(rc!=0){
+            if(rc == ETIMEDOUT){
+                paint(NULL);
+                continue;
+            } else {
+                printf("<<%s>> pthread_cond_timwait returned %d\n",
+                        __FUNCTION__,rc);
+                continue;
+            }
+        }
+    
+        printf("<<%s>> pthread_cond_timwait failed to wait \n",
+                __FUNCTION__);
+    }
+
+}
+
 RsvgHandle *
 rsvg_handle_from_file(const char *filename)
 {
@@ -110,7 +166,6 @@ rsvg_handle_from_file(const char *filename)
     
     return handle;
 }
-
 
 gint
 compare_element(
@@ -218,6 +273,8 @@ int main(int argc, char *argv[])
     }
     g_list_free(head_eidList);
 
+    pthread_t thr;
+    pthread_create(&thr,NULL,painter_thread,NULL);
 
     /*
      * Draw the sorted list of Elements

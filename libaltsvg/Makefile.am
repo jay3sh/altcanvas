@@ -117,7 +117,7 @@ rsvg_view_LDADD = $(GTK_LIBS) $(GDK_X11_LIBS) $(libm) $(LDADDS)
 
 inkface_SOURCES = \
 	inkface.c
-inkface_LDFLAGS =
+inkface_LDFLAGS = 
 inkface_DEPENDENCIES = $(DEPS)
 inkface_LDADD = $(GDK_X11_LIBS) $(LDADDS)
 

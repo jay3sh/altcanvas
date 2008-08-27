@@ -22,7 +22,6 @@
    Author: Raph Levien <raph@artofcode.com>
 */
 
-#include "config.h"
 #include "rsvg-private.h"
 #include "rsvg-defs.h"
 #include "rsvg-styles.h"

@@ -630,6 +630,9 @@ inkface_parse_attrs(RsvgNode *self, RsvgPropertyBag *atts)
      * Extract the order attribute and store is as part of state
      */
     const char *value;
+    if ((value = rsvg_property_bag_lookup (atts, "name"))) {
+        self->istate->name = strdup(value);
+    }
     if ((value = rsvg_property_bag_lookup (atts, "order"))) {
         self->istate->order = atoi(value);
     }
@@ -648,4 +651,5 @@ void
 inkface_istate_finalize (InkfaceState *istate)
 {
     (void)istate;    
+    free(istate->name);
 }
