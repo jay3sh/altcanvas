@@ -647,6 +647,11 @@ inkface_parse_attrs(RsvgNode *self, RsvgPropertyBag *atts)
 
 }
 
+void 
+inkface_istate_init(InkfaceState *istate)
+{
+}
+
 void
 inkface_istate_finalize (InkfaceState *istate)
 {
