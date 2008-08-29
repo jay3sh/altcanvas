@@ -85,6 +85,7 @@ void __cyg_profile_func_exit( void *this, void *callsite )
 
 cairo_t *ctx = NULL;
 Display *dpy=NULL;
+Window win;
 
 GList *sortedElemList = NULL;
 static gboolean dirty = TRUE;
@@ -224,6 +225,63 @@ rsvg_handle_from_file(const char *filename)
     return handle;
 }
 
+
+void eventloop()
+{
+    /*
+     * Setup the event listening
+     */
+    XSelectInput(dpy, win, StructureNotifyMask);
+    XSelectInput(dpy, win, StructureNotifyMask|PointerMotionMask);
+    while(1)
+    {
+        XMotionEvent *mevent;
+        XEvent event;
+        XNextEvent(dpy,&event);
+        switch(event.type){
+        case MapNotify:
+            break;
+        case MotionNotify:
+            mevent = (XMotionEvent *)(&event);
+            /*
+             * Trigger the events in decreasing "order" of the elements
+             */
+            GList *elem = g_list_last(sortedElemList);
+            while(elem){
+                gboolean nowInFocus = FALSE;
+                Element *el = (Element *)(elem->data);
+                if(el->transient){
+                    elem = elem->prev;
+                    continue;
+                }
+                if((mevent->x > el->x) &&
+                    (mevent->y > el->y) &&
+                    (mevent->x < (el->x+el->w)) &&
+                    (mevent->y < (el->y+el->h)))
+                {
+                    nowInFocus = TRUE;
+                } 
+
+                if(el->inFocus && !nowInFocus){
+                    //call onMouseLeave
+                    printf("%s mouseLeave\n",el->name);
+                }
+                if(!el->inFocus && nowInFocus){
+                    //call onMouseEnter
+                    printf("%s mouseEnter\n",el->name);
+                }
+                el->inFocus = nowInFocus;
+
+                elem = elem->prev;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+}
+
 gint
 compare_element(
     gconstpointer a, 
@@ -238,7 +296,7 @@ compare_element(
 int main(int argc, char *argv[])
 {
 
-    Window win,rwin;
+    Window rwin;
     int screen = 0;
     int w=800, h=480;
     int x=0, y=0;
@@ -337,45 +395,9 @@ int main(int argc, char *argv[])
     pthread_create(&thr,NULL,painter_thread,NULL);
 
     /*
-     * Setup the event listening
+     * Consume events infinitely
      */
-    XSelectInput(dpy, win, StructureNotifyMask);
-    XSelectInput(dpy, win, StructureNotifyMask|PointerMotionMask);
-    while(1)
-    {
-        XMotionEvent *mevent;
-        XEvent event;
-        XNextEvent(dpy,&event);
-        switch(event.type){
-        case MapNotify:
-            break;
-        case MotionNotify:
-            mevent = (XMotionEvent *)(&event);
-            /*
-             * Trigger the events in decreasing "order" of the elements
-             */
-            GList *elem = g_list_last(sortedElemList);
-            while(elem){
-                Element *el = (Element *)(elem->data);
-                if(el->transient){
-                    elem = elem->prev;
-                    continue;
-                }
-                if((mevent->x > el->x) &&
-                    (mevent->y > el->y) &&
-                    (mevent->x < (el->x+el->w)) &&
-                    (mevent->y < (el->y+el->h)))
-                {
-                    printf("%s under mouse\n",el->name);
-                }
-                elem = elem->prev;
-            }
-            break;
-        default:
-            break;
-        }
-    }
-
+    eventloop();
 
     rsvg_term ();
 
