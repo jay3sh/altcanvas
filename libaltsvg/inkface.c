@@ -36,6 +36,7 @@ typedef struct _RsvgNodeRect RsvgNodeRect;
            exit(1); \
         }
 
+
 #ifdef ENABLE_PROFILING
 /* Constructor and Destructor Prototypes */
 
@@ -82,15 +83,71 @@ void __cyg_profile_func_exit( void *this, void *callsite )
 
 #endif
 
+cairo_t *ctx = NULL;
+Display *dpy=NULL;
+
+GList *sortedElemList = NULL;
+static gboolean dirty = TRUE;
 
 pthread_mutex_t mutex;
 pthread_cond_t cond;
-static gboolean dirty = TRUE;
+
 
 void
 paint(void *arg)
 {
     if(dirty){
+
+        GList *elem = sortedElemList;
+        while(elem)
+        {
+            Element *element = (Element *)elem->data;
+    
+            ASSERT(element);
+    
+            if(element->transient)
+                goto next;
+    
+            if(!strncmp(element->name,"#rect7058",9)){
+                // Use this element surface as mask
+                int cover_w=1,cover_h=1;
+    
+                cairo_surface_t *cover_surface =
+                    cairo_image_surface_create_from_png(
+                    "/photos/inkfun/corrs.png");
+                cover_w = cairo_image_surface_get_width(cover_surface);
+                cover_h = cairo_image_surface_get_height(cover_surface);
+                cairo_save(ctx);
+                cairo_scale(ctx,
+                            element->w*1./cover_w,
+                            element->h*1./cover_h);
+                cairo_set_source_surface(ctx,
+                            cover_surface, 
+                            element->x*cover_w*1./element->w,
+                            element->y*cover_h*1./element->h);
+                
+                cairo_paint(ctx);
+                cairo_restore(ctx);
+    
+                // apply the mask
+                cairo_set_source_rgb(ctx,0,0,0);
+                cairo_mask_surface(ctx,element->surface,
+                            element->x,
+                            element->y);
+                cairo_fill(ctx);
+            } else {
+                cairo_set_source_surface(ctx,
+                    element->surface,element->x,element->y);
+                cairo_paint(ctx);
+            }
+            cairo_surface_destroy(element->surface);
+    
+            next:
+                g_free(elem->data);
+                elem = elem->next;
+        }
+
+        XFlush(dpy);
     }
 
     dirty = FALSE;
@@ -182,7 +239,6 @@ int main(int argc, char *argv[])
 {
 
     Window win,rwin;
-    Display *dpy=NULL;
     int screen = 0;
     int w=800, h=480;
     int x=0, y=0;
@@ -237,7 +293,6 @@ int main(int argc, char *argv[])
     XMapWindow(dpy, win);
 
     cairo_surface_t *surface = NULL;
-    cairo_t *ctx = NULL;
     Visual *visual = DefaultVisual(dpy,DefaultScreen(dpy));
     ASSERT(visual)
 
@@ -273,64 +328,13 @@ int main(int argc, char *argv[])
     }
     g_list_free(head_eidList);
 
+    /*
+     * Fork a thread to draw the sorted element list
+     */
+    sortedElemList = g_list_sort(elemList,compare_element);
+
     pthread_t thr;
     pthread_create(&thr,NULL,painter_thread,NULL);
-
-    /*
-     * Draw the sorted list of Elements
-     */
-    GList *sortedElemList = g_list_sort(elemList,compare_element);
-    GList *elem = sortedElemList;
-    while(elem)
-    {
-        Element *element = (Element *)elem->data;
-
-        ASSERT(element);
-
-        if(element->transient)
-            goto next;
-
-        if(!strncmp(element->name,"#rect7058",9)){
-            // Use this element surface as mask
-            int cover_w=1,cover_h=1;
-
-            cairo_surface_t *cover_surface =
-                cairo_image_surface_create_from_png(
-                "/photos/inkfun/corrs.png");
-            cover_w = cairo_image_surface_get_width(cover_surface);
-            cover_h = cairo_image_surface_get_height(cover_surface);
-            cairo_save(ctx);
-            cairo_scale(ctx,
-                        element->w*1./cover_w,
-                        element->h*1./cover_h);
-            cairo_set_source_surface(ctx,
-                        cover_surface, 
-                        element->x*cover_w*1./element->w,
-                        element->y*cover_h*1./element->h);
-            
-            cairo_paint(ctx);
-            cairo_restore(ctx);
-
-            // apply the mask
-            cairo_set_source_rgb(ctx,0,0,0);
-            cairo_mask_surface(ctx,element->surface,
-                        element->x,
-                        element->y);
-            cairo_fill(ctx);
-        } else {
-            cairo_set_source_surface(ctx,
-                element->surface,element->x,element->y);
-            cairo_paint(ctx);
-        }
-        cairo_surface_destroy(element->surface);
-
-        next:
-            g_free(elem->data);
-            elem = elem->next;
-    }
-    g_list_free(elemList);
-
-    XFlush(dpy);
 
     /*
      * Setup the event listening
