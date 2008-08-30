@@ -33,6 +33,8 @@
 
 #include <stdio.h>
 
+#include "inkface.h"
+
 void
 rsvg_node_calc (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 {

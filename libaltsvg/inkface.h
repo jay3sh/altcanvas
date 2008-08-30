@@ -35,5 +35,6 @@ struct _InkfaceState {
 
 
 void wire_logic(GList *);
+void inkface_istate_finalize (InkfaceState *);
 
 #endif /*__INKFACE_H__ */
