@@ -95,8 +95,10 @@ paint(void *arg)
         while(elem)
         {
             Element *element = (Element *)elem->data;
-    
+
             ASSERT(element);
+
+            printf("%s - %d\n",element->name,element->order);
     
             if(element->transient)
                 goto next;
@@ -355,6 +357,8 @@ int main(int argc, char *argv[])
      */
 
     GList *eidList = inkface_get_element_ids(handle->priv->defs);
+    ASSERT(eidList);
+
     GList *head_eidList = eidList;
 
     GList *elemList = NULL;

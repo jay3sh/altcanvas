@@ -69,27 +69,25 @@ rsvg_defs_set_base_uri (RsvgDefs * self, gchar * base_uri)
     self->base_uri = base_uri;
 }
 
+void
+extract_key(gpointer key,gpointer value, gpointer user_data)
+{
+    int is_g = !strncmp("g",(const char *)key,1);
+    int is_rect = !strncmp("rect",(const char *)key,4);
+    int is_path = !strncmp("path",(const char *)key,4);
+
+    GList **key_list = (GList **)user_data;
+    
+    if(is_g || is_rect || is_path){
+        *key_list = g_list_prepend(*key_list,strdup((const char *)key));
+    }
+}
+
 GList *
 inkface_get_element_ids(const RsvgDefs *defs)
 {
-    GList *keys = NULL;
     GList *fkeys = NULL;
-    keys = g_hash_table_get_keys(defs->hash);
-
-    if(!keys)
-        return NULL;
-
-    while(keys)
-    {
-        int is_g = !strncmp("g",keys->data,1);
-        int is_rect = !strncmp("rect",keys->data,4);
-        int is_path = !strncmp("path",keys->data,4);
-
-        if(is_g || is_rect || is_path){
-            fkeys = g_list_prepend(fkeys,strdup(keys->data));
-        }
-        keys = keys->next;
-    }
+    g_hash_table_foreach(defs->hash,extract_key,&fkeys);
 
     return fkeys;
 }
