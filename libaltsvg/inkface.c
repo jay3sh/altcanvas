@@ -5,14 +5,6 @@
 #include "rsvg-styles.h"
 #include "rsvg-structure.h"
 
-struct _RsvgNodeRect {
-    RsvgNode super;
-    RsvgLength x, y, w, h, rx, ry;
-    gboolean got_rx, got_ry;
-};
-
-typedef struct _RsvgNodeRect RsvgNodeRect;
-
 #include "config.h"
 #include "stdlib.h"
 #include "string.h"
@@ -386,11 +378,16 @@ int main(int argc, char *argv[])
     }
     g_list_free(head_eidList);
 
+    sortedElemList = g_list_sort(elemList,compare_element);
+
+    /*
+     * Wire the logic defined in event handlers with Elements
+     */
+    wire_logic(sortedElemList);
+
     /*
      * Fork a thread to draw the sorted element list
      */
-    sortedElemList = g_list_sort(elemList,compare_element);
-
     pthread_t thr;
     pthread_create(&thr,NULL,painter_thread,NULL);
 

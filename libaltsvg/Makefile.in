@@ -86,7 +86,7 @@ librsvg_2_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 @HAVE_GTK_TRUE@am__EXEEXT_1 = rsvg-view$(EXEEXT)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
-am_inkface_OBJECTS = inkface.$(OBJEXT)
+am_inkface_OBJECTS = inkface.$(OBJEXT) logic.$(OBJEXT)
 inkface_OBJECTS = $(am_inkface_OBJECTS)
 am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
@@ -409,7 +409,8 @@ rsvg_view_LDFLAGS =
 rsvg_view_DEPENDENCIES = $(DEPS)
 rsvg_view_LDADD = $(GTK_LIBS) $(GDK_X11_LIBS) $(libm) $(LDADDS)
 inkface_SOURCES = \
-	inkface.c
+	inkface.c \
+	logic.c
 
 inkface_LDFLAGS = 
 inkface_DEPENDENCIES = $(DEPS)
@@ -609,6 +610,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inkface.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/librsvg-enum-types.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/librsvg-features.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/logic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsvg-affine.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsvg-base-file-util.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsvg-base.Plo@am__quote@
