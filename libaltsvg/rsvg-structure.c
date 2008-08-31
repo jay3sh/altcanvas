@@ -639,13 +639,16 @@ inkface_parse_attrs(RsvgNode *self, RsvgPropertyBag *atts)
     if ((value = rsvg_property_bag_lookup (atts, "order"))) {
         self->istate->order = atoi(value);
     }
-    self->istate->transient = FALSE;
-    if ((value = rsvg_property_bag_lookup (atts, "transient"))) {
-        if(!strncasecmp(value,"true",4)){
-            self->istate->transient = TRUE;
+    if ((value = rsvg_property_bag_lookup (atts, "type"))) {
+        if(!strncasecmp(value,"transient",strlen("transient"))){
+            self->istate->type = ELEM_TYPE_TRANSIENT;
+        }
+        if(!strncasecmp(value,"mask",strlen("mask"))){
+            self->istate->type = ELEM_TYPE_MASK;
         }
     }
     if ((value = rsvg_property_bag_lookup (atts, "onMouseOver"))) {
+        self->istate->on_mouse_over = strdup(value);
     }
 
 }
@@ -659,5 +662,7 @@ inkface_istate_init(InkfaceState *istate)
 void
 inkface_istate_finalize (InkfaceState *istate)
 {
-    free(istate->name);
+    if(istate->name) free(istate->name);
+    // we should not free istate->data, because it is passed to
+    // element object, which will free it
 }

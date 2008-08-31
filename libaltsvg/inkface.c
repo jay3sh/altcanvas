@@ -21,13 +21,6 @@
 
 
 
-#define ASSERT(x) \
-        if (!(x)) { \
-           printf("Assertion failed: %s:%d <<%s>>\n", \
-                __FILE__,__LINE__,__FUNCTION__); \
-           exit(1); \
-        }
-
 
 #ifdef ENABLE_PROFILING
 /* Constructor and Destructor Prototypes */
@@ -98,11 +91,13 @@ paint(void *arg)
 
             ASSERT(element);
 
-            if(element->transient) goto next;
+            if(element->type == ELEM_TYPE_TRANSIENT) goto next;
     
-            if((element->name) &&
-                !strncmp(element->name,"currentCoverMask",
-                    strlen("currentCoverMask"))){
+            if((element->type == ELEM_TYPE_MASK) &&
+                (element->name) && 
+                !strncmp(element->name,
+                    "currentCoverMask",strlen("currentCoverMask")))
+            {
                 // Use this element surface as mask
                 int cover_w=1,cover_h=1;
 
@@ -141,7 +136,6 @@ paint(void *arg)
             cairo_surface_destroy(element->surface);
     
             next:
-                g_free(elem->data);
                 elem = elem->next;
         }
 
@@ -247,7 +241,7 @@ void eventloop()
             while(elem){
                 gboolean nowInFocus = FALSE;
                 Element *el = (Element *)(elem->data);
-                if(el->transient){
+                if(el->type == ELEM_TYPE_TRANSIENT){
                     elem = elem->prev;
                     continue;
                 }
@@ -260,13 +254,12 @@ void eventloop()
                 } 
 
                 if(el->inFocus && !nowInFocus){
-                    //call onMouseLeave
-                    printf("%s mouseLeave\n",el->name);
+                    if(el->onMouseLeave) el->onMouseLeave(el);
                 }
                 if(!el->inFocus && nowInFocus){
-                    //call onMouseEnter
-                    printf("%s mouseEnter\n",el->name);
+                    if(el->onMouseEnter) el->onMouseEnter(el);
                 }
+
                 el->inFocus = nowInFocus;
 
                 elem = elem->prev;
@@ -374,7 +367,7 @@ int main(int argc, char *argv[])
         element = (Element *)g_malloc(sizeof(Element));
         memset(element,0,sizeof(Element));
         strncpy(element->id,"#",1);
-        strncat(element->id,eidList->data,30);
+        strncat(element->id,eidList->data,30);  //TODO macro
 
         inkface_get_element(handle,element);
 

@@ -275,7 +275,8 @@ inkface_get_element(RsvgHandle *handle, Element *element)
     /* Get the order of the element */
     if(drawsub) {
         element->order = drawsub->istate->order;
-        element->transient = drawsub->istate->transient;
+        element->type = drawsub->istate->type;
+        element->on_mouse_over = drawsub->istate->on_mouse_over;
         if(drawsub->istate->name){
             element->name = strdup(drawsub->istate->name);
         }

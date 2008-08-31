@@ -79,6 +79,18 @@ AC_MSG_RESULT([$native_win32])
 AM_CONDITIONAL(OS_WIN32, test "$native_win32" = "yes")
 
 dnl ===========================================================================
+test_efence=true
+AC_ARG_WITH(efence,[ --with-efence  Use ElectricFence for memory debugging],[
+    if test "x$withval" = "xno"; then
+        test_efence=false
+    fi
+])
+if test "x$test_efence" = "xtrue"; then
+    AC_CHECK_LIB([efence], [malloc], [EFENCELIB=-lefence])
+    AC_SUBST([EFENCELIB])
+fi
+
+dnl ===========================================================================
 
 PKG_CHECK_MODULES(GLIB, \
 		glib-2.0 >= $GLIB_REQUIRED \

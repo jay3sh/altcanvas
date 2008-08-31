@@ -120,7 +120,7 @@ inkface_SOURCES = \
 	logic.c
 inkface_LDFLAGS = 
 inkface_DEPENDENCIES = $(DEPS)
-inkface_LDADD = $(GDK_X11_LIBS) $(LDADDS)
+inkface_LDADD = $(GDK_X11_LIBS) $(EFENCELIB) $(LDADDS)
 
 EXTRA_DIST =				\
 	MAINTAINERS			\

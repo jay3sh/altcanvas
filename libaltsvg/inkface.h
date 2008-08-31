@@ -6,6 +6,9 @@
 
 typedef struct _Element Element;
 
+typedef enum { ELEM_TYPE_MASK=1, 
+                ELEM_TYPE_TRANSIENT=2 } element_type_t;
+
 struct _Element{
     cairo_t *cr;
     cairo_surface_t *surface;
@@ -15,12 +18,15 @@ struct _Element{
     int h;
     int order;
     char *name;
-    char id[16];
-    gboolean transient;
+    char id[32];
+    element_type_t type;
+    char *on_mouse_over;
 
     gboolean inFocus;
 
     void (*onMouseEnter)(Element *self);
+    void (*onMouseLeave)(Element *self);
+
 };
 
 
@@ -29,8 +35,8 @@ typedef struct _InkfaceState InkfaceState;
 struct _InkfaceState {
     char *name;                 /* user friendly name */
     guint16 order;              /* Order to draw */
-    gboolean transient;         /* If transient, it will be visible 
-                                   only programmatically */
+    char *on_mouse_over;
+    element_type_t type; 
 };
 
 
@@ -40,7 +46,15 @@ void inkface_istate_init(InkfaceState *);
 
 
 #define LOG(...) \
-    fprintf(strerr,"[%s:%d] ",__FILE__,__LINE__); \
-    fprintf(stderr,__VA_ARGS__); 
+    fprintf(stderr,"[%s:%d] ",__FILE__,__LINE__); \
+    fprintf(stderr,__VA_ARGS__); \
+    fprintf(stderr,"\n"); 
+
+#define ASSERT(x) \
+        if (!(x)) { \
+           printf("Assertion failed: %s:%d <<%s>>\n", \
+                __FILE__,__LINE__,__FUNCTION__); \
+           exit(1); \
+        }
 
 #endif /*__INKFACE_H__ */
