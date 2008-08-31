@@ -175,6 +175,19 @@ make_canvasx()
     )
 }
 
+make_inkface()
+{
+    (
+        cd libaltsvg;
+        dpkg-buildpackage -rfakeroot
+        scp ../inkface*deb root@192.168.1.100:/root/
+
+        ssh root@192.168.1.100 \
+        "(dpkg --purge inkface; cd /root/; dpkg -i inkface*deb; rm -f inkface*deb)"
+    )
+
+}
+
 die()
 {
     echo $1
@@ -251,6 +264,9 @@ case $PACKAGE in
     "canvasx")
         make_canvasx;
 		;;
+    "inkface")
+        make_inkface;
+        ;;
     "altplayer")
         make_altplayer;
         ;;
