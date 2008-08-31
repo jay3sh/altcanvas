@@ -98,12 +98,12 @@ paint(void *arg)
 
             ASSERT(element);
 
-            printf("%s - %d\n",element->name,element->order);
     
             if(element->transient)
                 goto next;
     
-            if(!strncmp(element->name,"currentCoverMask",
+            if((element->name) &&
+                !strncmp(element->name,"currentCoverMask",
                     strlen("currentCoverMask"))){
                 // Use this element surface as mask
                 int cover_w=1,cover_h=1;

@@ -277,8 +277,7 @@ inkface_get_element(RsvgHandle *handle, Element *element)
         element->order = drawsub->istate->order;
         element->transient = drawsub->istate->transient;
         if(drawsub->istate->name){
-            printf("drawsub->istate->name = %s\n",drawsub->istate->name);
-            strncpy(element->name,drawsub->istate->name,16); //TODO: use macro
+            element->name = strdup(drawsub->istate->name);
         }
     } else {
         printf("[%s:%d] drawsub is NULL\n",__FILE__,__LINE__); //TODO: log macro

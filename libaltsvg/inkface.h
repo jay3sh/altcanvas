@@ -14,7 +14,7 @@ struct _Element{
     int w;
     int h;
     int order;
-    char name[16];
+    char *name;
     char id[16];
     gboolean transient;
 
