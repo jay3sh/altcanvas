@@ -267,17 +267,21 @@ inkface_get_element(RsvgHandle *handle, Element *element)
     if (!draw)
         return;
 
-    g_return_if_fail (element->name != NULL);
+    g_return_if_fail (element->id != NULL);
 
-    if (element->name && *element->name)
-        drawsub = rsvg_defs_lookup (handle->priv->defs, element->name);
+    if (element->id && *element->id)
+        drawsub = rsvg_defs_lookup (handle->priv->defs, element->id);
 
     /* Get the order of the element */
     if(drawsub) {
         element->order = drawsub->istate->order;
         element->transient = drawsub->istate->transient;
+        if(drawsub->istate->name){
+            printf("drawsub->istate->name = %s\n",drawsub->istate->name);
+            strncpy(element->name,drawsub->istate->name,16); //TODO: use macro
+        }
     } else {
-        printf("[%s:%d] drawsub is NULL\n",__FILE__,__LINE__);
+        printf("[%s:%d] drawsub is NULL\n",__FILE__,__LINE__); //TODO: log macro
     }
 
     while (drawsub != NULL) {
@@ -306,16 +310,20 @@ inkface_get_element(RsvgHandle *handle, Element *element)
     RsvgDrawingCtx *dctx;
     dctx = rsvg_cairo_new_drawing_ctx_mod(element,handle);
 
-    if (element->name && *element->name)
-        element_node = rsvg_defs_lookup (handle->priv->defs, element->name);
+    if (element->id && *element->id)
+    {
+        element_node = rsvg_defs_lookup (handle->priv->defs, element->id);
 
-    rsvg_state_push(dctx);
-    cairo_save(element->cr);
+        rsvg_state_push(dctx);
+        cairo_save(element->cr);
 
-    rsvg_node_draw(element_node, dctx, 0);
+        rsvg_node_draw(element_node, dctx, 0);
 
-    cairo_restore(element->cr);
-    rsvg_state_pop(dctx);
+        cairo_restore(element->cr);
+        rsvg_state_pop(dctx);
+    } else {
+        printf("element->id absent\n");
+    }
 
     rsvg_drawing_ctx_free(draw);
 

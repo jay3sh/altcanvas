@@ -103,7 +103,8 @@ paint(void *arg)
             if(element->transient)
                 goto next;
     
-            if(!strncmp(element->name,"#rect7058",9)){
+            if(!strncmp(element->name,"currentCoverMask",
+                    strlen("currentCoverMask"))){
                 // Use this element surface as mask
                 int cover_w=1,cover_h=1;
     
@@ -370,8 +371,8 @@ int main(int argc, char *argv[])
 
         element = (Element *)g_malloc(sizeof(Element));
         memset(element,0,sizeof(Element));
-        strncpy(element->name,"#",1);
-        strncat(element->name,eidList->data,30);
+        strncpy(element->id,"#",1);
+        strncat(element->id,eidList->data,30);
 
         inkface_get_element(handle,element);
 

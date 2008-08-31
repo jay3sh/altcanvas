@@ -142,6 +142,7 @@ _rsvg_node_init (RsvgNode * self)
     self->state = g_new (RsvgState, 1);
     self->istate = g_new (InkfaceState, 1);
     rsvg_state_init (self->state);
+    inkface_istate_init(self->istate);
     self->free = _rsvg_node_free;
     self->draw = _rsvg_node_draw_nothing;
     self->calc = _rsvg_node_calc_nothing;
@@ -652,11 +653,11 @@ inkface_parse_attrs(RsvgNode *self, RsvgPropertyBag *atts)
 void 
 inkface_istate_init(InkfaceState *istate)
 {
+    memset(istate,0,sizeof(InkfaceState));
 }
 
 void
 inkface_istate_finalize (InkfaceState *istate)
 {
-    (void)istate;    
     free(istate->name);
 }
