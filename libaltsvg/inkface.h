@@ -38,4 +38,9 @@ void wire_logic(GList *);
 void inkface_istate_finalize (InkfaceState *);
 void inkface_istate_init(InkfaceState *);
 
+
+#define LOG(...) \
+    fprintf(strerr,"[%s:%d] ",__FILE__,__LINE__); \
+    fprintf(stderr,__VA_ARGS__); 
+
 #endif /*__INKFACE_H__ */
