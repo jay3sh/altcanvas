@@ -98,19 +98,21 @@ paint(void *arg)
 
             ASSERT(element);
 
-    
-            if(element->transient)
-                goto next;
+            if(element->transient) goto next;
     
             if((element->name) &&
                 !strncmp(element->name,"currentCoverMask",
                     strlen("currentCoverMask"))){
                 // Use this element surface as mask
                 int cover_w=1,cover_h=1;
+
+                char *center_img_path = getenv("CENTER_COVER_ART");
+
+                if(!center_img_path) goto next;
     
                 cairo_surface_t *cover_surface =
                     cairo_image_surface_create_from_png(
-                    "/photos/inkfun/corrs.png");
+                    center_img_path);
                 cover_w = cairo_image_surface_get_width(cover_surface);
                 cover_h = cairo_image_surface_get_height(cover_surface);
                 cairo_save(ctx);
