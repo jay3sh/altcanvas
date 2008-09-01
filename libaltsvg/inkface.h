@@ -2,6 +2,7 @@
 #ifndef __INKFACE_H__
 #define __INKFACE_H__
 
+#include "rsvg.h"
 #include "stdlib.h"
 #include "cairo.h"
 
@@ -40,11 +41,8 @@ struct _InkfaceState {
     element_type_t type; 
 };
 
-
-void wire_logic(GList *);
 void inkface_istate_finalize (InkfaceState *);
 void inkface_istate_init(InkfaceState *);
-void signal_paint();
 
 #define LOG(...) \
     fprintf(stderr,"[%s:%d] ",__FILE__,__LINE__); \
@@ -57,5 +55,12 @@ void signal_paint();
                 __FILE__,__LINE__,__FUNCTION__); \
            exit(1); \
         }
+
+/* inkface functions */
+void signal_paint();
+void init_backend(const char* svgfilename);
+void cleanup_backend();
+GList *load_element_list();
+void fork_painter_thread();
 
 #endif /*__INKFACE_H__ */

@@ -79,7 +79,7 @@ extract_key(gpointer key,gpointer value, gpointer user_data)
     GList **key_list = (GList **)user_data;
     
     if(is_g || is_rect || is_path){
-        *key_list = g_list_prepend(*key_list,strdup((const char *)key));
+        *key_list = g_list_prepend(*key_list,g_strdup((const char *)key));
     }
 }
 
