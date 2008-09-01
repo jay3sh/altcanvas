@@ -265,8 +265,11 @@ compare_element(
     return(eA->order - eB->order);
 }
 
-int main(int argc, char *argv[])
+RsvgHandle *handle = NULL;
+
+void init_backend(const char* svgfilename)
 {
+    ASSERT(svgfilename);
 
     Window rwin;
     int screen = 0;
@@ -275,31 +278,20 @@ int main(int argc, char *argv[])
     Pixmap pix;
     XGCValues gcv;
     GC gc;
-    char *elemChoice = NULL;
     int xsp_event_base=-1;
     int xsp_error_base=-1;
     int xsp_major=-1;
     int xsp_minor=-1;
 
-
-    if(argc < 2){
-        printf("%s <svg-filepath>\n",argv[0]);
-        exit(0);
-    }
+    /* Setup X for multithreaded environment */
+    XInitThreads();
 
     /*
      * Load SVG file
      */
-    RsvgHandle *handle = NULL;
     rsvg_init ();
 
-    XInitThreads();
-
-    ASSERT(handle = rsvg_handle_from_file(argv[1]));
-
-    if(argc == 3){
-        elemChoice = argv[2];
-    }
+    ASSERT(handle = rsvg_handle_from_file(svgfilename));
 
     RsvgDimensionData dim;
     rsvg_handle_get_dimensions(handle,&dim);
@@ -332,6 +324,18 @@ int main(int argc, char *argv[])
                         dpy, win, visual, dim.width,dim.height));
     ASSERT(ctx = cairo_create(surface));
 
+}
+
+void cleanup_backend()
+{
+    //TODO cleanup element list
+    rsvg_term ();
+
+}
+
+GList *
+load_element_list()
+{
     /*
      * Create Element objects from the loaded SVG
      */
@@ -362,13 +366,14 @@ int main(int argc, char *argv[])
     }
     g_list_free(head_eidList);
 
-    sortedElemList = g_list_sort(elemList,compare_element);
+    ASSERT(sortedElemList = g_list_sort(elemList,compare_element));
 
-    /*
-     * Wire the logic defined in event handlers with Elements
-     */
-    wire_logic(sortedElemList);
+    return sortedElemList;
+}
 
+void 
+fork_painter_thread()
+{
     /*
      * Fork a thread to draw the sorted element list
      */
@@ -376,12 +381,30 @@ int main(int argc, char *argv[])
     pthread_t thr;
     pthread_create(&thr,NULL,painter_thread,NULL);
 
+}
+
+int main(int argc, char *argv[])
+{
+
+
+    if(argc < 2){
+        printf("%s <svg-filepath>\n",argv[0]);
+        exit(0);
+    }
+
+    init_backend(argv[1]);
+
+    GList *element_list = load_element_list();
+    /*
+     * Wire the logic defined in event handlers with Elements
+     */
+    wire_logic(sortedElemList);
+
+    fork_painter_thread();
     /*
      * Consume events infinitely
      */
     eventloop();
-
-    rsvg_term ();
 
     return 0;
 }
