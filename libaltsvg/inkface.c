@@ -340,7 +340,7 @@ load_element_list()
      * Create Element objects from the loaded SVG
      */
 
-    GList *eidList = inkface_get_element_ids(handle->priv->defs);
+    GList *eidList = inkface_get_element_ids(handle);
     ASSERT(eidList);
 
     GList *head_eidList = eidList;
@@ -354,8 +354,7 @@ load_element_list()
 
         element = (Element *)g_malloc(sizeof(Element));
         memset(element,0,sizeof(Element));
-        strncpy(element->id,"#",1);
-        strncat(element->id,eidList->data,30);  //TODO macro
+        strncpy(element->id,eidList->data,31);  //TODO macro
 
         inkface_get_element(handle,element);
 

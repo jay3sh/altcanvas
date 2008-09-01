@@ -42,7 +42,7 @@ void	     rsvg_defs_resolve_all	(RsvgDefs * defs);
 void	     rsvg_defs_register_name	(RsvgDefs * defs, const char *name, RsvgNode * val);
 void	     rsvg_defs_register_memory	(RsvgDefs * defs, RsvgNode * val);
 
-GList       *inkface_get_element_ids(const RsvgDefs *defs);
+GList       *inkface_get_element_ids(const RsvgHandle *handle);
 
 G_END_DECLS
 #endif
