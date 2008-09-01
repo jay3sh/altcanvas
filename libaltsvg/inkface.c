@@ -73,110 +73,92 @@ Display *dpy=NULL;
 Window win;
 
 GList *sortedElemList = NULL;
-static gboolean dirty = TRUE;
 
-pthread_mutex_t mutex;
-pthread_cond_t cond;
+gboolean inkface_dirty = TRUE;
+pthread_mutex_t inkface_dirty_mutex;
+
+pthread_mutex_t paint_mutex;
+pthread_cond_t paint_condition;
+
+void
+signal_paint()
+{
+    pthread_cond_signal(&paint_condition);
+}
 
 
 void
 paint(void *arg)
 {
-    if(dirty){
+    GList *elem = sortedElemList;
+    while(elem)
+    {
+        Element *element = (Element *)elem->data;
 
-        GList *elem = sortedElemList;
-        while(elem)
+        ASSERT(element);
+
+        if(element->type == ELEM_TYPE_TRANSIENT) goto next;
+
+        if((element->type == ELEM_TYPE_MASK) &&
+            (element->name) && 
+            !strncmp(element->name,
+                "currentCoverMask",strlen("currentCoverMask")))
         {
-            Element *element = (Element *)elem->data;
+            // Use this element surface as mask
+            int cover_w=1,cover_h=1;
 
-            ASSERT(element);
+            char *center_img_path = getenv("CENTER_COVER_ART");
 
-            if(element->type == ELEM_TYPE_TRANSIENT) goto next;
-    
-            if((element->type == ELEM_TYPE_MASK) &&
-                (element->name) && 
-                !strncmp(element->name,
-                    "currentCoverMask",strlen("currentCoverMask")))
-            {
-                // Use this element surface as mask
-                int cover_w=1,cover_h=1;
+            if(!center_img_path) goto next;
 
-                char *center_img_path = getenv("CENTER_COVER_ART");
+            cairo_surface_t *cover_surface =
+                cairo_image_surface_create_from_png(
+                center_img_path);
+            cover_w = cairo_image_surface_get_width(cover_surface);
+            cover_h = cairo_image_surface_get_height(cover_surface);
+            cairo_save(ctx);
+            cairo_scale(ctx,
+                        element->w*1./cover_w,
+                        element->h*1./cover_h);
+            cairo_set_source_surface(ctx,
+                        cover_surface, 
+                        element->x*cover_w*1./element->w,
+                        element->y*cover_h*1./element->h);
+            
+            cairo_paint(ctx);
+            cairo_restore(ctx);
 
-                if(!center_img_path) goto next;
-    
-                cairo_surface_t *cover_surface =
-                    cairo_image_surface_create_from_png(
-                    center_img_path);
-                cover_w = cairo_image_surface_get_width(cover_surface);
-                cover_h = cairo_image_surface_get_height(cover_surface);
-                cairo_save(ctx);
-                cairo_scale(ctx,
-                            element->w*1./cover_w,
-                            element->h*1./cover_h);
-                cairo_set_source_surface(ctx,
-                            cover_surface, 
-                            element->x*cover_w*1./element->w,
-                            element->y*cover_h*1./element->h);
-                
-                cairo_paint(ctx);
-                cairo_restore(ctx);
-    
-                // apply the mask
-                cairo_set_source_rgb(ctx,0,0,0);
-                cairo_mask_surface(ctx,element->surface,
-                            element->x,
-                            element->y);
-                cairo_fill(ctx);
-            } else {
-                cairo_set_source_surface(ctx,
-                    element->surface,element->x,element->y);
-                cairo_paint(ctx);
-            }
-            cairo_surface_destroy(element->surface);
-    
-            next:
-                elem = elem->next;
+            // apply the mask
+            cairo_set_source_rgb(ctx,0,0,0);
+            cairo_mask_surface(ctx,element->surface,
+                        element->x,
+                        element->y);
+            cairo_fill(ctx);
+        } else {
+            ASSERT(cairo_surface_status(element->surface) == 
+                    CAIRO_STATUS_SUCCESS)
+            cairo_set_source_surface(ctx,
+                element->surface,element->x,element->y);
+            cairo_paint(ctx);
         }
 
-        XFlush(dpy);
+        next:
+            elem = elem->next;
     }
 
-    dirty = FALSE;
+    XFlush(dpy);
 }
 
-void 
+void *
 painter_thread(void *arg)
 {
     int rc=0;
-    struct timespec timeout;
-    struct timeval curtime;
 
     while(1)
     {
-        ASSERT(!gettimeofday(&curtime,NULL))
-    
-        timeout.tv_sec = curtime.tv_sec;
-        timeout.tv_nsec = curtime.tv_usec * 1000;
-        timeout.tv_nsec += (40 * 1000000L);
-        timeout.tv_sec += timeout.tv_nsec/1000000000L;
-        timeout.tv_nsec %= 1000000000L;
-    
-        rc=pthread_cond_timedwait(&cond,&mutex,&timeout);
-    
-        if(rc!=0){
-            if(rc == ETIMEDOUT){
-                paint(NULL);
-                continue;
-            } else {
-                printf("<<%s>> pthread_cond_timwait returned %d\n",
-                        __FUNCTION__,rc);
-                continue;
-            }
-        }
-    
-        printf("<<%s>> pthread_cond_timwait failed to wait \n",
-                __FUNCTION__);
+        paint(NULL);
+        rc=pthread_cond_wait(&paint_condition,&paint_mutex);
+        ASSERT(!rc);
     }
 
 }
@@ -254,10 +236,10 @@ void eventloop()
                 } 
 
                 if(el->inFocus && !nowInFocus){
-                    if(el->onMouseLeave) el->onMouseLeave(el);
+                    if(el->onMouseLeave) el->onMouseLeave(el,sortedElemList);
                 }
                 if(!el->inFocus && nowInFocus){
-                    if(el->onMouseEnter) el->onMouseEnter(el);
+                    if(el->onMouseEnter) el->onMouseEnter(el,sortedElemList);
                 }
 
                 el->inFocus = nowInFocus;
@@ -310,6 +292,8 @@ int main(int argc, char *argv[])
      */
     RsvgHandle *handle = NULL;
     rsvg_init ();
+
+    XInitThreads();
 
     ASSERT(handle = rsvg_handle_from_file(argv[1]));
 
@@ -388,6 +372,7 @@ int main(int argc, char *argv[])
     /*
      * Fork a thread to draw the sorted element list
      */
+    pthread_mutex_init(&inkface_dirty_mutex,NULL);
     pthread_t thr;
     pthread_create(&thr,NULL,painter_thread,NULL);
 

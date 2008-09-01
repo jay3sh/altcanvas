@@ -1,37 +1,6 @@
 #include "rsvg.h"
 #include "inkface.h"
 
-/*
- * Event Handlers
- */
-
-void
-onNextButtonMouseEnter(Element *el)
-{
-    LOG("<<%s>>",__FUNCTION__);
-}
-
-void
-onNextButtonMouseLeave(Element *el)
-{
-    LOG("<<%s>>",__FUNCTION__);
-}
-
-void
-onPrevButtonMouseEnter(Element *el)
-{
-    LOG("<<%s>>",__FUNCTION__);
-}
-
-void
-onPrevButtonMouseLeave(Element *el)
-{
-    LOG("<<%s>>",__FUNCTION__);
-}
-
-/*
- * Wire the event handlers with the elements
- */
 
 gint 
 compare_element_by_name(
@@ -49,6 +18,53 @@ compare_element_by_name(
         return -1;
     }
 }
+
+void
+toggle_glow(Element *el, GList *elemList,gboolean glow)
+{
+    GList *result;
+    Element *elmo;
+    ASSERT(el->on_mouse_over);
+    ASSERT(result = g_list_find_custom(
+        elemList,el->on_mouse_over,compare_element_by_name)); 
+    ASSERT(elmo = (Element *)result->data);
+
+    elmo->type = glow ? !ELEM_TYPE_TRANSIENT:ELEM_TYPE_TRANSIENT;
+
+    signal_paint();
+}
+
+/*
+ * Event Handlers
+ */
+
+void
+onNextButtonMouseEnter(Element *el, void *userdata)
+{
+    toggle_glow(el,(GList *)userdata,TRUE);
+}
+
+void
+onNextButtonMouseLeave(Element *el, void *userdata)
+{
+    toggle_glow(el,(GList *)userdata,FALSE);
+}
+
+void
+onPrevButtonMouseEnter(Element *el, void *userdata)
+{
+    toggle_glow(el,(GList *)userdata,TRUE);
+}
+
+void
+onPrevButtonMouseLeave(Element *el, void *userdata)
+{
+    toggle_glow(el,(GList *)userdata,FALSE);
+}
+
+/*
+ * Wire the event handlers with the elements
+ */
 
 void wire_logic(GList *elemList)
 {

@@ -2,6 +2,7 @@
 #ifndef __INKFACE_H__
 #define __INKFACE_H__
 
+#include "stdlib.h"
 #include "cairo.h"
 
 typedef struct _Element Element;
@@ -24,8 +25,8 @@ struct _Element{
 
     gboolean inFocus;
 
-    void (*onMouseEnter)(Element *self);
-    void (*onMouseLeave)(Element *self);
+    void (*onMouseEnter)(Element *self, void *userdata);
+    void (*onMouseLeave)(Element *self, void *userdata);
 
 };
 
@@ -43,7 +44,7 @@ struct _InkfaceState {
 void wire_logic(GList *);
 void inkface_istate_finalize (InkfaceState *);
 void inkface_istate_init(InkfaceState *);
-
+void signal_paint();
 
 #define LOG(...) \
     fprintf(stderr,"[%s:%d] ",__FILE__,__LINE__); \
