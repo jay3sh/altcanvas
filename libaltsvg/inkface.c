@@ -11,6 +11,7 @@
 
 #include <cairo.h>
 #include <cairo-xlib.h>
+#include <X11/Xatom.h>
 
 #include <inkface.h>
 
@@ -267,10 +268,11 @@ compare_element(
 
 RsvgHandle *handle = NULL;
 
-void init_backend(const char* svgfilename)
+void init_backend(const char* svgfilename,gboolean fullscreen)
 {
     ASSERT(svgfilename);
 
+    int status = 0;
     Window rwin;
     int screen = 0;
     int w=800, h=480;
@@ -282,6 +284,8 @@ void init_backend(const char* svgfilename)
     int xsp_error_base=-1;
     int xsp_major=-1;
     int xsp_minor=-1;
+    Atom atoms_WINDOW_STATE;
+    Atom atoms_WINDOW_STATE_FULLSCREEN;
 
     /* Setup X for multithreaded environment */
     XInitThreads();
@@ -303,6 +307,16 @@ void init_backend(const char* svgfilename)
 
     ASSERT(rwin = DefaultRootWindow(dpy));
     screen = DefaultScreen(dpy);
+    ASSERT(screen >= 0);
+
+    atoms_WINDOW_STATE
+        = XInternAtom(dpy, "_NET_WM_STATE",False);
+    ASSERT((atoms_WINDOW_STATE != BadAlloc && 
+            atoms_WINDOW_STATE != BadValue));
+    atoms_WINDOW_STATE_FULLSCREEN
+        = XInternAtom(dpy, "_NET_WM_STATE_FULLSCREEN",False);
+    ASSERT((atoms_WINDOW_STATE_FULLSCREEN != BadAlloc && 
+            atoms_WINDOW_STATE_FULLSCREEN != BadValue));
 
     ASSERT(win = XCreateSimpleWindow(
                     dpy,
@@ -312,6 +326,19 @@ void init_backend(const char* svgfilename)
                     0,
                     BlackPixel(dpy,screen),
                     BlackPixel(dpy,screen)));
+
+    if(fullscreen){
+        /* Set the wmhints needed for fullscreen */
+        status = XChangeProperty(dpy, win, atoms_WINDOW_STATE, XA_ATOM, 32,
+                        PropModeReplace,
+                        (unsigned char *) &atoms_WINDOW_STATE_FULLSCREEN, 1);
+        ASSERT(status != BadAlloc);
+        ASSERT(status != BadAtom);
+        ASSERT(status != BadMatch);
+        ASSERT(status != BadPixmap);
+        ASSERT(status != BadValue);
+        ASSERT(status != BadWindow);
+    }
 
     XClearWindow(dpy,win);
     XMapWindow(dpy, win);
@@ -382,30 +409,3 @@ fork_painter_thread()
 
 }
 
-#if 0
-int main(int argc, char *argv[])
-{
-
-
-    if(argc < 2){
-        printf("%s <svg-filepath>\n",argv[0]);
-        exit(0);
-    }
-
-    init_backend(argv[1]);
-
-    GList *element_list = load_element_list();
-    /*
-     * Wire the logic defined in event handlers with Elements
-     */
-    wire_logic(sortedElemList);
-
-    fork_painter_thread();
-    /*
-     * Consume events infinitely
-     */
-    eventloop();
-
-    return 0;
-}
-#endif
