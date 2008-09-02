@@ -1,7 +1,6 @@
 #include "rsvg.h"
 #include "inkface.h"
 
-
 gint 
 compare_element_by_name(
     gconstpointer listitem,
@@ -85,3 +84,25 @@ void wire_logic(GList *elemList)
     nextButton->onMouseLeave = onNextButtonMouseLeave;
 }
 
+int main(int argc, char *argv[])
+{
+
+    if(argc < 2){
+        printf("%s <svg-filepath>\n",argv[0]);
+        exit(0);
+    }
+
+    init_backend(argv[1]);
+
+    GList *element_list = load_element_list();
+
+    wire_logic(element_list);
+
+    fork_painter_thread();
+
+    eventloop();
+
+    cleanup_backend();
+
+    return 0;
+}

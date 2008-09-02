@@ -36,7 +36,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = rsvg-convert$(EXEEXT) $(am__EXEEXT_1) keyboard$(EXEEXT)
+bin_PROGRAMS = rsvg-convert$(EXEEXT) $(am__EXEEXT_1) keyboard$(EXEEXT) \
+	player$(EXEEXT)
 noinst_PROGRAMS = test-performance$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(librsvginc_HEADERS) \
@@ -94,6 +95,11 @@ am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 keyboard_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(keyboard_LDFLAGS) \
 	$(LDFLAGS) -o $@
+am_player_OBJECTS = player.$(OBJEXT) inkface.$(OBJEXT)
+player_OBJECTS = $(am_player_OBJECTS)
+player_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(player_LDFLAGS) \
+	$(LDFLAGS) -o $@
 am_rsvg_convert_OBJECTS = rsvg-convert.$(OBJEXT)
 rsvg_convert_OBJECTS = $(am_rsvg_convert_OBJECTS)
 rsvg_convert_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -124,10 +130,10 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(librsvg_2_la_SOURCES) $(keyboard_SOURCES) \
-	$(rsvg_convert_SOURCES) $(rsvg_view_SOURCES) \
+	$(player_SOURCES) $(rsvg_convert_SOURCES) $(rsvg_view_SOURCES) \
 	$(test_performance_SOURCES)
 DIST_SOURCES = $(librsvg_2_la_SOURCES) $(keyboard_SOURCES) \
-	$(rsvg_convert_SOURCES) $(rsvg_view_SOURCES) \
+	$(player_SOURCES) $(rsvg_convert_SOURCES) $(rsvg_view_SOURCES) \
 	$(test_performance_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
@@ -423,6 +429,13 @@ keyboard_SOURCES = \
 keyboard_LDFLAGS = 
 keyboard_DEPENDENCIES = $(DEPS)
 keyboard_LDADD = $(GDK_X11_LIBS) $(EFENCELIB) $(LDADDS)
+player_SOURCES = \
+	player.c \
+	inkface.c
+
+player_LDFLAGS = 
+player_DEPENDENCIES = $(DEPS)
+player_LDADD = $(GDK_X11_LIBS) $(EFENCELIB) $(LDADDS)
 EXTRA_DIST = \
 	MAINTAINERS			\
 	AUTHORS				\
@@ -580,6 +593,9 @@ clean-noinstPROGRAMS:
 keyboard$(EXEEXT): $(keyboard_OBJECTS) $(keyboard_DEPENDENCIES) 
 	@rm -f keyboard$(EXEEXT)
 	$(keyboard_LINK) $(keyboard_OBJECTS) $(keyboard_LDADD) $(LIBS)
+player$(EXEEXT): $(player_OBJECTS) $(player_DEPENDENCIES) 
+	@rm -f player$(EXEEXT)
+	$(player_LINK) $(player_OBJECTS) $(player_LDADD) $(LIBS)
 rsvg-convert$(EXEEXT): $(rsvg_convert_OBJECTS) $(rsvg_convert_DEPENDENCIES) 
 	@rm -f rsvg-convert$(EXEEXT)
 	$(rsvg_convert_LINK) $(rsvg_convert_OBJECTS) $(rsvg_convert_LDADD) $(LIBS)
@@ -619,6 +635,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/keyboard.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/librsvg-enum-types.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/librsvg-features.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/player.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsvg-affine.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsvg-base-file-util.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsvg-base.Plo@am__quote@
