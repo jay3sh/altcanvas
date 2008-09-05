@@ -12,6 +12,7 @@
 #include <cairo.h>
 #include <cairo-xlib.h>
 #include <X11/Xatom.h>
+#include <X11/extensions/Xdbe.h>
 
 #include <inkface.h>
 
@@ -81,6 +82,9 @@ pthread_mutex_t inkface_dirty_mutex;
 pthread_mutex_t paint_mutex;
 pthread_cond_t paint_condition;
 
+XdbeBackBuffer backBuffer;
+XdbeSwapInfo swapinfo;
+
 void
 signal_paint()
 {
@@ -147,7 +151,10 @@ paint(void *arg)
             elem = elem->next;
     }
 
-    XFlush(dpy);
+    XdbeBeginIdiom(dpy);
+    XdbeSwapBuffers(dpy,&swapinfo,1);
+    XSync(dpy,0);
+    XdbeEndIdiom(dpy);
 }
 
 void *
@@ -340,6 +347,11 @@ void init_backend(const char* svgfilename,gboolean fullscreen)
         ASSERT(status != BadWindow);
     }
 
+    /* Enabled double buffering */
+    backBuffer = XdbeAllocateBackBufferName(dpy,win,XdbeBackground);
+    swapinfo.swap_window = win;
+    swapinfo.swap_action = XdbeBackground;
+
     XClearWindow(dpy,win);
     XMapWindow(dpy, win);
 
@@ -348,7 +360,7 @@ void init_backend(const char* svgfilename,gboolean fullscreen)
     ASSERT(visual)
 
     ASSERT(surface = cairo_xlib_surface_create(
-                        dpy, win, visual, dim.width,dim.height));
+                        dpy, backBuffer, visual, dim.width,dim.height));
     ASSERT(ctx = cairo_create(surface));
 
 }
