@@ -47,6 +47,12 @@ void onKeyLeave(Element *el, void *userdata)
     toggle_glow(el,(GList *)userdata,FALSE);
 }
 
+void onExit(Element *el, void *userdata)
+{
+    cleanup_backend();
+    exit(0);
+}
+
 void filter_key_buttons(gpointer data, gpointer userdata)
 {
     GList **button_list = (GList **)userdata;
@@ -68,6 +74,7 @@ void wire_logic(GList *element_list)
 {
     GList *key_button_list = NULL;
 
+    /* The Key buttons */
     g_list_foreach(element_list, filter_key_buttons, &key_button_list);
 
     GList *iter = key_button_list;
@@ -80,6 +87,13 @@ void wire_logic(GList *element_list)
         iter = iter->next;
     }
 
+    /* exitDoor button */
+    GList *result = NULL;
+    Element *exitButton = NULL;
+    ASSERT(result = g_list_find_custom(element_list,"exitDoor", 
+                compare_element_by_name));
+    ASSERT(exitButton = (Element *)result->data);
+    exitButton->onMouseEnter = onExit;
 }
 
 int main(int argc, char *argv[])
