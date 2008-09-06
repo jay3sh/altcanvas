@@ -22,8 +22,6 @@
 #include "errno.h"
 
 
-
-
 #ifdef ENABLE_PROFILING
 /* Constructor and Destructor Prototypes */
 
@@ -76,8 +74,8 @@ Window win;
 
 GList *sortedElemList = NULL;
 
-gboolean inkface_dirty = TRUE;
-pthread_mutex_t inkface_dirty_mutex;
+gboolean inkface_dirt_count = 1;
+pthread_mutex_t inkface_dirt_mutex;
 
 pthread_mutex_t paint_mutex;
 pthread_cond_t paint_condition;
@@ -91,10 +89,28 @@ signal_paint()
     pthread_cond_signal(&paint_condition);
 }
 
+/* Thread-safe routines to manipulate paint_mutex */
+void incr_dirt_count(int count)
+{
+    pthread_mutex_lock(&inkface_dirt_mutex);
+    inkface_dirt_count += count;
+    pthread_mutex_unlock(&inkface_dirt_mutex);
+}
+
+void decr_dirt_count(int count)
+{
+    pthread_mutex_lock(&inkface_dirt_mutex);
+    inkface_dirt_count -= count;
+    if(inkface_dirt_count < 0) 
+        inkface_dirt_count = 0;
+    pthread_mutex_unlock(&inkface_dirt_mutex);
+}
 
 void
 paint(void *arg)
 {
+    if(!inkface_dirt_count) return;
+
     GList *elem = sortedElemList;
     while(elem)
     {
@@ -102,71 +118,53 @@ paint(void *arg)
 
         ASSERT(element);
 
-        if(element->type == ELEM_TYPE_TRANSIENT) goto next;
-
-        if((element->type == ELEM_TYPE_MASK) &&
-            (element->name) && 
-            !strncmp(element->name,
-                "currentCoverMask",strlen("currentCoverMask")))
-        {
-            // Use this element surface as mask
-            int cover_w=1,cover_h=1;
-
-            char *center_img_path = getenv("CENTER_COVER_ART");
-
-            if(!center_img_path) goto next;
-
-            cairo_surface_t *cover_surface =
-                cairo_image_surface_create_from_png(
-                center_img_path);
-            cover_w = cairo_image_surface_get_width(cover_surface);
-            cover_h = cairo_image_surface_get_height(cover_surface);
-            cairo_save(ctx);
-            cairo_scale(ctx,
-                        element->w*1./cover_w,
-                        element->h*1./cover_h);
-            cairo_set_source_surface(ctx,
-                        cover_surface, 
-                        element->x*cover_w*1./element->w,
-                        element->y*cover_h*1./element->h);
-            
-            cairo_paint(ctx);
-            cairo_restore(ctx);
-
-            // apply the mask
-            cairo_set_source_rgb(ctx,0,0,0);
-            cairo_mask_surface(ctx,element->surface,
-                        element->x,
-                        element->y);
-            cairo_fill(ctx);
+        if(element->draw) {
+            element->draw(element,ctx);
         } else {
-            ASSERT(cairo_surface_status(element->surface) == 
-                    CAIRO_STATUS_SUCCESS)
             cairo_set_source_surface(ctx,
                 element->surface,element->x,element->y);
             cairo_paint(ctx);
         }
 
-        next:
-            elem = elem->next;
+        elem = elem->next;
     }
 
     XdbeBeginIdiom(dpy);
     XdbeSwapBuffers(dpy,&swapinfo,1);
     XSync(dpy,0);
     XdbeEndIdiom(dpy);
+
+    decr_dirt_count(1);
 }
 
 void *
 painter_thread(void *arg)
 {
     int rc=0;
+    struct timespec timeout;
+    struct timeval curtime;
 
     while(1)
     {
-        paint(NULL);
-        rc=pthread_cond_wait(&paint_condition,&paint_mutex);
-        ASSERT(!rc);
+        ASSERT(!gettimeofday(&curtime,NULL))
+        timeout.tv_sec = curtime.tv_sec;
+        timeout.tv_nsec = curtime.tv_usec * 1000;
+        timeout.tv_nsec += (40 * 1000000L);
+        timeout.tv_sec += timeout.tv_nsec/1000000000L;
+        timeout.tv_nsec %= 1000000000L;
+
+        rc=pthread_cond_timedwait(&paint_condition,&paint_mutex,&timeout);
+
+        if(rc!=0){
+            if(rc == ETIMEDOUT){
+                paint(NULL);
+                continue;
+            } else {
+                printf("<<%s>> pthread_cond_timwait returned %d\n",
+                        __FUNCTION__,rc);
+                continue;
+            }
+        }
     }
 
 }
@@ -415,7 +413,7 @@ fork_painter_thread()
     /*
      * Fork a thread to draw the sorted element list
      */
-    pthread_mutex_init(&inkface_dirty_mutex,NULL);
+    pthread_mutex_init(&inkface_dirt_mutex,NULL);
     pthread_t thr;
     pthread_create(&thr,NULL,painter_thread,NULL);
 

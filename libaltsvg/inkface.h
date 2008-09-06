@@ -24,11 +24,13 @@ struct _Element{
     element_type_t type;
     char *on_mouse_over;
 
+    int opacity;    /* TODO temp hack */
     gboolean inFocus;
 
     void (*onMouseEnter)(Element *self, void *userdata);
     void (*onMouseLeave)(Element *self, void *userdata);
 
+    void (*draw)(Element *self, void *userdata);
 };
 
 
@@ -63,4 +65,6 @@ void cleanup_backend();
 GList *load_element_list();
 void fork_painter_thread();
 
+void incr_dirt_count(int count);
+void decr_dirt_count(int count);
 #endif /*__INKFACE_H__ */

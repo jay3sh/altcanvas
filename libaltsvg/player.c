@@ -1,5 +1,6 @@
 #include "rsvg.h"
 #include "inkface.h"
+#include "string.h"
 
 gint 
 compare_element_by_name(
@@ -28,7 +29,7 @@ toggle_glow(Element *el, GList *elemList,gboolean glow)
         elemList,el->on_mouse_over,compare_element_by_name)); 
     ASSERT(elmo = (Element *)result->data);
 
-    elmo->type = glow ? !ELEM_TYPE_TRANSIENT:ELEM_TYPE_TRANSIENT;
+    elmo->opacity = 100;
 
     signal_paint();
 }
@@ -41,6 +42,7 @@ void
 onNextButtonMouseEnter(Element *el, void *userdata)
 {
     toggle_glow(el,(GList *)userdata,TRUE);
+    incr_dirt_count(6);
 }
 
 void
@@ -53,6 +55,7 @@ void
 onPrevButtonMouseEnter(Element *el, void *userdata)
 {
     toggle_glow(el,(GList *)userdata,TRUE);
+    incr_dirt_count(6);
 }
 
 void
@@ -61,27 +64,94 @@ onPrevButtonMouseLeave(Element *el, void *userdata)
     toggle_glow(el,(GList *)userdata,FALSE);
 }
 
+void
+onGlowDraw(Element *el, void *userdata)
+{
+    if(el->opacity > 0){
+        cairo_t *ctx = (cairo_t *)userdata;
+        cairo_set_source_surface(ctx,el->surface,el->x,el->y);
+        cairo_paint_with_alpha(ctx,el->opacity/100.);
+        el->opacity -= 20;
+
+        if(el->opacity < 0){
+            el->opacity = 0;
+        }
+
+    }
+
+}
+
+void
+onCoverArtDraw(Element *element, void *userdata)
+{
+    cairo_t *ctx = (cairo_t *)userdata;
+    // Use this element surface as mask
+    int cover_w=1,cover_h=1;
+
+    char *center_img_path = getenv("CENTER_COVER_ART");
+
+    if(!center_img_path) return;
+
+    cairo_surface_t *cover_surface =
+        cairo_image_surface_create_from_png(
+        center_img_path);
+    cover_w = cairo_image_surface_get_width(cover_surface);
+    cover_h = cairo_image_surface_get_height(cover_surface);
+    cairo_save(ctx);
+    cairo_scale(ctx,
+                element->w*1./cover_w,
+                element->h*1./cover_h);
+    cairo_set_source_surface(ctx,
+                cover_surface, 
+                element->x*cover_w*1./element->w,
+                element->y*cover_h*1./element->h);
+    
+    cairo_paint(ctx);
+    cairo_restore(ctx);
+
+    // apply the mask
+    cairo_set_source_rgb(ctx,0,0,0);
+    cairo_mask_surface(ctx,element->surface,
+                element->x,
+                element->y);
+    cairo_fill(ctx);
+
+}
+
 /*
  * Wire the event handlers with the elements
  */
 
+gboolean str_equal(const char *in, const char *ref)
+{
+   if(!strncmp(in,ref,strlen(ref)) && (strlen(in) == strlen(ref)))
+        return TRUE;
+
+   return FALSE;
+}
+
+void wire_element(gpointer data, gpointer userdata)
+{
+    Element *el = (Element *)data;
+
+    if(str_equal(el->name,"prevButton")){
+        el->onMouseEnter = onPrevButtonMouseEnter;
+        el->onMouseLeave = onPrevButtonMouseLeave;
+    } else if(str_equal(el->name,"nextButton")){
+        el->onMouseEnter = onNextButtonMouseEnter;
+        el->onMouseLeave = onNextButtonMouseLeave;
+    } else if(str_equal(el->name,"nextButtonGlow")){
+        el->draw = onGlowDraw;
+    } else if(str_equal(el->name,"prevButtonGlow")){
+        el->draw = onGlowDraw;
+    } else if(str_equal(el->name,"currentCoverMask")){
+        el->draw = onCoverArtDraw;
+    }
+}
+
 void wire_logic(GList *elemList)
 {
-    GList *result = NULL;
-    Element *prevButton=NULL, *nextButton=NULL;
-
-    ASSERT(result = 
-        g_list_find_custom(elemList,"prevButton",compare_element_by_name)); 
-    ASSERT(prevButton = (Element *)result->data);
-
-    ASSERT(result = 
-        g_list_find_custom(elemList,"nextButton",compare_element_by_name)); 
-    ASSERT(nextButton = (Element *)result->data);
-
-    prevButton->onMouseEnter = onPrevButtonMouseEnter;
-    prevButton->onMouseLeave = onPrevButtonMouseLeave;
-    nextButton->onMouseEnter = onNextButtonMouseEnter;
-    nextButton->onMouseLeave = onNextButtonMouseLeave;
+    g_list_foreach(elemList,wire_element,NULL);
 }
 
 int main(int argc, char *argv[])
