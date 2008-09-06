@@ -51,19 +51,56 @@ toggle_glow(Element *el, GList *elemList,gboolean glow)
 }
 
 void
-rotate_cover_art(gboolean forward)
+rotate_cover_art(GList *element_list,gboolean forward)
 {
-    if(forward){
-        char *tmp = center_img_path;
-        center_img_path = prev_img_path;
-        prev_img_path = next_img_path;
-        next_img_path = tmp;
-    } else {
-        char *tmp = center_img_path;
-        center_img_path = next_img_path;
-        next_img_path = prev_img_path;
-        prev_img_path = tmp;
+    GList *result;
+    Element *currentCover, *prevCover, *nextCover;
+    ASSERT(result = g_list_find_custom(
+        element_list,"currentCoverMask",compare_element_by_name)); 
+    ASSERT(currentCover = (Element *)result->data);
+    ASSERT(result = g_list_find_custom(
+        element_list,"prevCoverMask",compare_element_by_name)); 
+    ASSERT(prevCover = (Element *)result->data);
+    ASSERT(result = g_list_find_custom(
+        element_list,"nextCoverMask",compare_element_by_name)); 
+    ASSERT(nextCover = (Element *)result->data);
+
+    if(currentCover->target_x ||
+        currentCover->target_y ||
+        nextCover->target_x ||
+        nextCover->target_y ||
+        prevCover->target_x ||
+        prevCover->target_y)
+    {
+        /* Animation is already in progress */
+        return;
     }
+
+    int tmp_order = currentCover->order;
+    if(forward){
+        currentCover->order = nextCover->order;
+        nextCover->order = prevCover->order;
+        prevCover->order = tmp_order;
+
+        currentCover->target_x = nextCover->x;
+        currentCover->target_y = nextCover->y;
+        nextCover->target_x = prevCover->x;
+        nextCover->target_y = prevCover->y;
+        prevCover->target_x = currentCover->x;
+        prevCover->target_y = currentCover->y;
+    } else {
+        currentCover->order = prevCover->order;
+        prevCover->order = nextCover->order;
+        nextCover->order = tmp_order;
+
+        currentCover->target_x = prevCover->x;
+        currentCover->target_y = prevCover->y;
+        prevCover->target_x = nextCover->x;
+        prevCover->target_y = nextCover->y;
+        nextCover->target_x = currentCover->x;
+        nextCover->target_y = currentCover->y;
+    }
+    sort_elements();
 }
 
 /*
@@ -76,7 +113,7 @@ rotate_cover_art(gboolean forward)
 void
 onNextButtonMouseEnter(Element *el, void *userdata)
 {
-    rotate_cover_art(TRUE);
+    rotate_cover_art((GList *)userdata,TRUE);
     toggle_glow(el,(GList *)userdata,TRUE);
     incr_dirt_count(6);
 }
@@ -89,7 +126,7 @@ onNextButtonMouseLeave(Element *el, void *userdata)
 void
 onPrevButtonMouseEnter(Element *el, void *userdata)
 {
-    rotate_cover_art(FALSE);
+    rotate_cover_art((GList *)userdata,FALSE);
     toggle_glow(el,(GList *)userdata,TRUE);
     incr_dirt_count(6);
 }
@@ -107,14 +144,14 @@ onCenterCoverArtEnter(Element *el, void *userdata)
 void 
 onPrevCoverArtEnter(Element *el, void *userdata)
 {
-    rotate_cover_art(TRUE);
+    rotate_cover_art((GList *)userdata,TRUE);
     incr_dirt_count(1);
 }
 
 void 
 onNextCoverArtEnter(Element *el, void *userdata)
 {
-    rotate_cover_art(FALSE);
+    rotate_cover_art((GList *)userdata,FALSE);
     incr_dirt_count(1);
 }
 
@@ -179,9 +216,43 @@ onGlowDraw(Element *el, void *userdata)
     }
 }
 
+#define ANIM_LENGTH 6
+
 void
 draw_cover_art_with_mask(Element *element, cairo_t *ctx, const char *imgpath)
 {
+
+    /* Check if animation is triggered */
+    if(element->target_x || element->target_y){
+        if(element->frame_count == 0){
+            /* This is first frame of animation */
+            int x_diff = element->target_x - element->x;
+            int y_diff = element->target_y - element->y;
+            int x_corr = x_diff % ANIM_LENGTH;
+            int y_corr = y_diff % ANIM_LENGTH;
+            element->x += x_corr;
+            element->y += y_corr;
+            element->x_step = 
+                        (element->target_x - element->x)/ANIM_LENGTH;
+            element->y_step = 
+                        (element->target_y - element->y)/ANIM_LENGTH;
+        }
+        element->frame_count++;
+        element->x += element->frame_count*element->x_step;
+        element->y += element->frame_count*element->y_step;
+
+        if((element->x == element->target_x) && 
+            (element->y == element->target_y)){
+            /* Animation is complete */
+            element->target_x = 0;
+            element->target_y = 0;
+            element->frame_count = 0;
+            element->x_step = 0;
+            element->y_step = 0;
+        }
+    }
+
+
     int cover_w=1,cover_h=1;
 
     cairo_surface_t *cover_surface =

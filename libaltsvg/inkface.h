@@ -27,6 +27,11 @@ struct _Element{
     int opacity;    /* TODO temp hack */
     gboolean inFocus;
 
+    /* Animation related members */
+    int target_x, target_y, target_w, target_h;
+    int x_step,y_step;
+    int frame_count;
+
     void (*onMouseEnter)(Element *self, void *userdata);
     void (*onMouseLeave)(Element *self, void *userdata);
 
@@ -59,6 +64,7 @@ void inkface_istate_init(InkfaceState *);
         }
 
 /* inkface functions */
+void sort_elements();
 void signal_paint();
 void init_backend(const char* svgfilename,gboolean fullscreen);
 void cleanup_backend();

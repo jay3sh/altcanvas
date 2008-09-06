@@ -419,6 +419,17 @@ load_element_list()
     return sortedElemList;
 }
 
+void
+sort_elements()
+{
+    /* TODO this can potentially lead to race conditions
+     * It's is necessary to lock the sortedElementList, else 
+     * the concurrent operations which are in the middle of iterating
+     * over the list will get confused
+     */
+    ASSERT(sortedElemList = g_list_sort(sortedElemList,compare_element));
+}
+
 void 
 fork_painter_thread()
 {
