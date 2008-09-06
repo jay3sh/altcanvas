@@ -6,6 +6,9 @@ char *center_img_path;
 char *prev_img_path;
 char *next_img_path;
 
+typedef enum {PLAYER_PLAY, PLAYER_PAUSE} player_status_t;
+player_status_t player_status;
+
 gint 
 compare_element_by_name(
     gconstpointer listitem,
@@ -99,7 +102,6 @@ onPrevButtonMouseLeave(Element *el, void *userdata)
 void 
 onCenterCoverArtEnter(Element *el, void *userdata)
 {
-
 }
 
 void 
@@ -114,6 +116,48 @@ onNextCoverArtEnter(Element *el, void *userdata)
 {
     rotate_cover_art(FALSE);
     incr_dirt_count(1);
+}
+
+void 
+onPlayEnter(Element *el, void *userdata)
+{
+    if(player_status == PLAYER_PAUSE){
+        player_status = PLAYER_PLAY;
+    }
+    incr_dirt_count(1);
+}
+
+void 
+onPauseEnter(Element *el, void *userdata)
+{
+    if(player_status == PLAYER_PLAY){
+        player_status = PLAYER_PAUSE;
+    }
+    incr_dirt_count(1);
+}
+
+void
+onPlayDraw(Element *element, void *userdata)
+{
+    cairo_t *ctx = (cairo_t *)userdata;
+
+    if(player_status == PLAYER_PAUSE){
+        cairo_set_source_surface(ctx,
+            element->surface,element->x,element->y);
+        cairo_paint(ctx);
+    }
+}
+
+void
+onPauseDraw(Element *element, void *userdata)
+{
+    cairo_t *ctx = (cairo_t *)userdata;
+
+    if(player_status == PLAYER_PLAY){
+        cairo_set_source_surface(ctx,
+            element->surface,element->x,element->y);
+        cairo_paint(ctx);
+    }
 }
 
 
@@ -230,6 +274,12 @@ void wire_element(gpointer data, gpointer userdata)
     } else if(str_equal(el->name,"nextCoverMask")){
         el->draw = onNextCoverArtDraw;
         el->onMouseEnter = onNextCoverArtEnter;
+    } else if(str_equal(el->name,"playButton")){
+        el->onMouseEnter = onPlayEnter;
+        el->draw = onPlayDraw;
+    } else if(str_equal(el->name,"pauseButton")){
+        el->onMouseEnter = onPauseEnter;
+        el->draw = onPauseDraw;
     }
 }
 
@@ -240,6 +290,7 @@ void wire_logic(GList *elemList)
 
 void init_app()
 {
+    player_status = PLAYER_PAUSE;
     center_img_path = g_strdup(getenv("CENTER_COVER_ART"));
     prev_img_path = g_strdup(getenv("PREV_COVER_ART"));
     next_img_path = g_strdup(getenv("NEXT_COVER_ART"));
