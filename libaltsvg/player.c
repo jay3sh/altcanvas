@@ -15,9 +15,18 @@ compare_element_by_name(
     ASSERT(name);
     Element *element = (Element *)listitem;
     if(element->name){
-        return strncmp(element->name,
+        int diff = strncmp(element->name,
                         (const char *)name,
                         strlen((const char *)name));
+        /* Make sure it's an exact name match. 
+         * Avoid false matches where one is a left aligned substring
+         * of another
+         */
+        if(!diff){
+            if(strlen(element->name) != strlen(name))
+                return -1;
+        }
+        return diff;
     } else {
         return -1;
     }
