@@ -21,6 +21,7 @@
 #include "pthread.h"
 #include "errno.h"
 
+#define DOUBLE_BUFFER
 
 #ifdef ENABLE_PROFILING
 /* Constructor and Destructor Prototypes */
@@ -129,10 +130,14 @@ paint(void *arg)
         elem = elem->next;
     }
 
+    #ifdef DOUBLE_BUFFER
     XdbeBeginIdiom(dpy);
     XdbeSwapBuffers(dpy,&swapinfo,1);
     XSync(dpy,0);
     XdbeEndIdiom(dpy);
+    #else
+    XFlush(dpy);
+    #endif
 
     decr_dirt_count(1);
 }
@@ -345,10 +350,12 @@ void init_backend(const char* svgfilename,gboolean fullscreen)
         ASSERT(status != BadWindow);
     }
 
+    #ifdef DOUBLE_BUFFER
     /* Enabled double buffering */
     backBuffer = XdbeAllocateBackBufferName(dpy,win,XdbeBackground);
     swapinfo.swap_window = win;
     swapinfo.swap_action = XdbeBackground;
+    #endif
 
     XClearWindow(dpy,win);
     XMapWindow(dpy, win);
@@ -357,8 +364,13 @@ void init_backend(const char* svgfilename,gboolean fullscreen)
     Visual *visual = DefaultVisual(dpy,DefaultScreen(dpy));
     ASSERT(visual)
 
+    #ifdef DOUBLE_BUFFER
     ASSERT(surface = cairo_xlib_surface_create(
                         dpy, backBuffer, visual, dim.width,dim.height));
+    #else
+    ASSERT(surface = cairo_xlib_surface_create(
+                        dpy, win, visual, dim.width,dim.height));
+    #endif 
     ASSERT(ctx = cairo_create(surface));
 
 }
