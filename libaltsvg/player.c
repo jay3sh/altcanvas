@@ -81,7 +81,6 @@ onNextButtonMouseEnter(Element *el, void *userdata)
 void
 onNextButtonMouseLeave(Element *el, void *userdata)
 {
-    toggle_glow(el,(GList *)userdata,FALSE);
 }
 
 void
@@ -95,7 +94,6 @@ onPrevButtonMouseEnter(Element *el, void *userdata)
 void
 onPrevButtonMouseLeave(Element *el, void *userdata)
 {
-    toggle_glow(el,(GList *)userdata,FALSE);
 }
 
 void 
@@ -134,9 +132,7 @@ onGlowDraw(Element *el, void *userdata)
         if(el->opacity < 0){
             el->opacity = 0;
         }
-
     }
-
 }
 
 void
