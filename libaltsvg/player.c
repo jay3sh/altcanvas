@@ -2,6 +2,8 @@
 #include "inkface.h"
 #include "string.h"
 
+#define ANIM_LENGTH 6
+
 char *center_img_path;
 char *prev_img_path;
 char *next_img_path;
@@ -115,7 +117,7 @@ onNextButtonMouseEnter(Element *el, void *userdata)
 {
     rotate_cover_art((GList *)userdata,TRUE);
     toggle_glow(el,(GList *)userdata,TRUE);
-    incr_dirt_count(6);
+    incr_dirt_count(ANIM_LENGTH+1);
 }
 
 void
@@ -128,7 +130,7 @@ onPrevButtonMouseEnter(Element *el, void *userdata)
 {
     rotate_cover_art((GList *)userdata,FALSE);
     toggle_glow(el,(GList *)userdata,TRUE);
-    incr_dirt_count(6);
+    incr_dirt_count(ANIM_LENGTH+1);
 }
 
 void
@@ -205,10 +207,16 @@ void
 onGlowDraw(Element *el, void *userdata)
 {
     if(el->opacity > 0){
+        if(el->opacity == 100){
+            /* first frame of animation */
+            int op_corr = 100 % (100/ANIM_LENGTH);
+            el->opacity -= op_corr;
+        }
+
         cairo_t *ctx = (cairo_t *)userdata;
         cairo_set_source_surface(ctx,el->surface,el->x,el->y);
         cairo_paint_with_alpha(ctx,el->opacity/100.);
-        el->opacity -= 20;
+        el->opacity -= 100/ANIM_LENGTH;
 
         if(el->opacity < 0){
             el->opacity = 0;
@@ -216,7 +224,6 @@ onGlowDraw(Element *el, void *userdata)
     }
 }
 
-#define ANIM_LENGTH 6
 
 void
 draw_cover_art_with_mask(Element *element, cairo_t *ctx, const char *imgpath)
@@ -228,18 +235,21 @@ draw_cover_art_with_mask(Element *element, cairo_t *ctx, const char *imgpath)
             /* This is first frame of animation */
             int x_diff = element->target_x - element->x;
             int y_diff = element->target_y - element->y;
-            int x_corr = x_diff % ANIM_LENGTH;
-            int y_corr = y_diff % ANIM_LENGTH;
+            int x_step_tmp = x_diff / ANIM_LENGTH;
+            int y_step_tmp = y_diff / ANIM_LENGTH;
+            int x_corr = x_step_tmp ? x_diff % x_step_tmp : x_diff;
+            int y_corr = y_step_tmp ? y_diff % y_step_tmp : y_diff;
+
             element->x += x_corr;
             element->y += y_corr;
-            element->x_step = 
-                        (element->target_x - element->x)/ANIM_LENGTH;
-            element->y_step = 
-                        (element->target_y - element->y)/ANIM_LENGTH;
+
+            element->x_step = (element->target_x - element->x)/ANIM_LENGTH;
+            element->y_step = (element->target_y - element->y)/ANIM_LENGTH;
+
         }
         element->frame_count++;
-        element->x += element->frame_count*element->x_step;
-        element->y += element->frame_count*element->y_step;
+        element->x += element->x_step;
+        element->y += element->y_step;
 
         if((element->x == element->target_x) && 
             (element->y == element->target_y)){
