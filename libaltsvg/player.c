@@ -2,6 +2,10 @@
 #include "inkface.h"
 #include "string.h"
 
+char *center_img_path;
+char *prev_img_path;
+char *next_img_path;
+
 gint 
 compare_element_by_name(
     gconstpointer listitem,
@@ -34,13 +38,33 @@ toggle_glow(Element *el, GList *elemList,gboolean glow)
     signal_paint();
 }
 
+void
+rotate_cover_art(gboolean forward)
+{
+    if(forward){
+        char *tmp = center_img_path;
+        center_img_path = prev_img_path;
+        prev_img_path = next_img_path;
+        next_img_path = tmp;
+    } else {
+        char *tmp = center_img_path;
+        center_img_path = next_img_path;
+        next_img_path = prev_img_path;
+        prev_img_path = tmp;
+    }
+}
+
 /*
  * Event Handlers
  */
 
+/*
+ * Input event handlers
+ */
 void
 onNextButtonMouseEnter(Element *el, void *userdata)
 {
+    rotate_cover_art(TRUE);
     toggle_glow(el,(GList *)userdata,TRUE);
     incr_dirt_count(6);
 }
@@ -54,6 +78,7 @@ onNextButtonMouseLeave(Element *el, void *userdata)
 void
 onPrevButtonMouseEnter(Element *el, void *userdata)
 {
+    rotate_cover_art(FALSE);
     toggle_glow(el,(GList *)userdata,TRUE);
     incr_dirt_count(6);
 }
@@ -64,6 +89,30 @@ onPrevButtonMouseLeave(Element *el, void *userdata)
     toggle_glow(el,(GList *)userdata,FALSE);
 }
 
+void 
+onCenterCoverArtEnter(Element *el, void *userdata)
+{
+
+}
+
+void 
+onPrevCoverArtEnter(Element *el, void *userdata)
+{
+    rotate_cover_art(TRUE);
+    incr_dirt_count(1);
+}
+
+void 
+onNextCoverArtEnter(Element *el, void *userdata)
+{
+    rotate_cover_art(FALSE);
+    incr_dirt_count(1);
+}
+
+
+/*
+ * Drawing event handlers
+ */
 void
 onGlowDraw(Element *el, void *userdata)
 {
@@ -115,7 +164,6 @@ void
 onCurrentCoverArtDraw(Element *element, void *userdata)
 {
     cairo_t *ctx = (cairo_t *)userdata;
-    char *center_img_path = getenv("CENTER_COVER_ART");
 
     if(!center_img_path) return;
 
@@ -126,7 +174,6 @@ void
 onPrevCoverArtDraw(Element *element, void *userdata)
 {
     cairo_t *ctx = (cairo_t *)userdata;
-    char *prev_img_path = getenv("PREV_COVER_ART");
 
     if(!prev_img_path) return;
 
@@ -137,7 +184,6 @@ void
 onNextCoverArtDraw(Element *element, void *userdata)
 {
     cairo_t *ctx = (cairo_t *)userdata;
-    char *next_img_path = getenv("NEXT_COVER_ART");
 
     if(!next_img_path) return;
 
@@ -175,14 +221,30 @@ void wire_element(gpointer data, gpointer userdata)
         el->draw = onCurrentCoverArtDraw;
     } else if(str_equal(el->name,"prevCoverMask")){
         el->draw = onPrevCoverArtDraw;
+        el->onMouseEnter = onPrevCoverArtEnter;
     } else if(str_equal(el->name,"nextCoverMask")){
         el->draw = onNextCoverArtDraw;
+        el->onMouseEnter = onNextCoverArtEnter;
     }
 }
 
 void wire_logic(GList *elemList)
 {
     g_list_foreach(elemList,wire_element,NULL);
+}
+
+void init_app()
+{
+    center_img_path = g_strdup(getenv("CENTER_COVER_ART"));
+    prev_img_path = g_strdup(getenv("PREV_COVER_ART"));
+    next_img_path = g_strdup(getenv("NEXT_COVER_ART"));
+}
+
+void cleanup_app()
+{
+    g_free(center_img_path);
+    g_free(prev_img_path);
+    g_free(next_img_path);
 }
 
 int main(int argc, char *argv[])
@@ -194,6 +256,8 @@ int main(int argc, char *argv[])
     }
 
     init_backend(argv[1],FALSE);
+
+    init_app();
 
     GList *element_list = load_element_list();
 
