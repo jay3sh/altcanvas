@@ -82,19 +82,13 @@ onGlowDraw(Element *el, void *userdata)
 }
 
 void
-onCoverArtDraw(Element *element, void *userdata)
+draw_cover_art_with_mask(Element *element, cairo_t *ctx, const char *imgpath)
 {
-    cairo_t *ctx = (cairo_t *)userdata;
-    // Use this element surface as mask
     int cover_w=1,cover_h=1;
-
-    char *center_img_path = getenv("CENTER_COVER_ART");
-
-    if(!center_img_path) return;
 
     cairo_surface_t *cover_surface =
         cairo_image_surface_create_from_png(
-        center_img_path);
+        imgpath);
     cover_w = cairo_image_surface_get_width(cover_surface);
     cover_h = cairo_image_surface_get_height(cover_surface);
     cairo_save(ctx);
@@ -115,8 +109,41 @@ onCoverArtDraw(Element *element, void *userdata)
                 element->x,
                 element->y);
     cairo_fill(ctx);
-
 }
+
+void
+onCurrentCoverArtDraw(Element *element, void *userdata)
+{
+    cairo_t *ctx = (cairo_t *)userdata;
+    char *center_img_path = getenv("CENTER_COVER_ART");
+
+    if(!center_img_path) return;
+
+    draw_cover_art_with_mask(element,ctx,center_img_path);
+}
+
+void
+onPrevCoverArtDraw(Element *element, void *userdata)
+{
+    cairo_t *ctx = (cairo_t *)userdata;
+    char *prev_img_path = getenv("PREV_COVER_ART");
+
+    if(!prev_img_path) return;
+
+    draw_cover_art_with_mask(element,ctx,prev_img_path);
+}
+
+void
+onNextCoverArtDraw(Element *element, void *userdata)
+{
+    cairo_t *ctx = (cairo_t *)userdata;
+    char *next_img_path = getenv("NEXT_COVER_ART");
+
+    if(!next_img_path) return;
+
+    draw_cover_art_with_mask(element,ctx,next_img_path);
+}
+
 
 /*
  * Wire the event handlers with the elements
@@ -145,7 +172,11 @@ void wire_element(gpointer data, gpointer userdata)
     } else if(str_equal(el->name,"prevButtonGlow")){
         el->draw = onGlowDraw;
     } else if(str_equal(el->name,"currentCoverMask")){
-        el->draw = onCoverArtDraw;
+        el->draw = onCurrentCoverArtDraw;
+    } else if(str_equal(el->name,"prevCoverMask")){
+        el->draw = onPrevCoverArtDraw;
+    } else if(str_equal(el->name,"nextCoverMask")){
+        el->draw = onNextCoverArtDraw;
     }
 }
 
