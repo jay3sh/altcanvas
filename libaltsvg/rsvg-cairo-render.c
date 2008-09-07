@@ -264,8 +264,11 @@ inkface_get_element(RsvgHandle *handle, Element *element)
         CAIRO_FORMAT_ARGB32,0,0);
     cairo_t *tmp_cr = cairo_create(tmp_surface);
     draw = rsvg_cairo_new_drawing_ctx (tmp_cr, handle);
-    if (!draw)
+    if (!draw){
+        cairo_destroy(tmp_cr);
+        cairo_surface_destroy(tmp_surface);
         return;
+    }
 
     g_return_if_fail (element->id != NULL);
 
@@ -305,6 +308,11 @@ inkface_get_element(RsvgHandle *handle, Element *element)
     element->w = render->bbox.w;
     element->h = render->bbox.h;
 
+    /* The calculation part is over at this point, so ok to free resources */
+    cairo_destroy(tmp_cr);
+    cairo_surface_destroy(tmp_surface);
+    rsvg_drawing_ctx_free(draw);
+
     /* DRAW */
 
     RsvgDrawingCtx *dctx;
@@ -325,7 +333,7 @@ inkface_get_element(RsvgHandle *handle, Element *element)
         printf("element->id absent\n");
     }
 
-    rsvg_drawing_ctx_free(draw);
+    rsvg_drawing_ctx_free(dctx);
 
 }
 

@@ -380,6 +380,19 @@ void init_backend(const char* svgfilename,gboolean fullscreen)
 void cleanup_backend()
 {
     //TODO cleanup element list
+    GList *iter = sortedElemList;
+    while(iter){
+        Element *el = (Element *)iter->data;
+
+        if(el->cr) cairo_destroy(el->cr);
+        if(el->surface) cairo_surface_destroy(el->surface);
+        if(el->name) g_free(el->name);
+        if(el->on_mouse_over) g_free(el->on_mouse_over);
+        g_free(el);
+        
+        iter = iter->next;
+    }
+    g_free(sortedElemList);
     rsvg_term ();
 
 }
