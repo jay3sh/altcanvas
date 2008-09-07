@@ -10,9 +10,18 @@ compare_element_by_name(
     ASSERT(name);
     Element *element = (Element *)listitem;
     if(element->name){
-        return strncmp(element->name,
+        int diff = strncmp(element->name,
                         (const char *)name,
                         strlen((const char *)name));
+        /* Make sure it's an exact name match. 
+         * Avoid false matches where one is a left aligned substring
+         * of another
+         */
+        if(!diff){
+            if(strlen(element->name) != strlen(name))
+                return -1;
+        }
+        return diff;
     } else {
         return -1;
     }
@@ -32,19 +41,28 @@ toggle_glow(Element *el, GList *elemList,gboolean glow)
 
     ASSERT(elmo = (Element *)result->data);
 
-    elmo->type = glow ? !ELEM_TYPE_TRANSIENT:ELEM_TYPE_TRANSIENT;
+    elmo->opacity = glow ? 100:0;
 
-    signal_paint();
 }
+
+/*
+ * Event handlers
+ */
+
+/*
+ * Input event handlers
+ */
 
 void onKeyEnter(Element *el, void *userdata)
 {
     toggle_glow(el,(GList *)userdata,TRUE);
+    incr_dirt_count(1);
 }
 
 void onKeyLeave(Element *el, void *userdata)
 {
     toggle_glow(el,(GList *)userdata,FALSE);
+    incr_dirt_count(1);
 }
 
 void onExit(Element *el, void *userdata)
@@ -53,47 +71,55 @@ void onExit(Element *el, void *userdata)
     exit(0);
 }
 
-void filter_key_buttons(gpointer data, gpointer userdata)
+/*
+ * Drawing event handlers
+ */
+void
+onKeyDraw(Element *element, void *userdata)
 {
-    GList **button_list = (GList **)userdata;
+    if(element->opacity){
+        cairo_t *ctx = (cairo_t *)userdata;
+        cairo_set_source_surface(ctx,
+            element->surface,element->x,element->y);
+        cairo_paint(ctx);
+    }
+}
 
-    char *element_name = ((Element *)data)->name;
+gboolean str_equal(const char *in, const char *ref)
+{
+   if(!strncmp(in,ref,strlen(ref)) && (strlen(in) == strlen(ref)))
+        return TRUE;
 
-    if(element_name && 
-        !strncmp(element_name,"key",3) &&
-        strlen(element_name) == 4)
-    {
-        /* button_list items should not be freed by the app.
-         * the button_list itself can be freed
-         */
-        *button_list = g_list_prepend(*button_list,(Element *)data); 
+   return FALSE;
+}
+
+void wire_element(gpointer data, gpointer userdata)
+{
+    Element *el = (Element *)data;
+
+    if(!strncmp(el->name,"key",3)){
+        if(strstr(el->name,"Glow")){
+            /* Glowing button */
+            el->opacity = 0;
+        } else {
+            /* Original button */
+            el->opacity = 100;
+        }
+        el->onMouseEnter = onKeyEnter;
+        el->onMouseLeave = onKeyLeave;
+        el->draw = onKeyDraw;
+
+        return;
+    }
+
+    if(str_equal(el->name,"exitDoor")){
+        el->onMouseEnter = onExit;
     }
 }
 
 void wire_logic(GList *element_list)
 {
-    GList *key_button_list = NULL;
-
-    /* The Key buttons */
-    g_list_foreach(element_list, filter_key_buttons, &key_button_list);
-
-    GList *iter = key_button_list;
-
-    while(iter)
-    {
-        Element *key_element = (Element *)(iter->data);
-        key_element->onMouseEnter = onKeyEnter;
-        key_element->onMouseLeave = onKeyLeave;
-        iter = iter->next;
-    }
-
-    /* exitDoor button */
-    GList *result = NULL;
-    Element *exitButton = NULL;
-    ASSERT(result = g_list_find_custom(element_list,"exitDoor", 
-                compare_element_by_name));
-    ASSERT(exitButton = (Element *)result->data);
-    exitButton->onMouseEnter = onExit;
+    g_list_foreach(element_list,wire_element,NULL);
 }
 
 int main(int argc, char *argv[])
