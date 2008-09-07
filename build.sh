@@ -179,7 +179,7 @@ make_inkface()
 {
     (
         cd libaltsvg;
-        dpkg-buildpackage -rfakeroot
+        dpkg-buildpackage -rfakeroot || exit
         scp ../inkface*deb root@192.168.1.100:/root/
 
         ssh root@192.168.1.100 \
