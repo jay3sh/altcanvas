@@ -67,6 +67,7 @@ void inkface_istate_init(InkfaceState *);
 void sort_elements();
 void signal_paint();
 void init_backend(const char* svgfilename,gboolean fullscreen);
+void cleanup_app();
 void cleanup_backend();
 GList *load_element_list();
 void fork_painter_thread();
