@@ -23,7 +23,7 @@
 
 #define DOUBLE_BUFFER
 
-#define REFRESH_INTERVAL_USEC 40
+#define REFRESH_INTERVAL_MSEC 40
 
 #ifdef ENABLE_PROFILING
 /* Constructor and Destructor Prototypes */
@@ -156,7 +156,7 @@ painter_thread(void *arg)
         ASSERT(!gettimeofday(&curtime,NULL))
         timeout.tv_sec = curtime.tv_sec;
         timeout.tv_nsec = curtime.tv_usec * 1000;
-        timeout.tv_nsec += (REFRESH_INTERVAL_USEC * 1000000L);
+        timeout.tv_nsec += (REFRESH_INTERVAL_MSEC * 1000000L);
         timeout.tv_sec += timeout.tv_nsec/1000000000L;
         timeout.tv_nsec %= 1000000000L;
 

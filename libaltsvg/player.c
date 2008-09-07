@@ -282,6 +282,8 @@ draw_cover_art_with_mask(Element *element, cairo_t *ctx, const char *imgpath)
     cairo_paint(ctx);
     cairo_restore(ctx);
 
+    cairo_surface_destroy(cover_surface);
+
     // apply the mask
     cairo_set_source_rgb(ctx,0,0,0);
     cairo_mask_surface(ctx,element->surface,
@@ -318,6 +320,13 @@ onNextCoverArtDraw(Element *element, void *userdata)
     if(!next_img_path) return;
 
     draw_cover_art_with_mask(element,ctx,next_img_path);
+}
+
+void onExit(Element *el, void *userdata)
+{
+    cleanup_app();
+    cleanup_backend();
+    exit(0);
 }
 
 
@@ -361,6 +370,8 @@ void wire_element(gpointer data, gpointer userdata)
     } else if(str_equal(el->name,"pauseButton")){
         el->onMouseEnter = onPauseEnter;
         el->draw = onPauseDraw;
+    } else if(str_equal(el->name,"exitDoor")){
+        el->onMouseEnter = onExit;
     }
 }
 
