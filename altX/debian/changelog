@@ -1,6 +1,6 @@
-canvasx (0.1.0) unstable; urgency=low
+inkface (0.0.1) unstable; urgency=low
 
-  * Initial release 
+  * Experimental UI design utility based on librsvg
 
- -- Jayesh Salvi <jayesh@altfrequency.com>  Sat, 31 May 2007 17:34:43 +0300
+ -- Jayesh Salvi <jayesh@altfrequency.com>  Sun, 6 Sep 2008 17:34:43 +0300
 
