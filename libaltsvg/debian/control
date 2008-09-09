@@ -1,0 +1,10 @@
+Source: inkface
+Section: user/office
+Priority: optional
+Maintainer: Jayesh Salvi <jayesh@altfrequency.com>
+Build-Depends: debhelper (>= 4.0.0) 
+Standards-Version: 3.6.0
+
+Package: inkface
+Architecture: armel
+Description: UI experiment based on SVG

@@ -1,0 +1,1 @@
+shlibs:Depends=libatk1.0-0 (>= 1.12.2), libc6 (>= 2.5.0-1), libcairo2 (>= 1.4.10), libfontconfig1 (>= 2.4.1), libfreetype6 (>= 2.3.5), libglib2.0-0 (>= 2.12.12-1osso10), libgtk2.0-0 (>= 2:2.10.12-0osso15), libpango1.0-0 (>= 1.16.4), libpng12-0 (>= 1.2.8rel), libx11-6, libxext6, libxml2, zlib1g (>= 1:1.2.1)
