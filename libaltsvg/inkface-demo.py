@@ -1,12 +1,15 @@
+#!/usr/bin/env python
+
 import os
 import gtk
 
-player_gui_images = {'Auditorium':'/photos/inkface/music-player-auditorium.svg',
-              'Sunset':'/photos/inkface/music-player-sunset.svg'}
+IMAGE_BASE='/usr/share/pixmaps'
+player_gui_images = {'Auditorium':IMAGE_BASE+'/music-player-auditorium.svg',
+              'Sunset':IMAGE_BASE+'/music-player-sunset.svg'}
 
-keyboard_gui_images = {'Playful':'/photos/inkface/keyboard-playfull.svg',
-                'Formal':'/photos/inkface/keyboard-formal.svg',
-                'Elegant':'/photos/inkface/keyboard-elegant.svg'}
+keyboard_gui_images = {'Playful':IMAGE_BASE+'/keyboard-playfull.svg',
+                'Formal':IMAGE_BASE+'/keyboard-formal.svg',
+                'Elegant':IMAGE_BASE+'/keyboard-elegant.svg'}
 
 player_gui = None
 keyboard_gui = None
@@ -85,10 +88,10 @@ def launch_player(widget,data=None):
     active = player_gui.get_active()
     key = model[active][0]
     gui_filename = player_gui_images[key]
-    os.environ['CENTER_COVER_ART'] = '/photos/inkfun/dido.png'
-    os.environ['PREV_COVER_ART'] = '/photos/inkfun/corrs.png'
-    os.environ['NEXT_COVER_ART'] = '/photos/inkfun/jem.png'
-    (sin,soe) = os.popen4('./player '+gui_filename) 
+    os.environ['CENTER_COVER_ART'] = IMAGE_BASE+'/dido.png'
+    os.environ['PREV_COVER_ART'] = IMAGE_BASE+'/corrs.png'
+    os.environ['NEXT_COVER_ART'] = IMAGE_BASE+'/jem.png'
+    (sin,soe) = os.popen4('/usr/bin/player '+gui_filename) 
     for l in soe:
         print l
 
@@ -97,7 +100,7 @@ def launch_keyboard(widget,data=None):
     active = keyboard_gui.get_active()
     key = model[active][0]
     gui_filename = keyboard_gui_images[key]
-    (sin,soe) = os.popen4('./keyboard '+gui_filename) 
+    (sin,soe) = os.popen4('/usr/bin/keyboard '+gui_filename) 
     for l in soe:
         print l
 
