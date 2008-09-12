@@ -15,7 +15,7 @@
    sodipodi:version="0.32"
    inkscape:version="0.46"
    version="1.0"
-   sodipodi:docname="music-player-B.svg"
+   sodipodi:docname="music-player-sunset.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs2936">
@@ -131,10 +131,10 @@
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1280"
-     inkscape:window-height="1003"
+     inkscape:window-width="1268"
+     inkscape:window-height="985"
      inkscape:window-x="0"
-     inkscape:window-y="0" />
+     inkscape:window-y="6" />
   <metadata
      id="metadata2939">
     <rdf:RDF>
@@ -318,6 +318,27 @@
          width="8.8060961"
          id="rect3955"
          style="opacity:1;fill:#e6e6e6;fill-opacity:0.83137256;fill-rule:evenodd;stroke:none;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.78431373000000004" />
+    </g>
+    <g
+       id="g3490"
+       name="exitDoor"
+       order="100"
+       transform="translate(-753.77027,-425.71007)">
+      <rect
+         y="432.26892"
+         x="763.02521"
+         height="34.285713"
+         width="28.907562"
+         id="rect2618"
+         style="fill:#c8c8c8;fill-opacity:0.92156863;fill-rule:evenodd;stroke:none;stroke-width:5.19999981;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.92156863" />
+      <rect
+         transform="matrix(0.8372093,-0.1763263,0,1,212.16338,121.5038)"
+         y="433.94958"
+         x="663.1933"
+         height="34.285713"
+         width="28.907562"
+         id="rect3434"
+         style="fill:#4d4d4d;fill-opacity:0.92156863;fill-rule:evenodd;stroke:none;stroke-width:5.19999981;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.92156863" />
     </g>
   </g>
 </svg>

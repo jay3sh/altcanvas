@@ -15,7 +15,7 @@
    sodipodi:version="0.32"
    inkscape:version="0.46"
    version="1.0"
-   sodipodi:docname="keyboard-C.svg"
+   sodipodi:docname="keyboard-elegant.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs4144">
@@ -33,14 +33,6 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 526.18109 : 1"
        sodipodi:type="inkscape:persp3d" />
-    <filter
-       inkscape:collect="always"
-       id="filter5102">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="1.4429659"
-         id="feGaussianBlur5104" />
-    </filter>
     <filter
        inkscape:collect="always"
        id="filter5746"
@@ -365,15 +357,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.47625"
-     inkscape:cx="380.15453"
+     inkscape:cx="394.65205"
      inkscape:cy="240"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1280"
-     inkscape:window-height="1003"
+     inkscape:window-width="1268"
+     inkscape:window-height="985"
      inkscape:window-x="0"
-     inkscape:window-y="0" />
+     inkscape:window-y="6" />
   <metadata
      id="metadata4147">
     <rdf:RDF>
@@ -1814,6 +1806,27 @@
            x="93.544449"
            id="tspan6044"
            sodipodi:role="line">M</tspan></text>
+    </g>
+    <g
+       id="g3490"
+       name="exitDoor"
+       order="100"
+       transform="translate(-20.832079,-415.54919)">
+      <rect
+         y="432.26892"
+         x="763.02521"
+         height="34.285713"
+         width="28.907562"
+         id="rect2618"
+         style="fill:#c8c8c8;fill-opacity:0.92156863;fill-rule:evenodd;stroke:none;stroke-width:5.19999981;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.92156863" />
+      <rect
+         transform="matrix(0.8372093,-0.1763263,0,1,212.16338,121.5038)"
+         y="433.94958"
+         x="663.1933"
+         height="34.285713"
+         width="28.907562"
+         id="rect3434"
+         style="fill:#4d4d4d;fill-opacity:0.92156863;fill-rule:evenodd;stroke:none;stroke-width:5.19999981;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.92156863" />
     </g>
   </g>
 </svg>
