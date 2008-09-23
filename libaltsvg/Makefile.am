@@ -120,21 +120,21 @@ keyboard_SOURCES = \
 	inkface.c 
 keyboard_LDFLAGS =
 keyboard_DEPENDENCIES = $(DEPS)
-keyboard_LDADD = $(GDK_X11_LIBS) $(EFENCELIB) $(LDADDS)
+keyboard_LDADD = $(GDK_X11_LIBS) $(EFENCELIB) $(XEXTLIB) $(LDADDS)
 
 player_SOURCES = \
 	player.c \
 	inkface.c
 player_LDFLAGS = 
 player_DEPENDENCIES = $(DEPS)
-player_LDADD = $(GDK_X11_LIBS) $(EFENCELIB) $(LDADDS)
+player_LDADD = $(GDK_X11_LIBS) $(EFENCELIB) $(XEXTLIB) $(LDADDS)
 
 xvtest_SOURCES = \
 	xvtest.c
-xvtest_CFLAGS = -Wall 
+#xvtest_CFLAGS = -Wall 
 xvtest_LDFLAGS =
-xvtest_DEPENDENCIES = $(DEPS)
-xvtest_LDADD = -lX11 -lXext -lXv -lm $(LDADDS)
+xvtest_DEPENDENCIES = 
+xvtest_LDADD = -lX11 -lXv $(libm) $(XEXTLIB) 
 
 EXTRA_DIST =				\
 	MAINTAINERS			\

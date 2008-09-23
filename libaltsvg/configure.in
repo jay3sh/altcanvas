@@ -92,6 +92,13 @@ fi
 
 dnl ===========================================================================
 
+AC_CHECK_LIB([Xext], [XdbeQueryExtension], [XEXTLIB=-lXext])
+AC_SUBST([XEXTLIB])
+
+
+
+dnl ===========================================================================
+
 PKG_CHECK_MODULES(GLIB, \
 		glib-2.0 >= $GLIB_REQUIRED \
 		gthread-2.0 >= $GLIB_REQUIRED)
@@ -245,6 +252,9 @@ fi
 
 AC_SUBST(GDK_X11_CFLAGS)
 AC_SUBST(GDK_X11_LIBS)
+
+
+
 
 AC_ARG_ENABLE(gtk-theme,
     [  --enable-gtk-theme  Enable a RSVG based GTK+ theme engine [default=auto]],,
