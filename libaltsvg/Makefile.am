@@ -7,7 +7,7 @@ endif
 SUBDIRS = . moz-plugin gdk-pixbuf-loader gtk-engine data tests doc
 
 lib_LTLIBRARIES = librsvg-2.la
-bin_PROGRAMS = rsvg-convert $(target_rsvg_view) keyboard player xvtest
+bin_PROGRAMS = rsvg-convert $(target_rsvg_view) keyboard player xvtest survey
 noinst_PROGRAMS = test-performance
 
 man_MANS = rsvg.1
@@ -128,6 +128,13 @@ player_SOURCES = \
 player_LDFLAGS = 
 player_DEPENDENCIES = $(DEPS)
 player_LDADD = $(GDK_X11_LIBS) $(EFENCELIB) $(XEXTLIB) $(LDADDS)
+
+survey_SOURCES = \
+	survey.c \
+	inkface.c
+survey_LDFLAGS =
+survey_DEPENDENCIES = $(DEPS)
+survey_LDADD = $(GDK_X11_LIBS) $(EFENCELIB) $(XEXTLIB) $(LDADDS)
 
 xvtest_SOURCES = \
 	xvtest.c
