@@ -2,7 +2,8 @@
 #include "inkface.h"
 #include "string.h"
 
-#define SVG_PATH "/photos/inkfun/survey/survey.svg"
+//#define SVG_PATH "/photos/inkfun/survey/survey.svg"
+#define SVG_PATH "/usr/share/pixmaps/survey.svg"
 
 int screen_num = 0;
 
