@@ -66,13 +66,17 @@ onQuestionNumDraw(Element *element, void *userdata)
 {
     if(strstr(element->name,"Tick")){
         // by default hide Tick labels 
-        return;
-    } else {
-        cairo_t *ctx = (cairo_t *)userdata;
-        cairo_set_source_surface(ctx,
-            element->surface,element->x,element->y);
-        cairo_paint(ctx);
-    }
+        if((screen_num <= 0) && (screen_num >= 4))
+            return;
+        int qnum = 0;
+        sscanf(element->name,"labelQNum%dTick",&qnum);
+        if(screen_num < qnum+1) return;
+    } 
+
+    cairo_t *ctx = (cairo_t *)userdata;
+    cairo_set_source_surface(ctx,
+        element->surface,element->x,element->y);
+    cairo_paint(ctx);
 }
 
 void
