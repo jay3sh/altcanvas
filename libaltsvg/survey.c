@@ -6,6 +6,43 @@
 
 int screen_num = 0;
 
+
+/*
+ * Event callbacks
+ */
+
+void
+onTapStart(Element *el, void *userdata)
+{
+    if(screen_num == 0){
+        screen_num = 1;
+        incr_dirt_count(1);
+    }
+}
+
+void 
+onKeyTap(Element *el, void *userdata)
+{
+    int rating;
+    if((screen_num > 0) && (screen_num < 4)){
+        sscanf(el->name,"key%d",&rating);
+        LOG("Rating for question %d: %d",screen_num,rating);
+        screen_num++;
+        incr_dirt_count(1);
+    }
+}
+
+void onExit(Element *el, void *userdata)
+{
+    if(screen_num == 4){
+        cleanup_backend();
+        exit(0);
+    }
+}
+
+/*
+ * Drawing callbacks
+ */
 void
 onKeyDraw(Element *element, void *userdata)
 {
@@ -100,6 +137,8 @@ gboolean str_equal(const char *in, const char *ref)
 void wire_element(gpointer data, gpointer userdata)
 {
     Element *el = (Element *)data;
+
+    /* Wire rendering callbacks */
     if(!strncmp(el->name,"labelQNum",strlen("labelQNum"))){
         el->draw = onQuestionNumDraw;
     } else if( !strncmp(el->name,"labelQ",strlen("labelQ")) &&
@@ -117,6 +156,17 @@ void wire_element(gpointer data, gpointer userdata)
     } else if(str_equal(el->name,"labelFinish") ||
                 str_equal(el->name,"labelSubmitted")){
         el->draw = onLabelFinishDraw;
+    }
+
+    /* Wire event handlers */
+    if(str_equal(el->name,"buttonStart")){
+        el->onMouseEnter = onTapStart;
+    } else if(!strncmp(el->name,"key",strlen("key")) &&
+                (!strstr(el->name,"Tapped")))
+    {
+        el->onMouseEnter = onKeyTap;
+    } else if(str_equal(el->name,"labelFinish")) {
+        el->onMouseEnter = onExit;
     }
 
 }
@@ -143,5 +193,4 @@ int main(int argc, char *argv[])
     cleanup_backend();
 
     return 0;
-
 }
