@@ -1,10 +1,10 @@
-Source: inkface
+Source: libaltsvg
 Section: user/office
 Priority: optional
 Maintainer: Jayesh Salvi <jayesh@altfrequency.com>
 Build-Depends: debhelper (>= 4.0.0) 
 Standards-Version: 3.6.0
 
-Package: inkface
+Package: libaltsvg
 Architecture: armel
-Description: UI experiment based on SVG
+Description: Modified version of librsvg to render SVG image components
