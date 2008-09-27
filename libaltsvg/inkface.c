@@ -379,7 +379,6 @@ void init_backend(const char* svgfilename,gboolean fullscreen)
 
 void cleanup_backend()
 {
-    //TODO cleanup element list
     GList *iter = sortedElemList;
     while(iter){
         Element *el = (Element *)iter->data;
@@ -392,7 +391,7 @@ void cleanup_backend()
         
         iter = iter->next;
     }
-    g_free(sortedElemList);
+    //g_free(sortedElemList);
     rsvg_term ();
 
 }
