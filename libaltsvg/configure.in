@@ -20,8 +20,8 @@ AC_SUBST(PANGOFT2_REQUIRED)
 
 dnl ===========================================================================
 
-LIBRSVG_MAJOR_VERSION=2
-LIBRSVG_MINOR_VERSION=22
+LIBRSVG_MAJOR_VERSION=0
+LIBRSVG_MINOR_VERSION=0
 LIBRSVG_MICRO_VERSION=1
 AC_SUBST(LIBRSVG_MAJOR_VERSION)
 AC_SUBST(LIBRSVG_MINOR_VERSION)
@@ -34,7 +34,7 @@ AC_SUBST(VERSION_INFO)
 
 dnl ===========================================================================
 
-AM_INIT_AUTOMAKE(librsvg, $LIBRSVG_VERSION)
+AM_INIT_AUTOMAKE(libaltsvg, $LIBRSVG_VERSION)
 AM_CONFIG_HEADER(config.h)
 
 AM_MAINTAINER_MODE
@@ -347,27 +347,20 @@ AC_CONFIG_FILES([
 librsvg.spec
 librsvg-features.h
 Makefile
-librsvg-2.0.pc
-librsvg-2.0-uninstalled.pc
+libaltsvg.pc
+libaltsvg-uninstalled.pc
 librsvg-zip
 rsvg
 data/Makefile
-gtk-engine/Makefile
-gtk-engine/examples/Makefile
-gtk-engine/examples/bubble/Makefile
-gtk-engine/examples/bubble/gtk-2.0/Makefile
-gdk-pixbuf-loader/Makefile
-moz-plugin/Makefile
 tests/Makefile
 tests/pdiff/Makefile
-doc/Makefile
 ])
 
 AC_OUTPUT
 
 dnl =============================================================================================
 echo "
-librsvg-$LIBRSVG_VERSION
+libaltsvg
 
 	prefix:                         ${prefix}
 	compiler:                       ${CC}

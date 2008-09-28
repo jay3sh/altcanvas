@@ -2,7 +2,7 @@ SUBDIRS=pdiff .
 
 TESTS = rsvg-test
 
-LDADD = $(top_builddir)/librsvg-2.la		\
+LDADD = $(top_builddir)/libaltsvg.la		\
 	$(top_builddir)/tests/pdiff/libpdiff.la
 
 INCLUDES = -I$(srcdir) 				\

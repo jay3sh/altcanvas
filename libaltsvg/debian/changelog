@@ -1,6 +1,6 @@
-inkface (0.0.1) unstable; urgency=low
+libaltsvg (0.0.1) unstable; urgency=low
 
-  * Experimental UI design utility based on librsvg
+  * Modified librsvg library for rendering components of SVG image
 
- -- Jayesh Salvi <jayesh@altfrequency.com>  Sun, 6 Sep 2008 17:34:43 +0300
+ -- Jayesh Salvi <jayesh@altfrequency.com>  Sat, 27 Sep 2008 17:34:43 +0300
 

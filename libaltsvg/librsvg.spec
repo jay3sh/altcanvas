@@ -1,13 +1,13 @@
 %define __libtoolize :
 %define __spec_install_post /usr/lib/rpm/brp-compress
-Name:             librsvg2
-Summary:          An SVG library based on cairo.
-Version:          2.22.1
+Name:             libaltsvg
+Summary:          Modification of librsvg library
+Version:          0.0.1
 Release:          2
-License:          LGPL
+License:          GPL
 Group:            System Environment/Libraries
 Source:           librsvg-%{version}.tar.gz
-URL:		  http://librsvg.sourceforge.net/
+URL:		  http://code.google.com/p/altcanvas
 BuildRoot:        %{_tmppath}/%{name}-%{version}-root
 BuildRequires:    pkgconfig >= 0.8
 Requires:         glib2 >= 2.12.0
@@ -22,7 +22,7 @@ BuildRequires:    pango-devel >= 1.2.0
 BuildRequires:	  libgsf >= 1.6.0
 
 %description
-An SVG library based on cairo.
+Modification of librsvg library
 
 
 %package devel

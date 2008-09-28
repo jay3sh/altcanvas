@@ -4,9 +4,9 @@ else
 target_rsvg_view =
 endif
 
-SUBDIRS = . moz-plugin gdk-pixbuf-loader gtk-engine data tests doc
+SUBDIRS = . data tests 
 
-lib_LTLIBRARIES = librsvg-2.la
+lib_LTLIBRARIES = libaltsvg.la
 bin_PROGRAMS = rsvg-convert $(target_rsvg_view) keyboard player xvtest survey
 noinst_PROGRAMS = test-performance
 
@@ -25,7 +25,7 @@ enum_sources = \
 	librsvg-enum-types.h	\
 	librsvg-enum-types.c
 
-librsvg_2_la_SOURCES = 		\
+libaltsvg_la_SOURCES = 		\
 	rsvg-affine.c		\
 	librsvg-features.c 	\
 	rsvg-bpath-util.c 	\
@@ -69,10 +69,10 @@ librsvg_2_la_SOURCES = 		\
 	rsvg-gobject.c		\
 	rsvg-file-util.c
 
-librsvg_2_la_LDFLAGS = -version-info @VERSION_INFO@ -export-dynamic -no-undefined -export-symbols $(srcdir)/librsvg.def
-librsvg_2_la_LIBADD = $(LIBGSF_LIBS) $(LIBCROCO_LIBS) $(LIBRSVG_LIBS) $(FREETYPE_LIBS)
+libaltsvg_la_LDFLAGS = -version-info @VERSION_INFO@ -export-dynamic -no-undefined -export-symbols $(srcdir)/librsvg.def
+libaltsvg_la_LIBADD = $(LIBGSF_LIBS) $(LIBCROCO_LIBS) $(LIBRSVG_LIBS) $(FREETYPE_LIBS)
 
-librsvgincdir = $(includedir)/librsvg-2/librsvg
+librsvgincdir = $(includedir)/libaltsvg
 librsvginc_HEADERS = 	\
 	$(headers)	\
 	librsvg-features.h \
@@ -89,13 +89,13 @@ INCLUDES =				\
 	-DG_LOG_DOMAIN=\"librsvg\" 	\
 	-DLIBRSVG_DATADIR="\"$(datadir)\""
 
-DEPS = $(top_builddir)/librsvg-2.la
+DEPS = $(top_builddir)/libaltsvg.la
 LDADDS =				\
 	$(LIBGSF_LIBS)			\
 	$(GLIB_LIBS)			\
 	$(LIBCROCO_LIBS)		\
 	$(LIBRSVG_LIBS) 		\
-	$(top_builddir)/librsvg-2.la
+	$(top_builddir)/libaltsvg.la
 
 bin_SCRIPTS=rsvg
 
@@ -150,8 +150,8 @@ EXTRA_DIST =				\
 	TODO				\
 	COPYING.LIB 			\
 	librsvg.spec.in 		\
-	librsvg-2.0.pc.in 		\
-	librsvg-2.0-uninstalled.pc.in 	\
+	libaltsvg.pc.in 		\
+	libaltsvg-uninstalled.pc.in 	\
 	librsvg-zip.in 			\
 	rsvg.in				\
 	librsvg.def			\
@@ -167,7 +167,7 @@ CLEANFILES = \
 ## `install-exec', not `install-data'.
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = librsvg-2.0.pc
+pkgconfig_DATA = libaltsvg.pc
 
 dist-hook: librsvg.spec
 	cp librsvg.spec $(distdir)

@@ -14,7 +14,7 @@ DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 
 
 CFLAGS = -Wall -g -DHAS_XSP
-PACKAGENAME = inkfacedemo 
+PACKAGENAME = libaltsvg 
 
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -O0
@@ -28,7 +28,7 @@ endif
 config.status: configure
 	dh_testdir
 	# Add here commands to configure the package.
-	PYTHON=/usr/bin/python2.5 CFLAGS="$(CFLAGS)" ./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info  --libdir=/usr/lib/python2.5/site-packages
+	PYTHON=/usr/bin/python2.5 CFLAGS="$(CFLAGS)" ./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info  --libdir=/usr/lib
 
 configure:
 	./autogen.sh
