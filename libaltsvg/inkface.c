@@ -23,7 +23,7 @@
 
 #define DOUBLE_BUFFER
 
-#define REFRESH_INTERVAL_MSEC 40
+#define REFRESH_INTERVAL_MSEC 80
 
 #ifdef ENABLE_PROFILING
 /* Constructor and Destructor Prototypes */

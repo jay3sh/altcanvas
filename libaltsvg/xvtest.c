@@ -10,7 +10,7 @@
 #include <X11/keysymdef.h>
 
 
-#define DEPTH 24
+#define DEPTH 16 
 
 int main(int argc, char *argv[])
 {

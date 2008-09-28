@@ -183,7 +183,7 @@ void wire_logic(GList *element_list)
 
 int main(int argc, char *argv[])
 {
-    init_backend(SVG_PATH,FALSE);
+    init_backend(SVG_PATH,TRUE);
 
     GList *element_list = load_element_list();
 

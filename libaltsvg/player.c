@@ -2,7 +2,7 @@
 #include "inkface.h"
 #include "string.h"
 
-#define ANIM_LENGTH 6
+#define ANIM_LENGTH 2
 
 char *center_img_path;
 char *prev_img_path;
@@ -403,7 +403,7 @@ int main(int argc, char *argv[])
         exit(0);
     }
 
-    init_backend(argv[1],FALSE);
+    init_backend(argv[1],TRUE);
 
     init_app();
 

@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
         exit(0);
     }
 
-    init_backend(argv[1],FALSE);
+    init_backend(argv[1],TRUE);
 
     GList *element_list = load_element_list();
 
