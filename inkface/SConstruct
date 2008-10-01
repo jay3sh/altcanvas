@@ -1,3 +1,9 @@
 
 
+if 'deb' in COMMAND_LINE_TARGETS:
+    SConscript(['debian/SConscript'])
+    Exit()
+
 SConscript(['src/SConscript'])
+
+
