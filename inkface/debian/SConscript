@@ -1,0 +1,43 @@
+
+import os
+import shutil
+
+SRCDIR = os.environ['PWD']
+PKGDIR = os.path.join(SRCDIR,'debian','tmp')
+CONTROL_SRC = os.path.join(SRCDIR,'debian','control')
+CONTROL_DEST = os.path.join(PKGDIR,'DEBIAN','control')
+
+DEBFILES = [
+    ("usr/lib/libinkface.so", "src/libinkface.so"),
+    ("usr/include/inkface.h", "src/inkface.h"),
+    ("usr/lib/pkgconfig/inkface.pc","src/inkface.pc"),
+]
+
+shutil.rmtree(PKGDIR)
+os.mkdir(PKGDIR)
+
+for f in DEBFILES:
+    dest = os.path.join(PKGDIR,f[0])
+    src = os.path.join(SRCDIR,f[1])
+
+    # If the destination directory doesn't exit, create it
+    dest_dir = '/'.join(dest.split('/')[:-1])
+    if not os.path.exists(dest_dir):
+        os.makedirs(dest_dir)
+
+    print 'Deploying '+src
+    shutil.copyfile(src,dest)
+
+
+os.mkdir(PKGDIR+'/'+'DEBIAN')
+
+shutil.copyfile(CONTROL_SRC,CONTROL_DEST)
+                
+sin,soe = os.popen4('dpkg-deb --build tmp')
+    
+if not os.path.exists(os.path.join(SRCDIR,'debian','tmp.deb')):
+    print 'Debian package build failed'
+    Exit()
+
+shutil.copyfile(os.path.join(SRCDIR,'debian','tmp.deb'),
+                os.path.join(SRCDIR,'inkface.deb'))
