@@ -1,9 +1,20 @@
 
 
-if 'deb' in COMMAND_LINE_TARGETS:
-    SConscript(['debian/SConscript'])
-    Exit()
+#if 'deb' in COMMAND_LINE_TARGETS:
+#    SConscript(['debian/SConscript'])
+#    Exit()
 
-SConscript(['src/SConscript'])
+VERSION = '0.0.1'
+ARCH = 'armel'
+MAINTAINER = 'Jayesh Salvi <jayesh@altfrequency.com>'
+DEPENDS = 'libaltsvg (>= 0.0.1)'
+DESCRIPTION = 'UI framework based on SVG'
+PKGNAME = 'libinkface'
+
+Export('VERSION ARCH MAINTAINER DEPENDS DESCRIPTION PKGNAME')
 
 
+SConscript('src/SConscript')
+
+if 'debian' in COMMAND_LINE_TARGETS:
+    SConscript('debian/SConscript')
