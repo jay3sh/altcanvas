@@ -2,6 +2,9 @@
 
 env = Environment()
 
+######
+# libinface.so
+######
 
 # Configuration
 conf = Configure(env)
@@ -17,6 +20,29 @@ env.ParseConfig("pkg-config --cflags --libs libaltsvg")
 env.SharedLibrary(target='inkface',
                 source=['inkface.c'])
                 
+######
+# libinface-python.so
+######
+import distutils.sysconfig, os
+vars = distutils.sysconfig.get_config_vars('CC', 'CXX', 'OPT', \
+                        'BASECFLAGS', 'CCSHARED', 'LDSHARED', 'SO')
+for i in range(len(vars)):
+    if vars[i] is None:
+        vars[i] = ""
+(cc, cxx, opt, basecflags, ccshared, ldshared, so_ext) = vars
+
+lib = env.SharedLibrary(target='inkface-python',
+                source=['inkface-python.c'],
+                SHLINK=ldshared,
+                SHLINKFLAGS=[],
+                SHLIBPREFIX="",
+                SHLIBSUFFIX=so_ext,
+                CPPPATH=[distutils.sysconfig.get_python_inc()],
+                CPPFLAGS=basecflags + " " + opt)
+
+if type(lib) == type([]): lib = lib[0]
+
+
 
 # Get our configuration options:
 opts = Options('wm.conf') # Change wm to the name of your app
@@ -26,8 +52,6 @@ opts.Save('wm.conf', env) # Save, so user doesn't have to
                           # specify PREFIX every time
 
 Help(opts.GenerateHelpText(env))
-
-
 
 
 # Install
