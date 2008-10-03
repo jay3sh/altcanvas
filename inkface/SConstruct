@@ -14,7 +14,9 @@ PKGNAME = 'libinkface'
 Export('VERSION ARCH MAINTAINER DEPENDS DESCRIPTION PKGNAME')
 
 
-SConscript('src/SConscript')
+SConscript('src/lib.sc')
+SConscript('src/python.sc')
 
 if 'debian' in COMMAND_LINE_TARGETS:
     SConscript('debian/SConscript')
+

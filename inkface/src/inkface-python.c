@@ -1,10 +1,11 @@
+#include "Python.h"
 /*
  * "canvas" type object
  */
 typedef struct _canvas_t canvas_t;
 
 struct _canvas_t {
-
+    int dpy; 
 };
 
 static PyMethodDef canvas_methods[] = {
