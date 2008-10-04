@@ -135,8 +135,13 @@ PyTypeObject Element_Type = {
  * "inkface" module
  */
 static PyObject*
-loadsvg(const char *svgname)
+loadsvg(PyObject *self, PyObject *args)
 {
+    char *svgname;
+    ASSERT(PyArg_ParseTuple(args,"s",&svgname))
+        
+    ASSERT(svgname)
+
     // Create rsvg handle for the SVG file
     RsvgHandle *handle = NULL;
     ASSERT(handle = rsvg_handle_from_file(svgname));
@@ -195,6 +200,8 @@ static PyMethodDef inkface_methods[] =
 DL_EXPORT(void)
 initinkface(void)
 {
+    rsvg_init();
+
     Py_InitModule("inkface",inkface_methods);
 }
 
