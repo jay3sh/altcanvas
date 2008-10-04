@@ -16,7 +16,7 @@ env.ParseConfig("pkg-config --cflags --libs libaltsvg")
 
 env.AppendUnique(CPPPATH=[distutils.sysconfig.get_python_inc()])
 
-env.AppendUnique(CPPFLAGS=[basecflags + " " + opt])
+env.AppendUnique(CFLAGS=['-g'])
 
 lib = env.SharedLibrary(target='inkface-python',
                 source=['inkface-python.c'])
