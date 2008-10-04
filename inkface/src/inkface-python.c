@@ -1,12 +1,17 @@
+
 #include "Python.h"
+
+#include "inkface.h"
+
+RsvgHandle *rsvg_handle_from_file(const char *filename);
+
 /*
  * "canvas" type object
  */
-typedef struct _canvas_t canvas_t;
 
-struct _canvas_t {
+typedef struct {
     int dpy; 
-};
+} Canvas_t;
 
 static PyMethodDef canvas_methods[] = {
     {NULL, NULL, 0, NULL},
@@ -21,7 +26,7 @@ PyTypeObject Canvas_Type = {
     PyObject_HEAD_INIT(NULL)
     0,                                  /* ob_size */
     "inkface.canvas",                   /* tp_name */
-    sizeof(canvas_t),                   /* tp_basicsize */
+    sizeof(Canvas_t),                   /* tp_basicsize */
     0,                                  /* tp_itemsize */
     0,                                  /* tp_dealloc */
     0,                                  /* tp_print */
@@ -65,11 +70,10 @@ PyTypeObject Canvas_Type = {
 /*
  * "element" type object
  */
-typedef struct _element_t element_t;
-
-struct _element_t {
-
-};
+typedef struct {
+    PyObject_HEAD
+    Element *e;    
+} Element_t;
 
 static PyMethodDef element_methods[] = {
     { NULL, NULL, 0, NULL },
@@ -85,7 +89,7 @@ PyTypeObject Element_Type = {
     PyObject_HEAD_INIT(NULL)
     0,                                  /* ob_size */
     "inkface.element",                  /* tp_name */
-    sizeof(element_t),                  /* tp_basicsize */
+    sizeof(Element_t),                  /* tp_basicsize */
     0,                                  /* tp_itemsize */
     0,                                  /* tp_dealloc */
     0,                                  /* tp_print */
@@ -133,6 +137,52 @@ PyTypeObject Element_Type = {
 static PyObject*
 loadsvg(const char *svgname)
 {
+    // Create rsvg handle for the SVG file
+    RsvgHandle *handle = NULL;
+    ASSERT(handle = rsvg_handle_from_file(svgname));
+ 
+    // Get list of element IDs in the SVG
+    GList *eidList = inkface_get_element_ids(handle);
+    ASSERT(eidList);
+
+    GList *head_eidList = eidList;
+
+    Element *element = NULL;
+
+    PyObject *pyElementList = PyList_New(0);
+
+    while(eidList){
+
+        ASSERT(eidList->data);
+
+        element = (Element *)g_malloc(sizeof(Element));
+        memset(element,0,sizeof(Element));
+
+        // Find element for the id
+        strncpy(element->id,eidList->data,31);  //TODO macro
+        inkface_get_element(handle,element);
+
+
+        // Create python object for Element
+        PyTypeObject *pytype = NULL;
+        PyObject *pyo;
+        pytype = &Element_Type;
+        ASSERT(pyo = pytype->tp_alloc(pytype,0));
+
+        ((Element_t *)pyo)->e = element;
+
+        // Add python object to list
+        PyList_Append(pyElementList,pyo);
+
+        // Free id and jump to next
+        g_free(eidList->data);
+        eidList = eidList->next;
+    }
+    g_list_free(head_eidList);
+
+    ASSERT(!PyList_Sort(pyElementList));
+
+    return pyElementList;
 
 }
 
@@ -148,4 +198,42 @@ initinkface(void)
     Py_InitModule("inkface",inkface_methods);
 }
 
+
+
+/* INTERNAL FUNCTIONS */
+
+RsvgHandle *
+rsvg_handle_from_file(const char *filename)
+{
+    GByteArray *bytes = NULL;
+    RsvgHandle *handle = NULL;
+    guchar buffer[4096];
+    FILE *f;
+    int length;
+
+    ASSERT(f = fopen(filename,"rb"));
+    ASSERT(bytes = g_byte_array_new());
+    while (!feof (f)) {
+        length = fread (buffer, 1, sizeof (buffer), f);
+        if(length > 0){
+            if (g_byte_array_append (bytes, buffer, length) == NULL) {
+                fclose (f);
+                g_byte_array_free (bytes, TRUE);
+                return NULL;
+            }
+        } else if (ferror (f)) {
+            fclose (f);
+            g_byte_array_free (bytes, TRUE);
+            return NULL;
+        }
+    }
+    fclose(f);
+
+    ASSERT(handle = rsvg_handle_new());
+    rsvg_handle_set_base_uri (handle, filename);
+    ASSERT(rsvg_handle_write(handle,bytes->data,bytes->len,NULL));
+    ASSERT(rsvg_handle_close(handle,NULL));
+    
+    return handle;
+}
 
