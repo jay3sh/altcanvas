@@ -12,6 +12,7 @@ RsvgHandle *rsvg_handle_from_file(const char *filename);
  */
 
 typedef struct {
+    PyObject_HEAD
     int dpy; 
 } Canvas_t;
 
@@ -22,6 +23,89 @@ static PyMethodDef canvas_methods[] = {
 static PyObject *
 canvas_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
+    // Unused - GenericNew() is enough so far
+}
+
+static int
+canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
+{
+    int status = 0;
+    Window rwin;
+    int screen = 0;
+    int w=800, h=480;
+    int x=0, y=0;
+    Pixmap pix;
+    XGCValues gcv;
+    GC gc;
+    int xsp_event_base=-1;
+    int xsp_error_base=-1;
+    int xsp_major=-1;
+    int xsp_minor=-1;
+    Atom atoms_WINDOW_STATE;
+    Atom atoms_WINDOW_STATE_FULLSCREEN;
+
+    XInitThreads();
+
+    ASSERT(dpy = XOpenDisplay(0));
+
+    ASSERT(rwin = DefaultRootWindow(dpy));
+    screen = DefaultScreen(dpy);
+    ASSERT(screen >= 0);
+
+    atoms_WINDOW_STATE
+        = XInternAtom(dpy, "_NET_WM_STATE",False);
+    ASSERT((atoms_WINDOW_STATE != BadAlloc && 
+            atoms_WINDOW_STATE != BadValue));
+    atoms_WINDOW_STATE_FULLSCREEN
+        = XInternAtom(dpy, "_NET_WM_STATE_FULLSCREEN",False);
+    ASSERT((atoms_WINDOW_STATE_FULLSCREEN != BadAlloc && 
+            atoms_WINDOW_STATE_FULLSCREEN != BadValue));
+
+    ASSERT(win = XCreateSimpleWindow(
+                    dpy,
+                    rwin,
+                    x, y,
+                    dim.width, dim.height,
+                    0,
+                    BlackPixel(dpy,screen),
+                    BlackPixel(dpy,screen)));
+
+    if(fullscreen){
+        /* Set the wmhints needed for fullscreen */
+        status = XChangeProperty(dpy, win, atoms_WINDOW_STATE, XA_ATOM, 32,
+                        PropModeReplace,
+                        (unsigned char *) &atoms_WINDOW_STATE_FULLSCREEN, 1);
+        ASSERT(status != BadAlloc);
+        ASSERT(status != BadAtom);
+        ASSERT(status != BadMatch);
+        ASSERT(status != BadPixmap);
+        ASSERT(status != BadValue);
+        ASSERT(status != BadWindow);
+    }
+
+    #ifdef DOUBLE_BUFFER
+    /* Enabled double buffering */
+    backBuffer = XdbeAllocateBackBufferName(dpy,win,XdbeBackground);
+    swapinfo.swap_window = win;
+    swapinfo.swap_action = XdbeBackground;
+    #endif
+
+    XClearWindow(dpy,win);
+    XMapWindow(dpy, win);
+
+    cairo_surface_t *surface = NULL;
+    Visual *visual = DefaultVisual(dpy,DefaultScreen(dpy));
+    ASSERT(visual)
+
+    #ifdef DOUBLE_BUFFER
+    ASSERT(surface = cairo_xlib_surface_create(
+                        dpy, backBuffer, visual, dim.width,dim.height));
+    #else
+    ASSERT(surface = cairo_xlib_surface_create(
+                        dpy, win, visual, dim.width,dim.height));
+    #endif 
+    ASSERT(ctx = cairo_create(surface));
+
 }
 
 PyTypeObject Canvas_Type = {
@@ -45,7 +129,7 @@ PyTypeObject Canvas_Type = {
     0,                                  /* tp_getattro */
     0,                                  /* tp_setattro */
     0,                                  /* tp_as_buffer */
-    Py_TPFLAGS_DEFAULT,                 /* tp_flags */
+    Py_TPFLAGS_DEFAULT|Py_TPFLAGS_BASETYPE, /* tp_flags */
     0,                                  /* tp_doc */
     0,                                  /* tp_traverse */
     0,                                  /* tp_clear */
@@ -61,7 +145,7 @@ PyTypeObject Canvas_Type = {
     0,                                  /* tp_descr_get */
     0,                                  /* tp_descr_set */
     0,                                  /* tp_dictoffset */
-    0,                                  /* tp_init */
+    (initproc)canvas_init,              /* tp_init */
     0,                                  /* tp_alloc */
     (newfunc)canvas_new,                /* tp_new */
     0,                                  /* tp_free */
@@ -114,7 +198,7 @@ static PyMemberDef element_members[] = {
 static PyObject *
 element_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-
+    // Unused - GenericNew() is enough so far
 }
 
 PyTypeObject Element_Type = {
@@ -238,11 +322,20 @@ static PyMethodDef inkface_methods[] =
 DL_EXPORT(void)
 initinkface(void)
 {
+    PyObject *m;
+
     rsvg_init();
 
-    if (PyType_Ready(&Element_Type) < 0) return;
+    Element_Type.tp_new = PyType_GenericNew;
+    Canvas_Type.tp_new = PyType_GenericNew;
 
-    Py_InitModule("inkface",inkface_methods);
+    if (PyType_Ready(&Element_Type) < 0) return;
+    if (PyType_Ready(&Canvas_Type) < 0) return;
+
+    m = Py_InitModule("inkface",inkface_methods);
+
+    PyModule_AddObject(m,"canvas",(PyObject *)&Canvas_Type);
+
 }
 
 

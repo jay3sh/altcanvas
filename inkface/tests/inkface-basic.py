@@ -29,9 +29,16 @@ class TestSVGLoad(unittest.TestCase):
         for name in self.arbit_names:
             self.assert_(name in svg_names)
         
+class TestCanvas(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def testDefault(self):
+        canvas = inkface.canvas()
+        self.assert_(True)
             
 
 if __name__ == '__main__':
-    for t in [TestSVGLoad]:
+    for t in [TestSVGLoad,TestCanvas]:
         suite = unittest.TestLoader().loadTestsFromTestCase(t)
         testResult = unittest.TextTestRunner(verbosity=2).run(suite)
