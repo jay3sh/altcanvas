@@ -366,11 +366,88 @@ typedef struct {
 
     int opacity;
 
+    PyObject *onTap;
+    PyObject *onMouseEnter;
+    PyObject *onMouseLeave;
+
     PycairoSurface_t *surface;    
 
 } Element_t;
 
+
+static int
+element_init(Element_t *self, PyObject *args, PyObject *kwds)
+{
+    Py_INCREF(Py_None);
+    self->onTap = Py_None;
+    Py_INCREF(Py_None);
+    self->onMouseEnter = Py_None;
+    Py_INCREF(Py_None);
+    self->onMouseLeave = Py_None;
+
+    return 0;
+}
+
+static PyObject*
+element_register_tap_handler(Element_t *self, PyObject *args)
+{
+    PyObject *onTap;
+
+    if(!PyArg_ParseTuple(args,"O",&onTap)){
+        PyErr_Clear();
+        PyErr_SetString(PyExc_ValueError,"Invalid Arguments");
+        return NULL;
+    }
+
+    self->onTap = onTap;
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject*
+element_register_mouse_enter_handler(Element_t *self, PyObject *args)
+{
+    PyObject *onMouseEnter;
+
+    if(!PyArg_ParseTuple(args,"O",&onMouseEnter)){
+        PyErr_Clear();
+        PyErr_SetString(PyExc_ValueError,"Invalid Arguments");
+        return NULL;
+    }
+
+    self->onMouseEnter = onMouseEnter;
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject*
+element_register_mouse_leave_handler(Element_t *self, PyObject *args)
+{
+    PyObject *onMouseLeave;
+
+    if(!PyArg_ParseTuple(args,"O",&onMouseLeave)){
+        PyErr_Clear();
+        PyErr_SetString(PyExc_ValueError,"Invalid Arguments");
+        return NULL;
+    }
+
+    self->onMouseLeave = onMouseLeave;
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+
 static PyMethodDef element_methods[] = {
+    { "register_tap_handler", 
+        (PyCFunction)element_register_tap_handler, 
+        METH_VARARGS, "Register Tap handler" },
+    { "register_mouse_enter_handler", 
+        (PyCFunction)element_register_mouse_enter_handler, 
+        METH_VARARGS, "Register Mouse Enter handler" },
+    { "register_mouse_leave_handler", 
+        (PyCFunction)element_register_mouse_leave_handler, 
+        METH_VARARGS, "Register Mouse Leave handler" },
     { NULL, NULL, 0, NULL },
 };
 
@@ -383,6 +460,12 @@ static PyMemberDef element_members[] = {
     { "name", T_OBJECT,offsetof(Element_t,name),0,"Name of the element"},
     { "id", T_OBJECT,offsetof(Element_t,id),0,"Id of the element"},
     { "opacity", T_INT, offsetof(Element_t,opacity),0,"Opacity of element"},
+
+    { "onTap", T_OBJECT,offsetof(Element_t,onTap),0,"Tap handler"},
+    { "onMouseEnter", T_OBJECT,offsetof(Element_t,onMouseEnter),0,
+                    "Mouse Enter handler"},
+    { "onMouseLeave", T_OBJECT,offsetof(Element_t,onMouseLeave),0,
+                    "Mouse Leave handler"},
     { NULL }
 };
 

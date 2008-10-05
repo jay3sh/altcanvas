@@ -59,7 +59,30 @@ class TestCanvasElements(unittest.TestCase):
         self.canvas.unregister_elements(self.elements)
         # TODO: self.assert_(len(self.elements) == 0)
         
+class TestElements(unittest.TestCase):
+    def setUp(self):
+        self.SVG = os.path.join(TEST_DATA_DIR,'keyboard.svg')
+        self.elements = inkface.loadsvg(self.SVG)
+        self.canvas = inkface.canvas()
+
+    def testHandlerRegistration(self):
+        def onEvent(x,y):
+            pass
+        for e in self.elements:
+            self.assert_(e.onTap == None)
+            self.assert_(e.onMouseEnter == None)
+            self.assert_(e.onMouseLeave == None)
+
+            e.register_tap_handler(onEvent)
+            e.register_mouse_enter_handler(onEvent)
+            e.register_mouse_leave_handler(onEvent)
+
+            self.assert_(e.onTap)
+            self.assert_(e.onMouseEnter)
+            self.assert_(e.onMouseLeave)
+
+
 if __name__ == '__main__':
-    for t in [TestSVGLoad,TestCanvas,TestCanvasElements]:
+    for t in [TestSVGLoad,TestCanvas,TestCanvasElements,TestElements]:
         suite = unittest.TestLoader().loadTestsFromTestCase(t)
         testResult = unittest.TextTestRunner(verbosity=2).run(suite)
