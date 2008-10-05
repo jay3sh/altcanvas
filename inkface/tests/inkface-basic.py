@@ -54,7 +54,10 @@ class TestCanvasElements(unittest.TestCase):
 
     def testRegisterUnregister(self):
         self.canvas.register_elements(self.elements)
+        self.assert_(len(self.canvas.elements) ==
+                        len(self.elements))
         self.canvas.unregister_elements(self.elements)
+        # TODO: self.assert_(len(self.elements) == 0)
         
 if __name__ == '__main__':
     for t in [TestSVGLoad,TestCanvas,TestCanvasElements]:

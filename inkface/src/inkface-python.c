@@ -18,11 +18,13 @@ RsvgHandle *rsvg_handle_from_file(const char *filename);
 
 typedef struct {
     PyObject_HEAD
+    int width;
+    int height;
     Display *dpy; 
     cairo_t *ctx;
     cairo_surface_t *surface;
     Window win;
-    PyListObject *active_element_list;
+    PyObject *element_list;
 } Canvas_t;
 
 static PyObject *
@@ -74,8 +76,6 @@ canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
     }
 
     
-
-
 
     XInitThreads();
 
@@ -138,6 +138,11 @@ canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
                         self->dpy, self->win, visual, width, height));
     #endif 
     ASSERT(self->ctx = cairo_create(self->surface));
+
+    // Initialize the active element list
+    self->element_list = PyList_New(0);
+
+    return 0;
 }
 
 static PyObject*
@@ -157,12 +162,24 @@ canvas_register_elements(PyObject *self, PyObject *args)
     }
 
     ASSERT(PyList_Check(elemList_pyo));
+
+    PyObject *iterator = PyObject_GetIter(elemList_pyo);
+    PyObject *item;
+
+    ASSERT(iterator);
+
+    while(item = PyIter_Next(iterator)){
+        PyList_Append(((Canvas_t *)self)->element_list,item);
+    }
+
+    Py_DECREF(iterator);
+
     Py_INCREF(Py_None);
     return Py_None;
 }
 
 static PyObject*
-canvas_unregister_elements(PyObject *self, PyObject *args)
+canvas_unregister_elements(Canvas_t *self, PyObject *args)
 {
     PyObject *elemList_pyo;
 
@@ -178,6 +195,28 @@ canvas_unregister_elements(PyObject *self, PyObject *args)
     }
 
     ASSERT(PyList_Check(elemList_pyo));
+
+    //TODO:
+    
+    #if 0
+    PyObject *iterator = PyObject_GetIter(elemList_pyo);
+    PyObject *item;
+
+    ASSERT(iterator);
+
+    while(item = PyIter_Next(iterator)){
+        PyObject *reg_iterator = PyObject_GetIter(self->element_list);
+        PyObject *reg_item;
+        ASSERT(reg_iterator);
+
+        while(reg_item == PyIter_Next(reg_iterator)){
+             
+        }
+
+        Py_DECREF(item);
+    }
+    #endif
+
     Py_INCREF(Py_None);
     return Py_None;
 }
@@ -251,6 +290,14 @@ static PyMethodDef canvas_methods[] = {
     {NULL, NULL, 0, NULL},
 };
 
+static PyMemberDef canvas_members[] = {
+    { "width", T_INT, offsetof(Canvas_t,width),0,"Width of Canvas"},
+    { "height", T_INT, offsetof(Canvas_t,height),0,"Height of Canvas"},
+    { "elements", T_OBJECT, offsetof(Canvas_t,element_list),0,
+            "Elements currently registered with Canvas"},
+    { NULL }
+};
+
 
 PyTypeObject Canvas_Type = {
     PyObject_HEAD_INIT(NULL)
@@ -282,7 +329,7 @@ PyTypeObject Canvas_Type = {
     0,                                  /* tp_iter */
     0,                                  /* tp_iternext */
     canvas_methods,                     /* tp_methods */
-    0,                                  /* tp_members */
+    canvas_members,                     /* tp_members */
     0,                                  /* tp_getset */
     0, /* &Canvas_Type, */              /* tp_base */
     0,                                  /* tp_dict */
@@ -440,7 +487,7 @@ loadsvg(PyObject *self, PyObject *args)
         ((Element_t *)pyo)->order = element->order;
         ((Element_t *)pyo)->name = PyString_FromString(element->name);
         ((Element_t *)pyo)->id = PyString_FromString(element->id);
-        ((Element_t *)pyo)->surface = element->surface;
+        //TODO: ((Element_t *)pyo)->surface->surface = element->surface;
 
         // Add python object to list
         PyList_Append(pyElementList,pyo);
