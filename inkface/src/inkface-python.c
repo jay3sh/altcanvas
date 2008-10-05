@@ -1,7 +1,9 @@
 
 #include "Python.h"
+#include "structmember.h"
 
 #include "inkface.h"
+
 
 RsvgHandle *rsvg_handle_from_file(const char *filename);
 
@@ -72,11 +74,41 @@ PyTypeObject Canvas_Type = {
  */
 typedef struct {
     PyObject_HEAD
-    Element *e;    
+    cairo_surface_t *surface;
+} PycairoSurface_t;
+
+typedef struct {
+    PyObject_HEAD
+
+    int x;
+    int y;
+    int w;
+    int h;
+    int order;
+
+    PyObject *name;
+    PyObject *id;
+
+    int opacity;
+
+    PycairoSurface_t *surface;    
+
 } Element_t;
 
 static PyMethodDef element_methods[] = {
     { NULL, NULL, 0, NULL },
+};
+
+static PyMemberDef element_members[] = {
+    { "x", T_INT, offsetof(Element_t,x),0,"x coord"},
+    { "y", T_INT, offsetof(Element_t,y),0,"y coord"},
+    { "w", T_INT, offsetof(Element_t,w),0,"width"},
+    { "h", T_INT, offsetof(Element_t,h),0,"height"},
+    { "order", T_INT, offsetof(Element_t,order),0,"order to draw"},
+    { "name", T_OBJECT,offsetof(Element_t,name),0,"Name of the element"},
+    { "id", T_OBJECT,offsetof(Element_t,id),0,"Id of the element"},
+    { "opacity", T_INT, offsetof(Element_t,opacity),0,"Opacity of element"},
+    { NULL }
 };
 
 static PyObject *
@@ -115,7 +147,7 @@ PyTypeObject Element_Type = {
     0,                                  /* tp_iter */
     0,                                  /* tp_iternext */
     element_methods,                    /* tp_methods */
-    0,                                  /* tp_members */
+    element_members,                    /* tp_members */
     0,                                  /* tp_getset */
     0, /* &Element_Type, */             /* tp_base */
     0,                                  /* tp_dict */
@@ -167,14 +199,20 @@ loadsvg(PyObject *self, PyObject *args)
         strncpy(element->id,eidList->data,31);  //TODO macro
         inkface_get_element(handle,element);
 
-
         // Create python object for Element
         PyTypeObject *pytype = NULL;
         PyObject *pyo;
         pytype = &Element_Type;
         ASSERT(pyo = pytype->tp_alloc(pytype,0));
 
-        ((Element_t *)pyo)->e = element;
+        ((Element_t *)pyo)->x = element->x;
+        ((Element_t *)pyo)->y = element->y;
+        ((Element_t *)pyo)->w = element->w;
+        ((Element_t *)pyo)->h = element->h;
+        ((Element_t *)pyo)->order = element->order;
+        ((Element_t *)pyo)->name = PyString_FromString(element->name);
+        ((Element_t *)pyo)->id = PyString_FromString(element->id);
+        ((Element_t *)pyo)->surface = element->surface;
 
         // Add python object to list
         PyList_Append(pyElementList,pyo);
@@ -206,7 +244,6 @@ initinkface(void)
 
     Py_InitModule("inkface",inkface_methods);
 }
-
 
 
 /* INTERNAL FUNCTIONS */
