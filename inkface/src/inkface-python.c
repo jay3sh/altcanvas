@@ -2,6 +2,11 @@
 #include "Python.h"
 #include "structmember.h"
 
+#include <cairo.h>
+#include <cairo-xlib.h>
+#include <X11/Xatom.h>
+#include <X11/extensions/Xdbe.h>
+
 #include "inkface.h"
 
 
@@ -13,12 +18,12 @@ RsvgHandle *rsvg_handle_from_file(const char *filename);
 
 typedef struct {
     PyObject_HEAD
-    int dpy; 
+    Display *dpy; 
+    cairo_t *ctx;
+    cairo_surface_t *surface;
+    Window win;
+    PyListObject *active_element_list;
 } Canvas_t;
-
-static PyMethodDef canvas_methods[] = {
-    {NULL, NULL, 0, NULL},
-};
 
 static PyObject *
 canvas_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
@@ -32,7 +37,6 @@ canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
     int status = 0;
     Window rwin;
     int screen = 0;
-    int w=800, h=480;
     int x=0, y=0;
     Pixmap pix;
     XGCValues gcv;
@@ -44,35 +48,64 @@ canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
     Atom atoms_WINDOW_STATE;
     Atom atoms_WINDOW_STATE_FULLSCREEN;
 
+    // Parse keyword args
+
+    #define DEFAULT_WIDTH 800
+    #define DEFAULT_HEIGHT 480 
+    int width=0, height=0;
+    int fullscreen;
+    PyObject *fullscreen_pyo = NULL;
+    static char *kwlist[] = {"width", "height", "fullscreen", NULL};
+
+    ASSERT(PyArg_ParseTupleAndKeywords(args, kwds, "|iiO", kwlist, 
+                                          &width, &height, &fullscreen_pyo))
+
+    if(width <= 0) width = DEFAULT_WIDTH;
+    if(height <= 0) height = DEFAULT_HEIGHT;
+
+    if((fullscreen_pyo == NULL) || (!PyBool_Check(fullscreen_pyo))) {
+        fullscreen = FALSE;
+    } else {
+        if(fullscreen_pyo == Py_True){
+            fullscreen = TRUE;
+        } else {
+            fullscreen = FALSE;
+        }
+    }
+
+    
+
+
+
     XInitThreads();
 
-    ASSERT(dpy = XOpenDisplay(0));
+    ASSERT(self->dpy = XOpenDisplay(0));
 
-    ASSERT(rwin = DefaultRootWindow(dpy));
-    screen = DefaultScreen(dpy);
+    ASSERT(rwin = DefaultRootWindow(self->dpy));
+    screen = DefaultScreen(self->dpy);
     ASSERT(screen >= 0);
 
     atoms_WINDOW_STATE
-        = XInternAtom(dpy, "_NET_WM_STATE",False);
+        = XInternAtom(self->dpy, "_NET_WM_STATE",False);
     ASSERT((atoms_WINDOW_STATE != BadAlloc && 
             atoms_WINDOW_STATE != BadValue));
     atoms_WINDOW_STATE_FULLSCREEN
-        = XInternAtom(dpy, "_NET_WM_STATE_FULLSCREEN",False);
+        = XInternAtom(self->dpy, "_NET_WM_STATE_FULLSCREEN",False);
     ASSERT((atoms_WINDOW_STATE_FULLSCREEN != BadAlloc && 
             atoms_WINDOW_STATE_FULLSCREEN != BadValue));
 
-    ASSERT(win = XCreateSimpleWindow(
-                    dpy,
+    ASSERT(self->win = XCreateSimpleWindow(
+                    self->dpy,
                     rwin,
                     x, y,
-                    dim.width, dim.height,
+                    width, height,
                     0,
-                    BlackPixel(dpy,screen),
-                    BlackPixel(dpy,screen)));
+                    BlackPixel(self->dpy,screen),
+                    BlackPixel(self->dpy,screen)));
 
-    if(fullscreen){
+    if(fullscreen){  
         /* Set the wmhints needed for fullscreen */
-        status = XChangeProperty(dpy, win, atoms_WINDOW_STATE, XA_ATOM, 32,
+        status = XChangeProperty(self->dpy, self->win, atoms_WINDOW_STATE, XA_ATOM, 32,
                         PropModeReplace,
                         (unsigned char *) &atoms_WINDOW_STATE_FULLSCREEN, 1);
         ASSERT(status != BadAlloc);
@@ -85,28 +118,139 @@ canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
 
     #ifdef DOUBLE_BUFFER
     /* Enabled double buffering */
-    backBuffer = XdbeAllocateBackBufferName(dpy,win,XdbeBackground);
-    swapinfo.swap_window = win;
+    backBuffer = XdbeAllocateBackBufferName(self->dpy,self->win,XdbeBackground);
+    swapinfo.swap_window = self->win;
     swapinfo.swap_action = XdbeBackground;
     #endif
 
-    XClearWindow(dpy,win);
-    XMapWindow(dpy, win);
+    XClearWindow(self->dpy,self->win);
+    //TODO: XMapWindow(self->dpy, self->win);
 
-    cairo_surface_t *surface = NULL;
-    Visual *visual = DefaultVisual(dpy,DefaultScreen(dpy));
+    self->surface = NULL;
+    Visual *visual = DefaultVisual(self->dpy,DefaultScreen(self->dpy));
     ASSERT(visual)
 
     #ifdef DOUBLE_BUFFER
-    ASSERT(surface = cairo_xlib_surface_create(
-                        dpy, backBuffer, visual, dim.width,dim.height));
+    ASSERT(self->surface = cairo_xlib_surface_create(
+                        self->dpy, backBuffer, visual, width, height));
     #else
-    ASSERT(surface = cairo_xlib_surface_create(
-                        dpy, win, visual, dim.width,dim.height));
+    ASSERT(self->surface = cairo_xlib_surface_create(
+                        self->dpy, self->win, visual, width, height));
     #endif 
-    ASSERT(ctx = cairo_create(surface));
+    ASSERT(self->ctx = cairo_create(self->surface));
+}
+
+static PyObject*
+canvas_register_elements(PyObject *self, PyObject *args)
+{
+    PyObject *elemList_pyo;
+
+    if(!PyArg_ParseTuple(args,"O",&elemList_pyo)){
+        PyErr_Clear();
+        PyErr_SetString(PyExc_ValueError,"Invalid Arguments");
+        return NULL;
+    }
+
+    if(!elemList_pyo){
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+
+    ASSERT(PyList_Check(elemList_pyo));
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject*
+canvas_unregister_elements(PyObject *self, PyObject *args)
+{
+    PyObject *elemList_pyo;
+
+    if(!PyArg_ParseTuple(args,"O",&elemList_pyo)){
+        PyErr_Clear();
+        PyErr_SetString(PyExc_ValueError,"Invalid Arguments");
+        return NULL;
+    }
+
+    if(!elemList_pyo){
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+
+    ASSERT(PyList_Check(elemList_pyo));
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject*
+canvas_eventloop(PyObject *self, PyObject *args)
+{
+    Canvas_t *canvas = (Canvas_t *)self;
+    /*
+     * Setup the event listening
+     */
+    XSelectInput(canvas->dpy, canvas->win, StructureNotifyMask);
+    XSelectInput(canvas->dpy, canvas->win, StructureNotifyMask|PointerMotionMask);
+    while(1)
+    {
+        XMotionEvent *mevent;
+        XEvent event;
+        XNextEvent(canvas->dpy,&event);
+        switch(event.type){
+        case MapNotify:
+            break;
+        case MotionNotify:
+            mevent = (XMotionEvent *)(&event);
+            /*
+             * Trigger the events in decreasing "order" of the elements
+             */
+            #if 0
+            GList *elem = g_list_last(sortedElemList);
+            while(elem){
+                gboolean nowInFocus = FALSE;
+                Element *el = (Element *)(elem->data);
+                if(el->type == ELEM_TYPE_TRANSIENT){
+                    elem = elem->prev;
+                    continue;
+                }
+                if((mevent->x > el->x) &&
+                    (mevent->y > el->y) &&
+                    (mevent->x < (el->x+el->w)) &&
+                    (mevent->y < (el->y+el->h)))
+                {
+                    nowInFocus = TRUE;
+                } 
+
+                if(el->inFocus && !nowInFocus){
+                    if(el->onMouseLeave) el->onMouseLeave(el,sortedElemList);
+                }
+                if(!el->inFocus && nowInFocus){
+                    if(el->onMouseEnter) el->onMouseEnter(el,sortedElemList);
+                }
+
+                el->inFocus = nowInFocus;
+
+                elem = elem->prev;
+            }
+            #endif
+            break;
+        default:
+            break;
+        }
+    }
 
 }
+
+static PyMethodDef canvas_methods[] = {
+    { "register_elements", (PyCFunction)canvas_register_elements, 
+        METH_VARARGS, "Register elements with canvas" },
+    { "unregister_elements", (PyCFunction)canvas_unregister_elements, 
+        METH_VARARGS, "Unregister elements from canvas" },
+    { "eventloop", (PyCFunction)canvas_eventloop, 
+        METH_NOARGS, "Make canvas process events in infinite loop" },
+    {NULL, NULL, 0, NULL},
+};
+
 
 PyTypeObject Canvas_Type = {
     PyObject_HEAD_INIT(NULL)

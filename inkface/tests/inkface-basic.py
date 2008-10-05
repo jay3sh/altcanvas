@@ -33,12 +33,30 @@ class TestCanvas(unittest.TestCase):
     def setUp(self):
         pass
 
-    def testDefault(self):
-        canvas = inkface.canvas()
-        self.assert_(True)
+    def testCanvasInitNoParams(self):
+        self.assert_(inkface.canvas())
             
+    def testCanvasInitAllParams(self):
+        self.assert_(inkface.canvas(width=10,height=10,fullscreen=True))
 
+    def testCanvasInitSomeParams(self):
+        self.assert_(inkface.canvas(fullscreen=True))
+
+class TestCanvasElements(unittest.TestCase):
+    def setUp(self):
+        self.SVG = os.path.join(TEST_DATA_DIR,'keyboard.svg')
+        self.elements = inkface.loadsvg(self.SVG)
+        self.canvas = inkface.canvas()
+        
+    def testRegisterUnregisterNothing(self):
+        self.assertRaises(ValueError,self.canvas.register_elements)
+        self.assertRaises(ValueError,self.canvas.unregister_elements)
+
+    def testRegisterUnregister(self):
+        self.canvas.register_elements(self.elements)
+        self.canvas.unregister_elements(self.elements)
+        
 if __name__ == '__main__':
-    for t in [TestSVGLoad,TestCanvas]:
+    for t in [TestSVGLoad,TestCanvas,TestCanvasElements]:
         suite = unittest.TestLoader().loadTestsFromTestCase(t)
         testResult = unittest.TextTestRunner(verbosity=2).run(suite)
