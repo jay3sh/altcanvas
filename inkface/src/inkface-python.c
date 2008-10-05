@@ -27,6 +27,44 @@ typedef struct {
     PyObject *element_list;
 } Canvas_t;
 
+/*
+ * "element" type object
+ */
+typedef struct {
+    PyObject_HEAD
+    cairo_surface_t *surface;
+} PycairoSurface_t;
+
+typedef struct {
+    PyObject_HEAD
+
+    int x;
+    int y;
+    int w;
+    int h;
+    int order;
+    int inFocus;
+
+    PyObject *name;
+    PyObject *id;
+
+    int opacity;
+
+    PyObject *onTap;
+    PyObject *onMouseEnter;
+    PyObject *onMouseLeave;
+
+    PycairoSurface_t *surface;    
+
+} Element_t;
+
+
+
+
+//
+// "canvas" object methods and members
+//
+
 static PyObject *
 canvas_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
@@ -222,7 +260,7 @@ canvas_unregister_elements(Canvas_t *self, PyObject *args)
 }
 
 static PyObject*
-canvas_eventloop(PyObject *self, PyObject *args)
+canvas_eventloop(Canvas_t *self, PyObject *args)
 {
     Canvas_t *canvas = (Canvas_t *)self;
     /*
@@ -243,15 +281,14 @@ canvas_eventloop(PyObject *self, PyObject *args)
             /*
              * Trigger the events in decreasing "order" of the elements
              */
-            #if 0
-            GList *elem = g_list_last(sortedElemList);
-            while(elem){
+            PyObject *iterator = PyObject_GetIter(self->element_list);
+            PyObject *item;
+            while(item = PyIter_Next(iterator)){
+
                 gboolean nowInFocus = FALSE;
-                Element *el = (Element *)(elem->data);
-                if(el->type == ELEM_TYPE_TRANSIENT){
-                    elem = elem->prev;
-                    continue;
-                }
+
+                Element_t *el = (Element_t *)item;
+
                 if((mevent->x > el->x) &&
                     (mevent->y > el->y) &&
                     (mevent->x < (el->x+el->w)) &&
@@ -261,17 +298,26 @@ canvas_eventloop(PyObject *self, PyObject *args)
                 } 
 
                 if(el->inFocus && !nowInFocus){
-                    if(el->onMouseLeave) el->onMouseLeave(el,sortedElemList);
+                    if(PyCallable_Check(el->onMouseLeave)) {
+                        PyEval_CallFunction(el->onMouseLeave,
+                            "OO",el,self->element_list);
+                    }
                 }
+
                 if(!el->inFocus && nowInFocus){
-                    if(el->onMouseEnter) el->onMouseEnter(el,sortedElemList);
+                    if(PyCallable_Check(el->onMouseEnter)) {
+                        PyEval_CallFunction(el->onMouseEnter,
+                            "OO",el,self->element_list);
+                    }
                 }
 
                 el->inFocus = nowInFocus;
 
-                elem = elem->prev;
+                Py_DECREF(item);
             }
-            #endif
+
+            Py_DECREF(iterator);
+
             break;
         default:
             break;
@@ -344,36 +390,9 @@ PyTypeObject Canvas_Type = {
     0,                                  /* tp_bases */
 };
 
-/*
- * "element" type object
- */
-typedef struct {
-    PyObject_HEAD
-    cairo_surface_t *surface;
-} PycairoSurface_t;
-
-typedef struct {
-    PyObject_HEAD
-
-    int x;
-    int y;
-    int w;
-    int h;
-    int order;
-
-    PyObject *name;
-    PyObject *id;
-
-    int opacity;
-
-    PyObject *onTap;
-    PyObject *onMouseEnter;
-    PyObject *onMouseLeave;
-
-    PycairoSurface_t *surface;    
-
-} Element_t;
-
+//
+// "element" object methods and members
+//
 
 static int
 element_init(Element_t *self, PyObject *args, PyObject *kwds)
