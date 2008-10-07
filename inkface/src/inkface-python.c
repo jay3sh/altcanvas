@@ -13,6 +13,7 @@
 #define REFRESH_INTERVAL_MSEC 80
 
 RsvgHandle *rsvg_handle_from_file(const char *filename);
+void *painter_thread(void *arg);
 
 /*
  * "canvas" type object
@@ -194,6 +195,11 @@ canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
 
     // Initialize the active element list
     self->element_list = PyList_New(0);
+
+    // Fork a painter thread which does refresh jobs
+    pthread_mutex_init(&(self->dirt_mutex),NULL);
+    pthread_t thr;
+    pthread_create(&thr,NULL,painter_thread,self);
 
     return 0;
 }
