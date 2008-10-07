@@ -13,6 +13,7 @@ for i in range(len(vars)):
 (cc, cxx, opt, basecflags, ccshared, ldshared, so_ext) = vars
 
 env.ParseConfig("pkg-config --cflags --libs libaltsvg")
+env.ParseConfig("pkg-config --cflags --libs xext")
 
 env.AppendUnique(CPPPATH=[distutils.sysconfig.get_python_inc()])
 

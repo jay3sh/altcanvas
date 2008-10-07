@@ -32,6 +32,7 @@ typedef struct {
     int dirt_count;
     pthread_mutex_t paint_mutex;
     pthread_cond_t paint_condition;
+    pthread_mutex_t dirt_mutex;
 
     #ifdef DOUBLE_BUFFER
     XdbeBackBuffer backBuffer;
@@ -72,8 +73,8 @@ typedef struct {
 
 } Element_t;
 
-
-
+void inc_dirt_count(Canvas_t *canvas, int count);
+void dec_dirt_count(Canvas_t *canvas, int count);
 
 //
 // "canvas" object methods and members
@@ -684,6 +685,24 @@ rsvg_handle_from_file(const char *filename)
     return handle;
 }
 
+/* Thread-safe routines to manipulate paint_mutex */
+void inc_dirt_count(Canvas_t *canvas, int count)
+{
+    pthread_mutex_lock(&(canvas->dirt_mutex));
+    canvas->dirt_count += count;
+    pthread_mutex_unlock(&(canvas->dirt_mutex));
+}
+
+void dec_dirt_count(Canvas_t *canvas, int count)
+{
+    pthread_mutex_lock(&(canvas->dirt_mutex));
+    canvas->dirt_count -= count;
+    if(canvas->dirt_count < 0) 
+        canvas->dirt_count = 0;
+    pthread_mutex_unlock(&(canvas->dirt_mutex));
+}
+
+
 void
 paint(void *arg)
 {
@@ -716,7 +735,7 @@ paint(void *arg)
     XFlush(canvas->dpy);
     #endif
 
-    decr_dirt_count(1);
+    dec_dirt_count(canvas,1);
 }
 
 void *
