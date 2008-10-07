@@ -364,6 +364,7 @@ canvas_eventloop(Canvas_t *self, PyObject *args)
 
 }
 
+
 static PyMethodDef canvas_methods[] = {
     { "register_elements", (PyCFunction)canvas_register_elements, 
         METH_VARARGS, "Register elements with canvas" },
@@ -434,6 +435,7 @@ PyTypeObject Canvas_Type = {
 // "element" object methods and members
 //
 
+
 static int
 element_init(Element_t *self, PyObject *args, PyObject *kwds)
 {
@@ -496,6 +498,37 @@ element_register_mouse_leave_handler(Element_t *self, PyObject *args)
     return Py_None;
 }
 
+static PyObject*
+element_richcompare(Element_t *v, Element_t *w, int op)
+{
+    int r;
+    ASSERT(v)
+    ASSERT(w)
+    int vo = v->order;
+    int wo = w->order;
+    switch (op) {
+    case Py_EQ:
+        r = vo == wo;
+        break;
+    case Py_NE:
+        r = vo != wo;
+        break;
+    case Py_LE:
+        r = vo <= wo;
+        break;
+    case Py_GE:
+        r = vo >= wo;
+        break;
+    case Py_LT:
+        r = vo < wo;
+        break;
+    case Py_GT:
+        r = vo > wo;
+        break;
+    }
+
+    return PyBool_FromLong(r);
+}
 
 static PyMethodDef element_methods[] = {
     { "register_tap_handler", 
@@ -568,7 +601,7 @@ PyTypeObject Element_Type = {
     0,                                  /* tp_doc */
     0,                                  /* tp_traverse */
     0,                                  /* tp_clear */
-    0,                                  /* tp_richcompare */
+    element_richcompare,                /* tp_richcompare */
     0,                                  /* tp_weaklistoffset */
     0,                                  /* tp_iter */
     0,                                  /* tp_iternext */
