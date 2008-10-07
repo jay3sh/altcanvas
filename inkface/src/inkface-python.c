@@ -9,6 +9,8 @@
 
 #include "inkface.h"
 
+#define DOUBLE_BUFFER
+#define REFRESH_INTERVAL_MSEC 80
 
 RsvgHandle *rsvg_handle_from_file(const char *filename);
 
@@ -25,6 +27,16 @@ typedef struct {
     cairo_surface_t *surface;
     Window win;
     PyObject *element_list;
+
+    // Painting control members
+    int dirt_count;
+    pthread_mutex_t paint_mutex;
+    pthread_cond_t paint_condition;
+
+    #ifdef DOUBLE_BUFFER
+    XdbeBackBuffer backBuffer;
+    XdbeSwapInfo swapinfo;
+    #endif
 } Canvas_t;
 
 /*
@@ -50,11 +62,13 @@ typedef struct {
 
     int opacity;
 
+    PycairoSurface_t *surface;    
+
+    // Callback handlers
     PyObject *onTap;
     PyObject *onMouseEnter;
     PyObject *onMouseLeave;
-
-    PycairoSurface_t *surface;    
+    PyObject *draw;
 
 } Element_t;
 
@@ -156,9 +170,9 @@ canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
 
     #ifdef DOUBLE_BUFFER
     /* Enabled double buffering */
-    backBuffer = XdbeAllocateBackBufferName(self->dpy,self->win,XdbeBackground);
-    swapinfo.swap_window = self->win;
-    swapinfo.swap_action = XdbeBackground;
+    self->backBuffer = XdbeAllocateBackBufferName(self->dpy,self->win,XdbeBackground);
+    self->swapinfo.swap_window = self->win;
+    self->swapinfo.swap_action = XdbeBackground;
     #endif
 
     XClearWindow(self->dpy,self->win);
@@ -170,7 +184,7 @@ canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
 
     #ifdef DOUBLE_BUFFER
     ASSERT(self->surface = cairo_xlib_surface_create(
-                        self->dpy, backBuffer, visual, width, height));
+                        self->dpy, self->backBuffer, visual, width, height));
     #else
     ASSERT(self->surface = cairo_xlib_surface_create(
                         self->dpy, self->win, visual, width, height));
@@ -267,7 +281,8 @@ canvas_eventloop(Canvas_t *self, PyObject *args)
      * Setup the event listening
      */
     XSelectInput(canvas->dpy, canvas->win, StructureNotifyMask);
-    XSelectInput(canvas->dpy, canvas->win, StructureNotifyMask|PointerMotionMask);
+    XSelectInput(canvas->dpy, canvas->win, 
+                            StructureNotifyMask|PointerMotionMask);
     while(1)
     {
         XMotionEvent *mevent;
@@ -669,3 +684,72 @@ rsvg_handle_from_file(const char *filename)
     return handle;
 }
 
+void
+paint(void *arg)
+{
+    Canvas_t *canvas = (Canvas_t *) arg;
+
+    if(!canvas->dirt_count) return;
+
+    PyObject *iterator = PyObject_GetIter(canvas->element_list);
+    PyObject *item;
+    while(item = PyIter_Next(iterator)){
+        Element_t *el = (Element_t *)item;
+
+        if(PyCallable_Check(el->draw)){
+            // Call element's custom draw handler
+        } else {
+            // Call canvas's default draw method
+        }
+
+        Py_DECREF(item);
+    }
+    Py_DECREF(iterator);
+
+
+    #ifdef DOUBLE_BUFFER
+    XdbeBeginIdiom(canvas->dpy);
+    XdbeSwapBuffers(canvas->dpy,&canvas->swapinfo,1);
+    XSync(canvas->dpy,0);
+    XdbeEndIdiom(canvas->dpy);
+    #else
+    XFlush(canvas->dpy);
+    #endif
+
+    decr_dirt_count(1);
+}
+
+void *
+painter_thread(void *arg)
+{
+    int rc=0;
+    struct timespec timeout;
+    struct timeval curtime;
+
+    Canvas_t *canvas = (Canvas_t *)arg;
+
+    while(1)
+    {
+        ASSERT(!gettimeofday(&curtime,NULL))
+        timeout.tv_sec = curtime.tv_sec;
+        timeout.tv_nsec = curtime.tv_usec * 1000;
+        timeout.tv_nsec += (REFRESH_INTERVAL_MSEC * 1000000L);
+        timeout.tv_sec += timeout.tv_nsec/1000000000L;
+        timeout.tv_nsec %= 1000000000L;
+
+        rc=pthread_cond_timedwait(
+                    &(canvas->paint_condition),
+                    &(canvas->paint_mutex),
+                    &timeout);
+
+        if(rc!=0){
+            if(rc == ETIMEDOUT){
+                paint(canvas);
+                continue;
+            } else {
+                LOG("pthread_cond_timwait returned %d\n",rc);
+                continue;
+            }
+        }
+    }
+}
