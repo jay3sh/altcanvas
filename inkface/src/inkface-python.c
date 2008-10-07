@@ -19,6 +19,8 @@ void *painter_thread(void *arg);
  * "canvas" type object
  */
 
+//TODO: Make canvas singleton
+
 typedef struct {
     PyObject_HEAD
     int width;
@@ -64,7 +66,7 @@ typedef struct {
 
     int opacity;
 
-    PycairoSurface_t *surface;    
+    PycairoSurface_t *pysurface;    
 
     // Callback handlers
     PyObject *onTap;
@@ -74,6 +76,7 @@ typedef struct {
 
 } Element_t;
 
+void draw(Canvas_t *canvas, Element_t *element);
 void inc_dirt_count(Canvas_t *canvas, int count);
 void dec_dirt_count(Canvas_t *canvas, int count);
 
@@ -513,7 +516,16 @@ static PyMemberDef element_members[] = {
 static PyObject *
 element_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-    // Unused - GenericNew() is enough so far
+    Element_t *self;
+
+    self = (Element_t *)type->tp_alloc(type,0);
+
+    if(self){
+        self->pysurface = (PycairoSurface_t *)
+            malloc(sizeof(PycairoSurface_t));
+    }
+
+    return (PyObject *)self;
 }
 
 PyTypeObject Element_Type = {
@@ -600,21 +612,23 @@ loadsvg(PyObject *self, PyObject *args)
 
         // Create python object for Element
         PyTypeObject *pytype = NULL;
-        PyObject *pyo;
+        Element_t *pyo;
         pytype = &Element_Type;
         ASSERT(pyo = pytype->tp_alloc(pytype,0));
 
-        ((Element_t *)pyo)->x = element->x;
-        ((Element_t *)pyo)->y = element->y;
-        ((Element_t *)pyo)->w = element->w;
-        ((Element_t *)pyo)->h = element->h;
-        ((Element_t *)pyo)->order = element->order;
-        ((Element_t *)pyo)->name = PyString_FromString(element->name);
-        ((Element_t *)pyo)->id = PyString_FromString(element->id);
-        //TODO: ((Element_t *)pyo)->surface->surface = element->surface;
+        pyo->x = element->x;
+        pyo->y = element->y;
+        pyo->w = element->w;
+        pyo->h = element->h;
+        pyo->order = element->order;
+        pyo->name = PyString_FromString(element->name);
+        pyo->id = PyString_FromString(element->id);
+        ASSERT(pyo->pysurface = (PycairoSurface_t *)
+            malloc(sizeof(PycairoSurface_t)));
+        pyo->pysurface->surface = element->surface;
 
         // Add python object to list
-        PyList_Append(pyElementList,pyo);
+        PyList_Append(pyElementList,(PyObject *)pyo);
 
         // Free id and jump to next
         g_free(eidList->data);
@@ -641,7 +655,6 @@ initinkface(void)
 
     rsvg_init();
 
-    Element_Type.tp_new = PyType_GenericNew;
     Canvas_Type.tp_new = PyType_GenericNew;
 
     if (PyType_Ready(&Element_Type) < 0) return;
@@ -725,6 +738,7 @@ paint(void *arg)
             // Call element's custom draw handler
         } else {
             // Call canvas's default draw method
+            draw(canvas,el);
         }
 
         Py_DECREF(item);
@@ -777,4 +791,12 @@ painter_thread(void *arg)
             }
         }
     }
+}
+
+void 
+draw(Canvas_t *canvas, Element_t *element)
+{
+    cairo_set_source_surface(canvas->ctx,
+        element->pysurface->surface,element->x,element->y);
+    cairo_paint(canvas->ctx);
 }
