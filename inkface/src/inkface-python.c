@@ -132,8 +132,6 @@ canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
         }
     }
 
-    
-
     XInitThreads();
 
     ASSERT(self->dpy = XOpenDisplay(0));
@@ -181,7 +179,6 @@ canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
     #endif
 
     XClearWindow(self->dpy,self->win);
-    //TODO: XMapWindow(self->dpy, self->win);
 
     self->surface = NULL;
     Visual *visual = DefaultVisual(self->dpy,DefaultScreen(self->dpy));
@@ -199,12 +196,28 @@ canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
     // Initialize the active element list
     self->element_list = PyList_New(0);
 
+    // Initialize multi thread support for Python interpreter
+    PyEval_InitThreads();
+
     // Fork a painter thread which does refresh jobs
     pthread_mutex_init(&(self->dirt_mutex),NULL);
     pthread_t thr;
     pthread_create(&thr,NULL,painter_thread,self);
 
     return 0;
+}
+
+static PyObject*
+canvas_show(Canvas_t *self, PyObject *args)
+{
+    XMapWindow(self->dpy, self->win);
+    
+    XFlush(self->dpy);
+
+    inc_dirt_count(self,1);
+
+    Py_INCREF(Py_None);
+    return Py_None;
 }
 
 static PyObject*
@@ -358,6 +371,8 @@ static PyMethodDef canvas_methods[] = {
         METH_VARARGS, "Unregister elements from canvas" },
     { "eventloop", (PyCFunction)canvas_eventloop, 
         METH_NOARGS, "Make canvas process events in infinite loop" },
+    { "show", (PyCFunction)canvas_show, 
+        METH_NOARGS, "Show the canvas" },
     {NULL, NULL, 0, NULL},
 };
 
@@ -729,6 +744,10 @@ paint(void *arg)
 
     if(!canvas->dirt_count) return;
 
+    // BEGIN - Python thread safety code block
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+
     PyObject *iterator = PyObject_GetIter(canvas->element_list);
     PyObject *item;
     while(item = PyIter_Next(iterator)){
@@ -745,6 +764,8 @@ paint(void *arg)
     }
     Py_DECREF(iterator);
 
+    PyGILState_Release(gstate);
+    // END - Python thread safety code block
 
     #ifdef DOUBLE_BUFFER
     XdbeBeginIdiom(canvas->dpy);
