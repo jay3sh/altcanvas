@@ -69,10 +69,10 @@ typedef struct {
     PycairoSurface_t *pysurface;    
 
     // Callback handlers
+    PyObject *onDraw;
     PyObject *onTap;
     PyObject *onMouseEnter;
     PyObject *onMouseLeave;
-    PyObject *draw;
 
 } Element_t;
 
@@ -445,6 +445,8 @@ element_init(Element_t *self, PyObject *args, PyObject *kwds)
     self->onMouseEnter = Py_None;
     Py_INCREF(Py_None);
     self->onMouseLeave = Py_None;
+    Py_INCREF(Py_None);
+    self->onDraw = Py_None;
 
     return 0;
 }
@@ -499,6 +501,22 @@ element_register_mouse_leave_handler(Element_t *self, PyObject *args)
 }
 
 static PyObject*
+element_register_draw_handler(Element_t *self, PyObject *args)
+{
+    PyObject *onDraw;
+
+    if(!PyArg_ParseTuple(args,"O",&onDraw)){
+        PyErr_Clear();
+        PyErr_SetString(PyExc_ValueError,"Invalid Arguments");
+        return NULL;
+    }
+
+    self->onDraw = onDraw;
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject*
 element_richcompare(Element_t *v, Element_t *w, int op)
 {
     int r;
@@ -540,6 +558,9 @@ static PyMethodDef element_methods[] = {
     { "register_mouse_leave_handler", 
         (PyCFunction)element_register_mouse_leave_handler, 
         METH_VARARGS, "Register Mouse Leave handler" },
+    { "register_draw_handler", 
+        (PyCFunction)element_register_draw_handler, 
+        METH_VARARGS, "Register Custom draw handler" },
     { NULL, NULL, 0, NULL },
 };
 
@@ -553,6 +574,7 @@ static PyMemberDef element_members[] = {
     { "id", T_OBJECT,offsetof(Element_t,id),0,"Id of the element"},
     { "opacity", T_INT, offsetof(Element_t,opacity),0,"Opacity of element"},
 
+    { "onDraw", T_OBJECT,offsetof(Element_t,onDraw),0,"Draw handler"},
     { "onTap", T_OBJECT,offsetof(Element_t,onTap),0,"Tap handler"},
     { "onMouseEnter", T_OBJECT,offsetof(Element_t,onMouseEnter),0,
                     "Mouse Enter handler"},
@@ -786,7 +808,7 @@ paint(void *arg)
     while(item = PyIter_Next(iterator)){
         Element_t *el = (Element_t *)item;
 
-        if(PyCallable_Check(el->draw)){
+        if(PyCallable_Check(el->onDraw)){
             // Call element's custom draw handler
         } else {
             // Call canvas's default draw method

@@ -72,14 +72,17 @@ class TestElements(unittest.TestCase):
             self.assert_(e.onTap == None)
             self.assert_(e.onMouseEnter == None)
             self.assert_(e.onMouseLeave == None)
+            self.assert_(e.onDraw == None)
 
             e.register_tap_handler(onEvent)
             e.register_mouse_enter_handler(onEvent)
             e.register_mouse_leave_handler(onEvent)
+            e.register_draw_handler(onEvent)
 
             self.assert_(e.onTap)
             self.assert_(e.onMouseEnter)
             self.assert_(e.onMouseLeave)
+            self.assert_(e.onDraw)
 
 
 if __name__ == '__main__':
