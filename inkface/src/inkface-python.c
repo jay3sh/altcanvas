@@ -63,6 +63,7 @@ typedef struct {
 
     PyObject *name;
     PyObject *id;
+    PyObject *text;
 
     int opacity;
 
@@ -208,12 +209,44 @@ canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
 }
 
 static PyObject*
+canvas_draw(Canvas_t *self, PyObject *args)
+{
+    Element_t *element;
+
+    LOG("Inside canvas_draw");
+    if(!PyArg_ParseTuple(args,"O",&element)){
+        PyErr_Clear();
+        PyErr_SetString(PyExc_ValueError,"Invalid Arguments");
+        return NULL;
+    }
+
+    if(!element){
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+
+    draw(self,element);
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject*
 canvas_show(Canvas_t *self, PyObject *args)
 {
     XMapWindow(self->dpy, self->win);
     
     XFlush(self->dpy);
 
+    inc_dirt_count(self,1);
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject*
+canvas_refresh(Canvas_t *self, PyObject *args)
+{
     inc_dirt_count(self,1);
 
     Py_INCREF(Py_None);
@@ -310,7 +343,13 @@ canvas_eventloop(Canvas_t *self, PyObject *args)
     {
         XMotionEvent *mevent;
         XEvent event;
+
+        Py_BEGIN_ALLOW_THREADS
+
         XNextEvent(canvas->dpy,&event);
+
+        Py_END_ALLOW_THREADS
+        
         switch(event.type){
         case MapNotify:
             break;
@@ -372,8 +411,12 @@ static PyMethodDef canvas_methods[] = {
         METH_VARARGS, "Unregister elements from canvas" },
     { "eventloop", (PyCFunction)canvas_eventloop, 
         METH_NOARGS, "Make canvas process events in infinite loop" },
+    { "draw", (PyCFunction)canvas_draw, 
+        METH_VARARGS, "Draw the element canvas" },
     { "show", (PyCFunction)canvas_show, 
         METH_NOARGS, "Show the canvas" },
+    { "refresh", (PyCFunction)canvas_refresh, 
+        METH_NOARGS, "Refresh the canvas" },
     {NULL, NULL, 0, NULL},
 };
 
@@ -439,6 +482,9 @@ PyTypeObject Canvas_Type = {
 static int
 element_init(Element_t *self, PyObject *args, PyObject *kwds)
 {
+    Py_INCREF(Py_None);
+    self->text = Py_None;
+
     Py_INCREF(Py_None);
     self->onTap = Py_None;
     Py_INCREF(Py_None);
@@ -572,6 +618,7 @@ static PyMemberDef element_members[] = {
     { "order", T_INT, offsetof(Element_t,order),0,"order to draw"},
     { "name", T_OBJECT,offsetof(Element_t,name),0,"Name of the element"},
     { "id", T_OBJECT,offsetof(Element_t,id),0,"Id of the element"},
+    { "text", T_OBJECT,offsetof(Element_t,text),0,"Text of a text element"},
     { "opacity", T_INT, offsetof(Element_t,opacity),0,"Opacity of element"},
 
     { "onDraw", T_OBJECT,offsetof(Element_t,onDraw),0,"Draw handler"},
@@ -693,6 +740,9 @@ loadsvg(PyObject *self, PyObject *args)
         pyo->order = element->order;
         pyo->name = PyString_FromString(element->name);
         pyo->id = PyString_FromString(element->id);
+        if(element->text){
+            pyo->text = PyString_FromString(element->text->str);
+        }
         ASSERT(pyo->pysurface = (PycairoSurface_t *)
             malloc(sizeof(PycairoSurface_t)));
         pyo->pysurface->surface = element->surface;
@@ -791,7 +841,6 @@ void dec_dirt_count(Canvas_t *canvas, int count)
     pthread_mutex_unlock(&(canvas->dirt_mutex));
 }
 
-
 void
 paint(void *arg)
 {
@@ -810,6 +859,7 @@ paint(void *arg)
 
         if(PyCallable_Check(el->onDraw)){
             // Call element's custom draw handler
+            PyEval_CallFunction(el->onDraw,"O",el);
         } else {
             // Call canvas's default draw method
             draw(canvas,el);
