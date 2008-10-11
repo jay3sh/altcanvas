@@ -57,6 +57,7 @@ rsvg_cairo_render_new (cairo_t * cr, double width, double height)
     cairo_render->super.free = rsvg_cairo_render_free;
     cairo_render->super.create_pango_context = rsvg_cairo_create_pango_context;
     cairo_render->super.render_pango_layout = rsvg_cairo_render_pango_layout;
+    cairo_render->super.calc_pango_layout = rsvg_cairo_calc_pango_layout;
     cairo_render->super.render_image = rsvg_cairo_render_image;
     cairo_render->super.render_path = rsvg_cairo_render_path;
     cairo_render->super.calc_path = rsvg_cairo_calc_path;
@@ -284,7 +285,7 @@ inkface_get_element(RsvgHandle *handle, Element *element)
             element->name = strdup(drawsub->istate->name);
         }
     } else {
-        printf("[%s:%d] drawsub is NULL\n",__FILE__,__LINE__); //TODO: log macro
+        printf("[%s:%d] drawsub is NULL\n",__FILE__,__LINE__);
     }
 
     while (drawsub != NULL) {
@@ -292,11 +293,16 @@ inkface_get_element(RsvgHandle *handle, Element *element)
         drawsub = drawsub->parent;
     }
 
-
     rsvg_state_push (draw);
     cairo_save (tmp_cr);
 
+    if(!strcmp(element->name,"brandName")){
+        LOG("calculating brandName");
+    }
     rsvg_node_calc ((RsvgNode *) handle->priv->treebase, draw, 0);
+    if(!strcmp(element->name,"brandName")){
+        LOG("done calculating brandName");
+    }
 
     cairo_restore (tmp_cr);
     rsvg_state_pop (draw);
@@ -322,6 +328,7 @@ inkface_get_element(RsvgHandle *handle, Element *element)
     {
         element_node = rsvg_defs_lookup (handle->priv->defs, element->id);
 
+        printf("node %s, type %s\n",element->id,element_node->type->str);
         rsvg_state_push(dctx);
         cairo_save(element->cr);
 

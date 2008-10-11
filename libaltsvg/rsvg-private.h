@@ -200,6 +200,8 @@ struct RsvgRender {
     PangoContext    *(*create_pango_context)	(RsvgDrawingCtx * ctx);
     void	     (*render_pango_layout)	(RsvgDrawingCtx * ctx, PangoLayout *layout, 
 						 double x, double y);
+    void	     (*calc_pango_layout)	(RsvgDrawingCtx * ctx, PangoLayout *layout, 
+						 double x, double y);
     void	     (*render_path)		(RsvgDrawingCtx * ctx, const RsvgBpathDef * path);
     void	     (*calc_path)		(RsvgDrawingCtx * ctx, const RsvgBpathDef * path);
     void	     (*render_image)		(RsvgDrawingCtx * ctx, const GdkPixbuf * pixbuf,

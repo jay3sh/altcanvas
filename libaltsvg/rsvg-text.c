@@ -38,6 +38,9 @@
 
 #include <pango/pangoft2.h>
 
+#include "inkface.h"
+
+
 typedef struct _RsvgNodeText RsvgNodeText;
 
 struct _RsvgNodeText {
@@ -148,6 +151,8 @@ _rsvg_node_text_set_atts (RsvgNode * self, RsvgHandle * ctx, RsvgPropertyBag * a
         }
 
         rsvg_parse_style_attrs (ctx, self->state, "text", klazz, id, atts);
+
+        inkface_parse_attrs (self, atts);
     }
 }
 
@@ -185,6 +190,43 @@ _rsvg_node_text_type_children (RsvgNode * self, RsvgDrawingCtx * ctx,
         } else if (!strcmp (node->type->str, "tref")) {
             RsvgNodeTref *tref = (RsvgNodeTref *) node;
             _rsvg_node_text_type_tref (tref, ctx, x, y, lastwasspace);
+        }
+    }
+    rsvg_pop_discrete_layer (ctx);
+}
+
+static void
+_rsvg_node_text_type_tspan_calc (RsvgNodeText * self, RsvgDrawingCtx * ctx,
+                            gdouble * x, gdouble * y, gboolean * lastwasspace);
+
+static void
+_rsvg_node_text_type_tref_calc (RsvgNodeTref * self, RsvgDrawingCtx * ctx,
+                           gdouble * x, gdouble * y, gboolean * lastwasspace);
+
+void
+rsvg_text_calc_text (RsvgDrawingCtx * ctx, const char *text, gdouble * x, gdouble * y);
+static void
+_rsvg_node_text_type_children_calc (RsvgNode * self, RsvgDrawingCtx * ctx,
+                               gdouble * x, gdouble * y, gboolean * lastwasspace)
+{
+    guint i;
+
+    rsvg_push_discrete_layer (ctx);
+    for (i = 0; i < self->children->len; i++) {
+        RsvgNode *node = g_ptr_array_index (self->children, i);
+        if (!strcmp (node->type->str, "RSVG_NODE_CHARS")) {
+            RsvgNodeChars *chars = (RsvgNodeChars *) node;
+            GString *str = _rsvg_text_chomp (rsvg_state_current (ctx), chars->contents, lastwasspace);
+            rsvg_text_calc_text (ctx, str->str, x, y);
+            g_string_free (str, TRUE);
+        } else if (!strcmp (node->type->str, "tspan")) {
+            RsvgNodeText *tspan = (RsvgNodeText *) node;
+            rsvg_state_push (ctx);
+            _rsvg_node_text_type_tspan_calc (tspan, ctx, x, y, lastwasspace);
+            rsvg_state_pop (ctx);
+        } else if (!strcmp (node->type->str, "tref")) {
+            RsvgNodeTref *tref = (RsvgNodeTref *) node;
+            _rsvg_node_text_type_tref_calc (tref, ctx, x, y, lastwasspace);
         }
     }
     rsvg_pop_discrete_layer (ctx);
@@ -253,6 +295,33 @@ _rsvg_node_text_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
     _rsvg_node_text_type_children (self, ctx, &x, &y, &lastwasspace);
 }
 
+static void
+_rsvg_node_text_calc (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
+{
+    LOG("Starting the calc text path");
+    double x, y;
+    gboolean lastwasspace = TRUE;
+    RsvgNodeText *text = (RsvgNodeText *) self;
+    rsvg_state_reinherit_top (ctx, self->state, dominate);
+
+    x = _rsvg_css_normalize_length (&text->x, ctx, 'h');
+    y = _rsvg_css_normalize_length (&text->y, ctx, 'v');
+    x += _rsvg_css_normalize_length (&text->dx, ctx, 'h');
+    y += _rsvg_css_normalize_length (&text->dy, ctx, 'v');
+
+    if (rsvg_state_current (ctx)->text_anchor != TEXT_ANCHOR_START) {
+        double length = 0;
+        _rsvg_node_text_length_children (self, ctx, &length, &lastwasspace);
+        if (rsvg_state_current (ctx)->text_anchor == TEXT_ANCHOR_END)
+            x -= length;
+        if (rsvg_state_current (ctx)->text_anchor == TEXT_ANCHOR_MIDDLE)
+            x -= length / 2;
+    }
+
+    lastwasspace = TRUE;
+    _rsvg_node_text_type_children_calc (self, ctx, &x, &y, &lastwasspace);
+}
+
 RsvgNode *
 rsvg_new_text (void)
 {
@@ -260,6 +329,7 @@ rsvg_new_text (void)
     text = g_new (RsvgNodeText, 1);
     _rsvg_node_init (&text->super);
     text->super.draw = _rsvg_node_text_draw;
+    text->super.calc = _rsvg_node_text_calc;
     text->super.set_atts = _rsvg_node_text_set_atts;
     text->x = text->y = text->dx = text->dy = _rsvg_css_parse_length ("0");
     return &text->super;
@@ -289,6 +359,32 @@ _rsvg_node_text_type_tspan (RsvgNodeText * self, RsvgDrawingCtx * ctx,
     *y += _rsvg_css_normalize_length (&self->dy, ctx, 'v');
     _rsvg_node_text_type_children (&self->super, ctx, x, y, lastwasspace);
 }
+
+static void
+_rsvg_node_text_type_tspan_calc (RsvgNodeText * self, RsvgDrawingCtx * ctx,
+                            gdouble * x, gdouble * y, gboolean * lastwasspace)
+{
+    rsvg_state_reinherit_top (ctx, self->super.state, 0);
+
+    if (self->x.factor != 'n') {
+        *x = _rsvg_css_normalize_length (&self->x, ctx, 'h');
+        if (rsvg_state_current (ctx)->text_anchor != TEXT_ANCHOR_START) {
+            double length = 0;
+            gboolean lws = *lastwasspace;
+            _rsvg_node_text_length_children (&self->super, ctx, &length, &lws);
+            if (rsvg_state_current (ctx)->text_anchor == TEXT_ANCHOR_END)
+                *x -= length;
+            if (rsvg_state_current (ctx)->text_anchor == TEXT_ANCHOR_MIDDLE)
+                *x -= length / 2;
+        }
+    }
+    if (self->y.factor != 'n')
+        *y = _rsvg_css_normalize_length (&self->y, ctx, 'v');
+    *x += _rsvg_css_normalize_length (&self->dx, ctx, 'h');
+    *y += _rsvg_css_normalize_length (&self->dy, ctx, 'v');
+    _rsvg_node_text_type_children_calc (&self->super, ctx, x, y, lastwasspace);
+}
+
 
 static int
 _rsvg_node_text_length_tspan (RsvgNodeText * self, RsvgDrawingCtx * ctx, gdouble * x,
@@ -343,6 +439,14 @@ _rsvg_node_text_type_tref (RsvgNodeTref * self, RsvgDrawingCtx * ctx,
 {
     if (self->link)
         _rsvg_node_text_type_children (self->link, ctx, x, y, lastwasspace);
+}
+
+static void
+_rsvg_node_text_type_tref_calc (RsvgNodeTref * self, RsvgDrawingCtx * ctx,
+                           gdouble * x, gdouble * y, gboolean * lastwasspace)
+{
+    if (self->link)
+        _rsvg_node_text_type_children_calc (self->link, ctx, x, y, lastwasspace);
 }
 
 static int
@@ -858,6 +962,35 @@ rsvg_text_render_text (RsvgDrawingCtx * ctx, const char *text, gdouble * x, gdou
         GString *render;
         render = rsvg_text_render_text_as_string (ctx, text, x, y);
         rsvg_render_path (ctx, render->str);
+        g_string_free (render, TRUE);
+    }
+}
+
+void
+rsvg_text_calc_text (RsvgDrawingCtx * ctx, const char *text, gdouble * x, gdouble * y)
+{
+    if (ctx->render->create_pango_context && ctx->render->render_pango_layout) {
+        PangoContext *context;
+        PangoLayout *layout;
+        PangoLayoutIter *iter;
+        RsvgState *state;
+        gint w, h, baseline;
+
+        state = rsvg_state_current (ctx);
+        context = ctx->render->create_pango_context (ctx);
+        layout = rsvg_text_create_layout (ctx, state, text, context);
+        pango_layout_get_size (layout, &w, &h);
+        iter = pango_layout_get_iter (layout);
+        baseline = pango_layout_iter_get_baseline (iter) / (double)PANGO_SCALE;
+        pango_layout_iter_free (iter);
+        ctx->render->calc_pango_layout (ctx, layout, *x, *y - baseline);
+        *x += w / (double)PANGO_SCALE;
+        g_object_unref (layout);
+        g_object_unref (context);
+    } else {
+        GString *render;
+        render = rsvg_text_render_text_as_string (ctx, text, x, y);
+        rsvg_calc_path (ctx, render->str);
         g_string_free (render, TRUE);
     }
 }

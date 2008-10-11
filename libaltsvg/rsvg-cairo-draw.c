@@ -470,6 +470,32 @@ rsvg_cairo_create_pango_context (RsvgDrawingCtx * ctx)
 }
 
 void
+rsvg_cairo_calc_pango_layout (RsvgDrawingCtx * ctx, PangoLayout * layout, double x, double y)
+{
+    RsvgCairoRender *render = (RsvgCairoRender *) ctx->render;
+    RsvgState *state = rsvg_state_current (ctx);
+    PangoRectangle ink;
+    RsvgBbox bbox;
+
+    _rsvg_cairo_set_text_antialias (render->cr, state->text_rendering_type);
+
+    _set_rsvg_affine (render, state->affine);
+
+    pango_layout_get_extents (layout, &ink, NULL);
+
+    rsvg_bbox_init (&bbox, state->affine);
+    bbox.x = x + ink.x / (double)PANGO_SCALE;
+    bbox.y = y + ink.y / (double)PANGO_SCALE;
+    bbox.w = ink.width / (double)PANGO_SCALE;
+    bbox.h = ink.height / (double)PANGO_SCALE;
+    bbox.virgin = 0;
+
+    cairo_move_to (render->cr, x, y);
+
+    rsvg_bbox_insert (&render->bbox, &bbox);
+}
+
+void
 rsvg_cairo_render_pango_layout (RsvgDrawingCtx * ctx, PangoLayout * layout, double x, double y)
 {
     RsvgCairoRender *render = (RsvgCairoRender *) ctx->render;
