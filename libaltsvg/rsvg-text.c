@@ -298,7 +298,6 @@ _rsvg_node_text_draw (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 static void
 _rsvg_node_text_calc (RsvgNode * self, RsvgDrawingCtx * ctx, int dominate)
 {
-    LOG("Starting the calc text path");
     double x, y;
     gboolean lastwasspace = TRUE;
     RsvgNodeText *text = (RsvgNodeText *) self;

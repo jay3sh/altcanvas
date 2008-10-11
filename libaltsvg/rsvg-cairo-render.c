@@ -365,20 +365,19 @@ inkface_get_element(RsvgHandle *handle, Element *element)
         rsvg_state_push(dctx);
         cairo_save(element->cr);
 
-        /*  TEST CODE
         if(!strcmp(element_node->type->str,"text")){
 
-            GString *namestr;
-            namestr = g_string_new_len("voila",32);
+            GString *textstr;
+            textstr = g_string_new_len("",32);
 
-            //inkface_get_chars(element_node,namestr);
-            //inkface_set_chars(element_node,namestr);
+            inkface_get_chars(element_node,textstr);
 
-            LOG("%s",namestr->str);
-            g_string_free(namestr,TRUE);
+            LOG("%s",textstr->str);
+            element->text = g_string_new(textstr->str);
+            g_string_free(textstr,TRUE);
 
         }
-        */
+
         rsvg_node_draw(element_node, dctx, 0);
 
         cairo_restore(element->cr);

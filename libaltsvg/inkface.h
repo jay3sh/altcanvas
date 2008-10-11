@@ -27,6 +27,8 @@ struct _Element{
     int opacity;    /* TODO temp hack */
     gboolean inFocus;
 
+    GString *text;
+
     /* Animation related members */
     int target_x, target_y, target_w, target_h;
     int x_step,y_step;

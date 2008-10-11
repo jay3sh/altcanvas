@@ -76,7 +76,8 @@ librsvgincdir = $(includedir)/libaltsvg
 librsvginc_HEADERS = 	\
 	$(headers)	\
 	librsvg-features.h \
-	librsvg-enum-types.h
+	librsvg-enum-types.h \
+	inkface.h
 
 INCLUDES =				\
 	$(LIBGSF_CFLAGS)		\
