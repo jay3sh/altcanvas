@@ -248,6 +248,46 @@ rsvg_cairo_new_drawing_ctx (cairo_t * cr, RsvgHandle * handle)
     return draw;
 }
 
+
+// TODO: this is a duplicate declaration. get rid of it.
+typedef struct _RsvgNodeText {
+    RsvgNode super;
+    RsvgLength x, y, dx, dy;
+} RsvgNodeText;
+
+static void 
+inkface_get_chars(gpointer data,gpointer user_data)
+{
+    RsvgNode *node = (RsvgNode *)data;
+    GString *chars = (GString *)user_data;
+
+    if(!strcmp(node->type->str,"RSVG_NODE_CHARS")){
+        g_string_printf(chars,"%s",((RsvgNodeChars*)node)->contents->str);
+        return;
+    } else {
+        if(node->children->len > 0){
+            g_ptr_array_foreach(node->children,inkface_get_chars,user_data);
+        }
+    }
+}
+
+static void 
+inkface_set_chars(gpointer data,gpointer user_data)
+{
+    RsvgNode *node = (RsvgNode *)data;
+    GString *chars = (GString *)user_data;
+
+    if(!strcmp(node->type->str,"RSVG_NODE_CHARS")){
+        g_string_printf(((RsvgNodeChars*)node)->contents,"%s",chars->str);
+        return;
+    } else {
+        if(node->children->len > 0){
+            g_ptr_array_foreach(node->children,inkface_set_chars,user_data);
+        }
+    }
+}
+
+
 void
 inkface_get_element(RsvgHandle *handle, Element *element)
 {
@@ -296,13 +336,7 @@ inkface_get_element(RsvgHandle *handle, Element *element)
     rsvg_state_push (draw);
     cairo_save (tmp_cr);
 
-    if(!strcmp(element->name,"brandName")){
-        LOG("calculating brandName");
-    }
     rsvg_node_calc ((RsvgNode *) handle->priv->treebase, draw, 0);
-    if(!strcmp(element->name,"brandName")){
-        LOG("done calculating brandName");
-    }
 
     cairo_restore (tmp_cr);
     rsvg_state_pop (draw);
@@ -328,10 +362,23 @@ inkface_get_element(RsvgHandle *handle, Element *element)
     {
         element_node = rsvg_defs_lookup (handle->priv->defs, element->id);
 
-        printf("node %s, type %s\n",element->id,element_node->type->str);
         rsvg_state_push(dctx);
         cairo_save(element->cr);
 
+        /*  TEST CODE
+        if(!strcmp(element_node->type->str,"text")){
+
+            GString *namestr;
+            namestr = g_string_new_len("voila",32);
+
+            //inkface_get_chars(element_node,namestr);
+            //inkface_set_chars(element_node,namestr);
+
+            LOG("%s",namestr->str);
+            g_string_free(namestr,TRUE);
+
+        }
+        */
         rsvg_node_draw(element_node, dctx, 0);
 
         cairo_restore(element->cr);
@@ -343,6 +390,7 @@ inkface_get_element(RsvgHandle *handle, Element *element)
     rsvg_drawing_ctx_free(dctx);
 
 }
+
 
 /**
  * rsvg_handle_render_cairo_sub
