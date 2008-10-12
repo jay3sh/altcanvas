@@ -76,4 +76,7 @@ void fork_painter_thread();
 
 void incr_dirt_count(int count);
 void decr_dirt_count(int count);
+
+void inkface_get_element(RsvgHandle *handle, Element *element,int push);
+GList *inkface_get_element_ids(const RsvgHandle *handle);
 #endif /*__INKFACE_H__ */

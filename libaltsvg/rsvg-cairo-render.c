@@ -288,8 +288,14 @@ inkface_set_chars(gpointer data,gpointer user_data)
 }
 
 
+/*
+ * The push parameter will be used to redraw the element with
+ * selective attributes of element updated. Currently it's limited to
+ * 'text' of a text element
+ */
+
 void
-inkface_get_element(RsvgHandle *handle, Element *element)
+inkface_get_element(RsvgHandle *handle, Element *element,int push)
 {
     RsvgDrawingCtx *draw;
     RsvgNode *drawsub = NULL;
@@ -368,12 +374,16 @@ inkface_get_element(RsvgHandle *handle, Element *element)
         if(!strcmp(element_node->type->str,"text")){
 
             GString *textstr;
-            textstr = g_string_new_len("",32);
 
-            inkface_get_chars(element_node,textstr);
+            if(push){
+                textstr = g_string_new(element->text->str);
+                inkface_set_chars(element_node,textstr);
+            } else {
+                textstr = g_string_new_len("",32);
+                inkface_get_chars(element_node,textstr);
+                element->text = g_string_new(textstr->str);
+            }
 
-            LOG("%s",textstr->str);
-            element->text = g_string_new(textstr->str);
             g_string_free(textstr,TRUE);
 
         }
