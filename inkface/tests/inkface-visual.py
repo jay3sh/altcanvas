@@ -61,6 +61,10 @@ def main():
     for elem in elements:
         if elem.text:
             text_arr.append(elem.text)
+            if elem.text == 'inkface':
+                elem.text = elem.text[:3]+'-'+elem.text[3:]
+                elem.refresh()
+
         elem.register_mouse_enter_handler(onMouseEnter)
         if elem.name == 'leftTouch':
             elem.register_draw_handler(onDraw)

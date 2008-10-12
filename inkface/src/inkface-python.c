@@ -15,6 +15,8 @@
 RsvgHandle *rsvg_handle_from_file(const char *filename);
 void *painter_thread(void *arg);
 
+RsvgHandle *handle = NULL;
+
 /*
  * "canvas" type object
  */
@@ -68,6 +70,9 @@ typedef struct {
     int opacity;
 
     PycairoSurface_t *pysurface;    
+
+    // private 
+    Element *element;
 
     // Callback handlers
     PyObject *onDraw;
@@ -563,6 +568,23 @@ element_register_draw_handler(Element_t *self, PyObject *args)
 }
 
 static PyObject*
+element_refresh(Element_t *self,PyObject *args)
+{
+    g_string_free(self->element->text,TRUE);
+    self->element->text = g_string_new(
+        PyString_AsString(self->text));
+    inkface_get_element(handle,self->element,TRUE);
+
+    free(self->pysurface);
+    ASSERT(self->pysurface = (PycairoSurface_t *)
+        malloc(sizeof(PycairoSurface_t)));
+    self->pysurface->surface = self->element->surface;
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject*
 element_richcompare(Element_t *v, Element_t *w, int op)
 {
     int r;
@@ -607,6 +629,9 @@ static PyMethodDef element_methods[] = {
     { "register_draw_handler", 
         (PyCFunction)element_register_draw_handler, 
         METH_VARARGS, "Register Custom draw handler" },
+    { "refresh", 
+        (PyCFunction)element_refresh, 
+        METH_NOARGS, "Refresh/Redraw the element" },
     { NULL, NULL, 0, NULL },
 };
 
@@ -691,6 +716,7 @@ PyTypeObject Element_Type = {
 };
 
 
+
 /*
  * "inkface" module
  */
@@ -703,7 +729,6 @@ loadsvg(PyObject *self, PyObject *args)
     ASSERT(svgname)
 
     // Create rsvg handle for the SVG file
-    RsvgHandle *handle = NULL;
     ASSERT(handle = rsvg_handle_from_file(svgname));
  
     // Get list of element IDs in the SVG
@@ -725,7 +750,7 @@ loadsvg(PyObject *self, PyObject *args)
 
         // Find element for the id
         strncpy(element->id,eidList->data,31);  //TODO macro
-        inkface_get_element(handle,element);
+        inkface_get_element(handle,element,0);
 
         // Create python object for Element
         PyTypeObject *pytype = NULL;
@@ -746,6 +771,8 @@ loadsvg(PyObject *self, PyObject *args)
         ASSERT(pyo->pysurface = (PycairoSurface_t *)
             malloc(sizeof(PycairoSurface_t)));
         pyo->pysurface->surface = element->surface;
+
+        pyo->element = element;
 
         // Add python object to list
         PyList_Append(pyElementList,(PyObject *)pyo);

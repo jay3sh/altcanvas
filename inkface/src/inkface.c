@@ -419,7 +419,7 @@ load_element_list()
         memset(element,0,sizeof(Element));
         strncpy(element->id,eidList->data,31);  //TODO macro
 
-        inkface_get_element(handle,element);
+        inkface_get_element(handle,element,FALSE);
 
         elemList = g_list_prepend(elemList,element);
 
