@@ -62,7 +62,7 @@ def main():
         if elem.text:
             text_arr.append(elem.text)
             if elem.text == 'inkface':
-                elem.text = elem.text[:3]+'-'+elem.text[3:]
+                elem.text = '(== '+elem.text+' ==)'
                 elem.refresh()
 
         elem.register_mouse_enter_handler(onMouseEnter)
