@@ -218,7 +218,6 @@ canvas_draw(Canvas_t *self, PyObject *args)
 {
     Element_t *element;
 
-    LOG("Inside canvas_draw");
     if(!PyArg_ParseTuple(args,"O",&element)){
         PyErr_Clear();
         PyErr_SetString(PyExc_ValueError,"Invalid Arguments");
@@ -381,14 +380,14 @@ canvas_eventloop(Canvas_t *self, PyObject *args)
 
                 if(el->inFocus && !nowInFocus){
                     if(PyCallable_Check(el->onMouseLeave)) {
-                        PyEval_CallFunction(el->onMouseLeave,
+                        PyObject_CallFunction(el->onMouseLeave,
                             "OO",el,self->element_list);
                     }
                 }
 
                 if(!el->inFocus && nowInFocus){
                     if(PyCallable_Check(el->onMouseEnter)) {
-                        PyEval_CallFunction(el->onMouseEnter,
+                        PyObject_CallFunction(el->onMouseEnter,
                             "OO",el,self->element_list);
                     }
                 }
@@ -503,66 +502,8 @@ element_init(Element_t *self, PyObject *args, PyObject *kwds)
 }
 
 static PyObject*
-element_register_tap_handler(Element_t *self, PyObject *args)
+element_test(Element_t *self, PyObject *args)
 {
-    PyObject *onTap;
-
-    if(!PyArg_ParseTuple(args,"O",&onTap)){
-        PyErr_Clear();
-        PyErr_SetString(PyExc_ValueError,"Invalid Arguments");
-        return NULL;
-    }
-
-    self->onTap = onTap;
-
-    Py_INCREF(Py_None);
-    return Py_None;
-}
-
-static PyObject*
-element_register_mouse_enter_handler(Element_t *self, PyObject *args)
-{
-    PyObject *onMouseEnter;
-
-    if(!PyArg_ParseTuple(args,"O",&onMouseEnter)){
-        PyErr_Clear();
-        PyErr_SetString(PyExc_ValueError,"Invalid Arguments");
-        return NULL;
-    }
-
-    self->onMouseEnter = onMouseEnter;
-    Py_INCREF(Py_None);
-    return Py_None;
-}
-
-static PyObject*
-element_register_mouse_leave_handler(Element_t *self, PyObject *args)
-{
-    PyObject *onMouseLeave;
-
-    if(!PyArg_ParseTuple(args,"O",&onMouseLeave)){
-        PyErr_Clear();
-        PyErr_SetString(PyExc_ValueError,"Invalid Arguments");
-        return NULL;
-    }
-
-    self->onMouseLeave = onMouseLeave;
-    Py_INCREF(Py_None);
-    return Py_None;
-}
-
-static PyObject*
-element_register_draw_handler(Element_t *self, PyObject *args)
-{
-    PyObject *onDraw;
-
-    if(!PyArg_ParseTuple(args,"O",&onDraw)){
-        PyErr_Clear();
-        PyErr_SetString(PyExc_ValueError,"Invalid Arguments");
-        return NULL;
-    }
-
-    self->onDraw = onDraw;
     Py_INCREF(Py_None);
     return Py_None;
 }
@@ -617,21 +558,12 @@ element_richcompare(Element_t *v, Element_t *w, int op)
 }
 
 static PyMethodDef element_methods[] = {
-    { "register_tap_handler", 
-        (PyCFunction)element_register_tap_handler, 
-        METH_VARARGS, "Register Tap handler" },
-    { "register_mouse_enter_handler", 
-        (PyCFunction)element_register_mouse_enter_handler, 
-        METH_VARARGS, "Register Mouse Enter handler" },
-    { "register_mouse_leave_handler", 
-        (PyCFunction)element_register_mouse_leave_handler, 
-        METH_VARARGS, "Register Mouse Leave handler" },
-    { "register_draw_handler", 
-        (PyCFunction)element_register_draw_handler, 
-        METH_VARARGS, "Register Custom draw handler" },
+    { "test", 
+        (PyCFunction)element_test, 
+        METH_NOARGS, "Test" },
     { "refresh", 
         (PyCFunction)element_refresh, 
-        METH_NOARGS, "Refresh/Redraw the element" },
+        METH_NOARGS, "Refresh/Reload the element" },
     { NULL, NULL, 0, NULL },
 };
 
@@ -645,7 +577,6 @@ static PyMemberDef element_members[] = {
     { "id", T_OBJECT,offsetof(Element_t,id),0,"Id of the element"},
     { "text", T_OBJECT,offsetof(Element_t,text),0,"Text of a text element"},
     { "opacity", T_INT, offsetof(Element_t,opacity),0,"Opacity of element"},
-
     { "onDraw", T_OBJECT,offsetof(Element_t,onDraw),0,"Draw handler"},
     { "onTap", T_OBJECT,offsetof(Element_t,onTap),0,"Tap handler"},
     { "onMouseEnter", T_OBJECT,offsetof(Element_t,onMouseEnter),0,
@@ -886,7 +817,7 @@ paint(void *arg)
 
         if(PyCallable_Check(el->onDraw)){
             // Call element's custom draw handler
-            PyEval_CallFunction(el->onDraw,"O",el);
+            PyObject_CallFunction(el->onDraw,"O",el);
         } else {
             // Call canvas's default draw method
             draw(canvas,el);

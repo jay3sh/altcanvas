@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="800"
+   height="480"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.46"
+   version="1.0"
+   sodipodi:docname="test1.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <defs
+     id="defs4">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective10" />
+    <filter
+       inkscape:collect="always"
+       id="filter3429"
+       x="-0.040000001"
+       width="1.08"
+       y="-0.11999999"
+       height="1.24">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="6.2074688"
+         id="feGaussianBlur3431" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter3433"
+       x="-0.10549296"
+       width="1.2109859"
+       y="-0.041921641"
+       height="1.0838433">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="6.2157675"
+         id="feGaussianBlur3435" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter3437"
+       x="-0.10549296"
+       width="1.2109859"
+       y="-0.041921641"
+       height="1.0838433">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="6.2157675"
+         id="feGaussianBlur3439" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter3441"
+       x="-0.040000001"
+       width="1.08"
+       y="-0.11999999"
+       height="1.24">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="6.2074688"
+         id="feGaussianBlur3443" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     gridtolerance="10000"
+     guidetolerance="10"
+     objecttolerance="10"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.50625"
+     inkscape:cx="295.76763"
+     inkscape:cy="240"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1280"
+     inkscape:window-height="1003"
+     inkscape:window-x="0"
+     inkscape:window-y="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.78431373"
+       id="rect2403"
+       width="800"
+       height="480"
+       x="0"
+       y="0"
+       name="background"
+       order="0" />
+    <rect
+       style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3385"
+       width="80"
+       height="80"
+       x="357.17844"
+       y="194.19087" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 368.13278,241.41786 C 368.13278,241.41786 392.69709,278.59628 431.86722,238.76226"
+       id="path3313"
+       sodipodi:nodetypes="cc"
+       name="smile"
+       order="10" />
+    <text
+       xml:space="preserve"
+       style="font-size:56px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Gothic L;-inkscape-font-specification:URW Gothic L"
+       x="215.99994"
+       y="412.65878"
+       id="text3329"
+       sodipodi:linespacing="100%"
+       transform="matrix(2.7854802e-3,0.9999961,0.9999961,-2.7854802e-3,0,0)"
+       name="wink"
+       order="10"><tspan
+         sodipodi:role="line"
+         id="tspan3331"
+         x="215.99994"
+         y="412.65878">,</tspan></text>
+    <g
+       id="g3367"
+       name="topTouch"
+       order="10">
+      <rect
+         y="0.99584693"
+         x="213.77594"
+         height="124.14938"
+         width="372.44812"
+         id="rect3289"
+         style="opacity:1;fill:#80b3ff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter3441)" />
+      <text
+         id="text3346"
+         y="67.717842"
+         x="374.94238"
+         style="font-size:18px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="67.717842"
+           x="374.94238"
+           id="tspan3348"
+           sodipodi:role="line">Touch</tspan></text>
+    </g>
+    <g
+       id="g3377"
+       name="bottomTouch"
+       order="10">
+      <rect
+         y="355.85062"
+         x="213.77594"
+         height="124.14938"
+         width="372.44812"
+         id="rect3287"
+         style="opacity:1;fill:#80b3ff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter3429)" />
+      <text
+         id="text3350"
+         y="422.97601"
+         x="374.94238"
+         style="font-size:18px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="422.97601"
+           x="374.94238"
+           id="tspan3352"
+           sodipodi:role="line">Touch</tspan></text>
+    </g>
+    <g
+       id="g3372"
+       name="rightTouch"
+       order="10">
+      <rect
+         y="62.074692"
+         x="658.2655"
+         height="355.85062"
+         width="141.41078"
+         id="rect3189"
+         style="opacity:1;fill:#b3ff80;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter3433)" />
+      <text
+         transform="matrix(0,1,-1,0,0,0)"
+         id="text3354"
+         y="-728.22736"
+         x="214.94238"
+         style="font-size:18px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="-728.22736"
+           x="214.94238"
+           id="tspan3356"
+           sodipodi:role="line">Touch</tspan></text>
+    </g>
+    <g
+       id="g3362"
+       name="leftTouch"
+       order="10">
+      <rect
+         y="62.074692"
+         x="0.66390061"
+         height="355.85062"
+         width="141.41078"
+         id="rect3179"
+         style="opacity:1;fill:#b3ff80;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter3437)" />
+      <text
+         transform="matrix(0,-1,1,0,0,0)"
+         id="text3358"
+         y="70.444885"
+         x="-265.05762"
+         style="font-size:18px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="70.444885"
+           x="-265.05762"
+           id="tspan3360"
+           sodipodi:role="line">Touch</tspan></text>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:22px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:semi-condensed;text-align:justify;line-height:100%;writing-mode:lr;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:DejaVu Serif;-inkscape-font-specification:DejaVu Serif Bold Semi-Condensed"
+       x="368.46472"
+       y="308.71368"
+       id="text2427"
+       name="brandName"
+       sodipodi:linespacing="100%"><tspan
+         sodipodi:role="line"
+         id="tspan2429"
+         x="368.46472"
+         y="308.71368">inkface</tspan></text>
+  </g>
+</svg>
