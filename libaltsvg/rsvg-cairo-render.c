@@ -330,6 +330,16 @@ inkface_get_element(RsvgHandle *handle, Element *element,int push)
         if(drawsub->istate->name){
             element->name = strdup(drawsub->istate->name);
         }
+
+        if(!strcmp(drawsub->type->str,"text")){
+            if(push){
+                // This means that element is already populated
+                // The SVG node should be updated with element's text
+                GString *textstr;
+                textstr = g_string_new(element->text->str);
+                inkface_set_chars(drawsub,textstr);
+            }
+        }
     } else {
         printf("[%s:%d] drawsub is NULL\n",__FILE__,__LINE__);
     }
@@ -372,20 +382,13 @@ inkface_get_element(RsvgHandle *handle, Element *element,int push)
         cairo_save(element->cr);
 
         if(!strcmp(element_node->type->str,"text")){
-
-            GString *textstr;
-
-            if(push){
-                textstr = g_string_new(element->text->str);
-                inkface_set_chars(element_node,textstr);
-            } else {
+            if(!push){
+                GString *textstr;
                 textstr = g_string_new_len("",32);
                 inkface_get_chars(element_node,textstr);
                 element->text = g_string_new(textstr->str);
+                g_string_free(textstr,TRUE);
             }
-
-            g_string_free(textstr,TRUE);
-
         }
 
         rsvg_node_draw(element_node, dctx, 0);
