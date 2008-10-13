@@ -4,19 +4,14 @@
 #    SConscript(['debian/SConscript'])
 #    Exit()
 
-VERSION = '0.0.1'
+VERSION = '0.1.0'
 ARCH = 'armel'
 MAINTAINER = 'Jayesh Salvi <jayesh@altfrequency.com>'
-DEPENDS = 'libaltsvg (>= 0.0.1)'
+DEPENDS = 'libaltsvg (>= 0.1.0)'
 DESCRIPTION = 'UI framework based on SVG'
-PKGNAME = 'libinkface'
+PKGNAME = 'inkface-python'
 
 Export('VERSION ARCH MAINTAINER DEPENDS DESCRIPTION PKGNAME')
 
-SConscript('src/lib.sc')
-
-SConscript('src/python.sc')
-
-if 'debian' in COMMAND_LINE_TARGETS or 'all' in COMMAND_LINE_TARGETS:
-    SConscript('debian/SConscript')
+SConscript(['src/lib.sc','src/python.sc','debian/SConscript'])
 

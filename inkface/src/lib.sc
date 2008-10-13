@@ -41,7 +41,7 @@ idir_data   = '$PREFIX/share'
 Export('env idir_prefix idir_lib idir_bin idir_inc idir_data')
 
 env.Install(idir_lib, ['libinkface.so'])
-env.Install(idir_inc, ['inkface.h'])
+#env.Install(idir_inc, ['inkface.h'])
 install = env.Alias('install', idir_prefix)
 
 

@@ -10,11 +10,10 @@ svn_version = os.popen('svnversion ..').read()[:-1]
 svn_version = svn_version.split(':')[-1]
 
 
-debpkg = '#%s_%s_%s.deb'%('inkface',VERSION,ARCH)
+debpkg = '#%s_%s_%s.deb'%('inkface-python',VERSION,ARCH)
 
 DEBFILES = [
-    ("usr/lib/libinkface.so", "#src/libinkface.so"),
-    ("usr/include/inkface.h", "#src/inkface.h"),
+    ("usr/lib/python2.5/site-packages/inkface.so", "#src/inkface.so"),
     ("usr/lib/pkgconfig/inkface.pc","#src/inkface.pc"),
 ]
 
@@ -63,6 +62,6 @@ def make_control(target=None, source=None, env=None):
 env.Command(DEBCONTROLFILE, None, make_control)
 
 env.Command(debpkg, DEBCONTROLFILE,
-            "dpkg-deb -b %s %s"%(PKGDIR,"$TARGET"))
+            "dpkg-deb -b debian/%s %s"%(PKGDIR,"$TARGET"))
 
-Delete(PKGDIR)
+env.Command('','',Delete(PKGDIR))
