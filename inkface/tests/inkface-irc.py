@@ -20,19 +20,29 @@ def msghandler(nick,msg):
     global msglist
     
     print msg
-    clean_msg = msg.strip()
+    clean_msg = nick+': '+msg.strip()
+    '''
     if(len(clean_msg) > 50):
         final_msg = clean_msg[:50]+'...'
     else:
         final_msg = clean_msg
-
-    msglist =  [(nick,final_msg)] + msglist
+    '''
+    final_msg = clean_msg[:70]+'\n'+clean_msg[70:140]+'\n'+clean_msg[140:210]
+    msglist =  [final_msg] + msglist
     if(len(msglist) > 5):
         msglist = msglist[:-1]
 
     for i in range(len(msgtxtlist)):
         if i < len(msglist):
-            msgtxtlist[i].text = '%s:%s'%msglist[i]
+            if i == 0:
+                msgtxtlist[i].text = msglist[i]
+            elif i == 1:
+                msgtxtlist[i].text = msglist[i][:140]
+            elif i == 1:
+                msgtxtlist[i].text = msglist[i][:60]
+            else:
+                msgtxtlist[i].text = msglist[i][:40]+'...'
+                
             msgtxtlist[i].refresh()
         
     canvas.refresh()
@@ -47,7 +57,10 @@ def main():
     global canvas
     global msgtxtlist
 
-    irc = IRC(channel='ubuntu')
+    irc_network = 'irc.freenode.net'
+    irc_channel = 'ubuntu'
+
+    irc = IRC(channel=irc_channel,network=irc_network)
     irc.msghandler = msghandler
     irc.start()
 
@@ -64,6 +77,13 @@ def main():
 
         if el.name.startswith('msgbox'):
             el.onDraw = onMsgboxDraw
+
+        if el.name == 'networkName':
+            el.text = irc_network
+            el.refresh()
+        if el.name == 'channelName':
+            el.text = irc_channel
+            el.refresh()
 
     canvas.show()
     canvas.eventloop()

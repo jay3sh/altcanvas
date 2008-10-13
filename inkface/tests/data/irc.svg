@@ -50,6 +50,18 @@
        x2="801.8548"
        y2="261.17224"
        gradientUnits="userSpaceOnUse" />
+    <filter
+       inkscape:collect="always"
+       id="filter4461"
+       x="-0.12748023"
+       width="1.2549605"
+       y="-0.011358292"
+       height="1.0227166">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.4032539"
+         id="feGaussianBlur4463" />
+    </filter>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -62,8 +74,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.47625"
-     inkscape:cx="422.71838"
-     inkscape:cy="267.09568"
+     inkscape:cx="290.53768"
+     inkscape:cy="260.32176"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -87,7 +99,7 @@
      inkscape:groupmode="layer"
      id="layer1">
     <rect
-       style="opacity:1;fill:#ac939d;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="opacity:1;fill:#b3ff80;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect4306"
        width="800"
        height="480"
@@ -129,32 +141,31 @@
            sodipodi:role="line">,</tspan></text>
     </g>
     <g
-       id="g4328"
-       transform="translate(-11.506368,0)"
+       id="g4383"
        name="msgbox0"
        order="20">
       <rect
-         ry="12.285714"
-         rx="10.087041"
+         ry="10"
+         rx="10"
          y="68.177811"
-         x="76.916176"
-         height="58.255714"
-         width="706.5199"
+         x="65.409805"
+         height="109.73751"
+         width="713.97119"
          id="rect4326"
-         style="opacity:1;fill:#483745;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="fill:#1f241c;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
       <rect
-         ry="12.285714"
-         rx="10.087041"
+         ry="10"
+         rx="10"
          y="63.468246"
-         x="72.931442"
-         height="58.255714"
-         width="706.5199"
+         x="61.425076"
+         height="106.35055"
+         width="711.93903"
          id="rect4308"
-         style="opacity:1;fill:#e3dbde;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="fill:#9dac93;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     </g>
     <text
        xml:space="preserve"
-       style="font-size:15.99999985px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Courier 10 Pitch;-inkscape-font-specification:Courier 10 Pitch Bold"
+       style="font-size:17.30044921px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Liberation Mono;-inkscape-font-specification:Liberation Mono"
        x="87.694954"
        y="94.12056"
        id="text4310"
@@ -168,7 +179,7 @@
          y="94.12056">Text</tspan></text>
     <g
        id="g4332"
-       transform="matrix(0.9466098,0,0,1,11.354449,76.448561)"
+       transform="matrix(0.9466098,0,0,1.0860655,12.031841,122.69486)"
        style="opacity:0.8"
        name="msgbox1"
        order="20">
@@ -180,7 +191,7 @@
          height="58.255714"
          width="706.5199"
          id="rect4334"
-         style="opacity:1;fill:#483745;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="opacity:1;fill:#1f241c;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
       <rect
          ry="12.285714"
          rx="10.087041"
@@ -189,11 +200,11 @@
          height="58.255714"
          width="706.5199"
          id="rect4336"
-         style="opacity:1;fill:#e3dbde;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="opacity:1;fill:#9dac93;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     </g>
     <g
        id="g4338"
-       transform="matrix(0.8836857,0,0,1,38.297526,152.89714)"
+       transform="matrix(0.8836857,0,0,0.88166,38.297526,220.40797)"
        style="opacity:0.6"
        name="msgbox2"
        order="20">
@@ -205,7 +216,7 @@
          height="58.255714"
          width="706.5199"
          id="rect4340"
-         style="opacity:1;fill:#483745;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="opacity:1;fill:#1f241c;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
       <rect
          ry="12.285714"
          rx="10.087041"
@@ -214,11 +225,11 @@
          height="58.255714"
          width="706.5199"
          id="rect4342"
-         style="opacity:1;fill:#e3dbde;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="opacity:1;fill:#9dac93;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     </g>
     <g
        id="g4344"
-       transform="matrix(0.7997869,0,0,1,74.22163,229.34569)"
+       transform="matrix(0.7997869,0,0,0.6664963,74.22163,301.51174)"
        style="opacity:0.4"
        name="msgbox3"
        order="20">
@@ -230,7 +241,7 @@
          height="58.255714"
          width="706.5199"
          id="rect4346"
-         style="opacity:1;fill:#483745;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="opacity:1;fill:#1f241c;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
       <rect
          ry="12.285714"
          rx="10.087041"
@@ -239,11 +250,11 @@
          height="58.255714"
          width="706.5199"
          id="rect4348"
-         style="opacity:1;fill:#e3dbde;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="opacity:1;fill:#9dac93;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     </g>
     <g
        id="g4350"
-       transform="matrix(0.7216085,0,0,1,107.69635,305.79424)"
+       transform="matrix(0.7216085,0,0,0.5589145,107.69635,361.56224)"
        style="opacity:0.2"
        name="msgbox4"
        order="20">
@@ -255,7 +266,7 @@
          height="58.255714"
          width="706.5199"
          id="rect4352"
-         style="opacity:1;fill:#483745;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="opacity:1;fill:#1f241c;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
       <rect
          ry="12.285714"
          rx="10.087041"
@@ -264,27 +275,27 @@
          height="58.255714"
          width="706.5199"
          id="rect4354"
-         style="opacity:1;fill:#e3dbde;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="opacity:1;fill:#9dac93;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     </g>
     <text
        xml:space="preserve"
-       style="font-size:16.00000022px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;opacity:0.80000000000000004;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Courier 10 Pitch;-inkscape-font-specification:Courier 10 Pitch"
-       x="110.39358"
-       y="164.41684"
+       style="font-size:17.30044928px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;opacity:0.80000000000000004;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Liberation Mono;-inkscape-font-specification:Liberation Mono"
+       x="110.68737"
+       y="200.75938"
        id="text4356"
-       transform="scale(0.9475355,1.0553694)"
+       transform="scale(0.9264105,1.0794351)"
        sodipodi:linespacing="125%"
        name="msgtxt1"
        order="30"><tspan
          sodipodi:role="line"
          id="tspan4358"
-         x="110.39358"
-         y="164.41684">Text</tspan></text>
+         x="110.68737"
+         y="200.75938">Text</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:15.99999992px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;opacity:0.59999999999999998;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Courier 10 Pitch;-inkscape-font-specification:Courier 10 Pitch"
-       x="133.65753"
-       y="244.08093"
+       style="font-size:17.30044929px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;opacity:0.59999999999999998;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Liberation Mono;-inkscape-font-specification:Liberation Mono"
+       x="127.42156"
+       y="296.03748"
        id="text4360"
        transform="scale(0.9621611,1.039327)"
        sodipodi:linespacing="125%"
@@ -292,13 +303,13 @@
        order="30"><tspan
          sodipodi:role="line"
          id="tspan4362"
-         x="133.65753"
-         y="244.08093">Text</tspan></text>
+         x="127.42156"
+         y="296.03748">Text</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:15.99999932px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;opacity:0.40000000000000002;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Courier 10 Pitch;-inkscape-font-specification:Courier 10 Pitch"
-       x="152.72157"
-       y="331.94766"
+       style="font-size:17.30044864px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;opacity:0.40000000000000002;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Liberation Mono;-inkscape-font-specification:Liberation Mono"
+       x="148.7827"
+       y="372.56842"
        id="text4364"
        transform="scale(1.0155143,0.9847228)"
        sodipodi:linespacing="125%"
@@ -306,13 +317,13 @@
        order="30"><tspan
          sodipodi:role="line"
          id="tspan4366"
-         x="152.72157"
-         y="331.94766">Text</tspan></text>
+         x="148.7827"
+         y="372.56842">Text</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:16.00000035px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;opacity:0.20000000000000001;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Courier 10 Pitch;-inkscape-font-specification:Courier 10 Pitch"
-       x="182.59743"
-       y="403.80368"
+       style="font-size:17.30044974px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;opacity:0.20000000000000001;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Liberation Mono;-inkscape-font-specification:Liberation Mono"
+       x="178.60088"
+       y="415.81393"
        id="text4368"
        transform="scale(1.0008625,0.9991382)"
        sodipodi:linespacing="125%"
@@ -320,7 +331,105 @@
        order="30"><tspan
          sodipodi:role="line"
          id="tspan4370"
-         x="182.59743"
-         y="403.80368">Text</tspan></text>
+         x="178.60088"
+         y="415.81393">Text</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:18px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="68.416595"
+       y="26.147333"
+       id="text4387"
+       name="title"
+       order="20"><tspan
+         sodipodi:role="line"
+         id="tspan4389"
+         x="68.416595"
+         y="26.147333">Inkface IRC browser demo</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:18px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="-462.77667"
+       y="27.384705"
+       id="text4391"
+       transform="matrix(0,-1,1,0,0,0)"
+       name="networkLabel"
+       order="20"><tspan
+         sodipodi:role="line"
+         id="tspan4393"
+         x="-462.77667"
+         y="27.384705">IRC network </tspan></text>
+    <rect
+       style="opacity:0.5;fill:#9dac93;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4399"
+       width="268.92465"
+       height="29.127857"
+       x="253.34462"
+       y="36.308212"
+       rx="5"
+       ry="5"
+       transform="matrix(0,-1,0.9069767,0,-23.447218,598.54361)"
+       name="networkBox"
+       order="20" />
+    <text
+       xml:space="preserve"
+       style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:DejaVu Sans Mono;-inkscape-font-specification:DejaVu Sans Mono"
+       x="-132.25943"
+       y="28.7202"
+       id="text4395"
+       transform="matrix(0,-1,1,0,0,0)"
+       sodipodi:linespacing="100%"
+       name="networkName"
+       order="30"><tspan
+         sodipodi:role="line"
+         id="tspan4397"
+         x="-132.25943"
+         y="28.7202">Text</tspan></text>
+    <g
+       id="g4479"
+       name="channelBanner"
+       order="20">
+      <rect
+         ry="4.5348835"
+         rx="3.2070708"
+         y="6.5029635"
+         x="609.07538"
+         height="27.773073"
+         width="172.05757"
+         id="rect4465"
+         style="opacity:0.97000002;fill:#3e4837;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         sodipodi:linespacing="100%"
+         id="text4467"
+         y="26.147333"
+         x="613.81708"
+         style="font-size:16px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#dee3db;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Serif;-inkscape-font-specification:Bitstream Vera Serif"
+         xml:space="preserve"><tspan
+           y="26.147333"
+           x="613.81708"
+           id="tspan4471"
+           sodipodi:role="line">Channel </tspan></text>
+      <rect
+         ry="5"
+         rx="3.3333335"
+         y="9.889924"
+         x="691.03979"
+         height="20.321762"
+         width="86.706192"
+         id="rect4477"
+         style="opacity:0.97000002;fill:#bec8b7;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:16px;font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#3e4837;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Serif;-inkscape-font-specification:Bitstream Vera Serif Bold Italic"
+       x="696.16772"
+       y="25.469942"
+       id="text4473"
+       sodipodi:linespacing="125%"
+       name="channelName"
+       order="30"><tspan
+         sodipodi:role="line"
+         id="tspan4475"
+         x="696.16772"
+         y="25.469942">Text</tspan></text>
   </g>
 </svg>
