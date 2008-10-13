@@ -28,6 +28,11 @@ def onDraw(element):
     if flags[element.name] == 0:
         canvas.draw(element)
 
+def onMouseLeave(element,elist):
+    global flags
+    if 0 not in flags.values():
+        canvas.cleanup()
+        sys.exit(1)
 
 def main():
     global canvas
@@ -44,9 +49,10 @@ def main():
                 elem.text = '(-- '+elem.text+' --)'
                 elem.refresh()
 
-        elem.onMouseEnter = onMouseEnter
         if elem.name.endswith('Touch'):
             elem.onDraw = onDraw
+            elem.onMouseLeave = onMouseLeave
+            elem.onMouseEnter = onMouseEnter
 
     if 'inkface' not in text_arr:
         print 'Text validation test failed'
