@@ -17,6 +17,8 @@ void *painter_thread(void *arg);
 
 RsvgHandle *handle = NULL;
 
+int shutting_down = FALSE;
+
 /*
  * "canvas" type object
  */
@@ -211,6 +213,17 @@ canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
     pthread_create(&thr,NULL,painter_thread,self);
 
     return 0;
+}
+
+static PyObject*
+canvas_cleanup(Canvas_t *self, PyObject *args)
+{
+    rsvg_term();
+
+    shutting_down = TRUE;
+
+    Py_INCREF(Py_None);
+    return Py_None;
 }
 
 static PyObject*
@@ -421,6 +434,8 @@ static PyMethodDef canvas_methods[] = {
         METH_NOARGS, "Show the canvas" },
     { "refresh", (PyCFunction)canvas_refresh, 
         METH_NOARGS, "Refresh the canvas" },
+    { "cleanup", (PyCFunction)canvas_cleanup, 
+        METH_NOARGS, "Cleanup the canvas" },
     {NULL, NULL, 0, NULL},
 };
 
@@ -864,6 +879,13 @@ painter_thread(void *arg)
                     &(canvas->paint_condition),
                     &(canvas->paint_mutex),
                     &timeout);
+
+        if(shutting_down){
+            LOG("%s shutting down",__FUNCTION__);
+            PyErr_Clear();
+            PyErr_SetString(PyExc_SystemExit,"Invalid Arguments");
+            return NULL;
+        }
 
         if(rc!=0){
             if(rc == ETIMEDOUT){
