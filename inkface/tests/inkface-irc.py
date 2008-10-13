@@ -8,9 +8,9 @@ import threading
 
 canvas = None
 
-DATA_DIR='tests/data'
 KEYBOARD_SVG='keyboard-layout.svg'
-IRC_SVG='irc.svg'
+IRC_SVG=sys.argv[1]
+exit_sign = False
 
 msglist = []
 msgtxtlist = [None,None,None,None,None]
@@ -19,14 +19,7 @@ def msghandler(nick,msg):
     global msgtxtlist
     global msglist
     
-    print msg
     clean_msg = nick+': '+msg.strip()
-    '''
-    if(len(clean_msg) > 50):
-        final_msg = clean_msg[:50]+'...'
-    else:
-        final_msg = clean_msg
-    '''
     final_msg = clean_msg[:70]+'\n'+clean_msg[70:140]+'\n'+clean_msg[140:210]
     msglist =  [final_msg] + msglist
     if(len(msglist) > 5):
@@ -53,6 +46,15 @@ def onMsgboxDraw(elem):
     if(i == 0 or i < len(msglist)):
         canvas.draw(elem)
 
+def onExit(elem):
+    print 'exiting'
+    canvas.cleanup()
+    exit_sign = True
+    sys.exit(0)
+
+def test(elem):
+    print 'called test'
+
 def main():
     global canvas
     global msgtxtlist
@@ -64,7 +66,7 @@ def main():
     irc.msghandler = msghandler
     irc.start()
 
-    elements = inkface.loadsvg(os.path.join(DATA_DIR,IRC_SVG))
+    elements = inkface.loadsvg(IRC_SVG)
     canvas = inkface.canvas()
     canvas.register_elements(elements)
 
@@ -84,6 +86,10 @@ def main():
         if el.name == 'channelName':
             el.text = irc_channel
             el.refresh()
+        if el.name == 'exitButton':
+            el.onMouseEnter = onExit
+        if el.name == 'channelBanner':
+            el.onMouseEnter = test
 
     canvas.show()
     canvas.eventloop()
@@ -104,6 +110,8 @@ class IRC(threading.Thread):
     def run(self):
         global msglist
         while True:
+            if exit_sign:
+                sys.exit(0)
             data = self.irc.recv ( 4096 )
             if data.find ( 'PING' ) != -1:
                 self.irc.send ( 'PONG ' + data.split() [ 1 ] + '\r\n' )
