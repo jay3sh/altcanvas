@@ -37,6 +37,9 @@ def onBackspace(e,elements):
 
 def onEnter(e,elements):
     global canvas
+    for el in elements:
+        if el.name.startswith('msgbox'):
+            el.opacity = 1
     textbox.text = ''
     textbox.refresh()
     canvas.refresh()
@@ -70,6 +73,18 @@ def onExit(e,elements):
     canvas.cleanup()
     sys.exit(0)
 
+def onMsgBoxDraw(e):
+    global canvas
+    if e.opacity:
+        canvas.draw(e)
+
+def onMsgBoxOK(e,elist):
+    global canvas
+    for el in elist:
+        if el.name.startswith('msgbox'):
+            el.opacity = 0
+    canvas.refresh()
+
 def main():
     global canvas
     global textbox
@@ -101,6 +116,11 @@ def main():
             textbox = e
             textbox.text = ''
             textbox.refresh()
+        elif e.name.startswith('msgbox'):
+            e.opacity = 0
+            e.onDraw = onMsgBoxDraw
+            if e.name == 'msgboxOK':
+                e.onMouseEnter = onMsgBoxOK
 
     canvas.show()
     canvas.eventloop()

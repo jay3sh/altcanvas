@@ -62,7 +62,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.47625"
-     inkscape:cx="442.35844"
+     inkscape:cx="573.34684"
      inkscape:cy="233.22608"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -420,13 +420,13 @@
          x="696.16772"
          y="25.469942">Text</tspan></text>
     <g
-       id="g4531"
-       transform="translate(4,-4)"
+       id="g3222"
        name="exitButton"
-       order="20">
+       order="20"
+       transform="translate(-8.1287045,-3.3869602)">
       <path
          sodipodi:open="true"
-         transform="matrix(0.3944147,-0.9189325,0.9189325,0.3944147,48.801461,978.5066)"
+         transform="matrix(0.3944147,-0.9189325,0.9189325,0.3944147,52.801461,974.5066)"
          sodipodi:end="5.3616515"
          sodipodi:start="0"
          d="M 785.77478,452.22693 A 18.966978,18.289585 0 1 1 778.27522,437.65873"
@@ -439,8 +439,47 @@
          sodipodi:type="arc" />
       <path
          id="path4523"
-         d="M 766.1304,453.88961 L 766.1304,429.50075"
+         d="M 770.1304,449.88961 L 770.1304,425.50075"
          style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:4;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <g
+       id="g3230"
+       transform="translate(1.3547841,56.900931)"
+       name="exitButtonGlow"
+       order="30">
+      <rect
+         y="350.61813"
+         x="725.48688"
+         height="71.126167"
+         width="69.771378"
+         id="rect3228"
+         style="opacity:0.91479265;fill:#b4ff82;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:6.69999981;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         sodipodi:open="true"
+         transform="matrix(0.2915158,-0.5734711,0.560656,0.2959473,284.34193,693.65757)"
+         sodipodi:end="5.1871185"
+         sodipodi:start="0"
+         d="M 785.77478,452.22693 A 18.966978,18.289585 0 1 1 775.47757,435.95987"
+         sodipodi:ry="18.289585"
+         sodipodi:rx="18.966978"
+         sodipodi:cy="452.22693"
+         sodipodi:cx="766.8078"
+         id="path2444"
+         style="opacity:0.66820278;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:10.49191475;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         sodipodi:type="arc" />
+      <path
+         sodipodi:open="true"
+         transform="matrix(0.6813432,-1.2145065,1.3103891,0.6267621,-353.66384,1036.4124)"
+         sodipodi:end="11.749557"
+         sodipodi:start="6.0911991"
+         d="M 785.4263,448.7466 A 18.966978,18.239857 0 1 1 779.7916,438.93065"
+         sodipodi:ry="18.239857"
+         sodipodi:rx="18.966978"
+         sodipodi:cy="452.22693"
+         sodipodi:cx="766.8078"
+         id="path3216"
+         style="opacity:0.66820278;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:4.71583605;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         sodipodi:type="arc" />
     </g>
   </g>
 </svg>

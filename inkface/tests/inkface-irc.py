@@ -8,9 +8,9 @@ import threading
 
 canvas = None
 
-KEYBOARD_SVG='keyboard-layout.svg'
 IRC_SVG=sys.argv[1]
 exit_sign = False
+statusBar = None
 
 msglist = []
 msgtxtlist = [None,None,None,None,None]
@@ -40,31 +40,44 @@ def msghandler(nick,msg):
         
     canvas.refresh()
 
+def onReportStatus(status):
+    global statusBar
+    global canvas
+    statusBar.text = status 
+    statusBar.refresh()
+    canvas.refresh()
+    
 def onMsgboxDraw(elem):
     global canvas
     i = int(elem.name[6])
     if(i == 0 or i < len(msglist)):
         canvas.draw(elem)
 
-def onExit(elem):
-    print 'exiting'
+def onExitGlowDraw(e):
+    global canvas
+    if e.opacity:
+        canvas.draw(e)
+
+def onExit(elem,elist):
+    from time import sleep
+    for e in elist:
+        if e.name == 'exitButtonGlow':
+            e.opacity = 1
+            canvas.refresh()
+            sleep(1)
+            break
     canvas.cleanup()
     exit_sign = True
     sys.exit(0)
 
-def test(elem):
-    print 'called test'
-
 def main():
     global canvas
     global msgtxtlist
+    global statusBar
 
     irc_network = 'irc.freenode.net'
     irc_channel = 'ubuntu'
 
-    irc = IRC(channel=irc_channel,network=irc_network)
-    irc.msghandler = msghandler
-    irc.start()
 
     elements = inkface.loadsvg(IRC_SVG)
     canvas = inkface.canvas()
@@ -81,15 +94,20 @@ def main():
             el.onDraw = onMsgboxDraw
 
         if el.name == 'networkName':
-            el.text = irc_network
-            el.refresh()
+            statusBar = el
         if el.name == 'channelName':
             el.text = irc_channel
             el.refresh()
         if el.name == 'exitButton':
             el.onMouseEnter = onExit
-        if el.name == 'channelBanner':
-            el.onMouseEnter = test
+        if el.name == 'exitButtonGlow':
+            el.opacity = 0
+            el.onDraw = onExitGlowDraw
+
+    irc = IRC(channel=irc_channel,network=irc_network)
+    irc.msghandler = msghandler
+    irc.reportStatus = onReportStatus
+    irc.start()
 
     canvas.show()
     canvas.eventloop()
@@ -97,9 +115,11 @@ def main():
 
 class IRC(threading.Thread):
     msghandler = None
+    reportStatus = None
     def __init__(self,network='irc.freenode.net',port=6667,
                     channel='maemo',nick='pyIRC'):
         threading.Thread.__init__(self)
+        self.network = network
         self.irc = socket.socket ( socket.AF_INET, socket.SOCK_STREAM )
         self.irc.connect ( ( network, port ) )
         trash = self.irc.recv ( 4096 )
@@ -107,15 +127,27 @@ class IRC(threading.Thread):
         self.irc.send ( 'USER %s %s %s :%s\r\n'%(nick,nick,nick,nick) )
         self.irc.send ( 'JOIN #%s\r\n'%channel )
 
+
     def run(self):
         global msglist
+        first_msg = True
+        if self.reportStatus:
+            self.reportStatus('Connecting ...')
         while True:
             if exit_sign:
                 sys.exit(0)
+
             data = self.irc.recv ( 4096 )
+
             if data.find ( 'PING' ) != -1:
                 self.irc.send ( 'PONG ' + data.split() [ 1 ] + '\r\n' )
+
             elif data.find ( 'PRIVMSG' ) != -1:
+
+                if first_msg and self.reportStatus:
+                    self.reportStatus(self.network)
+                    first_msg = False
+
                 nick = data.split ( '!' ) [ 0 ].replace ( ':', '' )
                 message = ':'.join ( data.split ( ':' ) [ 2: ] )
                 if self.msghandler:
