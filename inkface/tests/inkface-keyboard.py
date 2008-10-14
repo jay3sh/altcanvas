@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import sys
 import inkface
 
@@ -40,6 +41,9 @@ def onEnter(e,elements):
     for el in elements:
         if el.name.startswith('msgbox'):
             el.opacity = 1
+            if el.name == 'msgboxText':
+                el.text = textbox.text[:25]+'\n'+textbox.text[25:]
+                el.refresh()
     textbox.text = ''
     textbox.refresh()
     canvas.refresh()
@@ -89,7 +93,13 @@ def main():
     global canvas
     global textbox
     elements = inkface.loadsvg(KEYBOARD_SVG)
-    canvas = inkface.canvas()
+    fullscreen = False
+    try:
+        if os.environ['INKFACE_FULLSCREEN']:
+            fullscreen = True
+    except:
+        pass
+    canvas = inkface.canvas(fullscreen=fullscreen)
     canvas.register_elements(elements)
 
     # Wire handlers and init some elements
@@ -122,6 +132,7 @@ def main():
             if e.name == 'msgboxOK':
                 e.onMouseEnter = onMsgBoxOK
 
+    # eventloop
     canvas.show()
     canvas.eventloop()
 

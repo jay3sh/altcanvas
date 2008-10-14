@@ -80,9 +80,16 @@ def main():
 
 
     elements = inkface.loadsvg(IRC_SVG)
-    canvas = inkface.canvas()
+    fullscreen = False
+    try:
+        if os.environ['INKFACE_FULLSCREEN']:
+            fullscreen = True
+    except:
+        pass
+    canvas = inkface.canvas(fullscreen=fullscreen)
     canvas.register_elements(elements)
 
+    # Wire the handlers and init elements
     for el in elements:
         if el.name.startswith('msgtxt'):
             i = int(el.name[6])
@@ -104,15 +111,19 @@ def main():
             el.opacity = 0
             el.onDraw = onExitGlowDraw
 
+    # Application logic
     irc = IRC(channel=irc_channel,network=irc_network)
     irc.msghandler = msghandler
     irc.reportStatus = onReportStatus
     irc.start()
 
+    # eventloop
     canvas.show()
     canvas.eventloop()
 
-
+#
+# IRC logic
+#
 class IRC(threading.Thread):
     msghandler = None
     reportStatus = None
