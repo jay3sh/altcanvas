@@ -389,6 +389,10 @@ canvas_eventloop(Canvas_t *self, PyObject *args)
                     (mevent->y < (el->y+el->h)))
                 {
                     nowInFocus = TRUE;
+                    if(PyCallable_Check(el->onTap)) {
+                        PyObject_CallFunction(el->onTap,
+                            "OO",el,self->element_list);
+                    }
                 } 
 
                 if(el->inFocus && !nowInFocus){
