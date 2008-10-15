@@ -7,7 +7,7 @@ endif
 SUBDIRS = . data tests 
 
 lib_LTLIBRARIES = libaltsvg.la
-bin_PROGRAMS = rsvg-convert $(target_rsvg_view) keyboard player xvtest survey
+bin_PROGRAMS = rsvg-convert $(target_rsvg_view) 
 noinst_PROGRAMS = test-performance
 
 man_MANS = rsvg.1
@@ -115,34 +115,6 @@ rsvg_view_SOURCES = 		\
 rsvg_view_LDFLAGS =
 rsvg_view_DEPENDENCIES = $(DEPS)
 rsvg_view_LDADD = $(GTK_LIBS) $(GDK_X11_LIBS) $(libm) $(LDADDS)
-
-keyboard_SOURCES = \
-	keyboard.c \
-	inkface.c 
-keyboard_LDFLAGS =
-keyboard_DEPENDENCIES = $(DEPS)
-keyboard_LDADD = $(GDK_X11_LIBS) $(EFENCELIB) $(XEXTLIB) $(LDADDS)
-
-player_SOURCES = \
-	player.c \
-	inkface.c
-player_LDFLAGS = 
-player_DEPENDENCIES = $(DEPS)
-player_LDADD = $(GDK_X11_LIBS) $(EFENCELIB) $(XEXTLIB) $(LDADDS)
-
-survey_SOURCES = \
-	survey.c \
-	inkface.c
-survey_LDFLAGS =
-survey_DEPENDENCIES = $(DEPS)
-survey_LDADD = $(GDK_X11_LIBS) $(EFENCELIB) $(XEXTLIB) $(LDADDS)
-
-xvtest_SOURCES = \
-	xvtest.c
-#xvtest_CFLAGS = -Wall 
-xvtest_LDFLAGS =
-xvtest_DEPENDENCIES = 
-xvtest_LDADD = -lX11 -lXv $(libm) $(XEXTLIB) 
 
 EXTRA_DIST =				\
 	MAINTAINERS			\

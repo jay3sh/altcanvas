@@ -2,7 +2,7 @@
 %define __spec_install_post /usr/lib/rpm/brp-compress
 Name:             libaltsvg
 Summary:          Modification of librsvg library
-Version:          0.0.1
+Version:          0.1.0
 Release:          2
 License:          GPL
 Group:            System Environment/Libraries

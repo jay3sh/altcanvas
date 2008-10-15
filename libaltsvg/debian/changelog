@@ -1,3 +1,9 @@
+libaltsvg (0.1.0) unstable; urgency=low
+
+  * Dynamic text node manipulation
+
+ -- Jayesh Salvi <jayesh@altfrequency.com>  Sun, 12 Oct 2008 17:34:43 +0300
+
 libaltsvg (0.0.1) unstable; urgency=low
 
   * Modified librsvg library for rendering components of SVG image
