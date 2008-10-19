@@ -74,10 +74,10 @@ class TestElements(unittest.TestCase):
             self.assert_(e.onMouseLeave == None)
             self.assert_(e.onDraw == None)
 
-            e.register_tap_handler(onEvent)
-            e.register_mouse_enter_handler(onEvent)
-            e.register_mouse_leave_handler(onEvent)
-            e.register_draw_handler(onEvent)
+            e.onTap = onEvent
+            e.onMouseEnter = onEvent
+            e.onMouseLeave = onEvent
+            e.onDraw = onEvent
 
             self.assert_(e.onTap)
             self.assert_(e.onMouseEnter)
