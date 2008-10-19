@@ -80,13 +80,7 @@ def main():
 
 
     elements = inkface.loadsvg(IRC_SVG)
-    fullscreen = False
-    try:
-        if os.environ['INKFACE_FULLSCREEN']:
-            fullscreen = True
-    except:
-        pass
-    canvas = inkface.canvas(fullscreen=fullscreen)
+    canvas = inkface.canvas()
     canvas.register_elements(elements)
 
     # Wire the handlers and init elements

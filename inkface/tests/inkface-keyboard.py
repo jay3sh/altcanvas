@@ -93,6 +93,7 @@ def main():
     global canvas
     global textbox
     elements = inkface.loadsvg(KEYBOARD_SVG)
+    '''
     fullscreen = False
     try:
         if os.environ['INKFACE_FULLSCREEN']:
@@ -100,6 +101,8 @@ def main():
     except:
         pass
     canvas = inkface.canvas(fullscreen=fullscreen)
+    '''
+    canvas = inkface.canvas()
     canvas.register_elements(elements)
 
     # Wire handlers and init some elements
