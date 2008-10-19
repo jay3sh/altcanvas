@@ -83,7 +83,11 @@ inkface_get_element_ids(const RsvgHandle *handle)
     GList *elem_id_list = NULL;
     RsvgNode *node = NULL;
 
-    g_hash_table_foreach(handle->priv->defs->hash,extract_key,&full_id_list);
+    // Copy each key in the defs hashtable as id of an element
+    g_hash_table_foreach(
+        handle->priv->defs->hash,   // hash_table
+        extract_key,                // GFunc
+        &full_id_list);             // output list
 
     GList *iter = full_id_list;
 
@@ -93,7 +97,8 @@ inkface_get_element_ids(const RsvgHandle *handle)
         strncat(id,(const char *)iter->data,30);
         node = rsvg_defs_lookup(handle->priv->defs, id);
         if(node){
-            if(node->istate && node->istate->name){
+            if(node->istate && node->istate->name)
+            {
                 elem_id_list = g_list_prepend(elem_id_list,g_strdup(id));
             }
         }
