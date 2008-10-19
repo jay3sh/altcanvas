@@ -6,14 +6,13 @@ import sys
 import os
 import inkface
 
-TEST_DATA_DIR = sys.argv[1]
 
 class TestSVGLoad(unittest.TestCase):
     arbit_ids = ('#g3509','#g3359','#rect2660','#g3434','#g3316')
     arbit_names = ('keyO','keyPGlow','exitDoor','background','keyDGlow')
 
     def setUp(self):
-        self.SVG = os.path.join(TEST_DATA_DIR,'keyboard.svg')
+        self.SVG = os.path.join(sys.argv[1])
         self.elements = inkface.loadsvg(self.SVG)
 
     def testLoad(self):
@@ -69,7 +68,7 @@ class TestCanvas(unittest.TestCase):
 
 class TestCanvasElements(unittest.TestCase):
     def setUp(self):
-        self.SVG = os.path.join(TEST_DATA_DIR,'keyboard.svg')
+        self.SVG = os.path.join(sys.argv[1])
         self.elements = inkface.loadsvg(self.SVG)
         self.canvas = inkface.canvas()
         
@@ -86,7 +85,7 @@ class TestCanvasElements(unittest.TestCase):
         
 class TestElements(unittest.TestCase):
     def setUp(self):
-        self.SVG = os.path.join(TEST_DATA_DIR,'keyboard.svg')
+        self.SVG = os.path.join(sys.argv[1])
         self.elements = inkface.loadsvg(self.SVG)
         self.canvas = inkface.canvas()
 
