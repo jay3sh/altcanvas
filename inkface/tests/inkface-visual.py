@@ -7,7 +7,6 @@ import os
 import inkface
 from time import sleep
 
-TEST_DATA_DIR = sys.argv[1]
 canvas = None
 
 flags = {
@@ -36,7 +35,7 @@ def onMouseLeave(element,elist):
 
 def main():
     global canvas
-    svg = os.path.join(TEST_DATA_DIR,'test1.svg')
+    svg = os.path.join(sys.argv[1])
     elements = inkface.loadsvg(svg)
     canvas = inkface.canvas()
     canvas.register_elements(elements)
