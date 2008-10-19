@@ -29,6 +29,7 @@ typedef struct {
     PyObject_HEAD
     int width;
     int height;
+    PyObject *fullscreen;
     Display *dpy; 
     cairo_t *ctx;
     cairo_surface_t *surface;
@@ -119,24 +120,35 @@ canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
 
     #define DEFAULT_WIDTH 800
     #define DEFAULT_HEIGHT 480 
-    int width=0, height=0;
-    int fullscreen;
-    PyObject *fullscreen_pyo = NULL;
+    self->width=0; 
+    self->height=0;
+    self->fullscreen = Py_False;
     static char *kwlist[] = {"width", "height", "fullscreen", NULL};
 
     ASSERT(PyArg_ParseTupleAndKeywords(args, kwds, "|iiO", kwlist, 
-                                          &width, &height, &fullscreen_pyo))
+                  &(self->width), &(self->height), &(self->fullscreen)))
 
-    if(width <= 0) width = DEFAULT_WIDTH;
-    if(height <= 0) height = DEFAULT_HEIGHT;
+    if(self->width <= 0) self->width = DEFAULT_WIDTH;
+    if(self->height <= 0) self->height = DEFAULT_HEIGHT;
 
-    if((fullscreen_pyo == NULL) || (!PyBool_Check(fullscreen_pyo))) {
-        fullscreen = FALSE;
+    //
+    // Fullscreen preferences:
+    //
+    // 1. env var INKFACE_FULLSCREEN 
+    // 2. kwd arg fullscreen 
+    //
+    char *env_fullscreen = getenv("INKFACE_FULLSCREEN");
+    if(env_fullscreen && !strncmp(env_fullscreen,"TRUE",4)){
+        self->fullscreen = Py_True;
     } else {
-        if(fullscreen_pyo == Py_True){
-            fullscreen = TRUE;
+        if((self->fullscreen == NULL) || (!PyBool_Check(self->fullscreen))) {
+            self->fullscreen = Py_False;
         } else {
-            fullscreen = FALSE;
+            if(self->fullscreen == Py_True){
+                self->fullscreen = Py_True;
+            } else {
+                self->fullscreen = Py_False;
+            }
         }
     }
 
@@ -161,12 +173,12 @@ canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
                     self->dpy,
                     rwin,
                     x, y,
-                    width, height,
+                    self->width, self->height,
                     0,
                     BlackPixel(self->dpy,screen),
                     BlackPixel(self->dpy,screen)));
 
-    if(fullscreen){  
+    if(self->fullscreen == Py_True){  
         /* Set the wmhints needed for fullscreen */
         status = XChangeProperty(self->dpy, self->win, atoms_WINDOW_STATE, XA_ATOM, 32,
                         PropModeReplace,
@@ -194,10 +206,10 @@ canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
 
     #ifdef DOUBLE_BUFFER
     ASSERT(self->surface = cairo_xlib_surface_create(
-                        self->dpy, self->backBuffer, visual, width, height));
+                        self->dpy, self->backBuffer, visual, self->width, self->height));
     #else
     ASSERT(self->surface = cairo_xlib_surface_create(
-                        self->dpy, self->win, visual, width, height));
+                        self->dpy, self->win, visual, self->width, self->height));
     #endif 
     ASSERT(self->ctx = cairo_create(self->surface));
 
@@ -446,6 +458,7 @@ static PyMethodDef canvas_methods[] = {
 static PyMemberDef canvas_members[] = {
     { "width", T_INT, offsetof(Canvas_t,width),0,"Width of Canvas"},
     { "height", T_INT, offsetof(Canvas_t,height),0,"Height of Canvas"},
+    { "fullscreen", T_OBJECT, offsetof(Canvas_t,fullscreen),0,"Fullscreen flag"},
     { "elements", T_OBJECT, offsetof(Canvas_t,element_list),0,
             "Elements currently registered with Canvas"},
     { NULL }

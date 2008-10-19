@@ -34,13 +34,32 @@ class TestCanvas(unittest.TestCase):
         pass
 
     def testCanvasInitNoParams(self):
-        self.assert_(inkface.canvas())
+        canvas = inkface.canvas()
+        self.assert_(canvas.width > 0)
+        self.assert_(canvas.height > 0)
+        self.assert_(canvas.fullscreen == False)
             
     def testCanvasInitAllParams(self):
-        self.assert_(inkface.canvas(width=10,height=10,fullscreen=True))
+        canvas = inkface.canvas(width=10,height=10,fullscreen=True)
+        self.assert_(canvas.width == 10)
+        self.assert_(canvas.height == 10)
+        self.assert_(canvas.fullscreen == True)
 
     def testCanvasInitSomeParams(self):
-        self.assert_(inkface.canvas(fullscreen=True))
+        canvas = inkface.canvas(fullscreen=True)
+        self.assert_(canvas.width > 0)
+        self.assert_(canvas.height > 0)
+        self.assert_(canvas.fullscreen == True)
+
+    def testCanvasInitFullscreen(self):
+        import os
+        os.environ['INKFACE_FULLSCREEN'] = 'TRUE'
+        canvas = inkface.canvas()
+        self.assert_(canvas.fullscreen == True)
+
+        del os.environ['INKFACE_FULLSCREEN']
+        canvas = inkface.canvas()
+        self.assert_(canvas.fullscreen == False)
 
 class TestCanvasElements(unittest.TestCase):
     def setUp(self):
@@ -88,4 +107,4 @@ class TestElements(unittest.TestCase):
 if __name__ == '__main__':
     for t in [TestSVGLoad,TestCanvas,TestCanvasElements,TestElements]:
         suite = unittest.TestLoader().loadTestsFromTestCase(t)
-        testResult = unittest.TextTestRunner(verbosity=2).run(suite)
+        testResult = unittest.TextTestRunner(verbosity=0).run(suite)
