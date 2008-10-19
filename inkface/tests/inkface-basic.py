@@ -61,6 +61,12 @@ class TestCanvas(unittest.TestCase):
         canvas = inkface.canvas()
         self.assert_(canvas.fullscreen == False)
 
+    def testCanvasTimer(self):
+        canvas = inkface.canvas()
+        canvas.set_timer(160) # msec
+        # Assuming REFRESH_INTERVAL_MSEC = 50 msec 
+        self.assert_(canvas.timer_step == 3)
+
 class TestCanvasElements(unittest.TestCase):
     def setUp(self):
         self.SVG = os.path.join(TEST_DATA_DIR,'keyboard.svg')

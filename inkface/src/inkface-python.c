@@ -10,7 +10,7 @@
 #include "inkface.h"
 
 #define DOUBLE_BUFFER
-#define REFRESH_INTERVAL_MSEC 80
+#define REFRESH_INTERVAL_MSEC 50
 
 RsvgHandle *rsvg_handle_from_file(const char *filename);
 void *painter_thread(void *arg);
@@ -38,6 +38,7 @@ typedef struct {
 
     // Painting control members
     int dirt_count;
+    unsigned int timer_step;
     pthread_mutex_t paint_mutex;
     pthread_cond_t paint_condition;
     pthread_mutex_t dirt_mutex;
@@ -283,6 +284,28 @@ canvas_refresh(Canvas_t *self, PyObject *args)
 }
 
 static PyObject*
+canvas_set_timer(Canvas_t *canvas, PyObject *args)
+{
+    int interval = -1;
+    if(!PyArg_ParseTuple(args,"i",&interval)){
+        PyErr_Clear();
+        PyErr_SetString(PyExc_ValueError,"Invalid Arguments");
+        return NULL;
+    }
+
+    if(interval < 0){
+        PyErr_Clear();
+        PyErr_SetString(PyExc_ValueError,"Invalid timer interval");
+        return NULL;
+    }
+
+    canvas->timer_step = (unsigned int)(interval/REFRESH_INTERVAL_MSEC);
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject*
 canvas_register_elements(PyObject *self, PyObject *args)
 {
     PyObject *elemList_pyo;
@@ -446,6 +469,9 @@ static PyMethodDef canvas_methods[] = {
         METH_NOARGS, "Make canvas process events in infinite loop" },
     { "draw", (PyCFunction)canvas_draw, 
         METH_VARARGS, "Draw the element canvas" },
+    { "set_timer", (PyCFunction)canvas_set_timer, 
+        METH_VARARGS, 
+        "Set a timer which expires periodically and triggers canvas refresh" },
     { "show", (PyCFunction)canvas_show, 
         METH_NOARGS, "Show the canvas" },
     { "refresh", (PyCFunction)canvas_refresh, 
@@ -458,7 +484,9 @@ static PyMethodDef canvas_methods[] = {
 static PyMemberDef canvas_members[] = {
     { "width", T_INT, offsetof(Canvas_t,width),0,"Width of Canvas"},
     { "height", T_INT, offsetof(Canvas_t,height),0,"Height of Canvas"},
-    { "fullscreen", T_OBJECT, offsetof(Canvas_t,fullscreen),0,"Fullscreen flag"},
+    { "timer_step", T_INT, offsetof(Canvas_t,timer_step),0,"Timer step"},
+    { "fullscreen", T_OBJECT, offsetof(Canvas_t,fullscreen),0,
+        "Fullscreen flag"},
     { "elements", T_OBJECT, offsetof(Canvas_t,element_list),0,
             "Elements currently registered with Canvas"},
     { NULL }
