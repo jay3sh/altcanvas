@@ -14,7 +14,7 @@
    sodipodi:version="0.32"
    inkscape:version="0.46"
    version="1.0"
-   sodipodi:docname="cartoon-anim.svg"
+   sodipodi:docname="anim.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs4">
@@ -42,8 +42,8 @@
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="900"
-     inkscape:window-height="636"
+     inkscape:window-width="1280"
+     inkscape:window-height="1003"
      inkscape:window-x="0"
      inkscape:window-y="0" />
   <metadata
@@ -126,7 +126,7 @@
     </g>
     <g
        id="g3476"
-       name="chair2"
+       name="chair2frame2"
        order="10"
        transform="translate(174.27526,-4.3872301)">
       <path
@@ -348,7 +348,7 @@
     </g>
     <g
        id="g2449"
-       name="chair2"
+       name="chair2frame3"
        order="10"
        transform="translate(228.61941,-8.0688245)">
       <path

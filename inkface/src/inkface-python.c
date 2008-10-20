@@ -39,9 +39,12 @@ typedef struct {
     // Painting control members
     int dirt_count;
     unsigned int timer_step;
+    int timer_counter;
     pthread_mutex_t paint_mutex;
     pthread_cond_t paint_condition;
     pthread_mutex_t dirt_mutex;
+
+    PyObject *onTimer;
 
     #ifdef DOUBLE_BUFFER
     XdbeBackBuffer backBuffer;
@@ -124,6 +127,9 @@ canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
     self->width=0; 
     self->height=0;
     self->fullscreen = Py_False;
+    self->timer_step = 0;
+    self->timer_counter = 0;
+    self->onTimer = NULL;
     static char *kwlist[] = {"width", "height", "fullscreen", NULL};
 
     ASSERT(PyArg_ParseTupleAndKeywords(args, kwds, "|iiO", kwlist, 
@@ -287,7 +293,8 @@ static PyObject*
 canvas_set_timer(Canvas_t *canvas, PyObject *args)
 {
     int interval = -1;
-    if(!PyArg_ParseTuple(args,"i",&interval)){
+    PyObject *onTimer_pyo;
+    if(!PyArg_ParseTuple(args,"iO",&interval,&onTimer_pyo)){
         PyErr_Clear();
         PyErr_SetString(PyExc_ValueError,"Invalid Arguments");
         return NULL;
@@ -298,6 +305,9 @@ canvas_set_timer(Canvas_t *canvas, PyObject *args)
         PyErr_SetString(PyExc_ValueError,"Invalid timer interval");
         return NULL;
     }
+
+    ASSERT(onTimer_pyo);
+    canvas->onTimer = onTimer_pyo;
 
     canvas->timer_step = (unsigned int)(interval/REFRESH_INTERVAL_MSEC);
 
@@ -864,42 +874,54 @@ paint(void *arg)
 {
     Canvas_t *canvas = (Canvas_t *) arg;
 
-    if(!canvas->dirt_count) return;
+    canvas->timer_counter++;
+    canvas->timer_counter = canvas->timer_counter % canvas->timer_step;
 
-    // BEGIN - Python thread safety code block
-    PyGILState_STATE gstate;
-    gstate = PyGILState_Ensure();
+    if((canvas->timer_counter == 0) || (canvas->dirt_count))
+    {
 
-    PyObject *iterator = PyObject_GetIter(canvas->element_list);
-    PyObject *item;
-    while(item = PyIter_Next(iterator)){
-        Element_t *el = (Element_t *)item;
-
-        if(PyCallable_Check(el->onDraw)){
-            // Call element's custom draw handler
-            PyObject_CallFunction(el->onDraw,"O",el);
-        } else {
-            // Call canvas's default draw method
-            draw(canvas,el);
+        // BEGIN - Python thread safety code block
+        PyGILState_STATE gstate;
+        gstate = PyGILState_Ensure();
+    
+        if(canvas->timer_counter == 0){
+            if(canvas->onTimer && PyCallable_Check(canvas->onTimer)){
+                PyObject_CallFunction(canvas->onTimer,NULL);
+            }
         }
+        
+        PyObject *iterator = PyObject_GetIter(canvas->element_list);
+        PyObject *item;
+        while(item = PyIter_Next(iterator)){
+            Element_t *el = (Element_t *)item;
+    
+            if(PyCallable_Check(el->onDraw)){
+                // Call element's custom draw handler
+                PyObject_CallFunction(el->onDraw,"O",el);
+            } else {
+                // Call canvas's default draw method
+                draw(canvas,el);
+            }
+    
+            Py_DECREF(item);
+        }
+        Py_DECREF(iterator);
+    
+        PyGILState_Release(gstate);
+        // END - Python thread safety code block
+    
+        #ifdef DOUBLE_BUFFER
+        XdbeBeginIdiom(canvas->dpy);
+        XdbeSwapBuffers(canvas->dpy,&canvas->swapinfo,1);
+        XSync(canvas->dpy,0);
+        XdbeEndIdiom(canvas->dpy);
+        #else
+        XFlush(canvas->dpy);
+        #endif
 
-        Py_DECREF(item);
+        dec_dirt_count(canvas,1);
+
     }
-    Py_DECREF(iterator);
-
-    PyGILState_Release(gstate);
-    // END - Python thread safety code block
-
-    #ifdef DOUBLE_BUFFER
-    XdbeBeginIdiom(canvas->dpy);
-    XdbeSwapBuffers(canvas->dpy,&canvas->swapinfo,1);
-    XSync(canvas->dpy,0);
-    XdbeEndIdiom(canvas->dpy);
-    #else
-    XFlush(canvas->dpy);
-    #endif
-
-    dec_dirt_count(canvas,1);
 }
 
 void *
