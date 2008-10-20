@@ -874,8 +874,10 @@ paint(void *arg)
 {
     Canvas_t *canvas = (Canvas_t *) arg;
 
-    canvas->timer_counter++;
-    canvas->timer_counter = canvas->timer_counter % canvas->timer_step;
+    if(canvas->timer_step){
+        canvas->timer_counter++;
+        canvas->timer_counter = canvas->timer_counter % canvas->timer_step;
+    }
 
     if((canvas->timer_counter == 0) || (canvas->dirt_count))
     {
