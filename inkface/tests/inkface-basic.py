@@ -62,7 +62,7 @@ class TestCanvas(unittest.TestCase):
 
     def testCanvasTimer(self):
         canvas = inkface.canvas()
-        canvas.set_timer(160) # msec
+        canvas.set_timer(160,None) # msec
         # Assuming REFRESH_INTERVAL_MSEC = 50 msec 
         self.assert_(canvas.timer_step == 3)
 
