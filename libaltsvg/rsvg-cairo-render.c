@@ -333,6 +333,8 @@ inkface_get_element(RsvgHandle *handle, Element *element,int push)
         element->type = drawsub->istate->type;
         element->on_mouse_over = drawsub->istate->on_mouse_over;
         if(drawsub->istate->name){
+            // free element->name if it already exists
+            if(element->name) free(element->name);
             element->name = strdup(drawsub->istate->name);
         }
 
