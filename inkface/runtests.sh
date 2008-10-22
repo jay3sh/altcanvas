@@ -1,7 +1,17 @@
 #!/bin/bash
 
+valgrind_wrapper()
+{
+    valgrind \
+        --log-file=$1.valgrind \
+        --tool=memcheck \
+        --leak-check=full \
+        --show-reachable=yes \
+        $*
+}
+
 GDB=cgdb
-VALGRIND=valgrind-wrapper
+VALGRIND=valgrind_wrapper
 
 VERBOSITY=0
 
@@ -25,9 +35,9 @@ execute()
 
     if [ "x$1" == "xall" ]
     then
-        for tfile in `ls tests/inkface-*.py`
+        for test in basic visual keyboard irc
         do
-            $WRAPPER $tfile $DATADIR
+            $WRAPPER python tests/inkface-$test.py $DATADIR/$test.svg
         done
     else
         $WRAPPER python tests/inkface-$1.py $DATADIR/$1.svg
@@ -38,12 +48,12 @@ execute()
 
 usage()
 {
-    echo "runtests.sh [options]"
+    echo "runtests.sh -t <testname> [options]"
+    echo "<testname> all,basic,visual,keyboard,anim"
     echo "Options:"
-    echo "   t <testname> all,basic,visual"
-    echo "   v <verbosity level> 0,1,2,3"
-    echo "   d Start python with gdb"
-    echo "   m Start python in valgrind"
+    echo "   -v <verbosity level> 0,1,2,3"
+    echo "   -d Start python with gdb"
+    echo "   -m Run test inside valgrind (output generated in python.valgrind)"
 }
 
 while getopts "t:v:dmh" options; do
@@ -62,6 +72,12 @@ done
 if [ "x$DEBUG" != "x" ] && [ "x$MEMDEBUG" != "x" ]
 then
     echo "GDB and Valgrind can't be used together"
+    exit 1;
+fi
+
+if [ -z $TEST ]
+then
+    usage;
     exit 1;
 fi
 
