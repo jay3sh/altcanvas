@@ -18,6 +18,8 @@ void *painter_thread(void *arg);
 RsvgHandle *handle = NULL;
 
 int shutting_down = FALSE;
+void cleanup();
+pthread_t painter_thr;
 
 /*
  * "canvas" type object
@@ -110,15 +112,10 @@ canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
     Window rwin;
     int screen = 0;
     int x=0, y=0;
-    Pixmap pix;
-    XGCValues gcv;
-    GC gc;
     int xsp_event_base=-1;
     int xsp_error_base=-1;
     int xsp_major=-1;
     int xsp_minor=-1;
-    Atom atoms_WINDOW_STATE;
-    Atom atoms_WINDOW_STATE_FULLSCREEN;
 
     // Parse keyword args
 
@@ -167,6 +164,8 @@ canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
     screen = DefaultScreen(self->dpy);
     ASSERT(screen >= 0);
 
+    Atom atoms_WINDOW_STATE;
+    Atom atoms_WINDOW_STATE_FULLSCREEN;
     atoms_WINDOW_STATE
         = XInternAtom(self->dpy, "_NET_WM_STATE",False);
     ASSERT((atoms_WINDOW_STATE != BadAlloc && 
@@ -228,8 +227,7 @@ canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
 
     // Fork a painter thread which does refresh jobs
     pthread_mutex_init(&(self->dirt_mutex),NULL);
-    pthread_t thr;
-    pthread_create(&thr,NULL,painter_thread,self);
+    pthread_create(&painter_thr,NULL,painter_thread,self);
 
     return 0;
 }
@@ -237,13 +235,12 @@ canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
 static PyObject*
 canvas_cleanup(Canvas_t *self, PyObject *args)
 {
-    rsvg_term();
-
     shutting_down = TRUE;
 
     Py_INCREF(Py_None);
     return Py_None;
 }
+
 
 static PyObject*
 canvas_draw(Canvas_t *self, PyObject *args)
@@ -391,6 +388,27 @@ canvas_unregister_elements(Canvas_t *self, PyObject *args)
     return Py_None;
 }
 
+// Private method of canvas
+void cleanup(Canvas_t *self)
+{
+    rsvg_term();
+
+    // Let's wait for the painter_thread to exit
+    // before we destroy the X cairo surface on which it
+    // might be drawing
+    //
+    Py_BEGIN_ALLOW_THREADS
+    pthread_join(painter_thr,NULL);
+    Py_END_ALLOW_THREADS
+
+    #ifdef DOUBLE_BUFFER
+    XdbeDeallocateBackBufferName(self->dpy,self->backBuffer);
+    #endif
+    XUnmapWindow(self->dpy,self->win);
+    XDestroyWindow(self->dpy,self->win);
+    XCloseDisplay(self->dpy);
+}
+
 static PyObject*
 canvas_eventloop(Canvas_t *self, PyObject *args)
 {
@@ -398,7 +416,6 @@ canvas_eventloop(Canvas_t *self, PyObject *args)
     /*
      * Setup the event listening
      */
-    XSelectInput(canvas->dpy, canvas->win, StructureNotifyMask);
     XSelectInput(canvas->dpy, canvas->win, 
                             StructureNotifyMask|PointerMotionMask);
     while(1)
@@ -462,8 +479,17 @@ canvas_eventloop(Canvas_t *self, PyObject *args)
             Py_DECREF(iterator);
 
             break;
+        case DestroyNotify:
+            // canvas is destroyed get out of eventloop
+            return;    
         default:
             break;
+        }
+
+        // Check if shutting_down was set during above event processing
+        if(shutting_down){
+            cleanup(self);
+            return;
         }
     }
 
@@ -671,13 +697,52 @@ element_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     return (PyObject *)self;
 }
 
+static void
+element_dealloc(Element_t *self)
+{
+    if (self->name) Py_DECREF(self->name);
+    if (self->id) Py_DECREF(self->id);
+    if (self->text) Py_DECREF(self->text);
+
+    if (self->onDraw) Py_DECREF(self->onDraw);
+    if (self->onTap) Py_DECREF(self->onTap);
+    if (self->onMouseEnter) Py_DECREF(self->onMouseEnter);
+    if (self->onMouseLeave) Py_DECREF(self->onMouseLeave);
+
+    // Element cleanup : TODO move to libaltsvg
+    if(self->element) {
+        if(self->element->cr) {
+            cairo_destroy(self->element->cr);
+        }
+        if(self->element->surface){
+            cairo_surface_destroy(self->element->surface);
+        }
+        if(self->element->name) {
+            free(self->element->name);
+        }
+        if(self->element->text){
+            g_string_free(self->element->text,TRUE);
+        }
+    
+        free(self->element);
+    }
+
+    // Don't have to cairo_destroy_surface, because that must have
+    // been already cleared during element's cleanup
+    if(self->pysurface){
+        free(self->pysurface);
+    }
+
+    self->ob_type->tp_free((PyObject *)self);
+}
+
 PyTypeObject Element_Type = {
     PyObject_HEAD_INIT(NULL)
     0,                                  /* ob_size */
     "inkface.element",                  /* tp_name */
     sizeof(Element_t),                  /* tp_basicsize */
     0,                                  /* tp_itemsize */
-    0,                                  /* tp_dealloc */
+    element_dealloc,                    /* tp_dealloc */
     0,                                  /* tp_print */
     0,                                  /* tp_getattr */
     0,                                  /* tp_setattr */
@@ -814,9 +879,7 @@ initinkface(void)
 
 }
 
-
 /* INTERNAL FUNCTIONS */
-
 RsvgHandle *
 rsvg_handle_from_file(const char *filename)
 {
@@ -950,10 +1013,7 @@ painter_thread(void *arg)
                     &timeout);
 
         if(shutting_down){
-            LOG("%s shutting down",__FUNCTION__);
-            PyErr_Clear();
-            PyErr_SetString(PyExc_SystemExit,"Invalid Arguments");
-            return NULL;
+            pthread_exit(NULL);
         }
 
         if(rc!=0){
