@@ -5,12 +5,15 @@
 #include <cairo.h>
 #include <cairo-xlib.h>
 #include <X11/Xatom.h>
-#include <X11/extensions/Xdbe.h>
 
 #include "inkface.h"
 
 #define DOUBLE_BUFFER
 #define REFRESH_INTERVAL_MSEC 50
+
+#ifdef DOUBLE_BUFFER
+#include <X11/extensions/Xdbe.h>
+#endif
 
 #include "common.h"
 
@@ -30,6 +33,9 @@ pthread_t painter_thr;
 
 typedef struct {
     PyObject_HEAD
+
+    canvas_t *cobject;
+
     int width;
     int height;
     PyObject *fullscreen;
@@ -156,6 +162,12 @@ canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
             }
         }
     }
+
+    self->cobject = (canvas_t *)malloc(sizeof(canvas_t));
+
+    self->cobject->width = self->width;
+    self->cobject->height = self->height;
+    self->cobject->fullscreen = (self->fullscreen == Py_True);
 
     XInitThreads();
 
@@ -743,7 +755,7 @@ PyTypeObject Element_Type = {
     "inkface.element",                  /* tp_name */
     sizeof(Element_t),                  /* tp_basicsize */
     0,                                  /* tp_itemsize */
-    element_dealloc,                    /* tp_dealloc */
+    (destructor) element_dealloc,       /* tp_dealloc */
     0,                                  /* tp_print */
     0,                                  /* tp_getattr */
     0,                                  /* tp_setattr */
@@ -762,7 +774,7 @@ PyTypeObject Element_Type = {
     0,                                  /* tp_doc */
     0,                                  /* tp_traverse */
     0,                                  /* tp_clear */
-    element_richcompare,                /* tp_richcompare */
+    (richcmpfunc) element_richcompare,  /* tp_richcompare */
     0,                                  /* tp_weaklistoffset */
     0,                                  /* tp_iter */
     0,                                  /* tp_iternext */
@@ -823,7 +835,7 @@ loadsvg(PyObject *self, PyObject *args)
         PyTypeObject *pytype = NULL;
         Element_t *pyo;
         pytype = &Element_Type;
-        ASSERT(pyo = pytype->tp_alloc(pytype,0));
+        ASSERT(pyo = (Element_t *)pytype->tp_alloc(pytype,0));
 
         pyo->x = element->x;
         pyo->y = element->y;
