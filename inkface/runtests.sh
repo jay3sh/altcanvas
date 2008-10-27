@@ -1,6 +1,11 @@
 #!/bin/bash
 
-valgrind_wrapper()
+export LD_LIBRARY_PATH=$HOME/usr/lib 
+export PYTHONPATH=`pwd`/src/bindings/python 
+export DATADIR=`pwd`/tests/data
+
+
+valgrind_memcheck()
 {
     valgrind \
         --log-file=$1.valgrind \
@@ -10,22 +15,23 @@ valgrind_wrapper()
         $*
 }
 
+valgrind_helgrind()
+{
+    valgrind \
+        -v \
+        --log-file=$1.valgrind \
+        --tool=helgrind \
+        --happens-before=all \
+        $*
+}
+
 GDB=cgdb
-VALGRIND=valgrind_wrapper
+VALGRIND=valgrind_helgrind
 
 VERBOSITY=0
 
 execute()
 {
-
-    export LD_LIBRARY_PATH=$HOME/usr/lib 
-    export PYTHONPATH=`pwd`/src 
-    export DATADIR=`pwd`/tests/data
-
-    if [ "x$DEBUG" != "x" ]
-    then
-        $GDB python
-    fi
 
     if [ "x$MEMDEBUG" != "x" ]
     then
@@ -74,6 +80,13 @@ then
     echo "GDB and Valgrind can't be used together"
     exit 1;
 fi
+
+if [ "x$DEBUG" != "x" ]
+then
+    $GDB python
+    exit 0;
+fi
+
 
 if [ -z $TEST ]
 then
