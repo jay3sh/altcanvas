@@ -14,11 +14,13 @@ for i in range(len(vars)):
 
 env.ParseConfig("pkg-config --cflags --libs libaltsvg")
 env.ParseConfig("pkg-config --cflags --libs xext")
+env.ParseConfig("pkg-config --cflags --libs pycairo")
 
 env.AppendUnique(CPPPATH=[distutils.sysconfig.get_python_inc()])
 
 env.AppendUnique(CFLAGS=['-g'])
 env.AppendUnique(CFLAGS=['-Isrc/lib'])
+env.AppendUnique(CFLAGS=['-DDOUBLE_BUFFER'])
 
 lib = env.SharedLibrary(target='inkface',
                 source=['inkface.c','#src/lib/common.c'])

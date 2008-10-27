@@ -6,10 +6,10 @@
 #include <cairo-xlib.h>
 #include <X11/Xatom.h>
 
+#include "pycairo.h"
+
 #include "inkface.h"
 
-#define DOUBLE_BUFFER
-#define REFRESH_INTERVAL_MSEC 50
 
 #ifdef DOUBLE_BUFFER
 #include <X11/extensions/Xdbe.h>
@@ -17,13 +17,13 @@
 
 #include "common.h"
 
-void *painter_thread(void *arg);
+static Pycairo_CAPI_t *Pycairo_CAPI;
+
+void paint(void *arg);
 
 RsvgHandle *handle = NULL;
 
-int shutting_down = FALSE;
 void cleanup();
-pthread_t painter_thr;
 
 /*
  * "canvas" type object
@@ -39,26 +39,14 @@ typedef struct {
     int width;
     int height;
     PyObject *fullscreen;
-    Display *dpy; 
-    cairo_t *ctx;
-    cairo_surface_t *surface;
-    Window win;
+
     PyObject *element_list;
 
     // Painting control members
-    int dirt_count;
     unsigned int timer_step;
-    int timer_counter;
-    pthread_mutex_t paint_mutex;
-    pthread_cond_t paint_condition;
-    pthread_mutex_t dirt_mutex;
 
     PyObject *onTimer;
 
-    #ifdef DOUBLE_BUFFER
-    XdbeBackBuffer backBuffer;
-    XdbeSwapInfo swapinfo;
-    #endif
 } Canvas_t;
 
 /*
@@ -85,7 +73,7 @@ typedef struct {
 
     int opacity;
 
-    PycairoSurface_t *pysurface;    
+    PyObject *p_surface;
 
     // private 
     Element *element;
@@ -107,23 +95,20 @@ void dec_dirt_count(Canvas_t *canvas, int count);
 //
 
 static PyObject *
-canvas_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
+p_canvas_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-    // Unused - GenericNew() is enough so far
+    Canvas_t *self;
+    
+    ASSERT(self = (Canvas_t *)type->tp_alloc(type,0));
+
+    ASSERT(self->cobject = canvas_new());
+
+    return (PyObject *)self;
 }
 
 static int
-canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
+p_canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
 {
-    int status = 0;
-    Window rwin;
-    int screen = 0;
-    int x=0, y=0;
-    int xsp_event_base=-1;
-    int xsp_error_base=-1;
-    int xsp_major=-1;
-    int xsp_minor=-1;
-
     // Parse keyword args
 
     #define DEFAULT_WIDTH 800
@@ -132,7 +117,6 @@ canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
     self->height=0;
     self->fullscreen = Py_False;
     self->timer_step = 0;
-    self->timer_counter = 0;
     self->onTimer = NULL;
     static char *kwlist[] = {"width", "height", "fullscreen", NULL};
 
@@ -163,92 +147,29 @@ canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
         }
     }
 
-    self->cobject = (canvas_t *)malloc(sizeof(canvas_t));
-
-    self->cobject->width = self->width;
-    self->cobject->height = self->height;
-    self->cobject->fullscreen = (self->fullscreen == Py_True);
-
-    XInitThreads();
-
-    ASSERT(self->dpy = XOpenDisplay(0));
-
-    ASSERT(rwin = DefaultRootWindow(self->dpy));
-    screen = DefaultScreen(self->dpy);
-    ASSERT(screen >= 0);
-
-    Atom atoms_WINDOW_STATE;
-    Atom atoms_WINDOW_STATE_FULLSCREEN;
-    atoms_WINDOW_STATE
-        = XInternAtom(self->dpy, "_NET_WM_STATE",False);
-    ASSERT((atoms_WINDOW_STATE != BadAlloc && 
-            atoms_WINDOW_STATE != BadValue));
-    atoms_WINDOW_STATE_FULLSCREEN
-        = XInternAtom(self->dpy, "_NET_WM_STATE_FULLSCREEN",False);
-    ASSERT((atoms_WINDOW_STATE_FULLSCREEN != BadAlloc && 
-            atoms_WINDOW_STATE_FULLSCREEN != BadValue));
-
-    ASSERT(self->win = XCreateSimpleWindow(
-                    self->dpy,
-                    rwin,
-                    x, y,
-                    self->width, self->height,
-                    0,
-                    BlackPixel(self->dpy,screen),
-                    BlackPixel(self->dpy,screen)));
-
-    if(self->fullscreen == Py_True){  
-        /* Set the wmhints needed for fullscreen */
-        status = XChangeProperty(self->dpy, self->win, atoms_WINDOW_STATE, XA_ATOM, 32,
-                        PropModeReplace,
-                        (unsigned char *) &atoms_WINDOW_STATE_FULLSCREEN, 1);
-        ASSERT(status != BadAlloc);
-        ASSERT(status != BadAtom);
-        ASSERT(status != BadMatch);
-        ASSERT(status != BadPixmap);
-        ASSERT(status != BadValue);
-        ASSERT(status != BadWindow);
-    }
-
-    #ifdef DOUBLE_BUFFER
-    /* Enabled double buffering */
-    self->backBuffer = XdbeAllocateBackBufferName(self->dpy,self->win,XdbeBackground);
-    self->swapinfo.swap_window = self->win;
-    self->swapinfo.swap_action = XdbeBackground;
-    #endif
-
-    XClearWindow(self->dpy,self->win);
-
-    self->surface = NULL;
-    Visual *visual = DefaultVisual(self->dpy,DefaultScreen(self->dpy));
-    ASSERT(visual)
-
-    #ifdef DOUBLE_BUFFER
-    ASSERT(self->surface = cairo_xlib_surface_create(
-                        self->dpy, self->backBuffer, visual, self->width, self->height));
-    #else
-    ASSERT(self->surface = cairo_xlib_surface_create(
-                        self->dpy, self->win, visual, self->width, self->height));
-    #endif 
-    ASSERT(self->ctx = cairo_create(self->surface));
-
-    // Initialize the active element list
-    self->element_list = PyList_New(0);
 
     // Initialize multi thread support for Python interpreter
     PyEval_InitThreads();
 
-    // Fork a painter thread which does refresh jobs
-    pthread_mutex_init(&(self->dirt_mutex),NULL);
-    pthread_create(&painter_thr,NULL,painter_thread,self);
+
+    ASSERT(self->cobject);
+    self->cobject->init(self->cobject,
+                        self->width, 
+                        self->height, 
+                        (self->fullscreen == Py_True),
+                        paint,
+                        (void *)self);
+
+    // Initialize the active element list
+    self->element_list = PyList_New(0);
 
     return 0;
 }
 
 static PyObject*
-canvas_cleanup(Canvas_t *self, PyObject *args)
+p_canvas_cleanup(Canvas_t *self, PyObject *args)
 {
-    shutting_down = TRUE;
+    self->cobject->shutting_down = TRUE;
 
     Py_INCREF(Py_None);
     return Py_None;
@@ -256,7 +177,7 @@ canvas_cleanup(Canvas_t *self, PyObject *args)
 
 
 static PyObject*
-canvas_draw(Canvas_t *self, PyObject *args)
+p_canvas_draw(Canvas_t *self, PyObject *args)
 {
     Element_t *element;
 
@@ -278,20 +199,7 @@ canvas_draw(Canvas_t *self, PyObject *args)
 }
 
 static PyObject*
-canvas_show(Canvas_t *self, PyObject *args)
-{
-    XMapWindow(self->dpy, self->win);
-    
-    XFlush(self->dpy);
-
-    inc_dirt_count(self,1);
-
-    Py_INCREF(Py_None);
-    return Py_None;
-}
-
-static PyObject*
-canvas_refresh(Canvas_t *self, PyObject *args)
+p_canvas_refresh(Canvas_t *self, PyObject *args)
 {
     inc_dirt_count(self,1);
 
@@ -300,7 +208,7 @@ canvas_refresh(Canvas_t *self, PyObject *args)
 }
 
 static PyObject*
-canvas_set_timer(Canvas_t *canvas, PyObject *args)
+p_canvas_set_timer(Canvas_t *canvas, PyObject *args)
 {
     int interval = -1;
     PyObject *onTimer_pyo;
@@ -326,7 +234,7 @@ canvas_set_timer(Canvas_t *canvas, PyObject *args)
 }
 
 static PyObject*
-canvas_register_elements(PyObject *self, PyObject *args)
+p_canvas_register_elements(PyObject *self, PyObject *args)
 {
     PyObject *elemList_pyo;
 
@@ -359,7 +267,7 @@ canvas_register_elements(PyObject *self, PyObject *args)
 }
 
 static PyObject*
-canvas_unregister_elements(Canvas_t *self, PyObject *args)
+p_canvas_unregister_elements(Canvas_t *self, PyObject *args)
 {
     PyObject *elemList_pyo;
 
@@ -404,32 +312,25 @@ canvas_unregister_elements(Canvas_t *self, PyObject *args)
 // Private method of canvas
 void cleanup(Canvas_t *self)
 {
-    rsvg_term();
-
-    // Let's wait for the painter_thread to exit
-    // before we destroy the X cairo surface on which it
-    // might be drawing
-    //
     Py_BEGIN_ALLOW_THREADS
-    pthread_join(painter_thr,NULL);
-    Py_END_ALLOW_THREADS
 
-    #ifdef DOUBLE_BUFFER
-    XdbeDeallocateBackBufferName(self->dpy,self->backBuffer);
-    #endif
-    XUnmapWindow(self->dpy,self->win);
-    XDestroyWindow(self->dpy,self->win);
-    XCloseDisplay(self->dpy);
+    self->cobject->cleanup(self->cobject);
+
+    Py_END_ALLOW_THREADS
 }
 
 static PyObject*
-canvas_eventloop(Canvas_t *self, PyObject *args)
+p_canvas_eventloop(Canvas_t *self, PyObject *args)
 {
-    Canvas_t *canvas = (Canvas_t *)self;
+    // Map the window so that it's visible
+    XMapWindow(self->cobject->dpy, self->cobject->win);
+    XFlush(self->cobject->dpy);
+    inc_dirt_count(self,1);
+
     /*
      * Setup the event listening
      */
-    XSelectInput(canvas->dpy, canvas->win, 
+    XSelectInput(self->cobject->dpy, self->cobject->win, 
                             StructureNotifyMask|PointerMotionMask);
     while(1)
     {
@@ -438,7 +339,7 @@ canvas_eventloop(Canvas_t *self, PyObject *args)
 
         Py_BEGIN_ALLOW_THREADS
 
-        XNextEvent(canvas->dpy,&event);
+        XNextEvent(self->cobject->dpy,&event);
 
         Py_END_ALLOW_THREADS
         
@@ -500,8 +401,8 @@ canvas_eventloop(Canvas_t *self, PyObject *args)
         }
 
         // Check if shutting_down was set during above event processing
-        if(shutting_down){
-            cleanup(self);
+        if(self->cobject->shutting_down){
+            self->cobject->cleanup(self->cobject);
             return;
         }
     }
@@ -510,22 +411,20 @@ canvas_eventloop(Canvas_t *self, PyObject *args)
 
 
 static PyMethodDef canvas_methods[] = {
-    { "register_elements", (PyCFunction)canvas_register_elements, 
+    { "register_elements", (PyCFunction)p_canvas_register_elements, 
         METH_VARARGS, "Register elements with canvas" },
-    { "unregister_elements", (PyCFunction)canvas_unregister_elements, 
+    { "unregister_elements", (PyCFunction)p_canvas_unregister_elements, 
         METH_VARARGS, "Unregister elements from canvas" },
-    { "eventloop", (PyCFunction)canvas_eventloop, 
+    { "eventloop", (PyCFunction)p_canvas_eventloop, 
         METH_NOARGS, "Make canvas process events in infinite loop" },
-    { "draw", (PyCFunction)canvas_draw, 
+    { "draw", (PyCFunction)p_canvas_draw, 
         METH_VARARGS, "Draw the element canvas" },
-    { "set_timer", (PyCFunction)canvas_set_timer, 
+    { "set_timer", (PyCFunction)p_canvas_set_timer, 
         METH_VARARGS, 
         "Set a timer which expires periodically and triggers canvas refresh" },
-    { "show", (PyCFunction)canvas_show, 
-        METH_NOARGS, "Show the canvas" },
-    { "refresh", (PyCFunction)canvas_refresh, 
+    { "refresh", (PyCFunction)p_canvas_refresh, 
         METH_NOARGS, "Refresh the canvas" },
-    { "cleanup", (PyCFunction)canvas_cleanup, 
+    { "cleanup", (PyCFunction)p_canvas_cleanup, 
         METH_NOARGS, "Cleanup the canvas" },
     {NULL, NULL, 0, NULL},
 };
@@ -579,9 +478,9 @@ PyTypeObject Canvas_Type = {
     0,                                  /* tp_descr_get */
     0,                                  /* tp_descr_set */
     0,                                  /* tp_dictoffset */
-    (initproc)canvas_init,              /* tp_init */
+    (initproc)p_canvas_init,            /* tp_init */
     0,                                  /* tp_alloc */
-    (newfunc)canvas_new,                /* tp_new */
+    (newfunc)p_canvas_new,              /* tp_new */
     0,                                  /* tp_free */
     0,                                  /* tp_is_gc */
     0,                                  /* tp_bases */
@@ -625,10 +524,10 @@ element_refresh(Element_t *self,PyObject *args)
         PyString_AsString(self->text));
     inkface_get_element(handle,self->element,TRUE);
 
-    free(self->pysurface);
-    ASSERT(self->pysurface = (PycairoSurface_t *)
-        malloc(sizeof(PycairoSurface_t)));
-    self->pysurface->surface = self->element->surface;
+    // Release ownership of old pycairo surface object
+    Py_DECREF(self->p_surface);
+    ASSERT(self->p_surface = PycairoSurface_FromSurface(
+                        self->element->surface,NULL));
 
     Py_INCREF(Py_None);
     return Py_None;
@@ -702,11 +601,6 @@ element_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 
     self = (Element_t *)type->tp_alloc(type,0);
 
-    if(self){
-        self->pysurface = (PycairoSurface_t *)
-            malloc(sizeof(PycairoSurface_t));
-    }
-
     return (PyObject *)self;
 }
 
@@ -742,8 +636,8 @@ element_dealloc(Element_t *self)
 
     // Don't have to cairo_destroy_surface, because that must have
     // been already cleared during element's cleanup
-    if(self->pysurface){
-        free(self->pysurface);
+    if(self->p_surface){
+        //TODO: free(self->p_surface);
     }
 
     self->ob_type->tp_free((PyObject *)self);
@@ -803,6 +697,9 @@ static PyObject*
 loadsvg(PyObject *self, PyObject *args)
 {
     char *svgname;
+    Element *element;
+    PyObject *p_elist = PyList_New(0);
+
     ASSERT(PyArg_ParseTuple(args,"s",&svgname))
         
     ASSERT(svgname)
@@ -810,6 +707,49 @@ loadsvg(PyObject *self, PyObject *args)
     // Create rsvg handle for the SVG file
     ASSERT(handle = rsvg_handle_from_file(svgname));
  
+    GList *elist = load_element_list(handle);
+
+    // Create Python list of elements
+
+    GList *elem_list_head = elist;
+
+    while(elist)
+    {
+        ASSERT(element = (Element *)elist->data);
+
+        // 
+        // Create python object for Element
+        // 
+        PyTypeObject *pytype = NULL;
+        Element_t *pyo;
+        pytype = &Element_Type;
+        ASSERT(pyo = (Element_t *)pytype->tp_alloc(pytype,0));
+
+        pyo->x = element->x;
+        pyo->y = element->y;
+        pyo->w = element->w;
+        pyo->h = element->h;
+        pyo->order = element->order;
+        pyo->name = PyString_FromString(element->name);
+        pyo->id = PyString_FromString(element->id);
+        if(element->text){
+            pyo->text = PyString_FromString(element->text->str);
+        }
+        pyo->p_surface = PycairoSurface_FromSurface(element->surface,NULL);
+
+        pyo->element = element;
+
+        // Add python object to list
+        PyList_Append(p_elist,(PyObject *)pyo);
+
+        // Free id and jump to next
+        g_free(elist->data);
+        elist = elist->next;
+    }
+
+    return p_elist;
+
+    #if 0
     // Get list of element IDs in the SVG
     GList *eidList = inkface_get_element_ids(handle);
     ASSERT(eidList);
@@ -863,8 +803,8 @@ loadsvg(PyObject *self, PyObject *args)
     g_list_free(head_eidList);
 
     ASSERT(!PyList_Sort(pyElementList));
-
-    return pyElementList;
+    #endif
+    //return pyElementList;
 
 }
 
@@ -879,9 +819,9 @@ initinkface(void)
 {
     PyObject *m;
 
-    rsvg_init();
+    Pycairo_IMPORT;
 
-    Canvas_Type.tp_new = PyType_GenericNew;
+    rsvg_init();
 
     if (PyType_Ready(&Element_Type) < 0) return;
     if (PyType_Ready(&Canvas_Type) < 0) return;
@@ -893,41 +833,23 @@ initinkface(void)
 }
 
 /* INTERNAL FUNCTIONS */
-/* Thread-safe routines to manipulate paint_mutex */
-void inc_dirt_count(Canvas_t *canvas, int count)
-{
-    pthread_mutex_lock(&(canvas->dirt_mutex));
-    canvas->dirt_count += count;
-    pthread_mutex_unlock(&(canvas->dirt_mutex));
-}
-
-void dec_dirt_count(Canvas_t *canvas, int count)
-{
-    pthread_mutex_lock(&(canvas->dirt_mutex));
-    canvas->dirt_count -= count;
-    if(canvas->dirt_count < 0) 
-        canvas->dirt_count = 0;
-    pthread_mutex_unlock(&(canvas->dirt_mutex));
-}
-
-void
-paint(void *arg)
+void paint(void *arg)
 {
     Canvas_t *canvas = (Canvas_t *) arg;
 
     if(canvas->timer_step){
-        canvas->timer_counter++;
-        canvas->timer_counter = canvas->timer_counter % canvas->timer_step;
+        canvas->cobject->timer_counter++;
+        canvas->cobject->timer_counter = canvas->cobject->timer_counter % canvas->timer_step;
     }
 
-    if((canvas->timer_counter == 0) || (canvas->dirt_count))
+    if((canvas->cobject->timer_counter == 0) || (canvas->cobject->dirt_count))
     {
 
         // BEGIN - Python thread safety code block
         PyGILState_STATE gstate;
         gstate = PyGILState_Ensure();
     
-        if(canvas->timer_counter == 0){
+        if(canvas->cobject->timer_counter == 0){
             if(canvas->onTimer && PyCallable_Check(canvas->onTimer)){
                 PyObject_CallFunction(canvas->onTimer,NULL);
             }
@@ -954,12 +876,12 @@ paint(void *arg)
         // END - Python thread safety code block
     
         #ifdef DOUBLE_BUFFER
-        XdbeBeginIdiom(canvas->dpy);
-        XdbeSwapBuffers(canvas->dpy,&canvas->swapinfo,1);
-        XSync(canvas->dpy,0);
-        XdbeEndIdiom(canvas->dpy);
+        XdbeBeginIdiom(canvas->cobject->dpy);
+        XdbeSwapBuffers(canvas->cobject->dpy,&canvas->cobject->swapinfo,1);
+        XSync(canvas->cobject->dpy,0);
+        XdbeEndIdiom(canvas->cobject->dpy);
         #else
-        XFlush(canvas->dpy);
+        XFlush(canvas->cobject->dpy);
         #endif
 
         dec_dirt_count(canvas,1);
@@ -967,49 +889,13 @@ paint(void *arg)
     }
 }
 
-void *
-painter_thread(void *arg)
-{
-    int rc=0;
-    struct timespec timeout;
-    struct timeval curtime;
-
-    Canvas_t *canvas = (Canvas_t *)arg;
-
-    while(1)
-    {
-        ASSERT(!gettimeofday(&curtime,NULL))
-        timeout.tv_sec = curtime.tv_sec;
-        timeout.tv_nsec = curtime.tv_usec * 1000;
-        timeout.tv_nsec += (REFRESH_INTERVAL_MSEC * 1000000L);
-        timeout.tv_sec += timeout.tv_nsec/1000000000L;
-        timeout.tv_nsec %= 1000000000L;
-
-        rc=pthread_cond_timedwait(
-                    &(canvas->paint_condition),
-                    &(canvas->paint_mutex),
-                    &timeout);
-
-        if(shutting_down){
-            pthread_exit(NULL);
-        }
-
-        if(rc!=0){
-            if(rc == ETIMEDOUT){
-                paint(canvas);
-                continue;
-            } else {
-                LOG("pthread_cond_timwait returned %d\n",rc);
-                continue;
-            }
-        }
-    }
-}
 
 void 
 draw(Canvas_t *canvas, Element_t *element)
 {
-    cairo_set_source_surface(canvas->ctx,
-        element->pysurface->surface,element->x,element->y);
-    cairo_paint(canvas->ctx);
+    cairo_surface_t *surface = 
+        ((PycairoSurface *)(element->p_surface))->surface;
+    cairo_set_source_surface(canvas->cobject->ctx,
+                                surface,element->x,element->y);
+    cairo_paint(canvas->cobject->ctx);
 }

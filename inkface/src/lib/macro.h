@@ -1,5 +1,8 @@
+#ifndef __MACRO_H__
+#define __MACRO_H__
 
 #include <stdlib.h>
+
 
 #define LOG(...) \
     fprintf(stderr,"[%s:%d] ",__FILE__,__LINE__); \
@@ -13,3 +16,4 @@
            exit(1); \
         }
 
+#endif /* __MACRO_H__ */
