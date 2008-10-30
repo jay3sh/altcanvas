@@ -103,13 +103,13 @@ canvas_init(
     #endif 
     ASSERT(self->ctx = cairo_create(self->surface));
 
-    pthread_mutex_init(&(self->dirt_mutex),NULL);
+    ASSERT(!pthread_mutex_init(&(self->dirt_mutex),NULL));
 
 
     // Fork a painter thread which does refresh jobs
-    pthread_mutex_init(&(self->paint_mutex),NULL);
-    pthread_cond_init(&(self->paint_condition),NULL);
-    pthread_create(&(self->painter_thr),NULL,painter_thread,self);
+    ASSERT(!pthread_mutex_init(&(self->paint_mutex),NULL));
+    ASSERT(!pthread_cond_init(&(self->paint_condition),NULL));
+    ASSERT(!pthread_create(&(self->painter_thr),NULL,painter_thread,self));
 
 }
 
@@ -126,10 +126,10 @@ void canvas_cleanup(canvas_t *self)
     // before we destroy the X cairo surface on which it
     // might be drawing
     //
-    pthread_join(self->painter_thr,NULL);
+    ASSERT(!pthread_join(self->painter_thr,NULL));
     
-    pthread_mutex_destroy(&(self->paint_mutex));
-    pthread_cond_destroy(&(self->paint_condition));
+    ASSERT(!pthread_mutex_destroy(&(self->paint_mutex)));
+    ASSERT(!pthread_cond_destroy(&(self->paint_condition)));
 
     #ifdef DOUBLE_BUFFER
     XdbeDeallocateBackBufferName(self->dpy,self->backBuffer);
@@ -142,25 +142,27 @@ void canvas_cleanup(canvas_t *self)
 
 void inc_dirt_count(canvas_t *self, int count)
 {
-    pthread_mutex_lock(&(self->dirt_mutex));
+    ASSERT(!pthread_mutex_lock(&(self->dirt_mutex)));
     self->dirt_count += count;
-    pthread_mutex_unlock(&(self->dirt_mutex));
+    ASSERT(!pthread_mutex_unlock(&(self->dirt_mutex)));
 }
 
 void dec_dirt_count(canvas_t *self, int count)
 {
-    pthread_mutex_lock(&(self->dirt_mutex));
+    ASSERT(!pthread_mutex_lock(&(self->dirt_mutex)));
     self->dirt_count -= count;
-    if(self->dirt_count < 0) 
+    if(self->dirt_count < 0) {
         self->dirt_count = 0;
-    pthread_mutex_unlock(&(self->dirt_mutex));
+    }
+    ASSERT(!pthread_mutex_unlock(&(self->dirt_mutex)));
 }
 
 
 canvas_t *canvas_new(void)
 {
-    canvas_t *object;
+    canvas_t *object = NULL;
     ASSERT(object = (canvas_t *)malloc(sizeof(canvas_t)));
+    LOG("- %s : %p",__FUNCTION__,object);
     memset(object,0,sizeof(canvas_t));
     object->init = canvas_init;
     object->cleanup = canvas_cleanup;
@@ -191,12 +193,12 @@ void *painter_thread(void *arg)
         timeout.tv_sec += timeout.tv_nsec/1000000000L;
         timeout.tv_nsec %= 1000000000L;
 
-        pthread_mutex_lock(&(canvas->paint_mutex));
+        ASSERT(!pthread_mutex_lock(&(canvas->paint_mutex)));
         rc=pthread_cond_timedwait(
                     &(canvas->paint_condition),
                     &(canvas->paint_mutex),
                     &timeout);
-        pthread_mutex_unlock(&(canvas->paint_mutex));
+        ASSERT(!pthread_mutex_unlock(&(canvas->paint_mutex)));
 
         if(canvas->shutting_down){
             pthread_exit(NULL);

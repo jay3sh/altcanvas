@@ -87,8 +87,6 @@ typedef struct {
 } Element_t;
 
 void draw(Canvas_t *canvas, Element_t *element);
-void inc_dirt_count(Canvas_t *canvas, int count);
-void dec_dirt_count(Canvas_t *canvas, int count);
 
 //
 // "canvas" object methods and members
@@ -98,7 +96,8 @@ static PyObject *
 p_canvas_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
     Canvas_t *self;
-    
+    LOG("%s",__FUNCTION__); 
+
     ASSERT(self = (Canvas_t *)type->tp_alloc(type,0));
 
     ASSERT(self->cobject = canvas_new());
@@ -106,10 +105,30 @@ p_canvas_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
     return (PyObject *)self;
 }
 
+static void
+p_canvas_dealloc(Canvas_t *self)
+{
+    LOG("%s",__FUNCTION__); 
+    if(self->cobject) {
+        self->cobject->shutting_down = TRUE;
+        Py_BEGIN_ALLOW_THREADS
+
+        self->cobject->cleanup(self->cobject);
+
+        Py_END_ALLOW_THREADS
+
+        free(self->cobject); 
+        self->cobject = NULL;
+    }
+    self->ob_type->tp_free((PyObject *)self);
+}
+
 static int
 p_canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
 {
     // Parse keyword args
+
+    LOG("%s",__FUNCTION__); 
 
     #define DEFAULT_WIDTH 800
     #define DEFAULT_HEIGHT 480 
@@ -169,6 +188,7 @@ p_canvas_init(Canvas_t *self, PyObject *args, PyObject *kwds)
 static PyObject*
 p_canvas_cleanup(Canvas_t *self, PyObject *args)
 {
+    LOG("%s",__FUNCTION__); 
     self->cobject->shutting_down = TRUE;
 
     Py_INCREF(Py_None);
@@ -181,6 +201,7 @@ p_canvas_draw(Canvas_t *self, PyObject *args)
 {
     Element_t *element;
 
+    LOG("%s",__FUNCTION__); 
     if(!PyArg_ParseTuple(args,"O",&element)){
         PyErr_Clear();
         PyErr_SetString(PyExc_ValueError,"Invalid Arguments");
@@ -201,7 +222,8 @@ p_canvas_draw(Canvas_t *self, PyObject *args)
 static PyObject*
 p_canvas_refresh(Canvas_t *self, PyObject *args)
 {
-    inc_dirt_count(self,1);
+    ASSERT(self && self->cobject)
+    self->cobject->inc_dirt_count(self->cobject,1);
 
     Py_INCREF(Py_None);
     return Py_None;
@@ -212,6 +234,7 @@ p_canvas_set_timer(Canvas_t *canvas, PyObject *args)
 {
     int interval = -1;
     PyObject *onTimer_pyo;
+
     if(!PyArg_ParseTuple(args,"iO",&interval,&onTimer_pyo)){
         PyErr_Clear();
         PyErr_SetString(PyExc_ValueError,"Invalid Arguments");
@@ -447,7 +470,7 @@ PyTypeObject Canvas_Type = {
     "inkface.canvas",                   /* tp_name */
     sizeof(Canvas_t),                   /* tp_basicsize */
     0,                                  /* tp_itemsize */
-    0,                                  /* tp_dealloc */
+    (destructor)p_canvas_dealloc,       /* tp_dealloc */
     0,                                  /* tp_print */
     0,                                  /* tp_getattr */
     0,                                  /* tp_setattr */
@@ -497,6 +520,7 @@ element_init(Element_t *self, PyObject *args, PyObject *kwds)
     Py_INCREF(Py_None);
     self->text = Py_None;
 
+    LOG("%s",__FUNCTION__); 
     Py_INCREF(Py_None);
     self->onTap = Py_None;
     Py_INCREF(Py_None);
@@ -598,6 +622,7 @@ static PyObject *
 element_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
     Element_t *self;
+    LOG("%s",__FUNCTION__); 
 
     self = (Element_t *)type->tp_alloc(type,0);
 
@@ -607,6 +632,7 @@ element_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 static void
 element_dealloc(Element_t *self)
 {
+    LOG("%s",__FUNCTION__); 
     if (self->name) Py_DECREF(self->name);
     if (self->id) Py_DECREF(self->id);
     if (self->text) Py_DECREF(self->text);
@@ -725,6 +751,7 @@ loadsvg(PyObject *self, PyObject *args)
         pytype = &Element_Type;
         ASSERT(pyo = (Element_t *)pytype->tp_alloc(pytype,0));
 
+        //LOG("element %p",pytype);
         pyo->x = element->x;
         pyo->y = element->y;
         pyo->w = element->w;
@@ -742,8 +769,7 @@ loadsvg(PyObject *self, PyObject *args)
         // Add python object to list
         PyList_Append(p_elist,(PyObject *)pyo);
 
-        // Free id and jump to next
-        g_free(elist->data);
+        // jump to next
         elist = elist->next;
     }
 
@@ -808,9 +834,79 @@ loadsvg(PyObject *self, PyObject *args)
 
 }
 
+static PyObject*
+create_X_canvas(PyObject *self, PyObject *args, PyObject *kwds)
+{
+    Canvas_t *object = NULL;
+    
+    ASSERT(object = PyObject_New(Canvas_t,&Canvas_Type));
+
+    /*
+    PyTypeObject *type = &Canvas_Type;
+    ASSERT(object = (Canvas_t *)type->tp_alloc(type,0));
+    */
+
+    ASSERT(object->cobject = canvas_new());
+
+    // Parse keyword args
+    #define DEFAULT_WIDTH 800
+    #define DEFAULT_HEIGHT 480 
+    object->width=0; 
+    object->height=0;
+    object->fullscreen = Py_False;
+    object->timer_step = 0;
+    object->onTimer = NULL;
+    static char *kwlist[] = {"width", "height", "fullscreen", NULL};
+
+    ASSERT(PyArg_ParseTupleAndKeywords(args, kwds, "|iiO", kwlist, 
+                  &(object->width), &(object->height), &(object->fullscreen)))
+
+    if(object->width <= 0) object->width = DEFAULT_WIDTH;
+    if(object->height <= 0) object->height = DEFAULT_HEIGHT;
+
+    //
+    // Fullscreen preferences:
+    //
+    // 1. env var INKFACE_FULLSCREEN 
+    // 2. kwd arg fullscreen 
+    //
+    char *env_fullscreen = getenv("INKFACE_FULLSCREEN");
+    if(env_fullscreen && !strncmp(env_fullscreen,"TRUE",4)){
+        object->fullscreen = Py_True;
+    } else {
+        if((object->fullscreen == NULL) || (!PyBool_Check(object->fullscreen))) {
+            object->fullscreen = Py_False;
+        } else {
+            if(object->fullscreen == Py_True){
+                object->fullscreen = Py_True;
+            } else {
+                object->fullscreen = Py_False;
+            }
+        }
+    }
+
+
+    // Initialize multi thread support for Python interpreter
+    PyEval_InitThreads();
+
+    object->cobject->init(object->cobject,
+                        object->width, 
+                        object->height, 
+                        (object->fullscreen == Py_True),
+                        paint,
+                        (void *)object);
+
+    // Initialize the active element list
+    object->element_list = PyList_New(0);
+
+    //LOG("X canvas %p",object);
+    return (PyObject *)object;
+}
+
 static PyMethodDef inkface_methods[] =
 {
     { "loadsvg", (PyCFunction)loadsvg, METH_VARARGS, NULL },
+    { "create_X_canvas", (PyCFunction)create_X_canvas, METH_KEYWORDS, NULL },
     { NULL, NULL, 0, NULL},
 };
 
@@ -828,7 +924,8 @@ initinkface(void)
 
     m = Py_InitModule("inkface",inkface_methods);
 
-    PyModule_AddObject(m,"canvas",(PyObject *)&Canvas_Type);
+    //Py_INCREF(&Canvas_Type);
+    //PyModule_AddObject(m,"canvas",(PyObject *)&Canvas_Type);
 
 }
 
@@ -836,10 +933,13 @@ initinkface(void)
 void paint(void *arg)
 {
     Canvas_t *canvas = (Canvas_t *) arg;
+    ASSERT(canvas);
+    ASSERT(canvas->cobject);
 
     if(canvas->timer_step){
         canvas->cobject->timer_counter++;
-        canvas->cobject->timer_counter = canvas->cobject->timer_counter % canvas->timer_step;
+        canvas->cobject->timer_counter = \
+            canvas->cobject->timer_counter % canvas->timer_step;
     }
 
     if((canvas->cobject->timer_counter == 0) || (canvas->cobject->dirt_count))
@@ -867,7 +967,7 @@ void paint(void *arg)
                 // Call canvas's default draw method
                 draw(canvas,el);
             }
-    
+
             Py_DECREF(item);
         }
         Py_DECREF(iterator);
@@ -884,7 +984,7 @@ void paint(void *arg)
         XFlush(canvas->cobject->dpy);
         #endif
 
-        dec_dirt_count(canvas,1);
+        canvas->cobject->dec_dirt_count(canvas->cobject,1);
 
     }
 }
@@ -893,6 +993,8 @@ void paint(void *arg)
 void 
 draw(Canvas_t *canvas, Element_t *element)
 {
+    ASSERT(canvas);
+    ASSERT(element);
     cairo_surface_t *surface = 
         ((PycairoSurface *)(element->p_surface))->surface;
     cairo_set_source_surface(canvas->cobject->ctx,

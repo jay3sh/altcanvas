@@ -22,6 +22,8 @@ env.AppendUnique(CFLAGS=['-g'])
 env.AppendUnique(CFLAGS=['-Isrc/lib'])
 env.AppendUnique(CFLAGS=['-DDOUBLE_BUFFER'])
 
+#env.AppendUnique(LINKFLAGS=['-lefence'])
+
 lib = env.SharedLibrary(target='inkface',
                 source=['inkface.c','#src/lib/common.c'])
 
