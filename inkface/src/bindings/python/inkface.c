@@ -52,10 +52,6 @@ Canvas_t *x_canvas = NULL;
 /*
  * "element" type object
  */
-typedef struct {
-    PyObject_HEAD
-    cairo_surface_t *surface;
-} PycairoSurface_t;
 
 typedef struct {
     PyObject_HEAD
@@ -438,13 +434,6 @@ element_init(Element_t *self, PyObject *args, PyObject *kwds)
 }
 
 static PyObject*
-element_test(Element_t *self, PyObject *args)
-{
-    Py_INCREF(Py_None);
-    return Py_None;
-}
-
-static PyObject*
 element_refresh(Element_t *self,PyObject *args)
 {
     g_string_free(self->element->text,TRUE);
@@ -494,9 +483,6 @@ element_richcompare(Element_t *v, Element_t *w, int op)
 }
 
 static PyMethodDef element_methods[] = {
-    { "test", 
-        (PyCFunction)element_test, 
-        METH_NOARGS, "Test" },
     { "refresh", 
         (PyCFunction)element_refresh, 
         METH_NOARGS, "Refresh/Reload the element" },
