@@ -66,7 +66,6 @@ def onExit(elem,elist):
             canvas.refresh()
             sleep(1)
             break
-    canvas.cleanup()
     exit_sign = True
     sys.exit(0)
 
@@ -80,7 +79,7 @@ def main():
 
 
     elements = inkface.loadsvg(IRC_SVG)
-    canvas = inkface.canvas()
+    canvas = inkface.create_X_canvas()
     canvas.register_elements(elements)
 
     # Wire the handlers and init elements
@@ -112,7 +111,6 @@ def main():
     irc.start()
 
     # eventloop
-    canvas.show()
     canvas.eventloop()
 
 #

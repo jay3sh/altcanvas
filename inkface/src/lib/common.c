@@ -122,6 +122,8 @@ void canvas_cleanup(canvas_t *self)
 {
     rsvg_term();
 
+    self->shutting_down = TRUE;
+
     // Let's wait for the painter_thread to exit
     // before we destroy the X cairo surface on which it
     // might be drawing
@@ -162,7 +164,6 @@ canvas_t *canvas_new(void)
 {
     canvas_t *object = NULL;
     ASSERT(object = (canvas_t *)malloc(sizeof(canvas_t)));
-    LOG("- %s : %p",__FUNCTION__,object);
     memset(object,0,sizeof(canvas_t));
     object->init = canvas_init;
     object->cleanup = canvas_cleanup;

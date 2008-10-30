@@ -33,19 +33,19 @@ class TestCanvas(unittest.TestCase):
         pass
 
     def testCanvasInitNoParams(self):
-        canvas = inkface.canvas()
+        canvas = inkface.create_X_canvas()
         self.assert_(canvas.width > 0)
         self.assert_(canvas.height > 0)
         self.assert_(canvas.fullscreen == False)
             
     def testCanvasInitAllParams(self):
-        canvas = inkface.canvas(width=10,height=10,fullscreen=True)
+        canvas = inkface.create_X_canvas(width=10,height=10,fullscreen=True)
         self.assert_(canvas.width == 10)
         self.assert_(canvas.height == 10)
         self.assert_(canvas.fullscreen == True)
 
     def testCanvasInitSomeParams(self):
-        canvas = inkface.canvas(fullscreen=True)
+        canvas = inkface.create_X_canvas(fullscreen=True)
         self.assert_(canvas.width > 0)
         self.assert_(canvas.height > 0)
         self.assert_(canvas.fullscreen == True)
@@ -53,15 +53,15 @@ class TestCanvas(unittest.TestCase):
     def testCanvasInitFullscreen(self):
         import os
         os.environ['INKFACE_FULLSCREEN'] = 'TRUE'
-        canvas = inkface.canvas()
+        canvas = inkface.create_X_canvas()
         self.assert_(canvas.fullscreen == True)
 
         del os.environ['INKFACE_FULLSCREEN']
-        canvas = inkface.canvas()
+        canvas = inkface.create_X_canvas()
         self.assert_(canvas.fullscreen == False)
 
     def testCanvasTimer(self):
-        canvas = inkface.canvas()
+        canvas = inkface.create_X_canvas()
         canvas.set_timer(160,None) # msec
         # Assuming REFRESH_INTERVAL_MSEC = 50 msec 
         self.assert_(canvas.timer_step == 3)
@@ -70,7 +70,7 @@ class TestCanvasElements(unittest.TestCase):
     def setUp(self):
         self.SVG = os.path.join(sys.argv[1])
         self.elements = inkface.loadsvg(self.SVG)
-        self.canvas = inkface.canvas()
+        self.canvas = inkface.create_X_canvas()
         
     def testRegisterUnregisterNothing(self):
         self.assertRaises(ValueError,self.canvas.register_elements)
@@ -87,7 +87,7 @@ class TestElements(unittest.TestCase):
     def setUp(self):
         self.SVG = os.path.join(sys.argv[1])
         self.elements = inkface.loadsvg(self.SVG)
-        self.canvas = inkface.canvas()
+        self.canvas = inkface.create_X_canvas()
 
     def testHandlerRegistration(self):
         def onEvent(x,y):

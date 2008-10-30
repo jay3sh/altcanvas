@@ -74,7 +74,8 @@ def onKeyGlowDraw(e):
         canvas.draw(e)
 
 def onExit(e,elements):
-    canvas.cleanup()
+    print 'onExit'
+    inkface.exit()
     sys.exit(0)
 
 def onMsgBoxDraw(e):
@@ -93,16 +94,7 @@ def main():
     global canvas
     global textbox
     elements = inkface.loadsvg(KEYBOARD_SVG)
-    '''
-    fullscreen = False
-    try:
-        if os.environ['INKFACE_FULLSCREEN']:
-            fullscreen = True
-    except:
-        pass
-    canvas = inkface.canvas(fullscreen=fullscreen)
-    '''
-    canvas = inkface.canvas()
+    canvas = inkface.create_X_canvas()
     canvas.register_elements(elements)
 
     # Wire handlers and init some elements
@@ -136,7 +128,6 @@ def main():
                 e.onMouseEnter = onMsgBoxOK
 
     # eventloop
-    canvas.show()
     canvas.eventloop()
 
 if __name__ == '__main__':
