@@ -184,6 +184,7 @@ void *painter_thread(void *arg)
     struct timeval curtime;
 
     canvas_t *canvas = (canvas_t *)arg;
+    ASSERT(canvas);
 
     while(1)
     {
@@ -207,11 +208,11 @@ void *painter_thread(void *arg)
 
         if(rc!=0){
             if(rc == ETIMEDOUT){
-                if(canvas->paint) canvas->paint(canvas->paint_arg);
-                continue;
+                if(canvas->paint) {
+                    canvas->paint(canvas->paint_arg);
+                }
             } else {
                 LOG("pthread_cond_timwait returned %d\n",rc);
-                continue;
             }
         }
     }
@@ -236,7 +237,8 @@ load_element_list(RsvgHandle *handle)
      * Create Element objects from the loaded SVG
      */
 
-    GList *sorted_elist;
+    ASSERT(handle);
+    GList *sorted_elist = NULL;
     GList *eidlist = inkface_get_element_ids(handle);
     ASSERT(eidlist);
 
@@ -276,6 +278,7 @@ rsvg_handle_from_file(const char *filename)
     FILE *f;
     int length;
 
+    ASSERT(filename);
     ASSERT(f = fopen(filename,"rb"));
     ASSERT(bytes = g_byte_array_new());
     while (!feof (f)) {
