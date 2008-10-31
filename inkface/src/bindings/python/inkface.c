@@ -243,10 +243,7 @@ p_canvas_unregister_elements(Canvas_t *self, PyObject *args)
 static PyObject*
 p_canvas_eventloop(Canvas_t *self, PyObject *args)
 {
-    // Map the window so that it's visible
-    XMapWindow(self->cobject->dpy, self->cobject->win);
-    XFlush(self->cobject->dpy);
-    self->cobject->inc_dirt_count(self->cobject,1);
+    self->cobject->show(self->cobject);
 
     /*
      * Setup the event listening

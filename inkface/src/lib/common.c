@@ -113,6 +113,14 @@ canvas_init(
 
 }
 
+void canvas_show(canvas_t *self)
+{
+    // Map the window so that it's visible
+    XMapWindow(self->dpy, self->win);
+    XFlush(self->dpy);
+    self->inc_dirt_count(self,1);
+}
+
 void canvas_refresh(canvas_t *self)
 {
 
@@ -168,6 +176,7 @@ canvas_t *canvas_new(void)
     object->init = canvas_init;
     object->cleanup = canvas_cleanup;
     object->refresh = canvas_refresh;
+    object->show = canvas_show;
     object->inc_dirt_count = inc_dirt_count;
     object->dec_dirt_count = dec_dirt_count;
     return object;
