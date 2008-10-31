@@ -25,7 +25,8 @@ env.AppendUnique(CFLAGS=['-DDOUBLE_BUFFER'])
 #env.AppendUnique(LINKFLAGS=['-lefence'])
 
 lib = env.SharedLibrary(target='inkface',
-                source=['inkface.c','canvas.c','#src/lib/common.c'])
+                source=['inkface.c','canvas.c', 'element.c',
+                        '#src/lib/common.c'])
 
 if type(lib) == type([]): lib = lib[0]
 
