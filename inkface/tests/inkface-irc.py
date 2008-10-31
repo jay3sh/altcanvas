@@ -11,6 +11,7 @@ canvas = None
 IRC_SVG=sys.argv[1]
 exit_sign = False
 statusBar = None
+irc = None
 
 msglist = []
 msgtxtlist = [None,None,None,None,None]
@@ -64,15 +65,17 @@ def onExit(elem,elist):
         if e.name == 'exitButtonGlow':
             e.opacity = 1
             canvas.refresh()
-            sleep(1)
             break
+    global exit_sign
     exit_sign = True
-    sys.exit(0)
+    irc.join()
+    inkface.exit()
 
 def main():
     global canvas
     global msgtxtlist
     global statusBar
+    global irc
 
     irc_network = 'irc.freenode.net'
     irc_channel = 'ubuntu'
@@ -133,12 +136,13 @@ class IRC(threading.Thread):
 
     def run(self):
         global msglist
+        global exit_sign
         first_msg = True
         if self.reportStatus:
             self.reportStatus('Connecting ...')
         while True:
             if exit_sign:
-                sys.exit(0)
+                return
 
             data = self.irc.recv ( 4096 )
 
