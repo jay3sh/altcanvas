@@ -120,10 +120,12 @@ rsvg_cairo_new_drawing_ctx_mod (Element *element, RsvgHandle * handle)
     cairo_matrix_t cairo_transform;
     double affine[6], bbx0, bby0, bbx1, bby1;
 
-    // Before allocating new surface, check if original surface
-    // needs to be freed
-    if(element->cr) cairo_destroy(element->cr);
-    if(element->surface) cairo_surface_destroy(element->surface);
+    // Before allocating new surface, 
+    // free context to old surface
+    // the old surface itself will be freed by up in python
+    if(element->cr) {
+        cairo_destroy(element->cr);
+    }
 
     element->surface = cairo_image_surface_create(
         CAIRO_FORMAT_ARGB32,element->w,element->h);
