@@ -74,7 +74,6 @@ def onKeyGlowDraw(e):
         canvas.draw(e)
 
 def onExit(e,elements):
-    print 'onExit'
     inkface.exit()
     sys.exit(0)
 

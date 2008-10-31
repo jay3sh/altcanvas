@@ -30,14 +30,14 @@ def onDraw(element):
 def onMouseLeave(element,elist):
     global flags
     if 0 not in flags.values():
-        canvas.cleanup()
+        inkface.exit()
         sys.exit(1)
 
 def main():
     global canvas
     svg = os.path.join(sys.argv[1])
     elements = inkface.loadsvg(svg)
-    canvas = inkface.canvas()
+    canvas = inkface.create_X_canvas()
     canvas.register_elements(elements)
 
     text_arr = []
@@ -57,7 +57,6 @@ def main():
         print 'Text validation test failed'
         sys.exit(1)
 
-    canvas.show()
     canvas.eventloop()
 
     
