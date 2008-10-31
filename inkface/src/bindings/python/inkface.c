@@ -246,7 +246,7 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
     // Map the window so that it's visible
     XMapWindow(self->cobject->dpy, self->cobject->win);
     XFlush(self->cobject->dpy);
-    inc_dirt_count(self,1);
+    self->cobject->inc_dirt_count(self->cobject,1);
 
     /*
      * Setup the event listening
@@ -667,9 +667,9 @@ inkface_loadsvg(PyObject *self, PyObject *args)
 static PyObject*
 inkface_create_X_canvas(PyObject *self, PyObject *args, PyObject *kwds)
 {
-    if(x_canvas){
-        return (PyObject *)x_canvas;
-    }
+    //if(x_canvas){
+    //    return (PyObject *)x_canvas;
+    //}
     
     ASSERT(x_canvas = PyObject_New(Canvas_t,&Canvas_Type));
 

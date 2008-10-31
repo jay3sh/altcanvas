@@ -144,19 +144,19 @@ void canvas_cleanup(canvas_t *self)
 
 void inc_dirt_count(canvas_t *self, int count)
 {
-    ASSERT(!pthread_mutex_lock(&(self->dirt_mutex)));
+    CHK_ERRNO(pthread_mutex_lock(&(self->dirt_mutex)));
     self->dirt_count += count;
-    ASSERT(!pthread_mutex_unlock(&(self->dirt_mutex)));
+    CHK_ERRNO(pthread_mutex_unlock(&(self->dirt_mutex)));
 }
 
 void dec_dirt_count(canvas_t *self, int count)
 {
-    ASSERT(!pthread_mutex_lock(&(self->dirt_mutex)));
+    CHK_ERRNO(pthread_mutex_lock(&(self->dirt_mutex)));
     self->dirt_count -= count;
     if(self->dirt_count < 0) {
         self->dirt_count = 0;
     }
-    ASSERT(!pthread_mutex_unlock(&(self->dirt_mutex)));
+    CHK_ERRNO(pthread_mutex_unlock(&(self->dirt_mutex)));
 }
 
 
