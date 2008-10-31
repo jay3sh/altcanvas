@@ -26,7 +26,7 @@ valgrind_helgrind()
 }
 
 GDB=cgdb
-VALGRIND=valgrind_helgrind
+VALGRIND=valgrind_memcheck
 
 VERBOSITY=0
 
@@ -38,8 +38,11 @@ execute()
         WRAPPER=$VALGRIND       
     fi
 
-
-    if [ "x$1" == "xall" ]
+    if [ "x$1" == "x" ]
+    then
+        $WRAPPER python
+        
+    elif [ "x$1" == "xall" ]
     then
         for test in basic visual keyboard irc
         do
@@ -87,12 +90,6 @@ then
     exit 0;
 fi
 
-
-if [ -z $TEST ]
-then
-    usage;
-    exit 1;
-fi
 
 execute $TEST
 
