@@ -17,6 +17,7 @@ typedef void (*refreshfunc_t) (canvas_t *self);
 typedef void (*showfunc_t) (canvas_t *self);
 typedef void (*incdcfunc_t) (canvas_t *self, int count);
 typedef void (*decdcfunc_t) (canvas_t *self, int count);
+typedef void (*draw_elem_t) (canvas_t *self, Element *elem);
 
 struct canvas_s {
 
@@ -63,6 +64,7 @@ struct canvas_s {
     incdcfunc_t inc_dirt_count;
     decdcfunc_t dec_dirt_count;
     paintfunc_t paint;
+    draw_elem_t draw_elem;
 
 };
 

@@ -12,8 +12,8 @@
 #include <X11/extensions/Xdbe.h>
 #endif
 
-#include "common.h"
 #include "inkface.h"
+#include "common.h"
 
 //--------------
 // canvas
@@ -167,6 +167,15 @@ void dec_dirt_count(canvas_t *self, int count)
     CHK_ERRNO(pthread_mutex_unlock(&(self->dirt_mutex)));
 }
 
+void canvas_draw_elem(canvas_t *self, Element *elem)
+{
+    ASSERT(self);
+    ASSERT(elem);
+    cairo_surface_t *surface = elem->surface;
+    cairo_set_source_surface(self->ctx,surface,elem->x,elem->y);
+    cairo_paint(self->ctx);
+}
+
 
 canvas_t *canvas_new(void)
 {
@@ -179,6 +188,7 @@ canvas_t *canvas_new(void)
     object->show = canvas_show;
     object->inc_dirt_count = inc_dirt_count;
     object->dec_dirt_count = dec_dirt_count;
+    object->draw_elem = canvas_draw_elem;
     return object;
 }
 

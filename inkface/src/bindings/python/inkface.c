@@ -27,7 +27,6 @@ Canvas_t *x_canvas = NULL;
 
 
 void paint(void *arg);
-void draw(Canvas_t *canvas, Element_t *element);
 
 extern PyTypeObject Canvas_Type;
 extern PyTypeObject Element_Type;
@@ -236,7 +235,7 @@ void paint(void *arg)
                 PyObject_CallFunction(el->onDraw,"O",el);
             } else {
                 // Call canvas's default draw method
-                draw(canvas,el);
+                canvas->cobject->draw_elem(canvas->cobject,el->element);
             }
 
             Py_DECREF(item);
@@ -260,14 +259,3 @@ void paint(void *arg)
     }
 }
 
-void 
-draw(Canvas_t *canvas, Element_t *element)
-{
-    ASSERT(canvas);
-    ASSERT(element);
-    cairo_surface_t *surface = 
-        ((PycairoSurface *)(element->p_surface))->surface;
-    cairo_set_source_surface(canvas->cobject->ctx,
-                                surface,element->x,element->y);
-    cairo_paint(canvas->cobject->ctx);
-}

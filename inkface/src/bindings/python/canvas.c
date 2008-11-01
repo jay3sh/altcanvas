@@ -42,6 +42,8 @@ static PyObject*
 p_canvas_draw(Canvas_t *self, PyObject *args)
 {
     Element_t *element;
+    ASSERT(self);
+    ASSERT(args);
 
     if(!PyArg_ParseTuple(args,"O",&element)){
         PyErr_Clear();
@@ -54,7 +56,7 @@ p_canvas_draw(Canvas_t *self, PyObject *args)
         return Py_None;
     }
 
-    draw(self,element);
+    self->cobject->draw_elem(self->cobject,element->element);
 
     Py_INCREF(Py_None);
     return Py_None;
