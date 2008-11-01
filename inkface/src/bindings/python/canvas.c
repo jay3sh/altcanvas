@@ -206,37 +206,31 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
             PyObject *item;
             while(item = PyIter_Next(iterator)){
 
-                gboolean nowInFocus = FALSE;
-
                 Element_t *el = (Element_t *)item;
 
-                if((mevent->x > el->x) &&
-                    (mevent->y > el->y) &&
-                    (mevent->x < (el->x+el->w)) &&
-                    (mevent->y < (el->y+el->h)))
+                int state = process_motion_event(el->element,mevent);
+    
+                if(state & POINTER_STATE_TAP)
                 {
-                    nowInFocus = TRUE;
                     if(PyCallable_Check(el->onTap)) {
                         PyObject_CallFunction(el->onTap,
                             "OO",el,self->element_list);
                     }
-                } 
-
-                if(el->inFocus && !nowInFocus){
+                }
+    
+                if(state & POINTER_STATE_LEAVE){
                     if(PyCallable_Check(el->onMouseLeave)) {
                         PyObject_CallFunction(el->onMouseLeave,
                             "OO",el,self->element_list);
                     }
                 }
-
-                if(!el->inFocus && nowInFocus){
+    
+                if(state & POINTER_STATE_ENTER){
                     if(PyCallable_Check(el->onMouseEnter)) {
                         PyObject_CallFunction(el->onMouseEnter,
                             "OO",el,self->element_list);
                     }
                 }
-
-                el->inFocus = nowInFocus;
 
                 Py_DECREF(item);
             }

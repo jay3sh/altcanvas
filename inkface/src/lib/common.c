@@ -182,6 +182,54 @@ canvas_t *canvas_new(void)
     return object;
 }
 
+
+//--------------------
+// Element
+//--------------------
+
+//
+// Ideally there should be an element_t class here in the cobject layer,
+// just like the canvas_t above.
+//
+// However a bulk of Element is defined inside libaltsvg. So defining a
+// new object just for the sake of it seems superfluous. Instead this part
+// will contain element related methods that do not fit inside libaltsvg
+// and yet are common across all bindings.
+//
+// If this collection of element related generic methods grows big enough
+// to justify a class in cobject layer then we can go for it.
+// 
+
+int process_motion_event(Element *el,XMotionEvent *mevent)
+{
+    ASSERT(el);
+    ASSERT(mevent);
+
+    int state = 0x0;
+    int nowInFocus = FALSE;
+
+    if((mevent->x > el->x) &&
+        (mevent->y > el->y) &&
+        (mevent->x < (el->x+el->w)) &&
+        (mevent->y < (el->y+el->h)))
+    {
+        nowInFocus = TRUE;
+        state |= POINTER_STATE_TAP;
+    }
+
+    if(el->inFocus && !nowInFocus){
+        state |= POINTER_STATE_LEAVE;
+    }
+
+    if(!el->inFocus && nowInFocus){
+        state |= POINTER_STATE_ENTER;
+    }
+ 
+    el->inFocus = nowInFocus;
+
+    return state; 
+}
+
 //--------------------
 // Helper functions
 //--------------------

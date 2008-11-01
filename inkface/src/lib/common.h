@@ -68,9 +68,13 @@ struct canvas_s {
 
 canvas_t *canvas_new(void);
 
+
 void * painter_thread(void *arg);
 
 #define REFRESH_INTERVAL_MSEC 50
 
+#define POINTER_STATE_TAP       0x1
+#define POINTER_STATE_ENTER     0x2
+#define POINTER_STATE_LEAVE     0x4
 
 #endif /* __COMMON_H__ */
