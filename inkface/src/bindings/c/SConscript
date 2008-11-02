@@ -1,5 +1,6 @@
-env = Environment()
+import os
 
+env = Environment()
 
 #
 # Library dependencies
@@ -10,13 +11,80 @@ env.AppendUnique(CFLAGS=['-g'])
 env.AppendUnique(CFLAGS=['-Isrc/lib'])
 env.AppendUnique(CFLAGS=['-DDOUBLE_BUFFER'])
 
-lib = env.SharedLibrary(target='inkface',
+nativelib = env.SharedLibrary(target='inkface',
                         source=['inkface.c',
                             '#src/lib/common.c'])
 
-if type(lib) == type([]): lib = lib[0]
+if type(nativelib) == type([]): nativelib = nativelib[0]
 
 env.Command('libinkface-native.so','libinkface.so',
             [
                 Move("$TARGET","$SOURCE"),
             ])
+
+env.Alias('nativelib',nativelib)
+
+#
+# Debian package
+# 
+
+Import('VERSION ARCH MAINTAINER DEPENDS DESCRIPTION PKGNAME')
+debpkg = 'inkface-native.deb'
+PKGNAME = 'inkface-native'
+
+svn_version = os.popen('svnversion ..').read()[:-1]
+# This may be as simple as '89' or as complex as '4123:4184M'.
+# We'll just use the last bit.
+svn_version = svn_version.split(':')[-1]
+
+DEBFILES = [
+    ("usr/lib/libinkface-native.so","#src/bindings/c/libinkface-native.so"),
+    ("usr/include/cinkface.h","#src/bindings/c/cinkface.h"),
+]
+
+PKGDIR = '#tmpdeb'
+
+DEBCONTROLFILE = os.path.join(PKGDIR, "DEBIAN/control")
+
+for f in DEBFILES:
+    dest = os.path.join(PKGDIR,f[0])
+    src = f[1]
+    env.Depends(debpkg,dest)
+    env.Command(dest,src,Copy('$TARGET','$SOURCE'))
+    env.Depends(DEBCONTROLFILE, dest)
+
+CONTROL_TEMPLATE = """
+Package: %s
+Priority: extra
+Section: misc
+Installed-Size: %s
+Maintainer: %s
+Architecture: %s
+Version: %s-%s
+Depends: %s
+Description: %s
+"""
+env.Depends(debpkg,DEBCONTROLFILE )
+
+# This function creates the control file from the template and info
+# specified above, and works out the final size of the package.
+def make_control(target=None, source=None, env=None):
+    installed_size = 0
+    for i in DEBFILES:
+        installed_size += os.stat(str(env.File(i[1])))[6]
+        control_info = CONTROL_TEMPLATE % (
+            PKGNAME, installed_size, MAINTAINER, ARCH, VERSION,
+            svn_version, DEPENDS, DESCRIPTION)
+        f = open(str(target[0]), 'w')
+        f.write(control_info)
+        f.close()
+
+env.Command(DEBCONTROLFILE, None, make_control)
+
+env.Command(debpkg, DEBCONTROLFILE,
+            "dpkg-deb -b %s %s"%(PKGDIR[1:],"$TARGET"))
+
+
+
+
+
