@@ -1,0 +1,22 @@
+env = Environment()
+
+
+#
+# Library dependencies
+#
+env.ParseConfig("pkg-config --cflags --libs libaltsvg")
+
+env.AppendUnique(CFLAGS=['-g'])
+env.AppendUnique(CFLAGS=['-Isrc/lib'])
+env.AppendUnique(CFLAGS=['-DDOUBLE_BUFFER'])
+
+lib = env.SharedLibrary(target='inkface',
+                        source=['inkface.c',
+                            '#src/lib/common.c'])
+
+if type(lib) == type([]): lib = lib[0]
+
+env.Command('libinkface-native.so','libinkface.so',
+            [
+                Move("$TARGET","$SOURCE"),
+            ])
