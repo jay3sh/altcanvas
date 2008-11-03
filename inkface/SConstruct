@@ -2,8 +2,10 @@
 # Top level SConstruct
 #----------------------
 
+import os
+
 VERSION = '0.1.1'
-ARCH = 'armel'
+ARCH = os.popen('dpkg --print-architecture').read().strip()
 MAINTAINER = 'Jayesh Salvi <jayesh@altfrequency.com>'
 Export('VERSION ARCH MAINTAINER')
 
