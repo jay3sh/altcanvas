@@ -1,9 +1,11 @@
 #include "rsvg.h"
+/*
 #include "rsvg-cairo.h"
 #include "rsvg-cairo-draw.h"
 #include "rsvg-cairo-render.h"
 #include "rsvg-styles.h"
 #include "rsvg-structure.h"
+*/
 
 #include "config.h"
 #include "stdlib.h"
@@ -419,7 +421,7 @@ load_element_list()
         memset(element,0,sizeof(Element));
         strncpy(element->id,eidList->data,31);  //TODO macro
 
-        inkface_get_element(handle,element);
+        inkface_get_element(handle,element,0);
 
         elemList = g_list_prepend(elemList,element);
 

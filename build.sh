@@ -177,13 +177,21 @@ make_canvasx()
 
 make_inkface()
 {
-    (
-        cd libaltsvg;
-        dpkg-buildpackage -rfakeroot || exit
-        scp ../inkface*deb root@192.168.1.100:/root/
+    echo 'making inkface'
+}
 
-        ssh root@192.168.1.100 \
-        "(dpkg --purge inkface; cd /root/; dpkg -i inkface*deb; rm -f inkface*deb)"
+
+make_libaltsvg()
+{
+    (
+        HOST_ARCH=`dpkg --print-architecture`
+        cd libaltsvg;
+        sed "s/@ARCH@/$HOST_ARCH/g" debian/control.in > debian/control
+        dpkg-buildpackage -rfakeroot || exit
+        #scp ../inkface*deb root@192.168.1.100:/root/
+
+        #ssh root@192.168.1.100 \
+        #"(dpkg --purge inkface; cd /root/; dpkg -i inkface*deb; rm -f inkface*deb)"
     )
 
 }
@@ -266,6 +274,9 @@ case $PACKAGE in
 		;;
     "inkface")
         make_inkface;
+        ;;
+    "libaltsvg")
+        make_libaltsvg;
         ;;
     "altplayer")
         make_altplayer;

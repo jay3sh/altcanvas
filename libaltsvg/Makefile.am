@@ -7,10 +7,10 @@ endif
 SUBDIRS = . data tests 
 
 lib_LTLIBRARIES = libaltsvg.la
-bin_PROGRAMS = rsvg-convert $(target_rsvg_view) 
-noinst_PROGRAMS = test-performance
+bin_PROGRAMS = 
+noinst_PROGRAMS = 
 
-man_MANS = rsvg.1
+man_MANS = 
 
 if OS_WIN32
 else
@@ -74,9 +74,7 @@ libaltsvg_la_LIBADD = $(LIBGSF_LIBS) $(LIBCROCO_LIBS) $(LIBRSVG_LIBS) $(FREETYPE
 
 librsvgincdir = $(includedir)/libaltsvg
 librsvginc_HEADERS = 	\
-	$(headers)	\
-	librsvg-features.h \
-	librsvg-enum-types.h \
+	rsvg.h \
 	inkface.h
 
 INCLUDES =				\
@@ -98,23 +96,7 @@ LDADDS =				\
 	$(LIBRSVG_LIBS) 		\
 	$(top_builddir)/libaltsvg.la
 
-bin_SCRIPTS=rsvg
-
-rsvg_convert_SOURCES=rsvg-convert.c
-rsvg_convert_LDFLAGS =
-rsvg_convert_DEPENDENCIES = $(DEPS)
-rsvg_convert_LDADD = $(LDADDS) $(libm)
-
-test_performance_SOURCES=test-performance.c
-test_performance_LDFLAGS =
-test_performance_DEPENDENCIES = $(DEPS)
-test_performance_LDADD = $(LDADDS) $(libm)
-
-rsvg_view_SOURCES = 		\
-	test-display.c
-rsvg_view_LDFLAGS =
-rsvg_view_DEPENDENCIES = $(DEPS)
-rsvg_view_LDADD = $(GTK_LIBS) $(GDK_X11_LIBS) $(libm) $(LDADDS)
+bin_SCRIPTS=
 
 EXTRA_DIST =				\
 	MAINTAINERS			\
