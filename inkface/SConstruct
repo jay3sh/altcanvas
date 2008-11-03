@@ -1,17 +1,15 @@
+#----------------------
+# Top level SConstruct
+#----------------------
 
-
-#if 'deb' in COMMAND_LINE_TARGETS:
-#    SConscript(['debian/SConscript'])
-#    Exit()
-
-VERSION = '0.1.0'
+VERSION = '0.1.1'
 ARCH = 'armel'
 MAINTAINER = 'Jayesh Salvi <jayesh@altfrequency.com>'
-DEPENDS = 'libaltsvg (>= 0.1.0)'
-DESCRIPTION = 'UI framework based on SVG'
-PKGNAME = 'inkface-python'
+Export('VERSION ARCH MAINTAINER')
 
-Export('VERSION ARCH MAINTAINER DEPENDS DESCRIPTION PKGNAME')
+env = Environment()
+Export('env')
 
-SConscript(['src/lib.sc','src/python.sc','debian/SConscript'])
+SConscript(['src/bindings/c/lib.sc'])
+SConscript(['src/bindings/c/debian.sc'])
 
