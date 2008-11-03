@@ -1,17 +1,21 @@
+#---------------------------------------------------
+# SConscript for building native inkface bindings
+#---------------------------------------------------
 
 import os
 
 Import('env')
+
+env.AppendUnique(CFLAGS=['-Isrc/lib'])
 
 #
 # Library dependencies
 #
 env.ParseConfig("pkg-config --cflags --libs libaltsvg")
 
-env.AppendUnique(CFLAGS=['-g'])
-env.AppendUnique(CFLAGS=['-Isrc/lib'])
-env.AppendUnique(CFLAGS=['-DDOUBLE_BUFFER'])
-
+#
+# Build the library
+#
 nativelib = env.SharedLibrary(target='inkface',
                         source=['inkface.c',
                             '#src/lib/common.c'])
@@ -24,5 +28,4 @@ env.Command('libinkface-native.so','libinkface.so',
             ])
 
 env.Alias('native-lib',nativelib)
-
 

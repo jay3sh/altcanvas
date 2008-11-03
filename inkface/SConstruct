@@ -8,8 +8,24 @@ MAINTAINER = 'Jayesh Salvi <jayesh@altfrequency.com>'
 Export('VERSION ARCH MAINTAINER')
 
 env = Environment()
+
+#
+# Set generic build options of the environment that 
+# can be applied to all subdirectories
+#
+env.AppendUnique(CFLAGS=['-g'])
+env.AppendUnique(CFLAGS=['-DDOUBLE_BUFFER'])
+
+env.ParseConfig("pkg-config --cflags --libs libaltsvg")
+
 Export('env')
+
+#
+# SConscript files of subdirectories
+#
 
 SConscript(['src/bindings/c/lib.sc'])
 SConscript(['src/bindings/c/debian.sc'])
 
+SConscript(['src/bindings/python/lib.sc'])
+#SConscript(['src/bindings/python/debian.sc'])
