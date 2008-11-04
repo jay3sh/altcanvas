@@ -6,10 +6,10 @@ import os
 
 Import('env')
 Import('VERSION ARCH MAINTAINER')
-DEPENDS = 'libaltsvg (>= 0.1.1)'
+DEPENDS = 'libaltsvg (>= 0.1.0)'
 DESCRIPTION = 'UI framework based on SVG'
 
-PKGNAME = 'inkface-native'
+PKGNAME = 'inkface-python'
 PKGFILE = '#%s_%s_%s.deb'%(PKGNAME,VERSION,ARCH)
 
 # Get Subversion number to embed in package information
@@ -19,8 +19,8 @@ svn_version = os.popen('svnversion ..').read()[:-1]
 svn_version = svn_version.split(':')[-1]
 
 DEBFILES = [
-    ("usr/lib/libinkface-native.so","#src/bindings/c/libinkface-native.so"),
-    ("usr/include/cinkface.h","#src/bindings/c/cinkface.h"),
+    ("usr/lib/python2.5/site-packages/inkface.so", 
+                                        "#src/bindings/python/inkface.so"),
 ]
 
 PKGDIR = 'tmpdeb'
@@ -69,6 +69,8 @@ def make_debpkg(target,source,env):
 
 env.Command(PKGFILE,PKGDIR,make_debpkg)
 
-env.Alias('native-debian',PKGFILE)
+env.Alias('python-debian',PKGFILE)
+
+
 
 

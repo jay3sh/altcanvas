@@ -30,4 +30,4 @@ SConscript(['src/bindings/c/lib.sc'])
 SConscript(['src/bindings/c/debian.sc'])
 
 SConscript(['src/bindings/python/lib.sc'])
-#SConscript(['src/bindings/python/debian.sc'])
+SConscript(['src/bindings/python/debian.sc'])
