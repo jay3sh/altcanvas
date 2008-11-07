@@ -18,6 +18,10 @@ env = Environment()
 env.AppendUnique(CFLAGS=['-g'])
 env.AppendUnique(CFLAGS=['-DDOUBLE_BUFFER'])
 
+if ARCH == 'armel':
+    env.AppendUnique(CFLAGS=['-DHAS_XSP'])
+    env.ParseConfig("pkg-config --cflags --libs xsp")
+
 env.ParseConfig("pkg-config --cflags --libs libaltsvg")
 
 Export('env')

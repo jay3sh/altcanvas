@@ -15,6 +15,14 @@
 #include "inkface.h"
 #include "common.h"
 
+#ifdef HAS_XSP
+#include <X11/extensions/Xsp.h>
+static int xsp_event_base=-1;
+#endif // HAS_XSP
+
+int GLOBAL_WIDTH = 0;
+int GLOBAL_HEIGHT = 0;
+
 //--------------
 // canvas
 //--------------
@@ -33,8 +41,9 @@ canvas_init(
     int screen = 0;
 
     ASSERT(self);
-    self->width = width;
-    self->height = height;
+    self->width = GLOBAL_WIDTH = width;
+    self->height = GLOBAL_HEIGHT = height;
+
     self->fullscreen = fullscreen;
     self->paint = paint;
     self->paint_arg = paint_arg;
@@ -81,8 +90,29 @@ canvas_init(
         ASSERT(status != BadWindow);
     }
 
+    //------------------------------------------
+    // XSP extension - pressure sensitive input
+    //------------------------------------------
+    #ifdef HAS_XSP
+    int xsp_error_base=-1;
+    int xsp_major=-1;
+    int xsp_minor=-1;
+    /* get xsp event base */
+    XSPQueryExtension(self->dpy,
+                    &xsp_event_base,
+                    &xsp_error_base,
+                    &xsp_major,
+                    &xsp_minor);
+    ASSERT(xsp_event_base >= 0);
+
+    XSPSetTSRawMode(self->dpy, True);
+    #endif
+
+
+    //--------------------------------
+    // Double buffering support
+    //--------------------------------
     #ifdef DOUBLE_BUFFER
-    /* Enabled double buffering */
     self->backBuffer = XdbeAllocateBackBufferName(self->dpy,self->win,XdbeBackground);
     self->swapinfo.swap_window = self->win;
     self->swapinfo.swap_action = XdbeBackground;
@@ -176,7 +206,6 @@ void canvas_draw_elem(canvas_t *self, Element *elem)
     cairo_paint(self->ctx);
 }
 
-
 canvas_t *canvas_new(void)
 {
     canvas_t *object = NULL;
@@ -238,6 +267,33 @@ int process_motion_event(Element *el,XMotionEvent *mevent)
     el->inFocus = nowInFocus;
 
     return state; 
+}
+
+int calculate_pressure(Element *el, XEvent *event)
+{
+#ifdef HAS_XSP
+    int tx=0,ty=0,pressure=0;
+    XSPRawTouchscreenEvent xsp_event;
+
+    if(event->type == xsp_event_base)
+    {
+        memcpy(&xsp_event, event,
+            sizeof(XSPRawTouchscreenEvent));
+        tx = xsp_event.x;
+        ty = xsp_event.y;
+        pressure = xsp_event.pressure;
+    
+        /* translate raw coordinates */
+        TRANSLATE_RAW_COORDS(&tx, &ty);
+        
+        if((tx > el->x) && (ty > el->y) &&
+            (tx < el->x+el->w) && (ty < el->y+el->h))
+        {
+            return pressure;
+        }
+    }
+#endif
+    return 0;
 }
 
 //--------------------

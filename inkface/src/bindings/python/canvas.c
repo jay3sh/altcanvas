@@ -189,6 +189,11 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
     {
         XMotionEvent *mevent;
         XEvent event;
+#ifdef HAS_XSP
+        int pressure = 0;
+#endif 
+        PyObject *iterator;
+        PyObject *item;
 
         Py_BEGIN_ALLOW_THREADS
 
@@ -204,8 +209,8 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
             /*
              * Trigger the events in decreasing "order" of the elements
              */
-            PyObject *iterator = PyObject_GetIter(self->element_list);
-            PyObject *item;
+            iterator = PyObject_GetIter(self->element_list);
+            item;
             while(item = PyIter_Next(iterator)){
 
                 Element_t *el = (Element_t *)item;
@@ -241,10 +246,29 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
 
             break;
         case DestroyNotify:
-            // canvas is destroyed get out of eventloop
             Py_INCREF(Py_None);
             return Py_None;
         default:
+#ifdef HAS_XSP
+            iterator = PyObject_GetIter(self->element_list);
+            while(item = PyIter_Next(iterator)){
+
+                Element_t *el = (Element_t *)item;
+                
+                pressure = calculate_pressure(el->element,&event);
+                if(pressure){
+                    LOG("pressure = %d",pressure);
+                }
+                if(pressure > 20){
+                    if(PyCallable_Check(el->onTap)) {
+                        PyObject_CallFunction(el->onTap,
+                            "OO",el,self->element_list);
+                    }
+                }
+                Py_DECREF(item);
+            }
+            Py_DECREF(iterator);
+#endif
             break;
         }
 
