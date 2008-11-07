@@ -9,7 +9,7 @@ env.AppendUnique(CFLAGS=['-Isrc/lib'])
 #
 # Resolve generic library dependencies using pkg-config
 #
-#env.ParseConfig("pkg-config --cflags --libs xext")
+env.ParseConfig("pkg-config --cflags --libs xext")
 env.ParseConfig("pkg-config --cflags --libs pycairo")
 
 #
