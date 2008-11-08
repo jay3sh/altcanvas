@@ -38,6 +38,8 @@ element_init(Element_t *self, PyObject *args, PyObject *kwds)
     self->onMouseLeave = Py_None;
     Py_INCREF(Py_None);
     self->onDraw = Py_None;
+    Py_INCREF(Py_None);
+    self->onKeyPress = Py_None;
 
     return 0;
 }
@@ -114,6 +116,8 @@ static PyMemberDef element_members[] = {
                     "Mouse Enter handler"},
     { "onMouseLeave", T_OBJECT,offsetof(Element_t,onMouseLeave),0,
                     "Mouse Leave handler"},
+    { "onKeyPress", T_OBJECT,offsetof(Element_t,onKeyPress),0,
+                    "Keyboard key handler"},
     { NULL }
 };
 
@@ -138,6 +142,7 @@ element_dealloc(Element_t *self)
     if (self->onTap) Py_DECREF(self->onTap);
     if (self->onMouseEnter) Py_DECREF(self->onMouseEnter);
     if (self->onMouseLeave) Py_DECREF(self->onMouseLeave);
+    if (self->onKeyPress) Py_DECREF(self->onKeyPress);
 
     // Element cleanup : TODO move to libaltsvg
     if(self->element) {

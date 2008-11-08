@@ -38,5 +38,5 @@ env.Command('inkface.so','libinkface.so',
                 Move("$TARGET","$SOURCE"),
             ])
 
-env.Alias('python-lib',pythonlib)
+env.Alias('python-lib','inkface.so')
 

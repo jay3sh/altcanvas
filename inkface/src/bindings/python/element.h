@@ -32,6 +32,7 @@ typedef struct {
     PyObject *onTap;
     PyObject *onMouseEnter;
     PyObject *onMouseLeave;
+    PyObject *onKeyPress;
 
 } Element_t;
 

@@ -180,12 +180,15 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
 {
     self->cobject->show(self->cobject);
 
-    LOG("Entering event loop");
     /*
      * Setup the event listening
      */
     XSelectInput(self->cobject->dpy, self->cobject->win, 
-                    StructureNotifyMask|PointerMotionMask|ExposureMask);
+                    StructureNotifyMask|
+                    PointerMotionMask|
+                    ExposureMask|
+                    KeyPressMask|
+                    KeyReleaseMask);
     while(1)
     {
         XMotionEvent *mevent;
@@ -205,13 +208,32 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
         switch(event.type){
         case MapNotify:
             break;
+        case KeyPress:
+            {
+                KeySym ksym;
+                char buf[3] = "\0\0\0";
+                XLookupString(&event.xkey,buf,1,&ksym,NULL);
+
+                iterator = PyObject_GetIter(self->element_list);
+                while(item = PyIter_Next(iterator)){
+                    Element_t *el = (Element_t *)item;
+                    if(PyCallable_Check(el->onKeyPress)){
+                        PyObject_CallFunction(
+                            el->onKeyPress,
+                            "OOO",
+                            el,
+                            PyString_FromString(buf),
+                            self->element_list);
+                    }
+                }
+            }
+            break;
         case MotionNotify:
             mevent = (XMotionEvent *)(&event);
             /*
              * Trigger the events in decreasing "order" of the elements
              */
             iterator = PyObject_GetIter(self->element_list);
-            item;
             while(item = PyIter_Next(iterator)){
 
                 Element_t *el = (Element_t *)item;

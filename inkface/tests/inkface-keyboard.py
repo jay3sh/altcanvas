@@ -55,6 +55,7 @@ def onSpecialKey(e,elements):
     canvas.refresh()
 
 def onKeyEnter(e,elements):
+    global canvas
     for el in elements:
         if el.name == e.name+'Glow':
             el.opacity = 1
@@ -89,6 +90,13 @@ def onMsgBoxOK(e,elist):
             el.opacity = 0
     canvas.refresh()
 
+def onKeyboardKeyPressed(e,string,elements):
+    global canvas
+    textbox.text = textbox.text+string
+    textbox.refresh()
+    canvas.refresh()
+
+   
 def main():
     global canvas
     global textbox
@@ -125,6 +133,7 @@ def main():
         elif e.name == 'textBox':
             textbox = e
             textbox.text = ''
+            textbox.onKeyPress = onKeyboardKeyPressed
             textbox.refresh()
         elif e.name.startswith('msgbox'):
             e.opacity = 0
