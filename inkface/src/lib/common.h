@@ -81,13 +81,6 @@ void * painter_thread(void *arg);
 
 #define DUP_TAP_IGNORANCE_LIMIT 1
 
-typedef struct {
-    unsigned int state;
-    int pressure;
-    char key;
-} event_meaning_t;
-
-int interpret_event(Element *el,XEvent *event, event_meaning_t *meaning);
 int process_motion_event(Element *el,XMotionEvent *mevent);
 int calculate_pressure(Element *el, XEvent *event);
 

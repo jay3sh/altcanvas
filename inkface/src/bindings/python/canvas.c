@@ -218,7 +218,6 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
 
                 int state = process_motion_event(el->element,mevent);
     
-                LOG("pointer state = 0x%x",state);
                 if(state & POINTER_STATE_TAP)
                 {
                     if(PyCallable_Check(el->onTap)) {

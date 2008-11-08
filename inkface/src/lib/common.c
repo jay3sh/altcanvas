@@ -239,68 +239,6 @@ canvas_t *canvas_new(void)
 // to justify a class in cobject layer then we can go for it.
 // 
 
-//
-// interpret_event - experimental method, not used.
-//
-int interpret_event(Element *el,XEvent *event, event_meaning_t *meaning)
-{
-    ASSERT(el);
-    ASSERT(event);
-    ASSERT(meaning);
-
-    static int tap_counter = 0;
-    int tx=0,ty=0,pressure=0;
-    int nowInFocus = FALSE;
-    XMotionEvent *mevent;
- 
-    switch(event->type){
-    case MotionNotify:
-        mevent = (XMotionEvent *)(&event);
-        tx = mevent->x;
-        ty = mevent->y;
-        break;
-    default:
-        #ifdef HAS_XSP
-        {
-            XSPRawTouchscreenEvent xsp_event;
-    
-            if(event->type == xsp_event_base)
-            {
-                memcpy(&xsp_event, event, sizeof(XSPRawTouchscreenEvent));
-                tx = xsp_event.x;
-                ty = xsp_event.y;
-                meaning->pressure = xsp_event.pressure;
-        
-                /* translate raw coordinates */
-                TRANSLATE_RAW_COORDS(&tx, &ty);
-            }
-        }
-        #endif
-        break;
-    } // end of switch
-
-    if((tx > el->x) &&
-        (ty > el->y) &&
-        (tx < (el->x+el->w)) &&
-        (ty < (el->y+el->h)))
-    {
-        nowInFocus = TRUE;
-        meaning->state |= POINTER_STATE_TAP;
-    }
-
-    if(el->inFocus && !nowInFocus){
-        meaning->state |= POINTER_STATE_LEAVE;
-    }
-
-    if(!el->inFocus && nowInFocus){
-        meaning->state |= POINTER_STATE_ENTER;
-    }
- 
-    el->inFocus = nowInFocus;
-
-    return TRUE;
-}
-
 int process_motion_event(Element *el,XMotionEvent *mevent)
 {
     ASSERT(el);
