@@ -79,6 +79,17 @@ void * painter_thread(void *arg);
 #define POINTER_STATE_ENTER     0x2
 #define POINTER_STATE_LEAVE     0x4
 
+#define DUP_TAP_IGNORANCE_LIMIT 1
+
+typedef struct {
+    unsigned int state;
+    int pressure;
+    char key;
+} event_meaning_t;
+
+int interpret_event(Element *el,XEvent *event, event_meaning_t *meaning);
+int process_motion_event(Element *el,XMotionEvent *mevent);
+int calculate_pressure(Element *el, XEvent *event);
 
 #ifdef HAS_XSP
 
@@ -98,8 +109,6 @@ void * painter_thread(void *arg);
   * x = GLOBAL_WIDTH - (GLOBAL_WIDTH * *x) / DEV_X_DELTA;\
   * y = GLOBAL_HEIGHT - (GLOBAL_HEIGHT * *y) / DEV_Y_DELTA;\
 }
-
-int calculate_pressure(Element *el, XEvent *event);
 
 #endif /* HAS_XSP */
 

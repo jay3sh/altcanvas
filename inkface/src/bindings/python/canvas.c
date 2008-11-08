@@ -180,11 +180,12 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
 {
     self->cobject->show(self->cobject);
 
+    LOG("Entering event loop");
     /*
      * Setup the event listening
      */
     XSelectInput(self->cobject->dpy, self->cobject->win, 
-                            StructureNotifyMask|PointerMotionMask);
+                    StructureNotifyMask|PointerMotionMask|ExposureMask);
     while(1)
     {
         XMotionEvent *mevent;
@@ -217,6 +218,7 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
 
                 int state = process_motion_event(el->element,mevent);
     
+                LOG("pointer state = 0x%x",state);
                 if(state & POINTER_STATE_TAP)
                 {
                     if(PyCallable_Check(el->onTap)) {
@@ -249,16 +251,13 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
             Py_INCREF(Py_None);
             return Py_None;
         default:
-#ifdef HAS_XSP
+            #ifdef HAS_XSP
             iterator = PyObject_GetIter(self->element_list);
             while(item = PyIter_Next(iterator)){
 
                 Element_t *el = (Element_t *)item;
                 
                 pressure = calculate_pressure(el->element,&event);
-                if(pressure){
-                    LOG("pressure = %d",pressure);
-                }
                 if(pressure > 20){
                     if(PyCallable_Check(el->onTap)) {
                         PyObject_CallFunction(el->onTap,
@@ -268,7 +267,7 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
                 Py_DECREF(item);
             }
             Py_DECREF(iterator);
-#endif
+            #endif
             break;
         }
 

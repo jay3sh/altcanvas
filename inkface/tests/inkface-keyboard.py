@@ -99,23 +99,29 @@ def main():
     # Wire handlers and init some elements
     for e in elements:
         if e.name == 'keySpace':
-            e.onMouseEnter = onSpacebar
+            #e.onMouseEnter = onSpacebar
+            e.onTap = onSpacebar
         elif e.name == 'keyEnter':
-            e.onMouseEnter = onEnter
+            #e.onMouseEnter = onEnter
+            e.onTap = onEnter
         elif e.name == 'keyBackspace':
-            e.onMouseEnter = onBackspace
+            #e.onMouseEnter = onBackspace
+            e.onTap = onBackspace
         elif e.name.startswith('keySp'):
-            e.onMouseEnter = onSpecialKey
+            #e.onMouseEnter = onSpecialKey
+            e.onTap = onSpecialKey
         elif e.name.startswith('key'):
             if e.name.endswith('Glow'):
                 e.opacity = 0
                 e.onDraw = onKeyGlowDraw
             else:
-                e.onMouseEnter = onKeyEnter
+                #e.onMouseEnter = onKeyEnter
+                e.onTap = onKeyEnter
                 e.onMouseLeave = onKeyLeave
                 e.opacity = 1
         elif e.name == 'exitDoor':
-            e.onMouseEnter = onExit
+            #e.onMouseEnter = onExit
+            e.onTap = onExit
         elif e.name == 'textBox':
             textbox = e
             textbox.text = ''
