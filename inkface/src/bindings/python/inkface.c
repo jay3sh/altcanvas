@@ -9,6 +9,8 @@
 
 #include "inkface.h"
 
+#include "X11/keysym.h"
+
 #ifdef DOUBLE_BUFFER
 #include <X11/extensions/Xdbe.h>
 #endif
@@ -197,6 +199,11 @@ initinkface(void)
 
     m = Py_InitModule("inkface",inkface_methods);
 
+    PyModule_AddIntConstant(m,"KeyBackspace",XK_BackSpace);
+    PyModule_AddIntConstant(m,"KeyTab",XK_Tab);
+    PyModule_AddIntConstant(m,"KeyEscape",XK_Escape);
+    PyModule_AddIntConstant(m,"KeyEnter",XK_Return);
+    PyModule_AddIntConstant(m,"KeySpace",XK_space);
 }
 
 /* INTERNAL FUNCTIONS */

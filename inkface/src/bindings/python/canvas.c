@@ -8,6 +8,8 @@
 
 #include "inkface.h"
 
+#include "X11/keysym.h"
+
 #ifdef DOUBLE_BUFFER
 #include <X11/extensions/Xdbe.h>
 #endif
@@ -210,19 +212,29 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
             break;
         case KeyPress:
             {
-                KeySym ksym;
+                KeySym keysym;
                 char buf[3] = "\0\0\0";
-                XLookupString(&event.xkey,buf,1,&ksym,NULL);
-
+                XLookupString(&event.xkey,buf,1,&keysym,NULL);
+                switch(keysym){
+                case XK_BackSpace:
+                case XK_Tab:
+                case XK_Escape:
+                    // For special keys clear the ASCII interpretation 
+                    // of the key
+                    memset(buf,0,3*sizeof(char));
+                default:
+                    break;
+                }
                 iterator = PyObject_GetIter(self->element_list);
                 while(item = PyIter_Next(iterator)){
                     Element_t *el = (Element_t *)item;
                     if(PyCallable_Check(el->onKeyPress)){
                         PyObject_CallFunction(
                             el->onKeyPress,
-                            "OOO",
+                            "OOiO",
                             el,
                             PyString_FromString(buf),
+                            keysym,
                             self->element_list);
                     }
                 }

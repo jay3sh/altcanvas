@@ -90,9 +90,19 @@ def onMsgBoxOK(e,elist):
             el.opacity = 0
     canvas.refresh()
 
-def onKeyboardKeyPressed(e,string,elements):
+def onKeyboardKeyPressed(e,string,keycode,elements):
     global canvas
-    textbox.text = textbox.text+string
+    textbox.text = textbox.text+string.strip()
+
+    if keycode == inkface.KeyEscape:
+        onExit(e,elements)
+    elif keycode == inkface.KeyBackspace:
+        onBackspace(e,elements)
+    elif keycode == inkface.KeyEnter:
+        onEnter(e,elements) 
+    elif keycode == inkface.KeySpace:
+        textbox.text = textbox.text + ' '
+
     textbox.refresh()
     canvas.refresh()
 
