@@ -12,6 +12,9 @@ typedef enum { ELEM_TYPE_MASK=1,
                 ELEM_TYPE_TRANSIENT=2 } element_type_t;
 
 struct _Element{
+    // handle to parent SVG document
+    RsvgHandle *handle;
+
     cairo_t *cr;
     cairo_surface_t *surface;
     int x;
@@ -77,6 +80,6 @@ void fork_painter_thread();
 void incr_dirt_count(int count);
 void decr_dirt_count(int count);
 
-void inkface_get_element(RsvgHandle *handle, Element *element,int push);
+void inkface_get_element(Element *element,int push);
 GList *inkface_get_element_ids(const RsvgHandle *handle);
 #endif /*__INKFACE_H__ */

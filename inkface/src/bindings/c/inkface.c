@@ -53,3 +53,8 @@ inkface_create_X_canvas(int width,int height,int fullscreen)
 void paint(void *arg)
 {
 }
+
+inkface_init(void)
+{
+    rsvg_init();
+}

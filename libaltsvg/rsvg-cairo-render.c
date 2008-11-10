@@ -302,11 +302,14 @@ inkface_set_chars(gpointer data,gpointer user_data)
  */
 
 void
-inkface_get_element(RsvgHandle *handle, Element *element,int push)
+inkface_get_element(Element *element,int push)
 {
     RsvgDrawingCtx *draw;
     RsvgNode *drawsub = NULL;
     RsvgNode *element_node = NULL;
+
+    ASSERT(element);
+    RsvgHandle *handle = element->handle;
 
     g_return_if_fail (handle != NULL);
 
@@ -350,7 +353,8 @@ inkface_get_element(RsvgHandle *handle, Element *element,int push)
             }
         }
     } else {
-        printf("[%s:%d] drawsub is NULL\n",__FILE__,__LINE__);
+        printf("[%s:%d] drawsub for %s is NULL\n",
+                    __FILE__,__LINE__,element->id);
     }
 
     while (drawsub != NULL) {

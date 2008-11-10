@@ -22,7 +22,6 @@
 //
 
 extern Pycairo_CAPI_t *Pycairo_CAPI;
-extern RsvgHandle *handle;
 
 static int
 element_init(Element_t *self, PyObject *args, PyObject *kwds)
@@ -50,7 +49,7 @@ element_refresh(Element_t *self,PyObject *args)
     g_string_free(self->element->text,TRUE);
     self->element->text = g_string_new(
         PyString_AsString(self->text));
-    inkface_get_element(handle,self->element,TRUE);
+    inkface_get_element(self->element,TRUE);
 
     // Release ownership of old pycairo surface object
     Py_DECREF(self->p_surface);

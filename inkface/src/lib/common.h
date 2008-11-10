@@ -3,6 +3,7 @@
 #define __COMMON_H__
 
 RsvgHandle *rsvg_handle_from_file(const char *filename);
+GList *load_element_list(char *svgname);
 
 typedef struct canvas_s canvas_t;
 typedef struct element_s element_t;

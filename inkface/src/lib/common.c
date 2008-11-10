@@ -360,12 +360,15 @@ compare_element(
 }
 
 GList *
-load_element_list(RsvgHandle *handle)
+load_element_list(char *svgname)
 {
-    /*
-     * Create Element objects from the loaded SVG
-     */
+    ASSERT(svgname);
 
+    RsvgHandle *handle = NULL;
+
+    // Create rsvg handle for the SVG file
+    ASSERT(handle = rsvg_handle_from_file(svgname));
+ 
     ASSERT(handle);
     GList *sorted_elist = NULL;
     GList *eidlist = inkface_get_element_ids(handle);
@@ -382,9 +385,12 @@ load_element_list(RsvgHandle *handle)
 
         e = (Element *)g_malloc(sizeof(Element));
         memset(e,0,sizeof(Element));
+
+        e->handle = handle;
+
         strncpy(e->id,eidlist->data,31);  //TODO macro
 
-        inkface_get_element(handle,e,FALSE);
+        inkface_get_element(e,FALSE);
 
         elist = g_list_prepend(elist,e);
 

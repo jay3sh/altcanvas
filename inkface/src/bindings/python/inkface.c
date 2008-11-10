@@ -23,7 +23,6 @@
 
 
 Pycairo_CAPI_t *Pycairo_CAPI;
-RsvgHandle *handle = NULL;
 //TODO: Make canvas singleton
 Canvas_t *x_canvas = NULL;
 
@@ -47,10 +46,7 @@ inkface_loadsvg(PyObject *self, PyObject *args)
         
     ASSERT(svgname)
 
-    // Create rsvg handle for the SVG file
-    ASSERT(handle = rsvg_handle_from_file(svgname));
- 
-    GList *elist = load_element_list(handle);
+    GList *elist = load_element_list(svgname);
 
     // Create Python list of elements
 
