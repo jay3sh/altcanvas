@@ -75,33 +75,6 @@ p_canvas_refresh(Canvas_t *self, PyObject *args)
 }
 
 static PyObject*
-p_canvas_set_timer(Canvas_t *canvas, PyObject *args)
-{
-    int interval = -1;
-    PyObject *onTimer_pyo;
-
-    if(!PyArg_ParseTuple(args,"iO",&interval,&onTimer_pyo)){
-        PyErr_Clear();
-        PyErr_SetString(PyExc_ValueError,"Invalid Arguments");
-        return NULL;
-    }
-
-    if(interval < 0){
-        PyErr_Clear();
-        PyErr_SetString(PyExc_ValueError,"Invalid timer interval");
-        return NULL;
-    }
-
-    ASSERT(onTimer_pyo);
-    canvas->onTimer = onTimer_pyo;
-
-    canvas->timer_step = (unsigned int)(interval/REFRESH_INTERVAL_MSEC);
-
-    Py_INCREF(Py_None);
-    return Py_None;
-}
-
-static PyObject*
 p_canvas_register_elements(PyObject *self, PyObject *args)
 {
     PyObject *elemList_pyo;
@@ -338,9 +311,6 @@ static PyMethodDef canvas_methods[] = {
         METH_NOARGS, "Make canvas process events in infinite loop" },
     { "draw", (PyCFunction)p_canvas_draw, 
         METH_VARARGS, "Draw the element canvas" },
-    { "set_timer", (PyCFunction)p_canvas_set_timer, 
-        METH_VARARGS, 
-        "Set a timer which expires periodically and triggers canvas refresh" },
     { "refresh", (PyCFunction)p_canvas_refresh, 
         METH_NOARGS, "Refresh the canvas" },
     {NULL, NULL, 0, NULL},
@@ -349,11 +319,13 @@ static PyMethodDef canvas_methods[] = {
 static PyMemberDef canvas_members[] = {
     { "width", T_INT, offsetof(Canvas_t,width),0,"Width of Canvas"},
     { "height", T_INT, offsetof(Canvas_t,height),0,"Height of Canvas"},
-    { "timer_step", T_INT, offsetof(Canvas_t,timer_step),0,"Timer step"},
+    { "timeout", T_INT, offsetof(Canvas_t,timeout),0,"Timeout in msec"},
     { "fullscreen", T_OBJECT, offsetof(Canvas_t,fullscreen),0,
         "Fullscreen flag"},
     { "elements", T_OBJECT, offsetof(Canvas_t,element_list),0,
             "Elements currently registered with Canvas"},
+    { "onTimer", T_OBJECT, offsetof(Canvas_t,onTimer),0,
+            "Timeout handler"},
     { NULL }
 };
 

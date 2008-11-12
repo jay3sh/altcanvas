@@ -17,7 +17,7 @@ typedef struct {
     PyObject *element_list;
 
     // Painting control members
-    unsigned int timer_step;
+    unsigned int timeout;
 
     PyObject *onTimer;
 

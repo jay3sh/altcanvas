@@ -111,7 +111,7 @@ inkface_create_X_canvas(PyObject *self, PyObject *args, PyObject *kwds)
     x_canvas->width=0; 
     x_canvas->height=0;
     x_canvas->fullscreen = Py_False;
-    x_canvas->timer_step = 0;
+    x_canvas->timeout = 0;
     x_canvas->onTimer = NULL;
     static char *kwlist[] = {"width", "height", "fullscreen", NULL};
 
@@ -211,10 +211,11 @@ void paint(void *arg)
     ASSERT(canvas);
     ASSERT(canvas->cobject);
 
-    if(canvas->timer_step){
+    if(canvas->timeout){
+        unsigned int timer_step = canvas->timeout/REFRESH_INTERVAL_MSEC;
         canvas->cobject->timer_counter++;
         canvas->cobject->timer_counter = \
-            canvas->cobject->timer_counter % canvas->timer_step;
+            canvas->cobject->timer_counter % timer_step;
     }
 
     if((canvas->cobject->timer_counter == 0) || (canvas->cobject->dirt_count))
