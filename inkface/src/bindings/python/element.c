@@ -53,6 +53,7 @@ element_refresh(Element_t *self,PyObject *args)
 
     // Release ownership of old pycairo surface object
     Py_DECREF(self->p_surface);
+    ASSERT(self->element->surface);
     ASSERT(self->p_surface = PycairoSurface_FromSurface(
                         self->element->surface,NULL));
 
