@@ -181,6 +181,9 @@ static PyObject*
 p_canvas_eventloop(Canvas_t *self, PyObject *args)
 {
     self->cobject->show(self->cobject);
+    
+    int error_flag = 0;
+    PyObject *result = NULL;
 
     /*
      * Setup the event listening
@@ -229,13 +232,14 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
                 while(item = PyIter_Next(iterator)){
                     Element_t *el = (Element_t *)item;
                     if(PyCallable_Check(el->onKeyPress)){
-                        PyObject_CallFunction(
+                        result = PyObject_CallFunction(
                             el->onKeyPress,
                             "OOiO",
                             el,
                             PyString_FromString(buf),
                             keysym,
                             self->element_list);
+                        if(!result) error_flag = 1;
                     }
                 }
             }
@@ -255,22 +259,25 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
                 if(state & POINTER_STATE_TAP)
                 {
                     if(PyCallable_Check(el->onTap)) {
-                        PyObject_CallFunction(el->onTap,
+                        result = PyObject_CallFunction(el->onTap,
                             "OO",el,self->element_list);
+                        if(!result) error_flag = 1;
                     }
                 }
     
                 if(state & POINTER_STATE_LEAVE){
                     if(PyCallable_Check(el->onMouseLeave)) {
-                        PyObject_CallFunction(el->onMouseLeave,
+                        result = PyObject_CallFunction(el->onMouseLeave,
                             "OO",el,self->element_list);
+                        if(!result) error_flag = 1;
                     }
                 }
     
                 if(state & POINTER_STATE_ENTER){
                     if(PyCallable_Check(el->onMouseEnter)) {
-                        PyObject_CallFunction(el->onMouseEnter,
+                        result = PyObject_CallFunction(el->onMouseEnter,
                             "OO",el,self->element_list);
+                        if(!result) error_flag = 1;
                     }
                 }
 
@@ -293,8 +300,9 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
                 pressure = calculate_pressure(el->element,&event);
                 if(pressure > 20){
                     if(PyCallable_Check(el->onTap)) {
-                        PyObject_CallFunction(el->onTap,
+                        result = PyObject_CallFunction(el->onTap,
                             "OO",el,self->element_list);
+                        if(!result) error_flag = 1;
                     }
                 }
                 Py_DECREF(item);
@@ -302,6 +310,10 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
             Py_DECREF(iterator);
             #endif
             break;
+        } // end of switch 
+
+        if(error_flag){
+            return NULL;
         }
 
         // Check if shutting_down was set during above event processing
@@ -310,7 +322,7 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
             Py_INCREF(Py_None);
             return Py_None;
         }
-    }
+    } // end of infinite while loop
 
     Py_INCREF(Py_None);
     return Py_None;
