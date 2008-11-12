@@ -206,6 +206,8 @@ initinkface(void)
 void paint(void *arg)
 {
     Canvas_t *canvas = (Canvas_t *) arg;
+    PyObject *result = NULL;
+    int error_flag = 0;
     ASSERT(canvas);
     ASSERT(canvas->cobject);
 
@@ -224,7 +226,11 @@ void paint(void *arg)
     
         if(canvas->cobject->timer_counter == 0){
             if(canvas->onTimer && PyCallable_Check(canvas->onTimer)){
-                PyObject_CallFunction(canvas->onTimer,NULL);
+                result = PyObject_CallFunction(canvas->onTimer,NULL);
+                if(!result){
+                    PyErr_Print();
+                    error_flag = 1;
+                }
             }
         }
         
@@ -235,7 +241,11 @@ void paint(void *arg)
     
             if(PyCallable_Check(el->onDraw)){
                 // Call element's custom draw handler
-                PyObject_CallFunction(el->onDraw,"O",el);
+                result = PyObject_CallFunction(el->onDraw,"O",el);
+                if(!result){
+                    PyErr_Print();
+                    error_flag = 1;
+                }
             } else {
                 // Call canvas's default draw method
                 canvas->cobject->draw_elem(canvas->cobject,el->element);
@@ -259,6 +269,9 @@ void paint(void *arg)
 
         canvas->cobject->dec_dirt_count(canvas->cobject,1);
 
+        if(error_flag){
+            canvas->cobject->shutting_down = 1;
+        }
     }
 }
 
