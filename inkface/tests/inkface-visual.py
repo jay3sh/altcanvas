@@ -10,11 +10,14 @@ from time import sleep
 canvas = None
 
 flags = {
-        'topTouch':0,
+        'topTap':0,
         'bottomTouch':0,
         'leftTouch':0,
         'rightTouch':0
     }
+
+def onTap(element,elist):
+    raise(TypeError)
 
 def onMouseEnter(element,elist):
     global flags
@@ -52,6 +55,10 @@ def main():
             elem.onDraw = onDraw
             elem.onMouseLeave = onMouseLeave
             elem.onMouseEnter = onMouseEnter
+
+        if elem.name == 'topTap':
+            elem.onDraw = onDraw
+            elem.onTap = onTap
 
     if 'inkface' not in text_arr:
         print 'Text validation test failed'

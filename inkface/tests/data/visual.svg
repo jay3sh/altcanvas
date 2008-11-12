@@ -14,7 +14,7 @@
    sodipodi:version="0.32"
    inkscape:version="0.46"
    version="1.0"
-   sodipodi:docname="test1.svg"
+   sodipodi:docname="visual.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs4">
@@ -85,15 +85,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.50625"
-     inkscape:cx="295.76763"
+     inkscape:cx="383.05377"
      inkscape:cy="240"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1280"
-     inkscape:window-height="1003"
-     inkscape:window-x="0"
-     inkscape:window-y="0" />
+     inkscape:window-height="964"
+     inkscape:window-x="-5"
+     inkscape:window-y="-3" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -148,7 +148,7 @@
          y="412.65878">,</tspan></text>
     <g
        id="g3367"
-       name="topTouch"
+       name="topTap"
        order="10">
       <rect
          y="0.99584693"
@@ -159,14 +159,14 @@
          style="opacity:1;fill:#80b3ff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter3441)" />
       <text
          id="text3346"
-         y="67.717842"
-         x="374.94238"
+         y="66.390038"
+         x="307.88843"
          style="font-size:18px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
          xml:space="preserve"><tspan
-           y="67.717842"
-           x="374.94238"
+           y="66.390038"
+           x="307.88843"
            id="tspan3348"
-           sodipodi:role="line">Touch</tspan></text>
+           sodipodi:role="line">Tap (expect exception)</tspan></text>
     </g>
     <g
        id="g3377"
