@@ -3,6 +3,7 @@
 #----------------------
 
 import os
+import sys
 
 VERSION = '0.1.1'
 ARCH = os.popen('dpkg --print-architecture').read().strip()
@@ -23,6 +24,13 @@ if ARCH == 'armel':
     env.ParseConfig("pkg-config --cflags --libs xsp")
 
 env.ParseConfig("pkg-config --cflags --libs libaltsvg")
+
+def print_cmd_line(s, target, src, env):
+    sys.stdout.write(" Compiling \033[01;32m %s\033[00m ...\n"%\
+         (' and '.join([str(x) for x in target])))
+
+if 'verbose' not in ARGUMENTS.keys():
+    env['PRINT_CMD_LINE_FUNC'] = print_cmd_line
 
 Export('env')
 
