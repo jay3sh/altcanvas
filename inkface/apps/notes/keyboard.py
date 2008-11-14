@@ -1,7 +1,7 @@
 
 import inkface
 
-KEYBOARD_SVG='keyboard-black.svg'
+KEYBOARD_SVG='keyboard.svg'
 
 class Keyboard:
     visible = False

@@ -14,7 +14,7 @@
    sodipodi:version="0.32"
    inkscape:version="0.46"
    version="1.0"
-   sodipodi:docname="keyboard-black.svg"
+   sodipodi:docname="keyboard.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs4">
@@ -1924,6 +1924,8 @@
        x="62.876247"
        y="51.906353"
        rx="5.3657255"
-       ry="8.7720909" />
+       ry="8.7720909"
+       name="keyboardEntry"
+       order="10" />
   </g>
 </svg>
