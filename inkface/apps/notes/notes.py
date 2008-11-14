@@ -1,65 +1,49 @@
 #!/usr/bin/env python
 
 import inkface
+from keyboard import Keyboard
 
 NOTEPAD_SVG='notepad.svg'
-KEYBOARD_SVG='keyboard-black.svg'
-canvas = None
 
-
-class Keyboard:
-    def __init__(self,canvas):
-        self.canvas = canvas
-        self.elements = inkface.loadsvg(KEYBOARD_SVG)
+class Notepad:
+    kbd = None
+    def __init__(self):
+        self.canvas = inkface.create_X_canvas()
+        self.elements = inkface.loadsvg(NOTEPAD_SVG)
+        self.canvas.register_elements(self.elements)
         for e in self.elements:
-            if e.name.startswith('key'):
-                e.onTap = self.onTap
-            elif e.name.endswith('Glow'):
-                e.opacity = 0
-                e.onDraw = self.glowDraw
+            if e.name == 'note':
+                e.text = ''
+                e.onKeyPress = self.onKeyPress
+                e.refresh()
+                self.note = e
+            elif e.name == 'keyKeyboard':
+                e.onTap = self.launchKeyboard
 
-    def onTap(self,e,elements):
-        pass
-        
-    def glowDraw(self,e):
-        print 'glowDrawing'
-        if e.opacity:
-            self.canvas.draw(e)
+    def launchKeyboard(self,e,elements):
+        if not self.kbd:
+            self.kbd = Keyboard(self.canvas)
+            self.canvas.register_elements(self.kbd.elements)
+        self.kbd.visible = True
+        self.canvas.refresh()
+ 
+    def onKeyPress(self,note,txt,code,elements):
+        self.note.text = note.text + txt
 
-    def onKeyPress(self,txt,code,elements):
-        print txt
+        if code == inkface.KeyBackspace:
+            note.text = note.text[:-1]
+        elif code == inkface.KeyEscape:
+            inkface.exit()
 
+        self.note.refresh()
+        self.canvas.refresh()
 
-def onKeyPress(note,txt,code,elements):
-    global canvas
-    note.text = note.text + txt
-
-    if code == inkface.KeyBackspace:
-        note.text = note.text[:-1]
-    elif code == inkface.KeyEscape:
-        inkface.exit()
-
-    note.refresh()
-    canvas.refresh()
+    def run(self):
+        self.canvas.eventloop()
 
 def main():
-    global canvas
-    elements = inkface.loadsvg(NOTEPAD_SVG)
-    canvas = inkface.create_X_canvas()
-    canvas.register_elements(elements)
-
-    for e in elements:
-        if e.name == 'note':
-            e.text = ''
-            e.onKeyPress = onKeyPress
-            e.refresh()
-
-    # Temp
-    kbd = Keyboard(canvas)
-    canvas.register_elements(kbd.elements)
-    # /Temp
-
-    canvas.eventloop()
+    notepad = Notepad()
+    notepad.run()
 
 if __name__ == '__main__':
     main()
