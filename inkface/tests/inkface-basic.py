@@ -60,12 +60,6 @@ class TestCanvas(unittest.TestCase):
         canvas = inkface.create_X_canvas()
         self.assert_(canvas.fullscreen == False)
 
-    def testCanvasTimer(self):
-        canvas = inkface.create_X_canvas()
-        canvas.set_timer(160,None) # msec
-        # Assuming REFRESH_INTERVAL_MSEC = 50 msec 
-        self.assert_(canvas.timer_step == 3)
-
 class TestCanvasElements(unittest.TestCase):
     def setUp(self):
         self.SVG = os.path.join(sys.argv[1])
@@ -108,8 +102,30 @@ class TestElements(unittest.TestCase):
             self.assert_(e.onMouseLeave)
             self.assert_(e.onDraw)
 
+class TestCallbackExceptions(unittest.TestCase):
+    def setUp(self):
+        self.SVG = os.path.join(sys.argv[1])
+        self.elements = inkface.loadsvg(self.SVG)
+        self.canvas = inkface.create_X_canvas()
+        self.canvas.register_elements(self.elements)
+        for e in self.elements:
+            if e.name == 'exitDoor':
+                e.onKeyPress = self.bad_callback
+                e.onMouseEnter = self.bad_callback
+
+    def bad_callback():
+        pass
+
+    def testEventHandlerExceptions(self):
+        print 'Press actual keyboard key'
+        self.assertRaises(TypeError,self.canvas.eventloop)
+        print 'Move the mouse over the exit door'
+        self.assertRaises(TypeError,self.canvas.eventloop)
+        inkface.exit()
+        
 
 if __name__ == '__main__':
-    for t in [TestSVGLoad,TestCanvas,TestCanvasElements,TestElements]:
+    for t in [TestSVGLoad,TestCanvas,TestCanvasElements,\
+                TestElements,TestCallbackExceptions]:
         suite = unittest.TestLoader().loadTestsFromTestCase(t)
         testResult = unittest.TextTestRunner(verbosity=0).run(suite)
