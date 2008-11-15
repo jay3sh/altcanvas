@@ -86,7 +86,7 @@ def main():
     canvas.register_elements(elements)
 
     # Wire the handlers and init elements
-    for el in elements:
+    for el in elements.values():
         if el.name.startswith('msgtxt'):
             i = int(el.name[6])
             msgtxtlist[i] = el

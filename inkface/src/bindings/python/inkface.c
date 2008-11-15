@@ -36,7 +36,7 @@ extern PyTypeObject Element_Type;
  * "inkface" module
  */
 static PyObject*
-inkface_loadsvg(PyObject *self, PyObject *args)
+inkface_loadsvg_list(PyObject *self, PyObject *args)
 {
     char *svgname;
     Element *element;
@@ -86,6 +86,62 @@ inkface_loadsvg(PyObject *self, PyObject *args)
     }
 
     return p_elist;
+
+}
+
+static PyObject*
+inkface_loadsvg(PyObject *self, PyObject *args)
+{
+    char *svgname;
+    Element *element;
+    PyObject *p_edict = PyDict_New();
+    ASSERT(p_edict);
+
+    ASSERT(PyArg_ParseTuple(args,"s",&svgname))
+        
+    ASSERT(svgname)
+
+    GList *elist = load_element_list(svgname);
+
+    // Create Python dictionary of elements
+
+    GList *elem_list_head = elist;
+
+    while(elist)
+    {
+        ASSERT(element = (Element *)elist->data);
+
+        // 
+        // Create python object for Element
+        // 
+        PyTypeObject *pytype = NULL;
+        Element_t *pyo;
+        pytype = &Element_Type;
+        ASSERT(pyo = (Element_t *)pytype->tp_alloc(pytype,0));
+
+        pyo->x = element->x;
+        pyo->y = element->y;
+        pyo->w = element->w;
+        pyo->h = element->h;
+        pyo->order = element->order;
+        pyo->name = PyString_FromString(element->name);
+        pyo->id = PyString_FromString(element->id);
+        if(element->text){
+            pyo->text = PyString_FromString(element->text->str);
+        }
+        pyo->p_surface = PycairoSurface_FromSurface(element->surface,NULL);
+
+        pyo->element = element;
+
+        // Add python object to dictionary
+        PyDict_SetItem(p_edict,PyString_FromString(element->name),
+                        (PyObject *)pyo);
+
+        // jump to next
+        elist = elist->next;
+    }
+
+    return p_edict;
 
 }
 

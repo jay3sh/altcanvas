@@ -44,7 +44,7 @@ def main():
     canvas.register_elements(elements)
 
     text_arr = []
-    for elem in elements:
+    for elem in elements.values():
         if elem.text:
             text_arr.append(elem.text)
             if elem.text == 'inkface':
@@ -64,7 +64,10 @@ def main():
         print 'Text validation test failed'
         sys.exit(1)
 
-    canvas.eventloop()
+    try:
+        canvas.eventloop()
+    except TypeError,te:
+        print 'TypeError caught - as expected!'
 
     
 if __name__ == '__main__':

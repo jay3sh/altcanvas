@@ -16,15 +16,16 @@ class TestSVGLoad(unittest.TestCase):
         self.elements = inkface.loadsvg(self.SVG)
 
     def testLoad(self):
-        self.assert_(len(self.elements) == 54)
+        self.assert_(type(self.elements) == dict)
+        self.assert_(len(self.elements.values()) == 54)
 
     def testIdPresence(self):
-        svg_ids = map(lambda x: x.id, self.elements)
+        svg_ids = map(lambda x: x.id, self.elements.values())
         for id in self.arbit_ids:
             self.assert_(id in svg_ids)
         
     def testNamePresence(self):
-        svg_names = map(lambda x: x.name, self.elements)
+        svg_names = map(lambda x: x.name, self.elements.values())
         for name in self.arbit_names:
             self.assert_(name in svg_names)
         
@@ -86,7 +87,7 @@ class TestElements(unittest.TestCase):
     def testHandlerRegistration(self):
         def onEvent(x,y):
             pass
-        for e in self.elements:
+        for e in self.elements.values():
             self.assert_(e.onTap == None)
             self.assert_(e.onMouseEnter == None)
             self.assert_(e.onMouseLeave == None)
@@ -108,7 +109,7 @@ class TestCallbackExceptions(unittest.TestCase):
         self.elements = inkface.loadsvg(self.SVG)
         self.canvas = inkface.create_X_canvas()
         self.canvas.register_elements(self.elements)
-        for e in self.elements:
+        for e in self.elements.values():
             if e.name == 'exitDoor':
                 e.onKeyPress = self.bad_callback
                 e.onMouseEnter = self.bad_callback

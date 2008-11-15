@@ -115,7 +115,7 @@ def main():
     canvas.register_elements(elements)
 
     # Wire handlers and init some elements
-    for e in elements:
+    for e in elements.values():
         if e.name == 'keySpace':
             #e.onMouseEnter = onSpacebar
             e.onTap = onSpacebar
