@@ -14,6 +14,7 @@ typedef struct {
     int height;
     PyObject *fullscreen;
 
+    PyObject *element_dict;
     PyObject *element_list;
 
     // Painting control members

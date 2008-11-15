@@ -5,7 +5,6 @@ import sys
 import inkface
 
 canvas = None
-textbox = None
 KEYBOARD_SVG=sys.argv[1]
 
 special_key_map = {
@@ -26,19 +25,20 @@ special_key_map = {
 
 def onSpacebar(e,elements):
     global canvas
-    textbox.text = textbox.text+' '
-    textbox.refresh()
+    elements['textBox'].text = elements['textBox'].text+' '
+    elements['textBox'].refresh()
     canvas.refresh()
 
 def onBackspace(e,elements):
     global canvas
-    textbox.text = textbox.text[:-1]
-    textbox.refresh()
+    elements['textBox'].text = elements['textBox'].text[:-1]
+    elements['textBox'].refresh()
     canvas.refresh()
 
 def onEnter(e,elements):
     global canvas
-    for el in elements:
+    textbox = elements['textBox']
+    for el in elements.values():
         if el.name.startswith('msgbox'):
             el.opacity = 1
             if el.name == 'msgboxText':
@@ -50,21 +50,22 @@ def onEnter(e,elements):
 
 def onSpecialKey(e,elements):
     global canvas
-    textbox.text = textbox.text + special_key_map[e.name[5:]]
-    textbox.refresh()
+    elements['textBox'].text = \
+        elements['textBox'].text + special_key_map[e.name[5:]]
+    elements['textBox'].refresh()
     canvas.refresh()
 
 def onKeyEnter(e,elements):
     global canvas
-    for el in elements:
+    for el in elements.values():
         if el.name == e.name+'Glow':
             el.opacity = 1
-    textbox.text = textbox.text+e.name[3]
-    textbox.refresh()
+    elements['textBox'].text = elements['textBox'].text+e.name[3]
+    elements['textBox'].refresh()
     canvas.refresh()
 
 def onKeyLeave(e,elements):
-    for el in elements:
+    for el in elements.values():
         if el.name == e.name+'Glow':
             el.opacity = 0
     canvas.refresh()
@@ -85,13 +86,14 @@ def onMsgBoxDraw(e):
 
 def onMsgBoxOK(e,elist):
     global canvas
-    for el in elist:
+    for el in elist.values():
         if el.name.startswith('msgbox'):
             el.opacity = 0
     canvas.refresh()
 
 def onKeyboardKeyPressed(e,string,keycode,elements):
     global canvas
+    textbox = elements['textBox']
     textbox.text = textbox.text+string.strip()
 
     if keycode == inkface.KeyEscape:
@@ -113,6 +115,12 @@ def main():
     elements = inkface.loadsvg(KEYBOARD_SVG)
     canvas = inkface.create_X_canvas()
     canvas.register_elements(elements)
+
+    elements['exitDoor'].onTap = onExit
+
+    elements['textBox'].text = ''
+    elements['textBox'].onKeyPress = onKeyboardKeyPressed
+    elements['textBox'].refresh()
 
     # Wire handlers and init some elements
     for e in elements.values():
@@ -137,14 +145,6 @@ def main():
                 e.onTap = onKeyEnter
                 e.onMouseLeave = onKeyLeave
                 e.opacity = 1
-        elif e.name == 'exitDoor':
-            #e.onMouseEnter = onExit
-            e.onTap = onExit
-        elif e.name == 'textBox':
-            textbox = e
-            textbox.text = ''
-            textbox.onKeyPress = onKeyboardKeyPressed
-            textbox.refresh()
         elif e.name.startswith('msgbox'):
             e.opacity = 0
             e.onDraw = onMsgBoxDraw

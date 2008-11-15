@@ -125,6 +125,15 @@ p_canvas_register_elements(PyObject *self, PyObject *args)
 
     ASSERT(PyDict_Check(elemDict_pyo));
 
+    // Store a reference to this dict for passing to event handlers
+    // TODO: This assumes only one usage of register_elements during the app
+    //      When we support unregister_elements, hence implying multiple
+    //      calls to register_elements, this will have to be fixed. 
+    //      With this implementation, every call to register_elements will
+    //      overwrite the dictionary object.
+    Py_INCREF(elemDict_pyo);
+    ((Canvas_t *)self)->element_dict = elemDict_pyo;
+
     PyObject *elemList_pyo = PyDict_Values(elemDict_pyo);
     PyObject *iterator = PyObject_GetIter(elemList_pyo);
     PyObject *item;
@@ -297,7 +306,7 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
                             el,
                             PyString_FromString(buf),
                             keysym,
-                            self->element_list);
+                            self->element_dict);
                         if(!result) error_flag = 1;
                     }
                 }
@@ -319,7 +328,7 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
                 {
                     if(PyCallable_Check(el->onTap)) {
                         result = PyObject_CallFunction(el->onTap,
-                            "OO",el,self->element_list);
+                            "OO",el,self->element_dict);
                         if(!result) error_flag = 1;
                     }
                 }
@@ -327,7 +336,7 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
                 if(state & POINTER_STATE_LEAVE){
                     if(PyCallable_Check(el->onMouseLeave)) {
                         result = PyObject_CallFunction(el->onMouseLeave,
-                            "OO",el,self->element_list);
+                            "OO",el,self->element_dict);
                         if(!result) error_flag = 1;
                     }
                 }
@@ -335,7 +344,7 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
                 if(state & POINTER_STATE_ENTER){
                     if(PyCallable_Check(el->onMouseEnter)) {
                         result = PyObject_CallFunction(el->onMouseEnter,
-                            "OO",el,self->element_list);
+                            "OO",el,self->element_dict);
                         if(!result) error_flag = 1;
                     }
                 }
@@ -360,7 +369,7 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
                 if(pressure > 20){
                     if(PyCallable_Check(el->onTap)) {
                         result = PyObject_CallFunction(el->onTap,
-                            "OO",el,self->element_list);
+                            "OO",el,self->element_dict);
                         if(!result) error_flag = 1;
                     }
                 }

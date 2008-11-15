@@ -60,12 +60,8 @@ def onExitGlowDraw(e):
         canvas.draw(e)
 
 def onExit(elem,elist):
-    from time import sleep
-    for e in elist:
-        if e.name == 'exitButtonGlow':
-            e.opacity = 1
-            canvas.refresh()
-            break
+    elist['exitButtonGlow'].opacity = 1
+    canvas.refresh()
     global exit_sign
     exit_sign = True
     irc.join()
