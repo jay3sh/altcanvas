@@ -14,6 +14,7 @@
 
 #include "inkface.h"
 #include "common.h"
+#include "canvas-x.h"
 
 #ifdef HAS_XSP
 #include <X11/extensions/Xsp.h>
@@ -25,7 +26,7 @@ int GLOBAL_HEIGHT = 0;
 
 
 //--------------
-// canvas
+// X11 canvas
 //--------------
 
 static void 
