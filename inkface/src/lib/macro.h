@@ -16,7 +16,7 @@
            exit(1); \
         }
 
-char *errno_str[] = {
+static char *errno_str[] = {
         "",
 	"EPERM",		 // 1	/* Operation not permitted */
 	"ENOENT",	     // 2	/* No such file or directory */

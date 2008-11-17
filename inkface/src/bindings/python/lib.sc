@@ -29,7 +29,7 @@ env.AppendUnique(CPPPATH=[distutils.sysconfig.get_python_inc()])
 #
 pythonlib = env.SharedLibrary(target='inkface',
                 source=['inkface.c','canvas.c', 'element.c',
-                        '#src/lib/common.c'])
+                        '#src/lib/common.c', '#src/lib/canvas-x.c'])
 
 if type(pythonlib) == type([]): pythonlib = pythonlib[0]
 
