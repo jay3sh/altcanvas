@@ -18,6 +18,8 @@
 
 #include "common.h"
 
+#include "canvas-common.h"
+#include "canvas-x.h"
 #include "canvas.h"
 #include "element.h"
 
@@ -159,7 +161,7 @@ inkface_create_X_canvas(PyObject *self, PyObject *args, PyObject *kwds)
     ASSERT(x_canvas = (Canvas_t *)type->tp_alloc(type,0));
     */
 
-    ASSERT(x_canvas->cobject = canvas_new());
+    ASSERT(x_canvas->cobject = (canvas_t *)x_canvas_new());
 
     // Parse keyword args
     #define DEFAULT_WIDTH 800
@@ -316,12 +318,14 @@ void paint(void *arg)
         // END - Python thread safety code block
     
         #ifdef DOUBLE_BUFFER
-        XdbeBeginIdiom(canvas->cobject->dpy);
-        XdbeSwapBuffers(canvas->cobject->dpy,&canvas->cobject->swapinfo,1);
-        XSync(canvas->cobject->dpy,0);
-        XdbeEndIdiom(canvas->cobject->dpy);
+        XdbeBeginIdiom(((x_canvas_t *)canvas->cobject)->dpy);
+        XdbeSwapBuffers(((x_canvas_t *)canvas->cobject)->dpy,
+                            &((x_canvas_t *)canvas->cobject)->swapinfo,
+                            1);
+        XSync(((x_canvas_t *)canvas->cobject)->dpy,0);
+        XdbeEndIdiom(((x_canvas_t *)canvas->cobject)->dpy);
         #else
-        XFlush(canvas->cobject->dpy);
+        XFlush(((x_canvas_t *)canvas->cobject)->dpy);
         #endif
 
         canvas->cobject->dec_dirt_count(canvas->cobject,1);

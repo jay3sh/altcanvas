@@ -31,7 +31,7 @@ int GLOBAL_HEIGHT = 0;
 
 static void 
 canvas_init(
-    canvas_t *self,
+    canvas_t *canvas,
     int width, int height, 
     int fullscreen,
     paintfunc_t paint,
@@ -42,13 +42,15 @@ canvas_init(
     int x=0, y=0;
     int screen = 0;
 
+    x_canvas_t *self = (x_canvas_t *)canvas;
+
     ASSERT(self);
     self->width = GLOBAL_WIDTH = width;
     self->height = GLOBAL_HEIGHT = height;
 
     self->fullscreen = fullscreen;
-    self->paint = paint;
-    self->paint_arg = paint_arg;
+    self->super.paint = paint;
+    self->super.paint_arg = paint_arg;
 
     XInitThreads();
 
@@ -135,43 +137,45 @@ canvas_init(
     #endif 
     ASSERT(self->ctx = cairo_create(self->surface));
 
-    ASSERT(!pthread_mutex_init(&(self->dirt_mutex),NULL));
+    ASSERT(!pthread_mutex_init(&(self->super.dirt_mutex),NULL));
 
 
     // Fork a painter thread which does refresh jobs
-    ASSERT(!pthread_mutex_init(&(self->paint_mutex),NULL));
-    ASSERT(!pthread_cond_init(&(self->paint_condition),NULL));
-    ASSERT(!pthread_create(&(self->painter_thr),NULL,painter_thread,self));
+    ASSERT(!pthread_mutex_init(&(self->super.paint_mutex),NULL));
+    ASSERT(!pthread_cond_init(&(self->super.paint_condition),NULL));
+    ASSERT(!pthread_create(&(self->super.painter_thr),NULL,painter_thread,self));
 
 }
 
-void canvas_show(canvas_t *self)
+void canvas_show(canvas_t *canvas)
 {
+    x_canvas_t *self = (x_canvas_t *)canvas;
     // Map the window so that it's visible
     XMapWindow(self->dpy, self->win);
     XFlush(self->dpy);
-    self->inc_dirt_count(self,1);
+    self->super.inc_dirt_count((canvas_t *)self,1);
 }
 
-void canvas_refresh(canvas_t *self)
+void canvas_refresh(canvas_t *canvas)
 {
 
 }
                     
-void canvas_cleanup(canvas_t *self)
+void canvas_cleanup(canvas_t *canvas)
 {
+    x_canvas_t *self = (x_canvas_t *)canvas;
     rsvg_term();
 
-    self->shutting_down = TRUE;
+    self->super.shutting_down = TRUE;
 
     // Let's wait for the painter_thread to exit
     // before we destroy the X cairo surface on which it
     // might be drawing
     //
-    ASSERT(!pthread_join(self->painter_thr,NULL));
+    ASSERT(!pthread_join(self->super.painter_thr,NULL));
     
-    ASSERT(!pthread_mutex_destroy(&(self->paint_mutex)));
-    ASSERT(!pthread_cond_destroy(&(self->paint_condition)));
+    ASSERT(!pthread_mutex_destroy(&(self->super.paint_mutex)));
+    ASSERT(!pthread_cond_destroy(&(self->super.paint_condition)));
 
     #ifdef DOUBLE_BUFFER
     XdbeDeallocateBackBufferName(self->dpy,self->backBuffer);
@@ -182,25 +186,30 @@ void canvas_cleanup(canvas_t *self)
 
 }
 
-void inc_dirt_count(canvas_t *self, int count)
+void inc_dirt_count(canvas_t *canvas, int count)
 {
-    CHK_ERRNO(pthread_mutex_lock(&(self->dirt_mutex)));
-    self->dirt_count += count;
-    CHK_ERRNO(pthread_mutex_unlock(&(self->dirt_mutex)));
+    x_canvas_t *self = (x_canvas_t *)canvas;
+
+    CHK_ERRNO(pthread_mutex_lock(&(self->super.dirt_mutex)));
+    self->super.dirt_count += count;
+    CHK_ERRNO(pthread_mutex_unlock(&(self->super.dirt_mutex)));
 }
 
-void dec_dirt_count(canvas_t *self, int count)
+void dec_dirt_count(canvas_t *canvas, int count)
 {
-    CHK_ERRNO(pthread_mutex_lock(&(self->dirt_mutex)));
-    self->dirt_count -= count;
-    if(self->dirt_count < 0) {
-        self->dirt_count = 0;
+    x_canvas_t *self = (x_canvas_t *)canvas;
+
+    CHK_ERRNO(pthread_mutex_lock(&(self->super.dirt_mutex)));
+    self->super.dirt_count -= count;
+    if(self->super.dirt_count < 0) {
+        self->super.dirt_count = 0;
     }
-    CHK_ERRNO(pthread_mutex_unlock(&(self->dirt_mutex)));
+    CHK_ERRNO(pthread_mutex_unlock(&(self->super.dirt_mutex)));
 }
 
-void canvas_draw_elem(canvas_t *self, Element *elem)
+void canvas_draw_elem(canvas_t *canvas, Element *elem)
 {
+    x_canvas_t *self = (x_canvas_t *)canvas;
     ASSERT(self);
     ASSERT(elem);
     cairo_surface_t *surface = elem->surface;
@@ -208,18 +217,18 @@ void canvas_draw_elem(canvas_t *self, Element *elem)
     cairo_paint(self->ctx);
 }
 
-canvas_t *canvas_new(void)
+x_canvas_t *x_canvas_new(void)
 {
-    canvas_t *object = NULL;
-    ASSERT(object = (canvas_t *)malloc(sizeof(canvas_t)));
-    memset(object,0,sizeof(canvas_t));
-    object->init = canvas_init;
-    object->cleanup = canvas_cleanup;
-    object->refresh = canvas_refresh;
-    object->show = canvas_show;
-    object->inc_dirt_count = inc_dirt_count;
-    object->dec_dirt_count = dec_dirt_count;
-    object->draw_elem = canvas_draw_elem;
+    x_canvas_t *object = NULL;
+    ASSERT(object = (x_canvas_t *)malloc(sizeof(x_canvas_t)));
+    memset(object,0,sizeof(x_canvas_t));
+    object->super.init = canvas_init;
+    object->super.cleanup = canvas_cleanup;
+    object->super.refresh = canvas_refresh;
+    object->super.show = canvas_show;
+    object->super.inc_dirt_count = inc_dirt_count;
+    object->super.dec_dirt_count = dec_dirt_count;
+    object->super.draw_elem = canvas_draw_elem;
     return object;
 }
 

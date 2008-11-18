@@ -16,6 +16,8 @@
 
 #include "common.h"
 
+#include "canvas-common.h"
+#include "canvas-x.h"
 #include "canvas.h"
 #include "element.h"
 
@@ -256,7 +258,8 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
     /*
      * Setup the event listening
      */
-    XSelectInput(self->cobject->dpy, self->cobject->win, 
+    XSelectInput(((x_canvas_t *)self->cobject)->dpy, 
+                    ((x_canvas_t *)self->cobject)->win, 
                     StructureNotifyMask|
                     PointerMotionMask|
                     ExposureMask|
@@ -274,7 +277,7 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
 
         Py_BEGIN_ALLOW_THREADS
 
-        XNextEvent(self->cobject->dpy,&event);
+        XNextEvent(((x_canvas_t *)self->cobject)->dpy,&event);
 
         Py_END_ALLOW_THREADS
         

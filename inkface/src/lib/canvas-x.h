@@ -1,21 +1,13 @@
 #ifndef __CANVAS_X_H__
 #define __CANVAS_X_H__
 
-typedef struct canvas_s canvas_t;
+#include "canvas-common.h"
 
-typedef void (*paintfunc_t) (void *arg);
-typedef void (*initfunc_t) (canvas_t *self,
-                    int width, int height, int fullscreen,
-                    paintfunc_t,void *);
-typedef void (*cleanupfunc_t) (canvas_t *self);
-typedef void (*drawfunc_t) (canvas_t *self, element_t *element);
-typedef void (*refreshfunc_t) (canvas_t *self);
-typedef void (*showfunc_t) (canvas_t *self);
-typedef void (*incdcfunc_t) (canvas_t *self, int count);
-typedef void (*decdcfunc_t) (canvas_t *self, int count);
-typedef void (*draw_elem_t) (canvas_t *self, Element *elem);
+typedef struct x_canvas_s x_canvas_t;
 
-struct canvas_s {
+struct x_canvas_s {
+
+    canvas_t super;
 
     //------------
     // Members
@@ -30,43 +22,14 @@ struct canvas_s {
     cairo_surface_t *surface;
     Window win;
 
-    // Painting control members
-    int dirt_count;
-    unsigned int timer_step;
-    int timer_counter;
-    pthread_mutex_t paint_mutex;
-    pthread_cond_t paint_condition;
-    pthread_mutex_t dirt_mutex;
-    pthread_t painter_thr;
-
-    int shutting_down;
-
     #ifdef DOUBLE_BUFFER
     XdbeBackBuffer backBuffer;
     XdbeSwapInfo swapinfo;
     #endif
 
-    void *paint_arg;
-
-    //------------
-    // Methods
-    //------------
-
-    initfunc_t init;
-    cleanupfunc_t cleanup;
-    drawfunc_t draw;
-    refreshfunc_t refresh;
-    showfunc_t show;
-    incdcfunc_t inc_dirt_count;
-    decdcfunc_t dec_dirt_count;
-    paintfunc_t paint;
-    draw_elem_t draw_elem;
-
 };
 
-canvas_t *canvas_new(void);
-
-
+x_canvas_t *x_canvas_new(void);
 
 
 #endif // __CANVAS_X_H__
