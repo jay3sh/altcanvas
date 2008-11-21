@@ -3,6 +3,8 @@
 
 #include "canvas-common.h"
 
+typedef void (*paintfunc_t) (void *arg);
+
 typedef struct x_canvas_s x_canvas_t;
 
 struct x_canvas_s {
@@ -26,6 +28,13 @@ struct x_canvas_s {
     XdbeBackBuffer backBuffer;
     XdbeSwapInfo swapinfo;
     #endif
+
+    //------------
+    // Methods
+    //------------
+    paintfunc_t paint;
+    void *paint_arg;
+    void (* register_paint_function)(x_canvas_t *,paintfunc_t,void *);
 
 };
 

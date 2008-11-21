@@ -207,9 +207,12 @@ inkface_create_X_canvas(PyObject *self, PyObject *args, PyObject *kwds)
     x_canvas->cobject->init(x_canvas->cobject,
                         x_canvas->width, 
                         x_canvas->height, 
-                        (x_canvas->fullscreen == Py_True),
+                        (x_canvas->fullscreen == Py_True));
+
+    ((x_canvas_t *)x_canvas->cobject)->register_paint_function(
+                        ((x_canvas_t *)x_canvas->cobject),
                         paint,
-                        (void *)x_canvas);
+                        x_canvas);
 
     // Initialize the active element list
     x_canvas->element_list = PyList_New(0);

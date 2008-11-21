@@ -137,8 +137,9 @@ void *painter_thread(void *arg)
 
         if(rc!=0){
             if(rc == ETIMEDOUT){
-                if(canvas->paint) {
-                    canvas->paint(canvas->paint_arg);
+                x_canvas_t *x_canvas = (x_canvas_t *)canvas;
+                if(x_canvas->paint) {
+                    x_canvas->paint(x_canvas->paint_arg);
                 }
             } else {
                 LOG("pthread_cond_timwait returned %d\n",rc);

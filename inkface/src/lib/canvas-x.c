@@ -33,9 +33,7 @@ static void
 canvas_init(
     canvas_t *canvas,
     int width, int height, 
-    int fullscreen,
-    paintfunc_t paint,
-    void *paint_arg)
+    int fullscreen)
 {
     int status = 0;
     Window rwin;
@@ -49,8 +47,6 @@ canvas_init(
     self->height = GLOBAL_HEIGHT = height;
 
     self->fullscreen = fullscreen;
-    self->super.paint = paint;
-    self->super.paint_arg = paint_arg;
 
     XInitThreads();
 
@@ -186,25 +182,21 @@ void canvas_cleanup(canvas_t *canvas)
 
 }
 
-void inc_dirt_count(canvas_t *canvas, int count)
+static void inc_dirt_count(canvas_t *self, int count)
 {
-    x_canvas_t *self = (x_canvas_t *)canvas;
-
-    CHK_ERRNO(pthread_mutex_lock(&(self->super.dirt_mutex)));
-    self->super.dirt_count += count;
-    CHK_ERRNO(pthread_mutex_unlock(&(self->super.dirt_mutex)));
+    CHK_ERRNO(pthread_mutex_lock(&(self->dirt_mutex)));
+    self->dirt_count += count;
+    CHK_ERRNO(pthread_mutex_unlock(&(self->dirt_mutex)));
 }
 
-void dec_dirt_count(canvas_t *canvas, int count)
+static void dec_dirt_count(canvas_t *self, int count)
 {
-    x_canvas_t *self = (x_canvas_t *)canvas;
-
-    CHK_ERRNO(pthread_mutex_lock(&(self->super.dirt_mutex)));
-    self->super.dirt_count -= count;
-    if(self->super.dirt_count < 0) {
-        self->super.dirt_count = 0;
+    CHK_ERRNO(pthread_mutex_lock(&(self->dirt_mutex)));
+    self->dirt_count -= count;
+    if(self->dirt_count < 0) {
+        self->dirt_count = 0;
     }
-    CHK_ERRNO(pthread_mutex_unlock(&(self->super.dirt_mutex)));
+    CHK_ERRNO(pthread_mutex_unlock(&(self->dirt_mutex)));
 }
 
 void canvas_draw_elem(canvas_t *canvas, Element *elem)
@@ -215,6 +207,16 @@ void canvas_draw_elem(canvas_t *canvas, Element *elem)
     cairo_surface_t *surface = elem->surface;
     cairo_set_source_surface(self->ctx,surface,elem->x,elem->y);
     cairo_paint(self->ctx);
+}
+
+void 
+canvas_register_paint_function(
+                x_canvas_t *canvas,
+                paintfunc_t paint_func,
+                void *arg)
+{
+    canvas->paint = paint_func;
+    canvas->paint_arg = arg;
 }
 
 x_canvas_t *x_canvas_new(void)
@@ -229,6 +231,9 @@ x_canvas_t *x_canvas_new(void)
     object->super.inc_dirt_count = inc_dirt_count;
     object->super.dec_dirt_count = dec_dirt_count;
     object->super.draw_elem = canvas_draw_elem;
+
+    object->register_paint_function = canvas_register_paint_function;
+
     return object;
 }
 

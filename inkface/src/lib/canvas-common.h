@@ -3,10 +3,8 @@
 
 typedef struct canvas_s canvas_t;
 
-typedef void (*paintfunc_t) (void *arg);
 typedef void (*initfunc_t) (canvas_t *self,
-                    int width, int height, int fullscreen,
-                    paintfunc_t,void *);
+                    int width, int height, int fullscreen);
 typedef void (*cleanupfunc_t) (canvas_t *self);
 typedef void (*drawfunc_t) (canvas_t *self, element_t *element);
 typedef void (*refreshfunc_t) (canvas_t *self);
@@ -46,7 +44,6 @@ struct canvas_s {
     showfunc_t show;
     incdcfunc_t inc_dirt_count;
     decdcfunc_t dec_dirt_count;
-    paintfunc_t paint;
     draw_elem_t draw_elem;
 };
 

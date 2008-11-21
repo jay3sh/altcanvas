@@ -7,7 +7,7 @@ typedef struct gl_canvas_s gl_canvas_t;
 
 struct gl_canvas_s {
 
-    canvas_t *super;
+    canvas_t super;
 
     //------------
     // Members

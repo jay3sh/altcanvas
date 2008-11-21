@@ -12,6 +12,10 @@ env.AppendUnique(CFLAGS=['-Isrc/lib'])
 env.ParseConfig("pkg-config --cflags --libs xext")
 env.ParseConfig("pkg-config --cflags --libs pycairo")
 
+Import('ARCH')
+#if ARCH != 'armel':
+#    env.ParseConfig("pkg-config --cflags --libs gl")
+
 #
 # Resolve python dependencies using distutils
 #
@@ -28,8 +32,12 @@ env.AppendUnique(CPPPATH=[distutils.sysconfig.get_python_inc()])
 # Build the library
 #
 pythonlib = env.SharedLibrary(target='inkface',
-                source=['inkface.c','canvas.c', 'element.c',
-                        '#src/lib/common.c', '#src/lib/canvas-x.c'])
+                source=['inkface.c',
+                        'canvas.c', 
+                        'element.c',
+                        '#src/lib/common.c', 
+                        '#src/lib/canvas-x.c',
+                        '#src/lib/canvas-gl.c'])
 
 if type(pythonlib) == type([]): pythonlib = pythonlib[0]
 
