@@ -123,10 +123,22 @@ class TestCallbackExceptions(unittest.TestCase):
         print 'Move the mouse over the exit door'
         self.assertRaises(TypeError,self.canvas.eventloop)
         inkface.exit()
-        
+       
+import inklib
+class TestFaceOps(unittest.TestCase):
+    def setUp(self):
+        self.SVG = os.path.join(sys.argv[1])
+        self.canvas = inkface.create_X_canvas()
+        self.face = inklib.Face(self.SVG)
+
+    def testAddRemove(self):
+        self.canvas.add(self.face)
+        self.assert_(len(self.canvas.elements) == 54)
+
 
 if __name__ == '__main__':
     for t in [TestSVGLoad,TestCanvas,TestCanvasElements,\
-                TestElements,TestCallbackExceptions]:
+                TestElements,TestCallbackExceptions,\
+                TestFaceOps]:
         suite = unittest.TestLoader().loadTestsFromTestCase(t)
         testResult = unittest.TextTestRunner(verbosity=0).run(suite)

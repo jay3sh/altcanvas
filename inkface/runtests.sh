@@ -1,9 +1,11 @@
 #!/bin/bash
 
-export LD_LIBRARY_PATH=$HOME/usr/lib 
-export PYTHONPATH=`pwd`/src/bindings/python 
+#export LD_LIBRARY_PATH=$HOME/usr/lib 
+#export PYTHONPATH=`pwd`/src/bindings/python 
+export PYTHONPATH=`pwd`/inklib/python
 export DATADIR=`pwd`/tests/data
 
+TESTSET="basic visual keyboard irc"
 
 valgrind_memcheck()
 {
@@ -12,6 +14,7 @@ valgrind_memcheck()
         --tool=memcheck \
         --leak-check=full \
         --show-reachable=yes \
+        --suppressions=valgrind-python.supp \
         $*
 }
 
@@ -44,7 +47,7 @@ execute()
         
     elif [ "x$1" == "xall" ]
     then
-        for test in basic visual keyboard irc
+        for test in $TESTSET
         do
             $WRAPPER python tests/inkface-$test.py $DATADIR/$test.svg
         done
