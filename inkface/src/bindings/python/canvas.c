@@ -246,9 +246,10 @@ p_canvas_unregister_elements(Canvas_t *self, PyObject *args)
     return Py_None;
 }
 
-static PyObject *
-p_canvas_add(Canvas_t *self, PyObject *args)
-{    
+
+PyObject *
+get_face_element_list(PyObject *args)
+{
     PyObject *face_pyo;
 
     if(!PyArg_ParseTuple(args,"O",&face_pyo)){
@@ -270,7 +271,18 @@ p_canvas_add(Canvas_t *self, PyObject *args)
         return NULL;
     }
 
-    PyObject *elemList_pyo = PyDict_Values(elemDict_pyo);
+    return PyDict_Values(elemDict_pyo);
+}
+
+static PyObject *
+p_canvas_add(Canvas_t *self, PyObject *args)
+{    
+    PyObject *elemList_pyo = get_face_element_list(args);
+
+    if(!elemList_pyo){
+        // The exception must have been set inside get_face_element_list
+        return NULL;
+    }
 
     // Sort the elements for this face by order
     // We do this sorting before mixing these elements with the canvas's
@@ -297,7 +309,54 @@ p_canvas_add(Canvas_t *self, PyObject *args)
 static PyObject *
 p_canvas_remove(Canvas_t *self, PyObject *args)
 {
+    PyObject *elemList_pyo = get_face_element_list(args);
 
+    if(!elemList_pyo){
+        // The exception must have been set inside get_face_element_list
+        return NULL;
+    }
+    PyObject *iterator = PyObject_GetIter(elemList_pyo);
+    PyObject *item;
+
+    ASSERT(iterator);
+
+    // TODO: This is O(n^2) - fix in future
+    while(item = PyIter_Next(iterator))
+    {
+        PyObject *citer = PyObject_GetIter(((Canvas_t *)self)->element_list); 
+        int ci = 0;
+        PyObject *citem = NULL;
+        while(citem = PyIter_Next(citer))
+        {
+            //
+            // If 'name' and 'id' of the elements match, then
+            // assume they are the same elements. This should be sufficient
+            // for now, but in future we can make elements hold name
+            // of the SVG file from which they were loaded and that will
+            // guarantee the unique match
+            //
+            int diff = PyUnicode_Compare(
+                PyObject_GetAttrString(citem,"name"),
+                PyObject_GetAttrString(item,"name"));
+
+            diff &= PyUnicode_Compare(
+                PyObject_GetAttrString(citem,"id"),
+                PyObject_GetAttrString(item,"id"));
+
+            if(diff == 0){
+                PySequence_DelItem(((Canvas_t *)self)->element_list,ci);
+                break;
+            }
+            
+            ci++;
+        }
+        Py_DECREF(citer);
+    }
+
+    Py_DECREF(iterator);
+
+    Py_INCREF(Py_None);
+    return Py_None;
 }
 
 static PyObject*

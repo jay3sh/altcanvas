@@ -135,6 +135,9 @@ class TestFaceOps(unittest.TestCase):
         self.canvas.add(self.face)
         self.assert_(len(self.canvas.elements) == 54)
 
+        self.canvas.remove(self.face)
+        self.assert_(len(self.canvas.elements) == 0)
+
 
 if __name__ == '__main__':
     for t in [TestSVGLoad,TestCanvas,TestCanvasElements,\
