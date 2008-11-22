@@ -246,6 +246,59 @@ p_canvas_unregister_elements(Canvas_t *self, PyObject *args)
     return Py_None;
 }
 
+static PyObject *
+p_canvas_add(Canvas_t *self, PyObject *args)
+{    
+    PyObject *face_pyo;
+
+    if(!PyArg_ParseTuple(args,"O",&face_pyo)){
+        PyErr_Clear();
+        PyErr_SetString(PyExc_ValueError,"Invalid Arguments");
+        return NULL;
+    }
+
+    if(!face_pyo){
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+
+    PyObject *elemDict_pyo = PyObject_GetAttrString(face_pyo,"elements");
+    
+    if(!elemDict_pyo){
+        PyErr_Clear();
+        PyErr_SetString(PyExc_ValueError,"elements dictionary not found");
+        return NULL;
+    }
+
+    PyObject *elemList_pyo = PyDict_Values(elemDict_pyo);
+
+    // Sort the elements for this face by order
+    // We do this sorting before mixing these elements with the canvas's
+    // elements.
+    PyList_Sort(elemList_pyo);
+
+    // Append this list to canvas's element list
+    PyObject *iterator = PyObject_GetIter(elemList_pyo);
+    PyObject *item;
+
+    ASSERT(iterator);
+
+    while(item = PyIter_Next(iterator)){
+        PyList_Append(((Canvas_t *)self)->element_list,item);
+    }
+
+    Py_DECREF(iterator);
+
+    Py_INCREF(Py_None);
+    return Py_None;
+
+}
+
+static PyObject *
+p_canvas_remove(Canvas_t *self, PyObject *args)
+{
+
+}
 
 static PyObject*
 p_canvas_eventloop(Canvas_t *self, PyObject *args)
@@ -411,6 +464,10 @@ static PyMethodDef canvas_methods[] = {
         METH_VARARGS, "Draw the element canvas" },
     { "refresh", (PyCFunction)p_canvas_refresh, 
         METH_NOARGS, "Refresh the canvas" },
+    { "add", (PyCFunction)p_canvas_add, 
+        METH_VARARGS, "Add a Face object to the canvas" },
+    { "remove", (PyCFunction)p_canvas_remove, 
+        METH_VARARGS, "Remove the Face object from the canvas" },
     {NULL, NULL, 0, NULL},
 };
 
