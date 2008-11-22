@@ -39,4 +39,8 @@ static PyObject*
 static PyObject*
     p_canvas_eventloop(Canvas_t *self, PyObject *args);
 
+// Internal helper functions
+
+void recalculate_clouds(Canvas_t *self);
+
 #endif /* __CANVAS_H__ */

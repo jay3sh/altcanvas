@@ -40,6 +40,8 @@ element_init(Element_t *self, PyObject *args, PyObject *kwds)
     Py_INCREF(Py_None);
     self->onKeyPress = Py_None;
 
+    self->clouds = (PyListObject *)PyList_New(0);
+
     return 0;
 }
 

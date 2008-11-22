@@ -301,6 +301,9 @@ p_canvas_add(Canvas_t *self, PyObject *args)
 
     Py_DECREF(iterator);
 
+
+    recalculate_clouds(self);
+
     Py_INCREF(Py_None);
     return Py_None;
 
@@ -357,6 +360,84 @@ p_canvas_remove(Canvas_t *self, PyObject *args)
 
     Py_INCREF(Py_None);
     return Py_None;
+}
+
+#define INK_MAX(a,b) ((a>b)?a:b)
+
+/*
+ * @method: recalculate_clouds
+ *
+ * @summary: This method compares surface extents of all existing widgets
+            with the new widget and determines if the new widget will
+            overlap with them. If it does overlap the existing widgets will 
+            loose their isKeyActive and isPoinerActive statuses.
+ * @param newWidget: New widget being appended to the widgetQ
+            
+            
+    (ox0,oy0)<-------- ow -------->
+           ^ ----------------------
+           | |                    |
+           | |                    |
+          oh |                    |
+           | |                    |
+           v ---------------------- (ox1,oy1)
+           
+           
+                        (nx0,ny0)<-------- nw -------->
+                               ^ ----------------------
+                               | |                    |
+                               | |                    |
+                              nh |     newWidget      |
+                               | |                    |
+                               | |                    |
+                               v ---------------------- (nx1,ny1)
+ 
+ */
+void 
+recalculate_clouds(Canvas_t *self)
+{
+    ASSERT(self);
+
+    int lsize = PyList_Size(self->element_list);
+
+    int ox0,oy0,ox1,oy1,nx0,ny0,nx1,ny1;
+    int i=0,j=0;
+
+    for(; i<lsize; i++)
+    {
+
+        Element_t *ne = (Element_t *)PyList_GetItem(self->element_list,i);
+
+        for(; j<i; j++)
+        {
+            Element_t *oe = (Element_t *)PyList_GetItem(self->element_list,j);
+
+            ox0 = oe->x;
+            oy0 = oe->y;
+            ox1 = ox0 + oe->w;
+            oy1 = oy0 + oe->h;
+
+            nx0 = ne->x;
+            ny0 = ne->y;
+            nx1 = nx0 + ne->w;
+            ny1 = ny0 + ne->h;
+
+            if ((ox0 < nx0 && ox1 < nx0) || (ox0 > nx1 && ox1 > nx1) || \
+                (oy0 < ny0 && oy1 < ny0) || (oy0 > ny1 &&  oy1 > ny1))
+            {
+                continue;
+
+            } else {
+                PyObject *cloud = PyTuple_Pack(4,
+                        PyInt_FromLong(INK_MAX(ox0,nx0)-ox0),
+                        PyInt_FromLong(INK_MAX(oy0,ny0)-oy0),
+                        PyInt_FromLong(INK_MAX(ox1,nx1)-ox0),
+                        PyInt_FromLong(INK_MAX(oy1,ny1)-oy0));
+                ASSERT(oe->clouds);
+                PyList_Append((PyObject *)oe->clouds,cloud);
+            }
+        }
+    }
 }
 
 static PyObject*

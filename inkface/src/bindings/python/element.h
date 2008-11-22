@@ -27,6 +27,8 @@ typedef struct {
     // private 
     Element *element;
 
+    PyListObject *clouds;
+
     // Callback handlers
     PyObject *onDraw;
     PyObject *onTap;

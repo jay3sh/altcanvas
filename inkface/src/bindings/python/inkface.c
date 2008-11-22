@@ -124,6 +124,7 @@ inkface_loadsvg(PyObject *self, PyObject *args)
         pytype = &Element_Type;
         ASSERT(pyo = (Element_t *)pytype->tp_alloc(pytype,0));
 
+        // TODO: use standard element_init
         pyo->x = element->x;
         pyo->y = element->y;
         pyo->w = element->w;
@@ -131,6 +132,7 @@ inkface_loadsvg(PyObject *self, PyObject *args)
         pyo->order = element->order;
         pyo->name = PyString_FromString(element->name);
         pyo->id = PyString_FromString(element->id);
+        pyo->clouds = (PyListObject *)PyList_New(0);
         if(element->text){
             pyo->text = PyString_FromString(element->text->str);
         }
