@@ -15,6 +15,8 @@ env.ParseConfig("pkg-config --cflags --libs pycairo")
 Import('ARCH')
 #if ARCH != 'armel':
 #    env.ParseConfig("pkg-config --cflags --libs gl")
+#    env.AppendUnique(LINKFLAGS="-lglut")
+#    env.AppendUnique(CFLAGS=['-DHAS_OPENGL'])
 
 #
 # Resolve python dependencies using distutils

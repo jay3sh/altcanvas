@@ -20,6 +20,8 @@
 
 #include "canvas-common.h"
 #include "canvas-x.h"
+#include "canvas-gl.h"
+
 #include "canvas.h"
 #include "element.h"
 
@@ -27,6 +29,7 @@
 Pycairo_CAPI_t *Pycairo_CAPI;
 //TODO: Make canvas singleton
 Canvas_t *x_canvas = NULL;
+Canvas_t *gl_canvas = NULL;
 
 
 void paint(void *arg);
@@ -220,6 +223,90 @@ inkface_create_X_canvas(PyObject *self, PyObject *args, PyObject *kwds)
     return (PyObject *)x_canvas;
 }
 
+
+void gl_display(void)
+{
+
+}
+
+static PyObject*
+inkface_create_GL_canvas(PyObject *self, PyObject *args, PyObject *kwds)
+{
+#ifdef HAS_OPENGL
+    //if(gl_canvas){
+    //    return (PyObject *)gl_canvas;
+    //}
+    
+    ASSERT(gl_canvas = PyObject_New(Canvas_t,&Canvas_Type));
+
+    /*
+    PyTypeObject *type = &Canvas_Type;
+    ASSERT(gl_canvas = (Canvas_t *)type->tp_alloc(type,0));
+    */
+
+    ASSERT(gl_canvas->cobject = (canvas_t *)gl_canvas_new());
+
+    // Parse keyword args
+    #define DEFAULT_WIDTH 800
+    #define DEFAULT_HEIGHT 480 
+    gl_canvas->width=0; 
+    gl_canvas->height=0;
+    gl_canvas->fullscreen = Py_False;
+    gl_canvas->timeout = 0;
+    gl_canvas->onTimer = NULL;
+    static char *kwlist[] = {"width", "height", "fullscreen", NULL};
+
+    ASSERT(PyArg_ParseTupleAndKeywords(args, kwds, "|iiO", kwlist, 
+                  &(gl_canvas->width), &(gl_canvas->height), &(gl_canvas->fullscreen)))
+
+    if(gl_canvas->width <= 0) gl_canvas->width = DEFAULT_WIDTH;
+    if(gl_canvas->height <= 0) gl_canvas->height = DEFAULT_HEIGHT;
+
+    //
+    // Fullscreen preferences:
+    //
+    // 1. env var INKFACE_FULLSCREEN 
+    // 2. kwd arg fullscreen 
+    //
+    char *env_fullscreen = getenv("INKFACE_FULLSCREEN");
+    if(env_fullscreen && !strncmp(env_fullscreen,"TRUE",4)){
+        gl_canvas->fullscreen = Py_True;
+    } else {
+        if((gl_canvas->fullscreen == NULL) || (!PyBool_Check(gl_canvas->fullscreen))) {
+            gl_canvas->fullscreen = Py_False;
+        } else {
+            if(gl_canvas->fullscreen == Py_True){
+                gl_canvas->fullscreen = Py_True;
+            } else {
+                gl_canvas->fullscreen = Py_False;
+            }
+        }
+    }
+
+
+    // Initialize multi thread support for Python interpreter
+    PyEval_InitThreads();
+
+    gl_canvas->cobject->init(gl_canvas->cobject,
+                        gl_canvas->width, 
+                        gl_canvas->height, 
+                        (gl_canvas->fullscreen == Py_True));
+
+    ((gl_canvas_t *)gl_canvas->cobject)->register_display_function(
+                        ((gl_canvas_t *)gl_canvas->cobject),
+                        gl_display);
+
+    // Initialize the active element list
+    gl_canvas->element_list = PyList_New(0);
+
+    return (PyObject *)gl_canvas;
+#else // HAS_OPENGL
+    PyErr_Clear();
+    PyErr_SetString(PyExc_Exception,"OpenGL support is not compiled in");
+    return NULL;
+#endif // HAS_OPENGL
+}
+
 static PyObject*
 inkface_exit(PyObject *self, PyObject *args)
 {
@@ -237,6 +324,8 @@ static PyMethodDef inkface_methods[] =
         (PyCFunction)inkface_loadsvg, METH_VARARGS, NULL },
     { "create_X_canvas", 
         (PyCFunction)inkface_create_X_canvas, METH_KEYWORDS, NULL },
+    { "create_GL_canvas", 
+        (PyCFunction)inkface_create_GL_canvas, METH_KEYWORDS, NULL },
     { "exit", 
         (PyCFunction)inkface_exit, METH_NOARGS, NULL },
     { NULL, NULL, 0, NULL},

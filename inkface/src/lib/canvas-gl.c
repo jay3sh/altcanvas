@@ -23,7 +23,42 @@
 // OpenGL canvas
 //-------------------
 
-#ifdef USE_OPENGL
+#ifdef HAS_OPENGL
+
+
+#ifdef GL_VERSION_1_1
+static GLuint texName;
+#endif
+static int checkImageWidth = 800;
+static int checkImageHeight = 480;
+static GLubyte checkImage[800][480][4];
+void init(void)
+{    
+   glClearColor (0.0, 0.0, 0.0, 0.0);
+   glShadeModel(GL_FLAT);
+   glEnable(GL_DEPTH_TEST);
+
+   //makeCheckImage();
+   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+#ifdef GL_VERSION_1_1
+   glGenTextures(1, &texName);
+   glBindTexture(GL_TEXTURE_2D, texName);
+#endif
+
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+#ifdef GL_VERSION_1_1
+   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, checkImageWidth, checkImageHeight, 
+                0, GL_RGBA, GL_UNSIGNED_BYTE, checkImage);
+#else
+   glTexImage2D(GL_TEXTURE_2D, 0, 4, checkImageWidth, checkImageHeight, 
+                0, GL_RGBA, GL_UNSIGNED_BYTE, checkImage);
+#endif
+}
+
 
 static void
 canvas_init(
@@ -33,17 +68,24 @@ canvas_init(
     int fullscreen)
 {
     gl_canvas_t *self = (gl_canvas_t *)canvas;
-    /*
     glutInit(NULL, NULL);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(250, 250);
     glutInitWindowPosition(100, 100);
     glutCreateWindow("inkface");
-    */
     //init();
-    //glutDisplayFunc(display);
+    ASSERT(self->display);
+    glutDisplayFunc(self->display);
     //glutReshapeFunc(reshape);
     //glutKeyboardFunc(keyboard);
+}
+
+static void 
+canvas_register_display_function(
+    gl_canvas_t *canvas,
+    displayfunc_t display)
+{
+    canvas->display = display;
 }
 
 static void canvas_show(canvas_t *self)

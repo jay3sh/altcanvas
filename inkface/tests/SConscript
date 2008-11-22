@@ -19,3 +19,6 @@ env.Command('simpy.so','libsimpy.so',
             [
                 Move("$TARGET","$SOURCE"),
             ])
+
+env.Alias('simpymod','simpy.so')
+

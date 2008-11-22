@@ -5,7 +5,7 @@
 import os
 import sys
 
-VERSION = '0.1.1'
+VERSION = '0.1.2'
 ARCH = os.popen('dpkg --print-architecture').read().strip()
 MAINTAINER = 'Jayesh Salvi <jayesh@altfrequency.com>'
 Export('VERSION ARCH MAINTAINER')
@@ -43,3 +43,5 @@ SConscript(['src/bindings/c/debian.sc'])
 
 SConscript(['src/bindings/python/lib.sc'])
 SConscript(['src/bindings/python/debian.sc'])
+
+SConscript(['tests/SConscript'])
