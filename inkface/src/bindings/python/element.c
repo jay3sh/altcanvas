@@ -173,6 +173,36 @@ element_dealloc(Element_t *self)
     self->ob_type->tp_free((PyObject *)self);
 }
 
+int
+element_under_cloud(Element_t *self,int x, int y)
+{
+    int cx0,cy0,cx1,cy1,rx,ry;
+    PyObject *iter = PyObject_GetIter((PyObject *)self->clouds);
+
+    PyObject *item;
+    // Conver incoming coordinates with reference to element coordinates.
+    rx = x - self->x;
+    ry = y - self->y;
+
+
+    while(item = PyIter_Next(iter))
+    {
+        ASSERT(PyTuple_Size(item) == 4);
+        cx0 = PyInt_AsLong(PyTuple_GetItem(item,0));
+        cy0 = PyInt_AsLong(PyTuple_GetItem(item,1));
+        cx1 = PyInt_AsLong(PyTuple_GetItem(item,2));
+        cy1 = PyInt_AsLong(PyTuple_GetItem(item,3));
+    
+        // If following expression is true, then this element is under cloud
+        if((rx > cx0) && (rx < cx1) && (ry > cy0) && (ry < cy1))
+        {
+            return TRUE;
+        }
+    }
+
+    return FALSE;
+}
+
 PyTypeObject Element_Type = {
     PyObject_HEAD_INIT(NULL)
     0,                                  /* ob_size */
