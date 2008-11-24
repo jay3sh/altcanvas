@@ -525,25 +525,22 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
             break;
         case MotionNotify:
             mevent = (XMotionEvent *)(&event);
-            /*
-             * Trigger the events in decreasing "order" of the elements
-             */
             iterator = PyObject_GetIter(self->element_list);
             while(item = PyIter_Next(iterator)){
 
                 Element_t *el = (Element_t *)item;
 
+                // If element is under cloud at this point, then skip it
+                if(element_under_cloud(el,mevent->x,mevent->y)) continue;
+
                 int state = process_motion_event(el->element,mevent);
     
                 if(state & POINTER_STATE_TAP)
                 {
-                    if(!element_under_cloud(el,mevent->x,mevent->y))
-                    {
-                        if(PyCallable_Check(el->onTap)) {
-                            result = PyObject_CallFunction(el->onTap,
-                                "OO",el,self->element_dict);
-                            if(!result) error_flag = 1;
-                        }
+                    if(PyCallable_Check(el->onTap)) {
+                        result = PyObject_CallFunction(el->onTap,
+                            "OO",el,self->element_dict);
+                        if(!result) error_flag = 1;
                     }
                 }
     
