@@ -40,7 +40,7 @@ element_init(Element_t *self, PyObject *args, PyObject *kwds)
     Py_INCREF(Py_None);
     self->onKeyPress = Py_None;
 
-    self->clouds = (PyListObject *)PyList_New(0);
+    self->clouds = PyList_New(0);
 
     return 0;
 }
@@ -177,13 +177,12 @@ int
 element_under_cloud(Element_t *self,int x, int y)
 {
     int cx0,cy0,cx1,cy1,rx,ry;
-    PyObject *iter = PyObject_GetIter((PyObject *)self->clouds);
+    PyObject *iter = PyObject_GetIter(self->clouds);
 
     PyObject *item;
     // Conver incoming coordinates with reference to element coordinates.
     rx = x - self->x;
     ry = y - self->y;
-
 
     while(item = PyIter_Next(iter))
     {
@@ -193,13 +192,21 @@ element_under_cloud(Element_t *self,int x, int y)
         cx1 = PyInt_AsLong(PyTuple_GetItem(item,2));
         cy1 = PyInt_AsLong(PyTuple_GetItem(item,3));
     
+        //LOG("%s (%d-%d,%d-%d) - (%d,%d),(%d,%d)",
+        //        PyString_AsString(self->name),
+        //        x,self->x,y,self->y,cx0,cy0,cx1,cy1);
+
         // If following expression is true, then this element is under cloud
         if((rx > cx0) && (rx < cx1) && (ry > cy0) && (ry < cy1))
         {
+            Py_DECREF(iter);
+            //LOG("%s clouded at (%d,%d)",PyString_AsString(self->name),x,y);
             return TRUE;
         }
     }
 
+    //LOG("%s not clouded at (%d,%d)",PyString_AsString(self->name),x,y);
+    Py_DECREF(iter);
     return FALSE;
 }
 

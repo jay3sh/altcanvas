@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="800"
+   height="480"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.46"
+   version="1.0"
+   sodipodi:docname="overlap-low.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <defs
+     id="defs4">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective10" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     gridtolerance="10000"
+     guidetolerance="10"
+     objecttolerance="10"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.495"
+     inkscape:cx="400"
+     inkscape:cy="240"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1280"
+     inkscape:window-height="964"
+     inkscape:window-x="-5"
+     inkscape:window-y="-3" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="opacity:1;fill:#f9f9f9;fill-opacity:0.75294118;fill-rule:evenodd;stroke:#ffffff;stroke-width:4.30000019;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect2490"
+       width="795.70001"
+       height="475.70001"
+       x="2.1500001"
+       y="2.1500001"
+       name="background"
+       order="0" />
+    <g
+       id="g2409"
+       name="buttonA"
+       order="10">
+      <rect
+         ry="50"
+         rx="50"
+         y="61.959869"
+         x="145.1505"
+         height="163.87959"
+         width="232.10701"
+         id="rect2383"
+         style="opacity:1;fill:#00ff00;fill-opacity:0.75294118;fill-rule:evenodd;stroke:#ffffff;stroke-width:4.30000019;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         id="text2393"
+         y="145.55183"
+         x="252.17392"
+         style="font-size:18px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="145.55183"
+           x="252.17392"
+           id="tspan2395"
+           sodipodi:role="line">A</tspan></text>
+    </g>
+    <g
+       id="g2414"
+       name="buttonB"
+       order="10">
+      <rect
+         ry="50"
+         rx="50"
+         y="60.287628"
+         x="422.40802"
+         height="163.87959"
+         width="232.10701"
+         id="rect2385"
+         style="opacity:1;fill:#ffcc00;fill-opacity:0.75294118;fill-rule:evenodd;stroke:#ffffff;stroke-width:4.30000019;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         id="text2397"
+         y="140.86957"
+         x="539.13043"
+         style="font-size:18px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="140.86957"
+           x="539.13043"
+           id="tspan2399"
+           sodipodi:role="line">B</tspan></text>
+    </g>
+    <g
+       id="g2424"
+       name="buttonC"
+       order="10">
+      <rect
+         ry="50"
+         rx="50"
+         y="263.63208"
+         x="145.48497"
+         height="163.87959"
+         width="232.10701"
+         id="rect2387"
+         style="opacity:1;fill:#0000ff;fill-opacity:0.75294118;fill-rule:evenodd;stroke:#ffffff;stroke-width:4.30000019;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         id="text2401"
+         y="341.53845"
+         x="249.49831"
+         style="font-size:18px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="341.53845"
+           x="249.49831"
+           id="tspan2403"
+           sodipodi:role="line">C</tspan></text>
+    </g>
+    <g
+       id="g2419"
+       name="buttonD"
+       order="10">
+      <rect
+         ry="50"
+         rx="50"
+         y="263.63211"
+         x="426.42142"
+         height="163.87959"
+         width="232.10701"
+         id="rect2389"
+         style="opacity:1;fill:#ff0000;fill-opacity:0.75294118;fill-rule:evenodd;stroke:#ffffff;stroke-width:4.30000019;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         id="text2405"
+         y="344.21405"
+         x="541.13715"
+         style="font-size:18px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="344.21405"
+           x="541.13715"
+           id="tspan2407"
+           sodipodi:role="line">D</tspan></text>
+    </g>
+    <path
+       sodipodi:type="arc"
+       style="opacity:1;fill:#000000;fill-opacity:0.75294118;fill-rule:evenodd;stroke:#ffffff;stroke-width:4.30000019;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path3279"
+       sodipodi:cx="644.14716"
+       sodipodi:cy="83.678932"
+       sodipodi:rx="52.842808"
+       sodipodi:ry="51.17057"
+       d="M 696.98996,83.678932 A 52.842808,51.17057 0 1 1 591.30435,83.678932 A 52.842808,51.17057 0 1 1 696.98996,83.678932 z"
+       name="trialBall"
+       order="10" />
+  </g>
+</svg>

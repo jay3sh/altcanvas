@@ -363,6 +363,7 @@ p_canvas_remove(Canvas_t *self, PyObject *args)
 }
 
 #define INK_MAX(a,b) ((a>b)?a:b)
+#define INK_MIN(a,b) ((a<b)?a:b)
 
 /*
  * @method: recalculate_clouds
@@ -398,6 +399,8 @@ recalculate_clouds(Canvas_t *self)
 {
     ASSERT(self);
 
+    //LOG("recalculating clouds");
+    //LOG("element list: ");
     int lsize = PyList_Size(self->element_list);
 
     int ox0,oy0,ox1,oy1,nx0,ny0,nx1,ny1;
@@ -408,7 +411,15 @@ recalculate_clouds(Canvas_t *self)
 
         Element_t *ne = (Element_t *)PyList_GetItem(self->element_list,i);
 
-        for(; j<i; j++)
+        nx0 = ne->x;
+        ny0 = ne->y;
+        nx1 = nx0 + ne->w;
+        ny1 = ny0 + ne->h;
+
+        //LOG(" - %s (%d,%d) (%d,%d)",PyString_AsString(ne->name),
+        //            nx0,ny0,nx1,ny1);
+
+        for(j=0; j<i; j++)
         {
             Element_t *oe = (Element_t *)PyList_GetItem(self->element_list,j);
 
@@ -417,10 +428,8 @@ recalculate_clouds(Canvas_t *self)
             ox1 = ox0 + oe->w;
             oy1 = oy0 + oe->h;
 
-            nx0 = ne->x;
-            ny0 = ne->y;
-            nx1 = nx0 + ne->w;
-            ny1 = ny0 + ne->h;
+            //LOG("   - %s (%d,%d),(%d,%d)",PyString_AsString(oe->name),
+            //            ox0,oy0,ox1,oy1);
 
             if ((ox0 < nx0 && ox1 < nx0) || (ox0 > nx1 && ox1 > nx1) || \
                 (oy0 < ny0 && oy1 < ny0) || (oy0 > ny1 &&  oy1 > ny1))
@@ -431,10 +440,16 @@ recalculate_clouds(Canvas_t *self)
                 PyObject *cloud = PyTuple_Pack(4,
                         PyInt_FromLong(INK_MAX(ox0,nx0)-ox0),
                         PyInt_FromLong(INK_MAX(oy0,ny0)-oy0),
-                        PyInt_FromLong(INK_MAX(ox1,nx1)-ox0),
-                        PyInt_FromLong(INK_MAX(oy1,ny1)-oy0));
+                        PyInt_FromLong(INK_MIN(ox1,nx1)-ox0),
+                        PyInt_FromLong(INK_MIN(oy1,ny1)-oy0));
                 ASSERT(oe->clouds);
                 PyList_Append((PyObject *)oe->clouds,cloud);
+                //LOG("   - clouding %s at (%d,%d),(%d,%d)",
+                //        PyString_AsString(oe->name),
+                //        (INK_MAX(ox0,nx0)-ox0),
+                //        (INK_MAX(oy0,ny0)-oy0),
+                //        (INK_MIN(ox1,nx1)-ox0),
+                //        (INK_MIN(oy1,ny1)-oy0));
             }
         }
     }
@@ -522,10 +537,13 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
     
                 if(state & POINTER_STATE_TAP)
                 {
-                    if(PyCallable_Check(el->onTap)) {
-                        result = PyObject_CallFunction(el->onTap,
-                            "OO",el,self->element_dict);
-                        if(!result) error_flag = 1;
+                    if(!element_under_cloud(el,mevent->x,mevent->y))
+                    {
+                        if(PyCallable_Check(el->onTap)) {
+                            result = PyObject_CallFunction(el->onTap,
+                                "OO",el,self->element_dict);
+                            if(!result) error_flag = 1;
+                        }
                     }
                 }
     

@@ -27,7 +27,7 @@ typedef struct {
     // private 
     Element *element;
 
-    PyListObject *clouds;
+    PyObject *clouds;
 
     // Callback handlers
     PyObject *onDraw;
@@ -38,5 +38,6 @@ typedef struct {
 
 } Element_t;
 
+int element_under_cloud(Element_t *self,int x, int y);
 
 #endif /* __ELEMENT_H__ */
