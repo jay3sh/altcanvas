@@ -129,7 +129,7 @@ class TestFaceOps(unittest.TestCase):
     def setUp(self):
         self.SVG = os.path.join(sys.argv[1])
         self.canvas = inkface.create_X_canvas()
-        self.face = inklib.Face(self.SVG)
+        self.face = inklib.Face(self.canvas,self.SVG)
 
     def testAddRemove(self):
         self.canvas.add(self.face)
