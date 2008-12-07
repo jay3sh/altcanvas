@@ -38,7 +38,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="1.495"
      inkscape:cx="400"
-     inkscape:cy="240"
+     inkscape:cy="230.64708"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -247,5 +247,54 @@
          id="tspan2463"
          x="553.3551"
          y="354.36203">text</tspan></text>
+    <g
+       id="g2496"
+       name="twitButton"
+       order="100">
+      <rect
+         ry="8"
+         rx="8"
+         y="9.0969896"
+         x="688.29431"
+         height="30.100334"
+         width="105.68562"
+         id="rect2490"
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:4.30000019;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         id="text2492"
+         y="28.488295"
+         x="723.08362"
+         style="font-size:18px;font-style:normal;font-weight:bold;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans Bold"
+         xml:space="preserve"><tspan
+           y="28.488295"
+           x="723.08362"
+           id="tspan2494"
+           sodipodi:role="line">twit</tspan></text>
+    </g>
+    <g
+       id="g2501"
+       transform="translate(-2.6755881,431.10368)"
+       name="quitButton"
+       order="100">
+      <rect
+         ry="8"
+         rx="8"
+         y="9.0969896"
+         x="688.29431"
+         height="30.100334"
+         width="105.68562"
+         id="rect2503"
+         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:4.30000019;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         id="text2505"
+         y="28.488295"
+         x="723.08362"
+         style="font-size:18px;font-style:normal;font-weight:bold;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans Bold"
+         xml:space="preserve"><tspan
+           y="28.488295"
+           x="723.08362"
+           id="tspan2507"
+           sodipodi:role="line">quit</tspan></text>
+    </g>
   </g>
 </svg>

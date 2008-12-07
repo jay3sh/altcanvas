@@ -3,6 +3,7 @@
 import inkface
 import inklib
 import twitter
+from keyboard import Keyboard
 
 import os
 
@@ -12,11 +13,18 @@ class TwitGui(inklib.Face):
     def __init__(self,canvas,svgname):
         inklib.Face.__init__(self,canvas,svgname)
 
+        self.twitButton.onTap = self.onTwit
+        self.quitButton.onTap = self.onExit
+
+        '''
+        self.kbd = Keyboard(self.canvas)
+        self.kbd.visible = False
+
         self.twtApi = twitter.Api(
                         username=os.environ['TWT_USERNAME'],
                         password=os.environ['TWT_PASSWORD'])
 
-        ptwt_list = self.twtApi.GetPublicTimeline();
+        ptwt_list = self.twtApi.GetPublicTimeline()
 
         i = 0
         LINE_LIMIT = 25 
@@ -25,13 +33,13 @@ class TwitGui(inklib.Face):
             twt_text = ''
             if name.startswith('publicTwt'):
 
-                # Iterate till we get a ascii string
+                # Iterate till we get an ascii string
                 while True:
                     try:
                         ascii_twt = str(ptwt_list[i].text)
                     except UnicodeEncodeError, uee:
                         i += 1
-                    except IndexError:
+                    except IndexError, ie:
                         self.canvas.refresh()
                         return
                     else:
@@ -50,7 +58,15 @@ class TwitGui(inklib.Face):
                 i += 1
 
         self.canvas.refresh()
+        '''
 
+    def onExit(self,e,elements):
+        inkface.exit()
+
+    def onTwit(self,e,elements):
+        self.kbd.visible = True
+        self.canvas.refresh()
+        
 def main():
     canvas = inkface.create_X_canvas()
     twitGui = TwitGui(canvas,'twit.svg')
