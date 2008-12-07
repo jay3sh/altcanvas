@@ -1929,7 +1929,7 @@
        order="10" />
     <g
        id="g4065"
-       transform="translate(-12,12)"
+       transform="translate(6,50)"
        name="keyEnter"
        order="10">
       <text
@@ -1964,5 +1964,55 @@
          id="tspan4072"
          x="73.037704"
          y="78.387794">text</tspan></text>
+    <g
+       id="g4180"
+       transform="translate(-35.755852,-3.6014272)"
+       name="keyBackspace"
+       order="10">
+      <text
+         id="text4182"
+         y="253.35727"
+         x="540.32318"
+         style="font-size:18px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans Bold"
+         xml:space="preserve"><tspan
+           y="253.35727"
+           x="540.32318"
+           id="tspan4184"
+           sodipodi:role="line">backspace</tspan></text>
+      <rect
+         ry="5"
+         rx="5"
+         y="233.26031"
+         x="530.25854"
+         height="33.609001"
+         width="125"
+         id="rect4186"
+         style="fill:none;stroke:#ffffff;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <g
+       id="g4188"
+       transform="translate(141.66964,165.5799)"
+       name="keyCancel"
+       order="10">
+      <text
+         id="text4190"
+         y="254.21904"
+         x="541.18494"
+         style="font-size:18px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans Bold"
+         xml:space="preserve"><tspan
+           y="254.21904"
+           x="541.18494"
+           id="tspan4192"
+           sodipodi:role="line">cancel</tspan></text>
+      <rect
+         ry="5"
+         rx="5"
+         y="233.26031"
+         x="530.25854"
+         height="33.608616"
+         width="82.728905"
+         id="rect4194"
+         style="fill:none;stroke:#ffffff;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
   </g>
 </svg>
