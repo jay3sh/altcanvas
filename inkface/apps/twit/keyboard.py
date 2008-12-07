@@ -61,6 +61,10 @@ class Keyboard(inklib.Face):
         self.canvas.remove(self)
         self.canvas.refresh()
         
+    def onCancel(self,e):
+        self.canvas.remove(self)
+        self.canvas.refresh()
+
     def glowDraw(self,e):
         if e.opacity:
             self.canvas.draw(e)
@@ -68,8 +72,14 @@ class Keyboard(inklib.Face):
     def reset(self):
         self.keyboardText.text = ''
         self.keyboardText.refresh()
-    def onKeyPress(self,e,txt,code):
-        self.keyboardText.text += txt
+
+    def onKeyPress(self,e,txt,keycode):
+        self.keyboardText.text += txt.strip()
+        if keycode == inkface.KeyEscape:
+            self.onCancel(e)
+        elif keycode == inkface.KeyEnter:
+            self.onEnter(e)
+
         self.keyboardText.refresh()
         self.canvas.refresh()
 

@@ -8,8 +8,8 @@ from keyboard import Keyboard
 import os
 
 class LoginGui(inklib.Face):
-    username = ''
-    password = ''
+    username = os.environ['TWT_USERNAME']
+    password = os.environ['TWT_PASSWORD']
     def __init__(self,canvas,svgname):
         inklib.Face.__init__(self,canvas,svgname)
 
@@ -21,6 +21,11 @@ class LoginGui(inklib.Face):
         self.usernameText.onTap = self.onUsernameTap
         self.passwordFrame.onTap = self.onPasswordTap
         self.passwordText.onTap = self.onPasswordTap
+        
+        self.usernameText.text = self.username
+        self.usernameText.refresh()
+        self.passwordText.text = '*'*len(self.password)
+        self.passwordText.refresh()
 
     def populateUsername(self,txt):
         self.username = txt
@@ -52,7 +57,7 @@ class LoginGui(inklib.Face):
 class TwitGui(inklib.Face):
     twtApi = None
 
-    def __init__(self,canvas,svgname):
+    def __init__(self,canvas,svgname,api):
         inklib.Face.__init__(self,canvas,svgname)
 
         self.twitButton.onTap = self.onTwit
@@ -60,10 +65,9 @@ class TwitGui(inklib.Face):
 
         self.kbd = Keyboard(self.canvas)
 
-        self.twtApi = twitter.Api(
-                        username=os.environ['TWT_USERNAME'],
-                        password=os.environ['TWT_PASSWORD'])
+        self.twtApi = api
 
+    def loadPublicTimeline(self):
         ptwt_list = self.twtApi.GetPublicTimeline()
 
         i = 0
@@ -123,9 +127,10 @@ class TwitterApp:
         
     def onLoginSuccess(self,twitterApi):
         self.canvas.remove(self.loginGui)
-        self.twitGui = TwitGui(self.canvas,'public.svg')
+        self.twitGui = TwitGui(self.canvas,'public.svg',twitterApi)
         self.canvas.add(self.twitGui)
         self.canvas.refresh()
+        self.twitGui.loadPublicTimeline()
 
 
 if __name__ == '__main__':
