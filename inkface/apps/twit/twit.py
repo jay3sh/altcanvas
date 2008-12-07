@@ -31,10 +31,12 @@ class LoginGui(inklib.Face):
 
     def onUsernameTap(self,e):
         self.kbd.resultProcessor = self.populateUsername
+        self.kbd.reset()
         self.canvas.add(self.kbd)
 
     def onPasswordTap(self,e):
         self.kbd.resultProcessor = self.populatePassword
+        self.kbd.reset()
         self.canvas.add(self.kbd)
         
     def onLogin(self,e):

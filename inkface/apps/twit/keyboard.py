@@ -65,6 +65,9 @@ class Keyboard(inklib.Face):
         if e.opacity:
             self.canvas.draw(e)
 
+    def reset(self):
+        self.keyboardText.text = ''
+        self.keyboardText.refresh()
     def onKeyPress(self,e,txt,code):
         self.keyboardText.text += txt
         self.keyboardText.refresh()
