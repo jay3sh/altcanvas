@@ -56,6 +56,8 @@ class LoginGui(inklib.Face):
 
 class TwitGui(inklib.Face):
     twtApi = None
+    PUBLIC_TIMELINE = 0
+    FRIENDS_TIMELINE = 1
 
     cloud_pattern = 'publicCloud(\d+)'
     twt_pattern = 'publicTwt(\d+)'
@@ -88,20 +90,27 @@ class TwitGui(inklib.Face):
             self.canvas.bring_to_front(self.friendsButton)
             self.canvas.bring_to_front(self.publicButton)
 
-    def loadPublicTimeline(self):
-        ptwt_list = self.twtApi.GetPublicTimeline()
+    def loadTimeline(self,type):
+
+        if type == self.PUBLIC_TIMELINE:
+            LINE_LIMIT = 25 
+            elem_prefix = 'publicTwt'
+            twt_list = self.twtApi.GetPublicTimeline()
+        else:
+            LINE_LIMIT = 60
+            elem_prefix = 'friendTwt'
+            twt_list = self.twtApi.GetFriendsTimeline()
 
         i = 0
-        LINE_LIMIT = 25 
         for name,elem in self.elements.items():
             j = 1
             twt_text = ''
-            if name.startswith('publicTwt'):
+            if name.startswith(elem_prefix):
 
                 # Iterate till we get an ascii string
                 while True:
                     try:
-                        ascii_twt = str(ptwt_list[i].text)
+                        ascii_twt = str(twt_list[i].text)
                     except UnicodeEncodeError, uee:
                         i += 1
                     except IndexError, ie:
@@ -123,7 +132,7 @@ class TwitGui(inklib.Face):
                 i += 1
 
         self.canvas.refresh()
-
+        
     def onExit(self,e):
         inkface.exit()
 
@@ -151,7 +160,8 @@ class TwitterApp:
         self.twitGui = TwitGui(self.canvas,'public.svg',twitterApi)
         self.canvas.add(self.twitGui)
         self.canvas.refresh()
-        self.twitGui.loadPublicTimeline()
+        self.twitGui.loadTimeline(self.twitGui.FRIENDS_TIMELINE)
+        self.twitGui.loadTimeline(self.twitGui.PUBLIC_TIMELINE)
 
 
 if __name__ == '__main__':
