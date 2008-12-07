@@ -3,6 +3,9 @@
 import inkface
 
 class Face:
+    def resultProcessor(result):
+        pass
+
     def __init__(self,canvas,svgname):
         assert(canvas)
         self.canvas = canvas
