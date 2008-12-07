@@ -57,6 +57,9 @@ class LoginGui(inklib.Face):
 class TwitGui(inklib.Face):
     twtApi = None
 
+    cloud_pattern = 'publicCloud(\d+)'
+    twt_pattern = 'publicTwt(\d+)'
+
     def __init__(self,canvas,svgname,api):
         inklib.Face.__init__(self,canvas,svgname)
 
@@ -66,6 +69,22 @@ class TwitGui(inklib.Face):
         self.kbd = Keyboard(self.canvas)
 
         self.twtApi = api
+
+        for name,elem in self.elements.items():
+            #if name.startswith('publicTwt') or name.startswith('publicCloud'):
+            if name.startswith('publicCloud'):
+                elem.onTap = self.FocusTwt
+
+    def FocusTwt(self,e):
+        import re
+        m = re.match(self.cloud_pattern,e.name) or re.match(self.twt_pattern,e.name)
+        if m:
+            num = m.group(1)
+            self.canvas.reset_order()
+            self.canvas.bring_to_front(self.elements['publicCloud'+str(num)])
+            self.canvas.bring_to_front(self.elements['publicTwt'+str(num)])
+            self.canvas.bring_to_front(self.twitButton)
+            self.canvas.bring_to_front(self.quitButton)
 
     def loadPublicTimeline(self):
         ptwt_list = self.twtApi.GetPublicTimeline()

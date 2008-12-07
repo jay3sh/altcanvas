@@ -43,6 +43,62 @@ p_canvas_dealloc(Canvas_t *self)
 }
 
 static PyObject*
+p_canvas_reset_order(Canvas_t *self,PyObject *args)
+{
+    ASSERT(self);
+    PyList_Sort(self->element_list);
+    recalculate_clouds(self);
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject*
+p_canvas_bring_to_front(Canvas_t *self,PyObject *args)
+{
+    Element_t *element;
+    ASSERT(self);
+    ASSERT(args);
+
+    if(!PyArg_ParseTuple(args,"O",&element)){
+        PyErr_Clear();
+        PyErr_SetString(PyExc_ValueError,"Invalid Arguments");
+        return NULL;
+    }
+
+    if(!element){
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+
+    int i = PySequence_Index(self->element_list,(PyObject *)element);
+
+    ASSERT(i>=0);
+
+    PySequence_DelItem(self->element_list,i);
+
+    PyList_Append(self->element_list,(PyObject *)element);
+
+    // Print the list
+    /*
+    PyObject *iter = PyObject_GetIter(self->element_list);
+    PyObject *item = NULL;
+    int j = 0;
+    while(item = PyIter_Next(iter)){
+        LOG("%d. %s",j++,PyString_AS_STRING(PyObject_GetAttrString(item,"name")));
+        Py_DECREF(item);
+    }
+    Py_DECREF(iter);
+    */
+
+    recalculate_clouds(self);
+
+    self->cobject->inc_dirt_count(self->cobject,1);
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject*
 p_canvas_draw(Canvas_t *self, PyObject *args)
 {
     Element_t *element;
@@ -70,6 +126,7 @@ static PyObject*
 p_canvas_refresh(Canvas_t *self, PyObject *args)
 {
     ASSERT(self && self->cobject)
+
     self->cobject->inc_dirt_count(self->cobject,1);
 
     Py_INCREF(Py_None);
@@ -591,7 +648,9 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
                             keysym);
                         if(!result) error_flag = 1;
                     }
+                    Py_DECREF(item);
                 }
+                Py_DECREF(iterator);
             }
             break;
         case MotionNotify:
@@ -681,13 +740,17 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
 
 static PyMethodDef canvas_methods[] = {
     { "register_elements", (PyCFunction)p_canvas_register_elements, 
-        METH_VARARGS, "Register elements with canvas" },
+        METH_VARARGS, "[deprecated] Register elements with canvas" },
     { "unregister_elements", (PyCFunction)p_canvas_unregister_elements, 
-        METH_VARARGS, "Unregister elements from canvas" },
+        METH_VARARGS, "[deprecated] Unregister elements from canvas" },
     { "eventloop", (PyCFunction)p_canvas_eventloop, 
         METH_NOARGS, "Make canvas process events in infinite loop" },
     { "draw", (PyCFunction)p_canvas_draw, 
         METH_VARARGS, "Draw the element canvas" },
+    { "bring_to_front", (PyCFunction)p_canvas_bring_to_front,
+        METH_VARARGS, "Bring element to the front" },
+    { "reset_order", (PyCFunction)p_canvas_reset_order,
+        METH_VARARGS, "Reset the order of canvas's elements" },
     { "refresh", (PyCFunction)p_canvas_refresh, 
         METH_NOARGS, "Refresh the canvas" },
     { "add", (PyCFunction)p_canvas_add, 
