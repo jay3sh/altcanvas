@@ -221,6 +221,8 @@ inkface_create_X_canvas(PyObject *self, PyObject *args, PyObject *kwds)
 
     // Initialize the active element list
     x_canvas->element_list = PyList_New(0);
+    // Initialize the face list
+    x_canvas->face_list = PyList_New(0);
 
     return (PyObject *)x_canvas;
 }

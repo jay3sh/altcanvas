@@ -1,14 +1,16 @@
 
 import inkface
+import inklib
 
 KEYBOARD_SVG='keyboard.svg'
 
-class Keyboard:
+class Keyboard(inklib.Face):
     visible = False
     glowing_elements = {}
     def __init__(self,canvas):
-        self.canvas = canvas
-        self.elements = inkface.loadsvg(KEYBOARD_SVG)
+        #self.canvas = canvas
+        #self.elements = inkface.loadsvg(KEYBOARD_SVG)
+        inklib.Face.__init__(self,canvas,KEYBOARD_SVG)
 
         for k,e in self.elements.items():
             if e.name.startswith('key'):
@@ -18,6 +20,7 @@ class Keyboard:
                     e.onDraw = self.glowDraw
                     self.glowing_elements[e.name] = 0
 
+        self.keyEnter.onTap = self.onEnter
         self.canvas.onTimer = self.onTimer
         self.canvas.timeout = 100
 
@@ -38,6 +41,9 @@ class Keyboard:
         except KeyError,ke:
             pass
 
+    def onEnter(self,e):
+        self.canvas.remove(self)
+        self.canvas.refresh()
         
     def glowDraw(self,e):
         if e.opacity:

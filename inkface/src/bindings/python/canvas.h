@@ -14,8 +14,9 @@ typedef struct {
     int height;
     PyObject *fullscreen;
 
-    PyObject *element_dict;
+    PyObject *element_dict; //TODO: remove
     PyObject *element_list;
+    PyObject *face_list;
 
     // Painting control members
     unsigned int timeout;

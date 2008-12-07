@@ -156,14 +156,14 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.495"
-     inkscape:cx="415.75721"
-     inkscape:cy="217.86077"
+     inkscape:zoom="1.1604167"
+     inkscape:cx="710.34999"
+     inkscape:cy="240"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1280"
-     inkscape:window-height="964"
+     inkscape:window-height="778"
      inkscape:window-x="-5"
      inkscape:window-y="-3" />
   <metadata
@@ -1927,5 +1927,30 @@
        ry="8.7720909"
        name="keyboardEntry"
        order="10" />
+    <g
+       id="g4065"
+       transform="translate(-12,12)"
+       name="keyEnter"
+       order="10">
+      <text
+         id="text3289"
+         y="255.0808"
+         x="544.63196"
+         style="font-size:18px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans Bold"
+         xml:space="preserve"><tspan
+           y="255.0808"
+           x="544.63196"
+           id="tspan3291"
+           sodipodi:role="line">enter</tspan></text>
+      <rect
+         ry="5"
+         rx="5"
+         y="233.26031"
+         x="530.25854"
+         height="33.608616"
+         width="82.728905"
+         id="rect3293"
+         style="fill:none;stroke:#ffffff;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
   </g>
 </svg>
