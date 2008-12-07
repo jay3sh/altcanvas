@@ -7,6 +7,15 @@ from keyboard import Keyboard
 
 import os
 
+class LoginGui(inklib.Face):
+    def __init__(self,canvas,svgname):
+        inklib.Face.__init__(self,canvas,svgname)
+
+        self.closeButton.onTap = self.onExit
+
+    def onExit(self,e):
+        inkface.exit()
+
 class TwitGui(inklib.Face):
     twtApi = None
 
@@ -66,8 +75,12 @@ class TwitGui(inklib.Face):
         
 def main():
     canvas = inkface.create_X_canvas()
-    twitGui = TwitGui(canvas,'twit.svg')
-    canvas.add(twitGui)
+
+    #twitGui = TwitGui(canvas,'twit.svg')
+    #canvas.add(twitGui)
+
+    loginGui = LoginGui(canvas,'login.svg')
+    canvas.add(loginGui)
 
     canvas.eventloop()
 
