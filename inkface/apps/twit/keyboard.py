@@ -17,8 +17,6 @@ class Keyboard:
                     e.opacity = 0
                     e.onDraw = self.glowDraw
                     self.glowing_elements[e.name] = 0
-                else:
-                    e.onDraw = self.defaultDraw
 
         self.canvas.onTimer = self.onTimer
         self.canvas.timeout = 100
@@ -31,18 +29,18 @@ class Keyboard:
                 self.elements[k].opacity = 0
                 self.canvas.refresh()
 
-    def onTap(self,e,elements):
-        for el in elements:
-            if el.name == e.name+'Glow':
-                el.opacity = 1
-                self.glowing_elements[el.name] = 3 
-        
-    def defaultDraw(self,e):
-        if self.visible:
-            self.canvas.draw(e)
+    def onTap(self,e):
+        try:
+            ge = self.elements[e.name+'Glow']
+            if ge: 
+                ge.opacity = 1
+                self.glowing_elements[ge.name] = 3
+        except KeyError,ke:
+            pass
 
+        
     def glowDraw(self,e):
-        if self.visible and e.opacity:
+        if e.opacity:
             self.canvas.draw(e)
 
     def onKeyPress(self,txt,code,elements):

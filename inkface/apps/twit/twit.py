@@ -17,7 +17,6 @@ class TwitGui(inklib.Face):
         self.quitButton.onTap = self.onExit
 
         self.kbd = Keyboard(self.canvas)
-        self.kbd.visible = False
 
         self.twtApi = twitter.Api(
                         username=os.environ['TWT_USERNAME'],
@@ -62,7 +61,7 @@ class TwitGui(inklib.Face):
         inkface.exit()
 
     def onTwit(self,e):
-        self.kbd.visible = True
+        self.canvas.add(self.kbd)
         self.canvas.refresh()
         
 def main():
