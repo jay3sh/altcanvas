@@ -389,7 +389,7 @@ p_canvas_remove(Canvas_t *self, PyObject *args)
                     PyObject_GetAttrString(citem,"name"),
                     PyObject_GetAttrString(item,"name"));
     
-                diff &= PyUnicode_Compare(
+                diff = diff || PyUnicode_Compare(
                     PyObject_GetAttrString(citem,"id"),
                     PyObject_GetAttrString(item,"id"));
     
