@@ -301,7 +301,6 @@ p_canvas_add(Canvas_t *self, PyObject *args)
 
     Py_DECREF(iterator);
 
-
     recalculate_clouds(self);
 
     Py_INCREF(Py_None);
@@ -539,7 +538,7 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
                 {
                     if(PyCallable_Check(el->onTap)) {
                         result = PyObject_CallFunction(el->onTap,
-                            "OO",el,self->element_dict);
+                            "O",el);
                         if(!result) error_flag = 1;
                     }
                 }
@@ -547,7 +546,7 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
                 if(state & POINTER_STATE_LEAVE){
                     if(PyCallable_Check(el->onMouseLeave)) {
                         result = PyObject_CallFunction(el->onMouseLeave,
-                            "OO",el,self->element_dict);
+                            "O",el);
                         if(!result) error_flag = 1;
                     }
                 }
@@ -555,7 +554,7 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
                 if(state & POINTER_STATE_ENTER){
                     if(PyCallable_Check(el->onMouseEnter)) {
                         result = PyObject_CallFunction(el->onMouseEnter,
-                            "OO",el,self->element_dict);
+                            "O",el);
                         if(!result) error_flag = 1;
                     }
                 }
