@@ -326,8 +326,8 @@ p_canvas_add(Canvas_t *self, PyObject *args)
 
     while(item = PyIter_Next(iterator)){
         PyList_Append(((Canvas_t *)self)->element_list,item);
-        LOG("Adding %s from queue",
-            PyString_AS_STRING(PyObject_GetAttrString(item,"name")));
+        //LOG("Adding %s from queue",
+        //    PyString_AS_STRING(PyObject_GetAttrString(item,"name")));
     }
 
     //LOG("Queue length --> %d",PySequence_Size(self->element_list));
@@ -398,8 +398,8 @@ p_canvas_remove(Canvas_t *self, PyObject *args)
                     PyObject_GetAttrString(item,"id"));
     
                 if(diff == 0){
-                    LOG("Removing %s from queue",
-                        PyString_AS_STRING(PyObject_GetAttrString(item,"name")));
+                    //LOG("Removing %s from queue",
+                    //    PyString_AS_STRING(PyObject_GetAttrString(item,"name")));
                     PySequence_DelItem(((Canvas_t *)self)->element_list,ci);
                     break;
                 }
@@ -470,6 +470,13 @@ recalculate_clouds(Canvas_t *self)
     int ox0,oy0,ox1,oy1,nx0,ny0,nx1,ny1;
     int i=0,j=0;
 
+    PyObject *iter = PyObject_GetIter(self->element_list);
+    PyObject *item = NULL;
+    while(item = PyIter_Next(iter)){
+        Py_DECREF(((Element_t *)item)->clouds);
+        ((Element_t *)item)->clouds = PyList_New(0);
+    }
+
     for(; i<lsize; i++)
     {
 
@@ -487,8 +494,6 @@ recalculate_clouds(Canvas_t *self)
         {
             Element_t *oe = (Element_t *)PyList_GetItem(self->element_list,j);
 
-            Py_DECREF(oe->clouds);
-            oe->clouds = PyList_New(0);
             ox0 = oe->x;
             oy0 = oe->y;
             ox1 = ox0 + oe->w;
