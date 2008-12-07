@@ -8,12 +8,15 @@ from keyboard import Keyboard
 import os
 
 class LoginGui(inklib.Face):
+    username = ''
+    password = ''
     def __init__(self,canvas,svgname):
         inklib.Face.__init__(self,canvas,svgname)
 
         self.kbd = Keyboard(self.canvas)
 
         self.closeButton.onTap = self.onExit
+        self.loginButton.onTap = self.onLogin
         self.usernameFrame.onTap = self.onUsernameTap
         self.usernameText.onTap = self.onUsernameTap
         self.passwordFrame.onTap = self.onPasswordTap
@@ -40,7 +43,7 @@ class LoginGui(inklib.Face):
         self.canvas.add(self.kbd)
         
     def onLogin(self,e):
-        self.twtApi = twitter.Api(username=self.username,password=self.password)
+        twitterApi = twitter.Api(username=self.username,password=self.password)
         self.resultProcessor(twitterApi)
        
     def onExit(self,e):
@@ -103,18 +106,29 @@ class TwitGui(inklib.Face):
         self.canvas.add(self.kbd)
         self.canvas.refresh()
         
-def main():
-    canvas = inkface.create_X_canvas()
+#
+# Control Flow
+# 
 
-    #twitGui = TwitGui(canvas,'twit.svg')
-    #canvas.add(twitGui)
+class TwitterApp:
+    def __init__(self):
+        self.canvas = inkface.create_X_canvas()
 
-    loginGui = LoginGui(canvas,'login.svg')
-    canvas.add(loginGui)
+    def main(self):
+        self.loginGui = LoginGui(self.canvas,'login.svg')
+        self.loginGui.resultProcessor = self.onLoginSuccess
+        self.canvas.add(self.loginGui)
 
-    canvas.eventloop()
+        self.canvas.eventloop()
+        
+    def onLoginSuccess(self,twitterApi):
+        self.canvas.remove(self.loginGui)
+        self.twitGui = TwitGui(self.canvas,'public.svg')
+        self.canvas.add(self.twitGui)
+        self.canvas.refresh()
+
 
 if __name__ == '__main__':
-    main()
+    TwitterApp().main()
 
 
