@@ -23,6 +23,7 @@ class Keyboard(inklib.Face):
 
         self.keySpace.onTap = self.onSpace
         self.keyEnter.onTap = self.onEnter
+        self.keyboardText.onKeyPress = self.onKeyPress
 
         self.keyboardText.text = ''
         self.keyboardText.refresh()
@@ -66,8 +67,10 @@ class Keyboard(inklib.Face):
         if e.opacity:
             self.canvas.draw(e)
 
-    def onKeyPress(self,txt,code,elements):
-        pass
+    def onKeyPress(self,e,txt,code):
+        self.keyboardText.text += txt
+        self.keyboardText.refresh()
+        self.canvas.refresh()
 
 
 

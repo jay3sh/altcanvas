@@ -567,11 +567,10 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
                     if(PyCallable_Check(el->onKeyPress)){
                         result = PyObject_CallFunction(
                             el->onKeyPress,
-                            "OOiO",
+                            "OOi",
                             el,
                             PyString_FromString(buf),
-                            keysym,
-                            self->element_dict);
+                            keysym);
                         if(!result) error_flag = 1;
                     }
                 }
