@@ -15,7 +15,9 @@ class LoginGui(inklib.Face):
 
         self.closeButton.onTap = self.onExit
         self.usernameFrame.onTap = self.onUsernameTap
+        self.usernameText.onTap = self.onUsernameTap
         self.passwordFrame.onTap = self.onPasswordTap
+        self.passwordText.onTap = self.onPasswordTap
 
     def populateUsername(self,txt):
         self.username = txt
@@ -28,13 +30,17 @@ class LoginGui(inklib.Face):
         self.passwordText.refresh()
 
     def onUsernameTap(self,e):
-        self.kbd.textHandler = self.populateUsername
+        self.kbd.resultProcessor = self.populateUsername
         self.canvas.add(self.kbd)
 
     def onPasswordTap(self,e):
-        self.kbd.textHandler = self.populatePassword
+        self.kbd.resultProcessor = self.populatePassword
         self.canvas.add(self.kbd)
         
+    def onLogin(self,e):
+        self.twtApi = twitter.Api(username=self.username,password=self.password)
+        self.resultProcessor(twitterApi)
+       
     def onExit(self,e):
         inkface.exit()
 

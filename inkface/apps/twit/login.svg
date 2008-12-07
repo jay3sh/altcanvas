@@ -37,8 +37,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.1604167"
-     inkscape:cx="400"
-     inkscape:cy="291.50886"
+     inkscape:cx="292.28007"
+     inkscape:cy="245.72321"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -76,7 +76,7 @@
        width="326.60678"
        height="54.290848"
        x="236.69661"
-       y="137.88152"
+       y="124.35213"
        ry="9"
        rx="9"
        name="usernameFrame"
@@ -110,22 +110,22 @@
     <text
        xml:space="preserve"
        style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
-       x="249.38599"
-       y="171.52603"
+       x="251.97127"
+       y="158.59964"
        id="text4765"
        name="usernameText"
        order="11"><tspan
          sodipodi:role="line"
          id="tspan4767"
-         x="249.38599"
-         y="171.52603">username</tspan></text>
+         x="251.97127"
+         y="158.59964">username</tspan></text>
     <rect
        style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect4771"
        width="326.60678"
        height="54.290848"
        x="236.69661"
-       y="278.19748"
+       y="229.97499"
        ry="9"
        rx="9"
        name="passwordFrame"
@@ -133,15 +133,15 @@
     <text
        xml:space="preserve"
        style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
-       x="251.25989"
-       y="311.02475"
+       x="250.39813"
+       y="263.26892"
        id="text4773"
        name="passwordText"
        order="11"><tspan
          sodipodi:role="line"
          id="tspan4775"
-         x="251.25989"
-         y="311.02475">password</tspan></text>
+         x="250.39813"
+         y="263.26892">password</tspan></text>
     <g
        id="g4789"
        transform="translate(8.6894073,0)"
@@ -220,6 +220,32 @@
            x="763.51886"
            id="tspan4875"
            sodipodi:role="line">x</tspan></text>
+    </g>
+    <g
+       id="g4882"
+       transform="matrix(0,1,-1,0,532.85817,347.57272)"
+       name="loginButton"
+       order="10">
+      <rect
+         ry="9"
+         rx="9"
+         y="54.219028"
+         x="-8.6894073"
+         height="157.27829"
+         width="53.005386"
+         id="rect4884"
+         style="fill:#00ffff;stroke:none;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         transform="matrix(0,-1,1,0,0,0)"
+         id="text4886"
+         y="24.868847"
+         x="-158.57684"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="24.868847"
+           x="-158.57684"
+           id="tspan4888"
+           sodipodi:role="line">login</tspan></text>
     </g>
   </g>
 </svg>

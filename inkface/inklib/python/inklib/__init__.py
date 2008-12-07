@@ -3,7 +3,7 @@
 import inkface
 
 class Face:
-    def resultProcessor(result):
+    def resultProcessor(self,**params):
         pass
 
     def __init__(self,canvas,svgname):
