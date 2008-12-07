@@ -136,7 +136,11 @@ class TwitGui(inklib.Face):
     def onExit(self,e):
         inkface.exit()
 
+    def publishTwit(self,txt):
+        print dir(self.twtApi.PostUpdate(txt))
+        
     def onTwit(self,e):
+        self.kbd.resultProcessor = self.publishTwit
         self.canvas.add(self.kbd)
         self.canvas.refresh()
         

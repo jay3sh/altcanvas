@@ -143,58 +143,6 @@
          x="250.39813"
          y="263.26892">password</tspan></text>
     <g
-       id="g4789"
-       transform="translate(8.6894073,0)"
-       name="friendsButton"
-       order="10">
-      <rect
-         ry="9"
-         rx="9"
-         y="54.219028"
-         x="-8.6894073"
-         height="157.27829"
-         width="53.005386"
-         id="rect4777"
-         style="fill:#00ffff;stroke:none;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-      <text
-         transform="matrix(0,-1,1,0,0,0)"
-         id="text4783"
-         y="24.868847"
-         x="-174.08852"
-         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
-         xml:space="preserve"><tspan
-           y="24.868847"
-           x="-174.08852"
-           id="tspan4785"
-           sodipodi:role="line">friends</tspan></text>
-    </g>
-    <g
-       id="g4794"
-       transform="translate(6.5170555,8.6894076)"
-       name="publicButton"
-       order="10">
-      <rect
-         ry="9"
-         rx="9"
-         y="243.21364"
-         x="-6.5170555"
-         height="157.27829"
-         width="53.005386"
-         id="rect4787"
-         style="fill:#00ffff;stroke:none;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-      <text
-         transform="matrix(0,-1,1,0,0,0)"
-         id="text4779"
-         y="25.693451"
-         x="-351.68286"
-         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
-         xml:space="preserve"><tspan
-           y="25.693451"
-           x="-351.68286"
-           id="tspan4781"
-           sodipodi:role="line">public</tspan></text>
-    </g>
-    <g
        id="g4877"
        name="closeButton"
        order="10">
