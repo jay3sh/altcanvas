@@ -11,8 +11,30 @@ class LoginGui(inklib.Face):
     def __init__(self,canvas,svgname):
         inklib.Face.__init__(self,canvas,svgname)
 
-        self.closeButton.onTap = self.onExit
+        self.kbd = Keyboard(self.canvas)
 
+        self.closeButton.onTap = self.onExit
+        self.usernameFrame.onTap = self.onUsernameTap
+        self.passwordFrame.onTap = self.onPasswordTap
+
+    def populateUsername(self,txt):
+        self.username = txt
+        self.usernameText.text = txt
+        self.usernameText.refresh()
+
+    def populatePassword(self,txt):
+        self.password = txt
+        self.passwordText.text = '*'*len(txt)
+        self.passwordText.refresh()
+
+    def onUsernameTap(self,e):
+        self.kbd.textHandler = self.populateUsername
+        self.canvas.add(self.kbd)
+
+    def onPasswordTap(self,e):
+        self.kbd.textHandler = self.populatePassword
+        self.canvas.add(self.kbd)
+        
     def onExit(self,e):
         inkface.exit()
 

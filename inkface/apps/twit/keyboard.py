@@ -8,6 +8,7 @@ KEYBOARD_SVG='keyboard.svg'
 class Keyboard(inklib.Face):
     visible = False
     glowing_elements = {}
+    textHandler = None
     def __init__(self,canvas):
         inklib.Face.__init__(self,canvas,KEYBOARD_SVG)
 
@@ -56,6 +57,8 @@ class Keyboard(inklib.Face):
         self.canvas.refresh()
 
     def onEnter(self,e):
+        if self.textHandler:
+            self.textHandler(self.keyboardText.text)
         self.canvas.remove(self)
         self.canvas.refresh()
         
