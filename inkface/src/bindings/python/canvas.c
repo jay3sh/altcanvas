@@ -326,7 +326,11 @@ p_canvas_add(Canvas_t *self, PyObject *args)
 
     while(item = PyIter_Next(iterator)){
         PyList_Append(((Canvas_t *)self)->element_list,item);
+        LOG("Adding %s from queue",
+            PyString_AS_STRING(PyObject_GetAttrString(item,"name")));
     }
+
+    //LOG("Queue length --> %d",PySequence_Size(self->element_list));
 
     Py_DECREF(iterator);
 
@@ -394,6 +398,8 @@ p_canvas_remove(Canvas_t *self, PyObject *args)
                     PyObject_GetAttrString(item,"id"));
     
                 if(diff == 0){
+                    LOG("Removing %s from queue",
+                        PyString_AS_STRING(PyObject_GetAttrString(item,"name")));
                     PySequence_DelItem(((Canvas_t *)self)->element_list,ci);
                     break;
                 }
@@ -411,6 +417,10 @@ p_canvas_remove(Canvas_t *self, PyObject *args)
     if(i >= 0){
         PySequence_DelItem(self->face_list,i);
     }
+
+    //LOG("Queue length --> %d",PySequence_Size(self->element_list));
+
+    recalculate_clouds(self);
 
     Py_INCREF(Py_None);
     return Py_None;
@@ -477,6 +487,8 @@ recalculate_clouds(Canvas_t *self)
         {
             Element_t *oe = (Element_t *)PyList_GetItem(self->element_list,j);
 
+            Py_DECREF(oe->clouds);
+            oe->clouds = PyList_New(0);
             ox0 = oe->x;
             oy0 = oe->y;
             ox1 = ox0 + oe->w;
@@ -498,7 +510,8 @@ recalculate_clouds(Canvas_t *self)
                         PyInt_FromLong(INK_MIN(oy1,ny1)-oy0));
                 ASSERT(oe->clouds);
                 PyList_Append((PyObject *)oe->clouds,cloud);
-                //LOG("   - clouding %s at (%d,%d),(%d,%d)",
+                //LOG(" %s - clouding %s at (%d,%d),(%d,%d)",
+                //        PyString_AsString(ne->name),
                 //        PyString_AsString(oe->name),
                 //        (INK_MAX(ox0,nx0)-ox0),
                 //        (INK_MAX(oy0,ny0)-oy0),
