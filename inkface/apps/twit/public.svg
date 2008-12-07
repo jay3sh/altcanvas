@@ -18,6 +18,21 @@
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs4">
+    <linearGradient
+       id="linearGradient5533">
+      <stop
+         style="stop-color:#00ff00;stop-opacity:0;"
+         offset="0"
+         id="stop5535" />
+      <stop
+         id="stop5541"
+         offset="0.17021276"
+         style="stop-color:#00ff00;stop-opacity:0.58536583;" />
+      <stop
+         style="stop-color:#00ff00;stop-opacity:1;"
+         offset="1"
+         id="stop5537" />
+    </linearGradient>
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
        inkscape:vp_x="0 : 526.18109 : 1"
@@ -37,8 +52,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.1604167"
-     inkscape:cx="361.01475"
-     inkscape:cy="242.59933"
+     inkscape:cx="422.03451"
+     inkscape:cy="240"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -124,7 +139,7 @@
        name="publicCloud7"
        order="23" />
     <path
-       style="fill:#00ffff;fill-rule:evenodd;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;opacity:0.92244898"
+       style="fill:#00ffff;fill-rule:evenodd;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;opacity:0.92244897999999997;fill-opacity:1"
        d="M 24.087014,50.358705 C 23.624054,48.794625 26.670454,43.185135 28.769294,38.987465 C 30.567054,35.391935 33.916514,32.066025 37.464944,30.291815 C 41.183674,28.432445 44.378344,27.125115 48.167284,25.609535 C 52.458484,23.893055 57.032184,24.062205 61.545214,22.933955 C 64.877744,22.100825 68.342504,21.736305 71.578654,20.927265 C 74.705784,20.145485 78.353434,20.258365 81.612104,20.258365 C 85.179544,20.258365 88.746994,20.258365 92.314444,20.258365 C 96.282134,20.258365 97.879784,22.713185 102.34788,21.596165 C 108.26143,20.117775 112.5404,15.332045 117.0636,11.562715 C 120.70968,8.5243148 123.38632,7.3064548 127.76594,6.2115448 C 131.80201,5.2025248 136.01755,5.1519848 139.80608,4.2048548 C 143.65421,3.2428248 147.58481,4.8737548 151.17731,4.8737548 C 154.396,4.8737548 158.5811,6.9034048 161.21076,8.2182348 C 165.09106,10.158385 168.19825,12.678285 171.9131,14.907195 C 175.80219,17.240655 179.60981,18.421105 183.28434,20.258365 C 187.27215,22.252275 189.98768,24.955025 193.31778,28.285125 C 196.54687,31.514215 199.90708,35.066555 203.35123,37.649675 C 207.28264,40.598235 210.83404,41.725525 214.72246,43.669735 C 217.20623,44.911625 224.99891,42.149565 227.43149,41.663055 C 231.78258,40.792835 238.20426,41.346205 242.14721,42.331945 C 248.52595,43.926635 254.77677,46.305585 260.20741,49.020905 C 265.24427,51.539335 265.48361,57.566607 267.56527,61.729937 C 272.51079,71.620977 270.75896,86.394037 272.91644,97.181447 C 273.27703,98.984367 273.80831,100.7489 274.25424,102.53262 C 275.4808,107.43887 275.59203,112.20283 275.59203,117.24834 C 275.59203,121.82657 275.07973,123.98708 271.57865,126.61289 C 266.1496,130.68468 260.44063,132.9091 253.51845,134.63964 C 249.0081,135.76723 244.09962,137.34237 240.14052,139.32192 C 233.87255,142.45591 225.5163,142.20097 221.41143,148.01757 C 215.62353,156.21902 206.35329,154.1778 200.67564,158.71991 C 197.21959,161.48475 192.06371,163.92056 187.96661,164.73998 C 181.14605,166.10409 174.77645,166.36528 167.89972,168.08446 C 161.32753,169.72751 152.47513,169.42225 145.82614,169.42225 C 136.62733,169.42225 125.90792,170.99787 117.0636,172.76673 C 112.02911,173.77363 106.18677,173.43563 101.01009,173.43563 C 97.143344,173.43563 93.093134,173.6303 89.638854,172.76673 C 86.310164,171.93456 82.769474,172.21996 79.605414,171.42894 C 75.870734,170.49527 71.839064,169.65458 68.234174,168.75336 C 62.901914,167.42029 57.546004,164.33078 52.849554,161.3955 C 48.661824,158.77816 25.895434,136.44806 22.749224,133.30185 C 19.975844,130.52847 17.816044,126.50131 15.391364,123.26841 C 12.287784,119.13029 10.938314,113.69341 8.7024044,109.22158 C 6.7565244,105.32983 7.0757544,100.70832 6.0268144,96.512547 C 5.1915444,93.171467 5.3579244,89.318437 5.3579244,85.810207 C 5.3579244,81.456717 5.5762944,78.015597 7.3646144,74.438967 C 9.2074744,70.753237 12.331454,67.593547 14.722474,64.405527 C 17.157564,61.158737 17.716994,57.514277 20.073634,54.372087 C 22.627374,50.967105 17.622004,54.237707 24.087014,50.358705 z"
        id="path2427"
        sodipodi:nodetypes="csssssssssssssssssssssssssssssssssssssssssssssssc"
@@ -250,7 +265,7 @@
     <g
        id="g2496"
        name="twitButton"
-       order="100">
+       order="1000">
       <rect
          ry="8"
          rx="8"
@@ -275,7 +290,7 @@
        id="g2501"
        transform="translate(-2.6755881,431.10368)"
        name="quitButton"
-       order="100">
+       order="1000">
       <rect
          ry="8"
          rx="8"
@@ -353,5 +368,218 @@
          id="tspan5521"
          x="340.73862"
          y="369.64426">text</tspan></text>
+    <g
+       id="g4789"
+       transform="translate(774.2334,18.289046)"
+       name="friendsButton"
+       order="1000">
+      <rect
+         ry="9"
+         rx="9"
+         y="54.219028"
+         x="-8.6894073"
+         height="157.278"
+         width="35"
+         id="rect4777"
+         style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         transform="matrix(0,-1,1,0,0,0)"
+         id="text4783"
+         y="17.113012"
+         x="-168.91795"
+         style="font-size:18px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans Bold"
+         xml:space="preserve"><tspan
+           y="17.113012"
+           x="-168.91795"
+           id="tspan4785"
+           sodipodi:role="line">friends</tspan></text>
+    </g>
+    <g
+       id="g4794"
+       transform="translate(765.16697,24.393175)"
+       name="publicButton"
+       order="1000">
+      <rect
+         ry="9"
+         rx="9"
+         y="238.04308"
+         x="1.2387793"
+         height="157.278"
+         width="35"
+         id="rect4787"
+         style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         transform="matrix(0,-1,1,0,0,0)"
+         id="text4779"
+         y="25.693451"
+         x="-350.82111"
+         style="font-size:18px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans Bold"
+         xml:space="preserve"><tspan
+           y="25.693451"
+           x="-350.82111"
+           id="tspan4781"
+           sodipodi:role="line">public</tspan></text>
+    </g>
+    <rect
+       style="opacity:0.7;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect5543"
+       width="653.21362"
+       height="74.111313"
+       x="19.820465"
+       y="16.373426"
+       rx="15"
+       ry="15"
+       name="friendCloud0"
+       order="112" />
+    <rect
+       style="opacity:0.7;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect5545"
+       width="653.21362"
+       height="74.111313"
+       x="87.899475"
+       y="77.55835"
+       rx="15"
+       ry="15"
+       name="friendCloud1"
+       order="110" />
+    <rect
+       style="opacity:0.7;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect5547"
+       width="653.21362"
+       height="74.111313"
+       x="8.61761"
+       y="142.19031"
+       rx="15"
+       ry="15"
+       name="friendCloud2"
+       order="108" />
+    <rect
+       style="opacity:0.7;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect5549"
+       width="653.21362"
+       height="74.111313"
+       x="52.567333"
+       y="203.37523"
+       rx="15"
+       ry="15"
+       name="friendCloud3"
+       order="106" />
+    <rect
+       style="opacity:0.7;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect5551"
+       width="653.21362"
+       height="74.111313"
+       x="93.07003"
+       y="267.14542"
+       rx="15"
+       ry="15"
+       name="friendCloud4"
+       order="104" />
+    <rect
+       style="opacity:0.7;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect5553"
+       width="653.21362"
+       height="74.111313"
+       x="69.802528"
+       y="332.63916"
+       rx="15"
+       ry="15"
+       name="friendCloud5"
+       order="102" />
+    <rect
+       style="opacity:0.7;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect5555"
+       width="653.21362"
+       height="74.111313"
+       x="25.852793"
+       y="393.82407"
+       rx="15"
+       ry="15"
+       name="friendCloud6"
+       order="100" />
+    <text
+       xml:space="preserve"
+       style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="37.05566"
+       y="45.673252"
+       id="text5557"
+       name="friendTwt0"
+       order="113"><tspan
+         sodipodi:role="line"
+         id="tspan5559"
+         x="37.05566"
+         y="45.673252">text</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="101.12933"
+       y="102.70895"
+       id="text5561"
+       name="friendTwt1"
+       order="111"><tspan
+         sodipodi:role="line"
+         id="tspan5563"
+         x="101.12933"
+         y="102.70895">text</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="24.432755"
+       y="166.47914"
+       id="text5565"
+       name="friendTwt2"
+       order="109"><tspan
+         sodipodi:role="line"
+         id="tspan5567"
+         x="24.432755"
+         y="166.47914">text</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="66.658966"
+       y="228.52582"
+       id="text5569"
+       name="friendTwt3"
+       order="107"><tspan
+         sodipodi:role="line"
+         id="tspan5571"
+         x="66.658966"
+         y="228.52582">text</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="108.02341"
+       y="292.29602"
+       id="text5573"
+       name="friendTwt4"
+       order="105"><tspan
+         sodipodi:role="line"
+         id="tspan5575"
+         x="108.02341"
+         y="292.29602">text</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="84.75592"
+       y="356.92798"
+       id="text5577"
+       name="friendTwt5"
+       order="103"><tspan
+         sodipodi:role="line"
+         id="tspan5579"
+         x="84.75592"
+         y="356.92798">text</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="39.082664"
+       y="418.97464"
+       id="text5581"
+       name="friendTwt6"
+       order="101"><tspan
+         sodipodi:role="line"
+         id="tspan5583"
+         x="39.082664"
+         y="418.97464">text</tspan></text>
   </g>
 </svg>

@@ -85,6 +85,8 @@ class TwitGui(inklib.Face):
             self.canvas.bring_to_front(self.elements['publicTwt'+str(num)])
             self.canvas.bring_to_front(self.twitButton)
             self.canvas.bring_to_front(self.quitButton)
+            self.canvas.bring_to_front(self.friendsButton)
+            self.canvas.bring_to_front(self.publicButton)
 
     def loadPublicTimeline(self):
         ptwt_list = self.twtApi.GetPublicTimeline()
