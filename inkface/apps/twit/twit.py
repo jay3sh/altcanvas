@@ -5,9 +5,9 @@ import inklib
 import twitter
 from keyboard import Keyboard
 import threading
-from time import sleep
 
 import os
+import re
 
 class LoginGui(inklib.Face):
     username = os.environ['TWT_USERNAME']
@@ -61,10 +61,10 @@ class TwitGui(inklib.Face):
     PUBLIC_TIMELINE = 0
     FRIENDS_TIMELINE = 1
 
-    image_list = []
-
-    cloud_pattern = 'publicCloud(\d+)'
-    twt_pattern = 'publicTwt(\d+)'
+    public_cloud_pattern = 'publicCloud(\d+)'
+    public_twt_pattern = 'publicTwt(\d+)'
+    friend_cloud_patter = 'friendCloud(\d+)'
+    friend_twt_patter = 'friendTwt(\d+)'
 
     def __init__(self,canvas,svgname,api):
         inklib.Face.__init__(self,canvas,svgname)
@@ -82,12 +82,32 @@ class TwitGui(inklib.Face):
             elif name.startswith('friendImg'):
                 elem.onDraw = self.donotdraw
 
+        self.iloader = ImageLoader(None)
+        self.iloader.start()
+
     def donotdraw(self,e):
         pass
 
+    def drawProfileImage(self,e):
+        twt = e.user_data
+        img_surface = iloader.get_image_surface(twt.GetUser().profile_image_url)
+        if not img_surface:
+            print "Failed to get Image surface for "+e.name
+            return
+        ctx = cairo.Context(e.surface)
+        ctx.set_source_surface(img_surface,0,0)
+        ctx.paint()
+        
+    def FocusFriendTwt(self,e):
+        m = re.match(self.friend_cloud_pattern,e.name) or \
+            re.match(self.friend_twt_pattern,e.name)
+        if m:
+            num = m.group(1)
+            self.elements['friendImg'+str(num)].onDraw = self.drawProfileImage
+            
     def FocusPublicTwt(self,e):
-        import re
-        m = re.match(self.cloud_pattern,e.name) or re.match(self.twt_pattern,e.name)
+        m = re.match(self.public_cloud_pattern,e.name) or \
+            re.match(self.public_twt_pattern,e.name)
         if m:
             num = m.group(1)
             self.canvas.reset_order()
@@ -110,6 +130,7 @@ class TwitGui(inklib.Face):
             twt_list = self.twtApi.GetFriendsTimeline()
 
         i = 0
+        image_list = []
         for name,elem in self.elements.items():
             j = 1
             twt_text = ''
@@ -119,7 +140,8 @@ class TwitGui(inklib.Face):
                 while True:
                     try:
                         ascii_twt = str(twt_list[i].text)
-                        self.image_list.append(
+                        elem.user_data = twt_list[i]
+                        image_list.append(
                             twt_list[i].GetUser().profile_image_url)
                     except UnicodeEncodeError, uee:
                         i += 1
@@ -141,6 +163,7 @@ class TwitGui(inklib.Face):
                 elem.refresh()
                 i += 1
 
+        self.iloader.add_img_url(image_list)
         self.canvas.refresh()
         
     def onExit(self,e):
@@ -156,9 +179,11 @@ class TwitGui(inklib.Face):
         
 
 class ImageLoader(threading.Thread):
+    __img_map_lock__ = None
     __img_map__ = {}
     IMG_CACHE_DIR = os.environ['HOME']+os.sep+'.twitinkface'
     def __init__(self,urls=None):
+        threading.Thread.__init__(self)
         if urls:
             for url in urls:
                 localfile = self.IMG_CACHE_DIR+os.sep+'-'.join(url.split('/')[-2:])
@@ -169,26 +194,57 @@ class ImageLoader(threading.Thread):
             # File already exists
             pass
 
+        self.__img_map_lock__ = threading.Lock()
     
+    def get_image_surface(self,url):
+        self.__img_map_lock__.acquire()
+        localfile = self.__img_map__[url]
+        self.__img_map_lock__.release()
+
+        if localfile:
+            if not localfile.endswith('png'):
+                png_name = '.'.join(localfile.split('.')[:-2]) + '.png'
+                if not os.path.exists(png_name):
+                    print "PNG file doesn't exist for "+url
+                    return None
+                else:
+                    return cairo.ImageSurface.create_from_png(png_name)
+            else:
+                return cairo.ImageSurface.create_from_png(localfile)
+        else:
+            # Image is not yet loaded
+            return None
+
+    def add_img_url(self,url):
+        self.__img_map_lock__.acquire()
+        if (type(url) == list or type(url) == tuple):
+            for u in url:
+                localfile = self.IMG_CACHE_DIR+os.sep+'-'.join(u.split('/')[-2:])
+                self.__img_map__[u] = localfile
+        else:
+            localfile = self.IMG_CACHE_DIR+os.sep+'-'.join(url.split('/')[-2:])
+            self.__img_map__[url] = localfile
+        self.__img_map_lock__.release()
+
     def run(self):
         import urllib
         from PIL import Image
+        from time import sleep
         while True:
-            for url,localfile in self.__img_map__.items():
-                if not localfile:
-                    print 'localfile not defined for '+url
-                    continue
-                if not os.path.exists(localfile):
+
+            self.__img_map_lock__.acquire()
+            map_items = self.__img_map__.items()
+            self.__img_map_lock__.release()
+
+            for url,localfile in map_items:
+                if localfile and not os.path.exists(localfile):
                     urllib.urlretrieve(url,localfile)
                     if not localfile.endswith('png'):
                         jpg = Image.open(localfile)
                         png_name = '.'.join(localfile.split('.')[:-2]) + '.png'
                         jpg.save(png_name)
-                        self.__img_map__[url] = png_name
-                    else:
-                        self.__img_map__[url] = localfile
 
-            break
+            sleep(5)
                     
 
 #
@@ -214,8 +270,6 @@ class TwitterApp:
         self.twitGui.loadTimeline(self.twitGui.FRIENDS_TIMELINE)
         self.twitGui.loadTimeline(self.twitGui.PUBLIC_TIMELINE)
 
-        ilThread = ImageLoader(self.twitGui.image_list)
-        ilThread.run()
 
 
 if __name__ == '__main__':
