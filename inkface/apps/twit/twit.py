@@ -1,60 +1,20 @@
 #!/usr/bin/python
 
+import os
+import re
+import threading
+
+import cairo
+
 import inkface
 import inklib
 import twitter
+
 from keyboard import Keyboard
-import threading
+from login import LoginGui
+from imgloader import ImageLoader
 
-import os
-import re
 
-class LoginGui(inklib.Face):
-    username = os.environ['TWT_USERNAME']
-    password = os.environ['TWT_PASSWORD']
-    def __init__(self,canvas,svgname):
-        inklib.Face.__init__(self,canvas,svgname)
-
-        self.kbd = Keyboard(self.canvas)
-
-        self.closeButton.onTap = self.onExit
-        self.loginButton.onTap = self.onLogin
-        self.usernameFrame.onTap = self.onUsernameTap
-        self.usernameText.onTap = self.onUsernameTap
-        self.passwordFrame.onTap = self.onPasswordTap
-        self.passwordText.onTap = self.onPasswordTap
-        
-        self.usernameText.text = self.username
-        self.usernameText.refresh()
-        self.passwordText.text = '*'*len(self.password)
-        self.passwordText.refresh()
-
-    def populateUsername(self,txt):
-        self.username = txt
-        self.usernameText.text = txt
-        self.usernameText.refresh()
-
-    def populatePassword(self,txt):
-        self.password = txt
-        self.passwordText.text = '*'*len(txt)
-        self.passwordText.refresh()
-
-    def onUsernameTap(self,e):
-        self.kbd.resultProcessor = self.populateUsername
-        self.kbd.reset()
-        self.canvas.add(self.kbd)
-
-    def onPasswordTap(self,e):
-        self.kbd.resultProcessor = self.populatePassword
-        self.kbd.reset()
-        self.canvas.add(self.kbd)
-        
-    def onLogin(self,e):
-        twitterApi = twitter.Api(username=self.username,password=self.password)
-        self.resultProcessor(twitterApi)
-       
-    def onExit(self,e):
-        inkface.exit()
 
 class TwitGui(inklib.Face):
     twtApi = None
@@ -63,8 +23,9 @@ class TwitGui(inklib.Face):
 
     public_cloud_pattern = 'publicCloud(\d+)'
     public_twt_pattern = 'publicTwt(\d+)'
-    friend_cloud_patter = 'friendCloud(\d+)'
-    friend_twt_patter = 'friendTwt(\d+)'
+    friend_cloud_pattern = 'friendCloud(\d+)'
+    friend_twt_pattern = 'friendTwt(\d+)'
+    friend_img_pattern = 'friendImg(\d+)'
 
     def __init__(self,canvas,svgname,api):
         inklib.Face.__init__(self,canvas,svgname)
@@ -79,31 +40,55 @@ class TwitGui(inklib.Face):
         for name,elem in self.elements.items():
             if name.startswith('publicTwt') or name.startswith('publicCloud'):
                 elem.onTap = self.FocusPublicTwt
+            elif name.startswith('friendTwt') or name.startswith('friendCloud'):
+                elem.onTap = self.FocusFriendTwt
+                elem.onMouseLeave = self.lostFocusTwt
             elif name.startswith('friendImg'):
                 elem.onDraw = self.donotdraw
 
         self.iloader = ImageLoader(None)
-        self.iloader.start()
+        #self.iloader.start()
 
     def donotdraw(self,e):
         pass
 
     def drawProfileImage(self,e):
-        twt = e.user_data
-        img_surface = iloader.get_image_surface(twt.GetUser().profile_image_url)
-        if not img_surface:
-            print "Failed to get Image surface for "+e.name
-            return
-        ctx = cairo.Context(e.surface)
-        ctx.set_source_surface(img_surface,0,0)
-        ctx.paint()
+        print 'TG: drawProfileImage for '+e.name
+        m = re.match(self.friend_img_pattern,e.name)
+        if m:
+            num = m.group(1)
+            twt = self.elements['friendTwt'+str(num)].user_data
+
+            if twt:
+                url = twt.GetUser().profile_image_url
+                print 'TG: Getting cairo surface for '+url
+                img_surface = self.iloader.get_image_surface(url)
+
+                if not img_surface:
+                    print "Failed to get Image surface for "+e.name
+                    return
+                ctx = cairo.Context(e.surface)
+                ctx.set_source_surface(img_surface,0,0)
+                ctx.paint()
+                self.canvas.draw(e)
+                self.canvas.refresh()
+                print 'TG: Drew the image'
         
+    def lostFocusTwt(self,e):
+        m = re.match(self.friend_cloud_pattern,e.name) or \
+            re.match(self.friend_twt_pattern,e.name)
+        if m:
+            num = m.group(1)
+            self.elements['friendImg'+str(num)].onDraw = self.donotdraw
+            self.canvas.refresh()
+
     def FocusFriendTwt(self,e):
         m = re.match(self.friend_cloud_pattern,e.name) or \
             re.match(self.friend_twt_pattern,e.name)
         if m:
             num = m.group(1)
             self.elements['friendImg'+str(num)].onDraw = self.drawProfileImage
+            self.canvas.refresh()
             
     def FocusPublicTwt(self,e):
         m = re.match(self.public_cloud_pattern,e.name) or \
@@ -176,76 +161,6 @@ class TwitGui(inklib.Face):
         self.kbd.resultProcessor = self.publishTwit
         self.canvas.add(self.kbd)
         self.canvas.refresh()
-        
-
-class ImageLoader(threading.Thread):
-    __img_map_lock__ = None
-    __img_map__ = {}
-    IMG_CACHE_DIR = os.environ['HOME']+os.sep+'.twitinkface'
-    def __init__(self,urls=None):
-        threading.Thread.__init__(self)
-        if urls:
-            for url in urls:
-                localfile = self.IMG_CACHE_DIR+os.sep+'-'.join(url.split('/')[-2:])
-                self.__img_map__[url] = localfile
-        try:
-            os.makedirs(self.IMG_CACHE_DIR)
-        except OSError,oe:
-            # File already exists
-            pass
-
-        self.__img_map_lock__ = threading.Lock()
-    
-    def get_image_surface(self,url):
-        self.__img_map_lock__.acquire()
-        localfile = self.__img_map__[url]
-        self.__img_map_lock__.release()
-
-        if localfile:
-            if not localfile.endswith('png'):
-                png_name = '.'.join(localfile.split('.')[:-2]) + '.png'
-                if not os.path.exists(png_name):
-                    print "PNG file doesn't exist for "+url
-                    return None
-                else:
-                    return cairo.ImageSurface.create_from_png(png_name)
-            else:
-                return cairo.ImageSurface.create_from_png(localfile)
-        else:
-            # Image is not yet loaded
-            return None
-
-    def add_img_url(self,url):
-        self.__img_map_lock__.acquire()
-        if (type(url) == list or type(url) == tuple):
-            for u in url:
-                localfile = self.IMG_CACHE_DIR+os.sep+'-'.join(u.split('/')[-2:])
-                self.__img_map__[u] = localfile
-        else:
-            localfile = self.IMG_CACHE_DIR+os.sep+'-'.join(url.split('/')[-2:])
-            self.__img_map__[url] = localfile
-        self.__img_map_lock__.release()
-
-    def run(self):
-        import urllib
-        from PIL import Image
-        from time import sleep
-        while True:
-
-            self.__img_map_lock__.acquire()
-            map_items = self.__img_map__.items()
-            self.__img_map_lock__.release()
-
-            for url,localfile in map_items:
-                if localfile and not os.path.exists(localfile):
-                    urllib.urlretrieve(url,localfile)
-                    if not localfile.endswith('png'):
-                        jpg = Image.open(localfile)
-                        png_name = '.'.join(localfile.split('.')[:-2]) + '.png'
-                        jpg.save(png_name)
-
-            sleep(5)
-                    
 
 #
 # Control Flow
