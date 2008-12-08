@@ -29,6 +29,9 @@ typedef struct {
 
     PyObject *clouds;
 
+    // opaque pointer to userdata
+    PyObject *user_data;
+
     // Callback handlers
     PyObject *onDraw;
     PyObject *onTap;

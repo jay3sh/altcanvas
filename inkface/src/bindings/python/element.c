@@ -114,6 +114,8 @@ static PyMemberDef element_members[] = {
     { "opacity", T_INT, offsetof(Element_t,opacity),0,"Opacity of element"},
     { "surface", T_OBJECT, offsetof(Element_t,p_surface),0,
             "Cairo surface of element"},
+    { "user_data", T_OBJECT, offsetof(Element_t,user_data),0,
+            "Opaque object for user app to associate any data with the element"},
     { "onDraw", T_OBJECT,offsetof(Element_t,onDraw),0,"Draw handler"},
     { "onTap", T_OBJECT,offsetof(Element_t,onTap),0,"Tap handler"},
     { "onMouseEnter", T_OBJECT,offsetof(Element_t,onMouseEnter),0,
