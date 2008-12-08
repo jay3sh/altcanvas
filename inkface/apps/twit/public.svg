@@ -52,7 +52,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.1604167"
-     inkscape:cx="422.03451"
+     inkscape:cx="400"
      inkscape:cy="240"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -581,5 +581,82 @@
          id="tspan5583"
          x="39.082664"
          y="418.97464">text</tspan></text>
+    <rect
+       style="opacity:0.8408163;fill:#f2f2f2;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect5619"
+       width="100"
+       height="100"
+       x="585.13464"
+       y="6.0323162"
+       rx="15"
+       ry="15"
+       name="friendImg0"
+       order="150" />
+    <rect
+       style="opacity:0.8408163;fill:#f2f2f2;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect5623"
+       width="100"
+       height="100"
+       x="653.19568"
+       y="65.475769"
+       rx="15"
+       ry="15"
+       name="friendImg1"
+       order="150" />
+    <rect
+       style="opacity:0.8408163;fill:#f2f2f2;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect5625"
+       width="100"
+       height="100"
+       x="575.63733"
+       y="134.41652"
+       rx="15"
+       ry="15"
+       name="friendImg2"
+       order="150" />
+    <rect
+       style="opacity:0.8408163;fill:#f2f2f2;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect5627"
+       width="100"
+       height="100"
+       x="618.72534"
+       y="191.29263"
+       rx="15"
+       ry="15"
+       name="friendImg3"
+       order="150" />
+    <rect
+       style="opacity:0.8408163;fill:#f2f2f2;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect5629"
+       width="100"
+       height="100"
+       x="654.91925"
+       y="255.92459"
+       rx="15"
+       ry="15"
+       name="friendImg4"
+       order="150" />
+    <rect
+       style="opacity:0.8408163;fill:#f2f2f2;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect5631"
+       width="100"
+       height="100"
+       x="609.24597"
+       y="317.10953"
+       rx="15"
+       ry="15"
+       name="friendImg5"
+       order="150" />
+    <rect
+       style="opacity:0.8408163;fill:#f2f2f2;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect5633"
+       width="100"
+       height="100"
+       x="585.97845"
+       y="377.43268"
+       rx="15"
+       ry="15"
+       name="friendImg6"
+       order="150" />
   </g>
 </svg>

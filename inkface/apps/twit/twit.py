@@ -4,6 +4,8 @@ import inkface
 import inklib
 import twitter
 from keyboard import Keyboard
+import threading
+from time import sleep
 
 import os
 
@@ -59,6 +61,8 @@ class TwitGui(inklib.Face):
     PUBLIC_TIMELINE = 0
     FRIENDS_TIMELINE = 1
 
+    image_list = []
+
     cloud_pattern = 'publicCloud(\d+)'
     twt_pattern = 'publicTwt(\d+)'
 
@@ -73,11 +77,15 @@ class TwitGui(inklib.Face):
         self.twtApi = api
 
         for name,elem in self.elements.items():
-            #if name.startswith('publicTwt') or name.startswith('publicCloud'):
-            if name.startswith('publicCloud'):
-                elem.onTap = self.FocusTwt
+            if name.startswith('publicTwt') or name.startswith('publicCloud'):
+                elem.onTap = self.FocusPublicTwt
+            elif name.startswith('friendImg'):
+                elem.onDraw = self.donotdraw
 
-    def FocusTwt(self,e):
+    def donotdraw(self,e):
+        pass
+
+    def FocusPublicTwt(self,e):
         import re
         m = re.match(self.cloud_pattern,e.name) or re.match(self.twt_pattern,e.name)
         if m:
@@ -97,7 +105,7 @@ class TwitGui(inklib.Face):
             elem_prefix = 'publicTwt'
             twt_list = self.twtApi.GetPublicTimeline()
         else:
-            LINE_LIMIT = 60
+            LINE_LIMIT = 55 
             elem_prefix = 'friendTwt'
             twt_list = self.twtApi.GetFriendsTimeline()
 
@@ -111,6 +119,8 @@ class TwitGui(inklib.Face):
                 while True:
                     try:
                         ascii_twt = str(twt_list[i].text)
+                        self.image_list.append(
+                            twt_list[i].GetUser().profile_image_url)
                     except UnicodeEncodeError, uee:
                         i += 1
                     except IndexError, ie:
@@ -144,6 +154,43 @@ class TwitGui(inklib.Face):
         self.canvas.add(self.kbd)
         self.canvas.refresh()
         
+
+class ImageLoader(threading.Thread):
+    __img_map__ = {}
+    IMG_CACHE_DIR = os.environ['HOME']+os.sep+'.twitinkface'
+    def __init__(self,urls=None):
+        if urls:
+            for url in urls:
+                localfile = self.IMG_CACHE_DIR+os.sep+'-'.join(url.split('/')[-2:])
+                self.__img_map__[url] = localfile
+        try:
+            os.makedirs(self.IMG_CACHE_DIR)
+        except OSError,oe:
+            # File already exists
+            pass
+
+    
+    def run(self):
+        import urllib
+        from PIL import Image
+        while True:
+            for url,localfile in self.__img_map__.items():
+                if not localfile:
+                    print 'localfile not defined for '+url
+                    continue
+                if not os.path.exists(localfile):
+                    urllib.urlretrieve(url,localfile)
+                    if not localfile.endswith('png'):
+                        jpg = Image.open(localfile)
+                        png_name = '.'.join(localfile.split('.')[:-2]) + '.png'
+                        jpg.save(png_name)
+                        self.__img_map__[url] = png_name
+                    else:
+                        self.__img_map__[url] = localfile
+
+            break
+                    
+
 #
 # Control Flow
 # 
@@ -166,6 +213,9 @@ class TwitterApp:
         self.canvas.refresh()
         self.twitGui.loadTimeline(self.twitGui.FRIENDS_TIMELINE)
         self.twitGui.loadTimeline(self.twitGui.PUBLIC_TIMELINE)
+
+        ilThread = ImageLoader(self.twitGui.image_list)
+        ilThread.run()
 
 
 if __name__ == '__main__':
