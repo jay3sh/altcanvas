@@ -53,7 +53,7 @@ class TwitGui(inklib.Face):
         pass
 
     def drawProfileImage(self,e):
-        print 'TG: drawProfileImage for '+e.name
+        #print 'TG: drawProfileImage for '+e.name
         m = re.match(self.friend_img_pattern,e.name)
         if m:
             num = m.group(1)
@@ -61,18 +61,21 @@ class TwitGui(inklib.Face):
 
             if twt:
                 url = twt.GetUser().profile_image_url
-                print 'TG: Getting cairo surface for '+url
+                #print 'TG: Getting cairo surface for '+url
                 img_surface = self.iloader.get_image_surface(url)
 
                 if not img_surface:
-                    print "Failed to get Image surface for "+e.name
+                    #print "Failed to get Image surface for "+e.name
                     return
                 ctx = cairo.Context(e.surface)
+                sx = e.surface.get_width()*1.0/img_surface.get_width()
+                sy = e.surface.get_height()*1.0/img_surface.get_height()
+                ctx.scale(sx,sy)
                 ctx.set_source_surface(img_surface,0,0)
                 ctx.paint()
                 self.canvas.draw(e)
                 self.canvas.refresh()
-                print 'TG: Drew the image'
+                #print 'TG: Drew the image'
         
     def lostFocusTwt(self,e):
         m = re.match(self.friend_cloud_pattern,e.name) or \
