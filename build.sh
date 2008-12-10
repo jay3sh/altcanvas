@@ -177,7 +177,13 @@ make_canvasx()
 
 make_inkface()
 {
-    echo 'making inkface'
+    (
+        cd inkface;
+        scons -c
+        #scons -Q native-debian
+        scons -Q python-debian
+        mv *.deb ../packages/
+    )
 }
 
 
@@ -187,7 +193,8 @@ make_libaltsvg()
         HOST_ARCH=`dpkg --print-architecture`
         cd libaltsvg;
         sed "s/@ARCH@/$HOST_ARCH/g" debian/control.in > debian/control
-        dpkg-buildpackage -rfakeroot || exit
+        dpkg-buildpackage -rfakeroot 
+        mv ../libaltsvg*deb ../packages/
         #scp ../inkface*deb root@192.168.1.100:/root/
 
         #ssh root@192.168.1.100 \
