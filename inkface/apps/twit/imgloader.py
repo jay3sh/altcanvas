@@ -12,6 +12,7 @@ import login
 
 class ImageLoader(threading.Thread):
 
+    stop = False
     __img_map_lock__ = None
     __img_map__ = {}
     IMG_CACHE_DIR = os.environ['HOME']+os.sep+'.twitinkface'
@@ -28,11 +29,9 @@ class ImageLoader(threading.Thread):
             # File already exists
             pass
 
-        print 'IL: created'
         self.__img_map_lock__ = threading.Lock()
     
     def get_image_surface(self,url):
-        print 'IL: Getting image surface for '+url
         self.__img_map_lock__.acquire()
         localfile = self.__img_map__[url]
         self.__img_map_lock__.release()
@@ -52,15 +51,18 @@ class ImageLoader(threading.Thread):
             return None
 
     def add_img_url(self,url):
-        print 'IL: Adding %s to list'%str(url)
         self.__img_map_lock__.acquire()
+        
         if (type(url) == list or type(url) == tuple):
+            print 'Adding %d images to map'%len(url)
             for u in url:
                 localfile = self.IMG_CACHE_DIR+os.sep+'-'.join(u.split('/')[-2:])
                 self.__img_map__[u] = localfile
         else:
+            print 'Adding '+str(url)
             localfile = self.IMG_CACHE_DIR+os.sep+'-'.join(url.split('/')[-2:])
             self.__img_map__[url] = localfile
+
         self.__img_map_lock__.release()
 
     def run(self):
@@ -72,7 +74,7 @@ class ImageLoader(threading.Thread):
             map_items = self.__img_map__.items()
             self.__img_map_lock__.release()
 
-            print 'IL: Fetching images'
+            #print 'IL: Fetching images'
             for url,localfile in map_items:
                 if localfile and not os.path.exists(localfile):
                     urllib.urlretrieve(url,localfile)
@@ -81,6 +83,12 @@ class ImageLoader(threading.Thread):
                         png_name = '.'.join(localfile.split('.')[:-2]) + '.png'
                         jpg.save(png_name)
 
-            print 'IL: sleeping for 5 sec'
-            sleep(5)
+                    if self.stop:
+                        return
+
+            #print 'IL: sleeping for 2 sec'
+            sleep(2)
+            
+            if self.stop:
+                return
          

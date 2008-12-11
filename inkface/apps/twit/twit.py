@@ -47,7 +47,7 @@ class TwitGui(inklib.Face):
                 elem.onDraw = self.donotdraw
 
         self.iloader = ImageLoader(None)
-        #self.iloader.start()
+        self.iloader.start()
 
     def donotdraw(self,e):
         pass
@@ -62,10 +62,15 @@ class TwitGui(inklib.Face):
             if twt:
                 url = twt.GetUser().profile_image_url
                 #print 'TG: Getting cairo surface for '+url
-                img_surface = self.iloader.get_image_surface(url)
+
+                img_surface = e.user_data
+                if not img_surface:
+                    print 'TG: @'+twt.GetUser().screen_name
+                    img_surface = self.iloader.get_image_surface(url)
+                    e.user_data = img_surface
 
                 if not img_surface:
-                    #print "Failed to get Image surface for "+e.name
+                    print "Failed to get Image surface for "+e.name
                     return
                 ctx = cairo.Context(e.surface)
                 sx = e.surface.get_width()*1.0/img_surface.get_width()
@@ -98,13 +103,13 @@ class TwitGui(inklib.Face):
             re.match(self.public_twt_pattern,e.name)
         if m:
             num = m.group(1)
-            self.canvas.reset_order()
-            self.canvas.bring_to_front(self.elements['publicCloud'+str(num)])
-            self.canvas.bring_to_front(self.elements['publicTwt'+str(num)])
-            self.canvas.bring_to_front(self.twitButton)
-            self.canvas.bring_to_front(self.quitButton)
-            self.canvas.bring_to_front(self.friendsButton)
-            self.canvas.bring_to_front(self.publicButton)
+            #self.canvas.reset_order()
+            #self.canvas.bring_to_front(self.elements['publicCloud'+str(num)])
+            #self.canvas.bring_to_front(self.elements['publicTwt'+str(num)])
+            #self.canvas.bring_to_front(self.twitButton)
+            #self.canvas.bring_to_front(self.quitButton)
+            #self.canvas.bring_to_front(self.friendsButton)
+            #self.canvas.bring_to_front(self.publicButton)
 
     def loadTimeline(self,type):
 
@@ -155,6 +160,8 @@ class TwitGui(inklib.Face):
         self.canvas.refresh()
         
     def onExit(self,e):
+        self.iloader.stop = True
+        self.iloader.join()
         inkface.exit()
 
     def publishTwit(self,txt):
