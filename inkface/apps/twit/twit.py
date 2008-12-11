@@ -43,7 +43,7 @@ class TwitGui(inklib.Face):
             elif name.startswith('friendTwt') or name.startswith('friendCloud'):
                 elem.onTap = self.FocusFriendTwt
                 elem.onMouseLeave = self.lostFocusTwt
-            elif name.startswith('friendImg'):
+            elif name.startswith('friendImg') or name.startswith('friendFrame'):
                 elem.onDraw = self.donotdraw
 
         self.iloader = ImageLoader(None)
@@ -51,6 +51,9 @@ class TwitGui(inklib.Face):
 
     def donotdraw(self,e):
         pass
+
+    def drawProfileFrame(self,e):
+        self.canvas.draw(e)
 
     def drawProfileImage(self,e):
         #print 'TG: drawProfileImage for '+e.name
@@ -65,13 +68,10 @@ class TwitGui(inklib.Face):
 
                 img_surface = e.user_data
                 if not img_surface:
-                    #print 'TG: @'+twt.GetUser().screen_name
-                    #print 'TG: * '+twt.GetUser().screen_name
                     img_surface = self.iloader.get_image_surface(url)
                     e.user_data = img_surface
 
                 if not img_surface:
-                    #print "Failed to get Image surface for "+e.name
                     return
                 ctx = cairo.Context(e.surface)
                 sx = e.surface.get_width()*1.0/img_surface.get_width()
@@ -89,6 +89,7 @@ class TwitGui(inklib.Face):
         if m:
             num = m.group(1)
             self.elements['friendImg'+str(num)].onDraw = self.donotdraw
+            self.elements['friendFrame'+str(num)].onDraw = self.donotdraw
             self.canvas.refresh()
 
     def FocusFriendTwt(self,e):
@@ -97,6 +98,7 @@ class TwitGui(inklib.Face):
         if m:
             num = m.group(1)
             self.elements['friendImg'+str(num)].onDraw = self.drawProfileImage
+            self.elements['friendFrame'+str(num)].onDraw = self.drawProfileFrame
             self.canvas.refresh()
             
     def FocusPublicTwt(self,e):
