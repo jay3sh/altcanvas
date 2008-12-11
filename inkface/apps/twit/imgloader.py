@@ -38,13 +38,15 @@ class ImageLoader(threading.Thread):
 
         if localfile:
             if not localfile.endswith('png'):
-                png_name = '.'.join(localfile.split('.')[:-2]) + '.png'
+                png_name = '.'.join(localfile.split('.')[:-1]) + '.png'
                 if not os.path.exists(png_name):
-                    print "PNG file doesn't exist for "+url
+                    #print "PNG file doesn't exist for "+url
                     return None
                 else:
+                    #print 'IL: 1# '+png_name
                     return cairo.ImageSurface.create_from_png(png_name)
             else:
+                #print 'IL: 2# '+localfile
                 return cairo.ImageSurface.create_from_png(localfile)
         else:
             # Image is not yet loaded
@@ -54,12 +56,10 @@ class ImageLoader(threading.Thread):
         self.__img_map_lock__.acquire()
         
         if (type(url) == list or type(url) == tuple):
-            print 'Adding %d images to map'%len(url)
             for u in url:
                 localfile = self.IMG_CACHE_DIR+os.sep+'-'.join(u.split('/')[-2:])
                 self.__img_map__[u] = localfile
         else:
-            print 'Adding '+str(url)
             localfile = self.IMG_CACHE_DIR+os.sep+'-'.join(url.split('/')[-2:])
             self.__img_map__[url] = localfile
 
@@ -74,19 +74,19 @@ class ImageLoader(threading.Thread):
             map_items = self.__img_map__.items()
             self.__img_map_lock__.release()
 
-            #print 'IL: Fetching images'
             for url,localfile in map_items:
-                if localfile and not os.path.exists(localfile):
-                    urllib.urlretrieve(url,localfile)
+                if localfile:
+                    if not os.path.exists(localfile):
+                        urllib.urlretrieve(url,localfile)
+
                     if not localfile.endswith('png'):
                         jpg = Image.open(localfile)
-                        png_name = '.'.join(localfile.split('.')[:-2]) + '.png'
+                        png_name = '.'.join(localfile.split('.')[:-1]) + '.png'
                         jpg.save(png_name)
 
                     if self.stop:
                         return
 
-            #print 'IL: sleeping for 2 sec'
             sleep(2)
             
             if self.stop:

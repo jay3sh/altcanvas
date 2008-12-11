@@ -65,12 +65,13 @@ class TwitGui(inklib.Face):
 
                 img_surface = e.user_data
                 if not img_surface:
-                    print 'TG: @'+twt.GetUser().screen_name
+                    #print 'TG: @'+twt.GetUser().screen_name
+                    #print 'TG: * '+twt.GetUser().screen_name
                     img_surface = self.iloader.get_image_surface(url)
                     e.user_data = img_surface
 
                 if not img_surface:
-                    print "Failed to get Image surface for "+e.name
+                    #print "Failed to get Image surface for "+e.name
                     return
                 ctx = cairo.Context(e.surface)
                 sx = e.surface.get_width()*1.0/img_surface.get_width()
