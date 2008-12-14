@@ -1,5 +1,4 @@
 
-
 #include "errno.h"
 #include "rsvg.h"
 #include "macro.h"
@@ -7,17 +6,10 @@
 #include "string.h"
 #include <cairo.h>
 #include <cairo-xlib.h>
-#include <X11/Xatom.h>
-
-#ifdef DOUBLE_BUFFER
-#include <X11/extensions/Xdbe.h>
-#endif
 
 #include "inkface.h"
 #include "common.h"
 #include "canvas-gl.h"
-
-#include <GL/glut.h>
 
 //-------------------
 // OpenGL canvas
@@ -25,6 +17,11 @@
 
 #ifdef HAS_OPENGL
 
+#include <GL/gl.h>
+#include <GL/glx.h>
+
+extern int GLOBAL_WIDTH;
+extern int GLOBAL_HEIGHT;
 
 #ifdef GL_VERSION_1_1
 static GLuint texName;
@@ -32,13 +29,12 @@ static GLuint texName;
 static int checkImageWidth = 800;
 static int checkImageHeight = 480;
 static GLubyte checkImage[800][480][4];
-void init(void)
+void glinit(void)
 {    
    glClearColor (0.0, 0.0, 0.0, 0.0);
    glShadeModel(GL_FLAT);
    glEnable(GL_DEPTH_TEST);
 
-   //makeCheckImage();
    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 #ifdef GL_VERSION_1_1
@@ -67,30 +63,56 @@ canvas_init(
     int height,
     int fullscreen)
 {
+    Window rwin;
+    int screen = 0;
+    int attrib[] = { GLX_RGBA,
+		    GLX_RED_SIZE, 1,
+		    GLX_GREEN_SIZE, 1,
+		    GLX_BLUE_SIZE, 1,
+		    GLX_DOUBLEBUFFER,
+		    None };
+    XVisualInfo *visinfo = NULL;
+    unsigned long mask;
+    GLXContext glctx;
+    XSetWindowAttributes attr;
+ 
+    gl_canvas_t *self = (gl_canvas_t *) canvas;
+    ASSERT(self);
+    self->width = GLOBAL_WIDTH = width;
+    self->height = GLOBAL_HEIGHT = height;
+
+    self->fullscreen = fullscreen;
+
+    ASSERT(self->dpy = XOpenDisplay(0));
+    screen = DefaultScreen(self->dpy);
+    rwin = RootWindow(self->dpy,screen);
+
+    ASSERT(visinfo = glXChooseVisual( self->dpy, screen, attrib ));
+    /* window attributes */
+    attr.background_pixel = 0;
+    attr.border_pixel = 0;
+    attr.colormap = XCreateColormap(self->dpy,rwin,visinfo->visual,AllocNone);
+    attr.event_mask = StructureNotifyMask | ExposureMask;
+    mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
+
+    ASSERT(self->win = XCreateWindow( self->dpy, rwin, 0, 0, 
+                self->width, self->height,
+		        0, visinfo->depth, InputOutput,
+		        visinfo->visual, mask, &attr ));
+
+    ASSERT(glctx = glXCreateContext(self->dpy, visinfo, NULL, True ));
+
+    glXMakeCurrent( self->dpy, self->win, glctx );
+
+    glinit();
+}
+
+static void canvas_show(canvas_t *canvas)
+{
     gl_canvas_t *self = (gl_canvas_t *)canvas;
-    glutInit(NULL, NULL);
-    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
-    glutInitWindowSize(250, 250);
-    glutInitWindowPosition(100, 100);
-    glutCreateWindow("inkface");
-    //init();
-    ASSERT(self->display);
-    glutDisplayFunc(self->display);
-    //glutReshapeFunc(reshape);
-    //glutKeyboardFunc(keyboard);
-}
-
-static void 
-canvas_register_display_function(
-    gl_canvas_t *canvas,
-    displayfunc_t display)
-{
-    canvas->display = display;
-}
-
-static void canvas_show(canvas_t *self)
-{
-
+    XMapWindow(self->dpy, self->win);
+    XFlush(self->dpy);
+    canvas->inc_dirt_count(canvas,1);
 }
 
 static void canvas_refresh(canvas_t *self)
@@ -98,8 +120,13 @@ static void canvas_refresh(canvas_t *self)
 
 }
                     
-static void canvas_cleanup(canvas_t *self)
+static void canvas_cleanup(canvas_t *canvas)
 {
+    gl_canvas_t *self = (gl_canvas_t *)canvas;
+    rsvg_term();
+
+    self->super.shutting_down = TRUE;
+
 
 }
 
