@@ -3,6 +3,7 @@
 import os
 import re
 import threading
+import urllib2
 
 import cairo
 
@@ -14,6 +15,7 @@ from keyboard import Keyboard
 from login import LoginGui
 from imgloader import ImageLoader
 
+import sys
 
 
 class TwitGui(inklib.Face):
@@ -116,14 +118,18 @@ class TwitGui(inklib.Face):
 
     def loadTimeline(self,type):
 
-        if type == self.PUBLIC_TIMELINE:
-            LINE_LIMIT = 25 
-            elem_prefix = 'publicTwt'
-            twt_list = self.twtApi.GetPublicTimeline()
-        else:
-            LINE_LIMIT = 55 
-            elem_prefix = 'friendTwt'
-            twt_list = self.twtApi.GetFriendsTimeline()
+        try:
+            if type == self.PUBLIC_TIMELINE:
+                LINE_LIMIT = 25 
+                elem_prefix = 'publicTwt'
+                twt_list = self.twtApi.GetPublicTimeline()
+            else:
+                LINE_LIMIT = 55 
+                elem_prefix = 'friendTwt'
+                twt_list = self.twtApi.GetFriendsTimeline()
+        except urllib2.URLError, urle:
+            print 'Error connecting to Twitter: '+str(urle)
+            return
 
         i = 0
         image_list = []
@@ -168,12 +174,14 @@ class TwitGui(inklib.Face):
         self.iloader.join()
         self.resultProcessor()
 
-    def publishTwit(self,txt):
-        #print dir(self.twtApi.PostUpdate(txt))
-        print 'Pseudo publishing: '+txt
+    def publishTwit(self,txt=None):
+        if txt:
+            #print dir(self.twtApi.PostUpdate(txt))
+            print 'Pseudo publishing: '+txt
+        self.canvas.remove(self.kbd)
+        self.canvas.refresh()
         
     def onTwit(self,e):
-        print 'Showing keyboard'
         self.kbd.resultProcessor = self.publishTwit
         self.canvas.add(self.kbd)
         self.canvas.refresh()
@@ -187,7 +195,6 @@ class TwitterApp:
         self.canvas = inkface.create_X_canvas()
 
     def main(self):
-        import sys
         self.loginGui = LoginGui(self.canvas,'login.svg')
         self.loginGui.resultProcessor = self.onLoginSuccess
         self.canvas.add(self.loginGui)
@@ -207,9 +214,14 @@ class TwitterApp:
         self.twitGui.loadTimeline(self.twitGui.PUBLIC_TIMELINE)
 
     def onExit(self,user_data=None):
+        #from time import sleep
         self.canvas.remove(self.twitGui)
+        print 'twitGui refcount %d'%sys.getrefcount(self.twitGui)
         del self.twitGui
-        inkface.exit()
+        #for i in range(10):
+        #    print 'waiting %d'%i
+        #    sleep(1)
+        #inkface.exit()
 
 
 if __name__ == '__main__':

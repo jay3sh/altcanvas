@@ -58,12 +58,9 @@ class Keyboard(inklib.Face):
 
     def onEnter(self,e):
         self.resultProcessor(self.keyboardText.text)
-        self.canvas.remove(self)
-        self.canvas.refresh()
         
     def onCancel(self,e):
-        self.canvas.remove(self)
-        self.canvas.refresh()
+        self.resultProcessor()
 
     def glowDraw(self,e):
         if e.opacity:

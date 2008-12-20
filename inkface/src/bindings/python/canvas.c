@@ -620,7 +620,6 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
             mevent = (XMotionEvent *)(&event);
             iterator = PyObject_GetIter(self->element_list);
             int lsize = PyList_Size(self->element_list);
-            //LOG("Current list size = %d",lsize);
             while(item = PyIter_Next(iterator)){
 
                 Element_t *el = (Element_t *)item;
@@ -689,9 +688,6 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
             break;
         } // end of switch 
 
-        // The even callback might have removed some faces from the canvas
-        // Check the to_remove_face_list and cleanup its elements from
-        // the canvas's list
         canvas_refresh_elements(self);
 
         canvas_cleanup_faces_pending_removal(self);
