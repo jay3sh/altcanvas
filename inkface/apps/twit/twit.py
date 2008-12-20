@@ -169,7 +169,8 @@ class TwitGui(inklib.Face):
         inkface.exit()
 
     def publishTwit(self,txt):
-        print dir(self.twtApi.PostUpdate(txt))
+        #print dir(self.twtApi.PostUpdate(txt))
+        print 'Pseudo publishing: '+txt
         
     def onTwit(self,e):
         print 'Showing keyboard'
@@ -188,7 +189,6 @@ class TwitterApp:
     def main(self):
         import sys
         self.loginGui = LoginGui(self.canvas,'login.svg')
-        print '-------> %d'%sys.getrefcount(self.loginGui)
         self.loginGui.resultProcessor = self.onLoginSuccess
         self.canvas.add(self.loginGui)
 
@@ -196,8 +196,7 @@ class TwitterApp:
         
     def onLoginSuccess(self,twitterApi):
         self.canvas.remove(self.loginGui)
-        #self.loginGui.unload()
-        #inkface.release(self.loginGui)
+        del self.loginGui
         self.twitGui = TwitGui(self.canvas,'public.svg',twitterApi)
         self.canvas.add(self.twitGui)
         self.canvas.refresh()

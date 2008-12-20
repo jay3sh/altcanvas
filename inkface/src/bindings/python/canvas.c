@@ -327,8 +327,6 @@ p_canvas_add(Canvas_t *self, PyObject *args)
 {    
     PyObject *elemList_pyo = NULL;
 
-    calculate_total_refcnt(self,__LINE__);
-
     PyObject *face_pyo;
 
     if(!PyArg_ParseTuple(args,"O",&face_pyo)){
@@ -350,8 +348,6 @@ p_canvas_add(Canvas_t *self, PyObject *args)
     self->__face_list_dirty__ = TRUE;
 
     canvas_refresh_elements(self);
-
-    calculate_total_refcnt(self,__LINE__);
 
     Py_RETURN_TRUE;
 }
@@ -428,6 +424,9 @@ canvas_refresh_elements(Canvas_t *self)
     {
         PyObject_CallMethod(remface_item,"unload",NULL);        
         Py_DECREF(remface_item);
+
+        LOG("face refcnt after unload: %d",
+            remface_item->ob_refcnt);
     }
     Py_DECREF(remface_iter);
 
@@ -436,6 +435,7 @@ canvas_refresh_elements(Canvas_t *self)
 
     return;
 }
+
 
 #define INK_MAX(a,b) ((a>b)?a:b)
 #define INK_MIN(a,b) ((a<b)?a:b)
