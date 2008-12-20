@@ -352,6 +352,7 @@ p_canvas_add(Canvas_t *self, PyObject *args)
     canvas_refresh_elements(self);
 
     calculate_total_refcnt(self,__LINE__);
+
     Py_RETURN_TRUE;
 }
 
@@ -376,6 +377,8 @@ p_canvas_remove(Canvas_t *self, PyObject *args)
     if(i >= 0){
         ASSERT(PySequence_DelItem(self->face_list,i) >= 0);
     }
+
+    PyList_Append(self->removed_face_list,face_pyo);
 
     self->__face_list_dirty__ = TRUE;
 
@@ -418,7 +421,15 @@ canvas_refresh_elements(Canvas_t *self)
     self->__face_list_dirty__ = FALSE;
 
     recalculate_clouds(self);
-
+    
+    PyObject *remface_iter = PyObject_GetIter(self->removed_face_list);
+    PyObject *remface_item = NULL;
+    while(remface_item = PyIter_Next(remface_iter))
+    {
+        PyObject_CallMethod(remface_item,"unload",NULL);        
+        Py_DECREF(remface_item);
+    }
+    Py_DECREF(remface_iter);
     return;
 }
 

@@ -155,6 +155,42 @@ inkface_loadsvg(PyObject *self, PyObject *args)
 }
 
 static PyObject*
+inkface_unload(PyObject *self, PyObject *args)
+{
+    PyObject *elem_dict = NULL;
+
+    if(!PyArg_ParseTuple(args,"O",&elem_dict)){
+        PyErr_Clear();
+        PyErr_SetString(PyExc_ValueError,"Invalid Arguments");
+        return NULL;
+    }
+
+    if(!elem_dict){
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+
+    PyObject *elem_keys = PyDict_Keys(elem_dict);
+    PyObject *key_iter = PyObject_GetIter(elem_keys);
+    PyObject *key_item = NULL;
+    while(key_item = PyIter_Next(key_iter))
+    {
+        Py_DECREF(PyDict_GetItem(elem_dict,key_item));
+        Py_DECREF(key_item);
+    }
+    Py_DECREF(key_iter);
+
+    Py_DECREF(elem_keys);
+
+    PyDict_Clear(elem_dict);
+
+    Py_DECREF(elem_dict);
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject*
 inkface_create_X_canvas(PyObject *self, PyObject *args, PyObject *kwds)
 {
     //if(x_canvas){
@@ -225,6 +261,7 @@ inkface_create_X_canvas(PyObject *self, PyObject *args, PyObject *kwds)
     x_canvas->element_list = PyList_New(0);
     // Initialize the face list
     x_canvas->face_list = PyList_New(0);
+    x_canvas->removed_face_list = PyList_New(0);
     x_canvas->__face_list_dirty__ = FALSE;
 
     return (PyObject *)x_canvas;
@@ -371,6 +408,8 @@ static PyMethodDef inkface_methods[] =
         (PyCFunction)inkface_test_refcnt, METH_VARARGS, NULL },
     { "loadsvg", 
         (PyCFunction)inkface_loadsvg, METH_VARARGS, NULL },
+    { "unload", 
+        (PyCFunction)inkface_unload, METH_VARARGS, NULL },
     { "create_X_canvas", 
         (PyCFunction)inkface_create_X_canvas, METH_KEYWORDS, NULL },
     { "create_GL_canvas", 

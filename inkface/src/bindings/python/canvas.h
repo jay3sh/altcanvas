@@ -17,6 +17,7 @@ typedef struct {
     PyObject *element_dict; //TODO: remove
     PyObject *element_list;
     PyObject *face_list;
+    PyObject *removed_face_list;
 
     int __face_list_dirty__;
 
