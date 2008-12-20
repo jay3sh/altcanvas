@@ -430,6 +430,10 @@ canvas_refresh_elements(Canvas_t *self)
         Py_DECREF(remface_item);
     }
     Py_DECREF(remface_iter);
+
+    PySequence_DelSlice(self->removed_face_list,
+            0,PyList_Size(self->removed_face_list));
+
     return;
 }
 
