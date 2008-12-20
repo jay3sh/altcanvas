@@ -164,9 +164,9 @@ class TwitGui(inklib.Face):
         
     def onExit(self,e):
         self.iloader.stop = True
+        print 'Waiting for imageLoader to stop'
         self.iloader.join()
-        self.canvas.remove(self)
-        inkface.exit()
+        self.resultProcessor()
 
     def publishTwit(self,txt):
         #print dir(self.twtApi.PostUpdate(txt))
@@ -197,12 +197,19 @@ class TwitterApp:
     def onLoginSuccess(self,twitterApi):
         self.canvas.remove(self.loginGui)
         del self.loginGui
+
         self.twitGui = TwitGui(self.canvas,'public.svg',twitterApi)
+        self.twitGui.resultProcessor = self.onExit
         self.canvas.add(self.twitGui)
         self.canvas.refresh()
+
         self.twitGui.loadTimeline(self.twitGui.FRIENDS_TIMELINE)
         self.twitGui.loadTimeline(self.twitGui.PUBLIC_TIMELINE)
 
+    def onExit(self,user_data=None):
+        self.canvas.remove(self.twitGui)
+        del self.twitGui
+        inkface.exit()
 
 
 if __name__ == '__main__':

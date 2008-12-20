@@ -48,5 +48,6 @@ static PyObject*
 void recalculate_clouds(Canvas_t *self);
 static void canvas_refresh_elements(Canvas_t *self);
 void calculate_total_refcnt(Canvas_t *self,int line);
+static void canvas_cleanup_faces_pending_removal(Canvas_t *self);
 
 #endif /* __CANVAS_H__ */

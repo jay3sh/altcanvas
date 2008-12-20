@@ -418,6 +418,12 @@ canvas_refresh_elements(Canvas_t *self)
 
     recalculate_clouds(self);
     
+    return;
+}
+
+static void
+canvas_cleanup_faces_pending_removal(Canvas_t *self)
+{
     PyObject *remface_iter = PyObject_GetIter(self->removed_face_list);
     PyObject *remface_item = NULL;
     while(remface_item = PyIter_Next(remface_iter))
@@ -687,6 +693,8 @@ p_canvas_eventloop(Canvas_t *self, PyObject *args)
         // Check the to_remove_face_list and cleanup its elements from
         // the canvas's list
         canvas_refresh_elements(self);
+
+        canvas_cleanup_faces_pending_removal(self);
 
         if(error_flag){
             return NULL;
