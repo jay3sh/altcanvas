@@ -45,5 +45,7 @@ static PyObject*
 // Internal helper functions
 
 void recalculate_clouds(Canvas_t *self);
+static void canvas_refresh_elements(Canvas_t *self);
+void calculate_total_refcnt(Canvas_t *self,int line);
 
 #endif /* __CANVAS_H__ */

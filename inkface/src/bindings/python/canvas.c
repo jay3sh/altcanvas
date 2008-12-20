@@ -21,8 +21,6 @@
 #include "canvas.h"
 #include "element.h"
 
-static void
-canvas_refresh_elements(Canvas_t *self);
 
 void calculate_total_refcnt(Canvas_t *self,int line)
 {
@@ -324,34 +322,6 @@ p_canvas_unregister_elements(Canvas_t *self, PyObject *args)
     return Py_None;
 }
 
-
-PyObject *
-get_face_element_list(PyObject *args)
-{
-    PyObject *face_pyo;
-
-    if(!PyArg_ParseTuple(args,"O",&face_pyo)){
-        PyErr_Clear();
-        PyErr_SetString(PyExc_ValueError,"Invalid Arguments");
-        return NULL;
-    }
-
-    if(!face_pyo){
-        Py_INCREF(Py_None);
-        return Py_None;
-    }
-
-    PyObject *elemDict_pyo = PyObject_GetAttrString(face_pyo,"elements");
-    
-    if(!elemDict_pyo){
-        PyErr_Clear();
-        PyErr_SetString(PyExc_ValueError,"elements dictionary not found");
-        return NULL;
-    }
-
-    return PyDict_Values(elemDict_pyo);
-}
-
 static PyObject *
 p_canvas_add(Canvas_t *self, PyObject *args)
 {    
@@ -371,7 +341,6 @@ p_canvas_add(Canvas_t *self, PyObject *args)
         Py_RETURN_FALSE;
     }
 
-    LOG("face_pyo refcnt = %d",face_pyo->ob_refcnt);
     // Check if this Face object is already added to the canvas
     if(PySequence_Contains(self->face_list,face_pyo)) Py_RETURN_FALSE;
 
@@ -381,45 +350,6 @@ p_canvas_add(Canvas_t *self, PyObject *args)
     self->__face_list_dirty__ = TRUE;
 
     canvas_refresh_elements(self);
-    #if 0
-    //TODO: delete this ref
-    PyObject *elemDict_pyo = PyObject_GetAttrString(face_pyo,"elements");
-    
-    if(!elemDict_pyo){
-        PyErr_Clear();
-        PyErr_SetString(PyExc_ValueError,"elements dictionary not found");
-        return NULL;
-    }
-
-    elemList_pyo = PyDict_Values(elemDict_pyo);
-   
-    // Sort the elements for this face by order
-    // We do this sorting before mixing these elements with the canvas's
-    // elements.
-    PyList_Sort(elemList_pyo);
-
-    // Append this list to canvas's element list
-    PyObject *iterator = PyObject_GetIter(elemList_pyo);
-    PyObject *item;
-
-    ASSERT(iterator);
-
-    while(item = PyIter_Next(iterator)){
-        PyList_Append(((Canvas_t *)self)->element_list,item);
-        //LOG("Adding %s from queue",
-        //    PyString_AS_STRING(PyObject_GetAttrString(item,"name")));
-        Py_DECREF(item);
-    }
-
-    LOG("Queue length --> %d",PySequence_Size(self->element_list));
-
-    Py_DECREF(iterator);
-
-    Py_DECREF(elemList_pyo);
-
-
-    recalculate_clouds(self);
-    #endif
 
     calculate_total_refcnt(self,__LINE__);
     Py_RETURN_TRUE;
@@ -441,8 +371,6 @@ p_canvas_remove(Canvas_t *self, PyObject *args)
         return Py_None;
     }
 
-    //LOG("face_pyo refcnt = %d",face_pyo->ob_refcnt);
-    
     // Remove Face object from the canvas's face_list
     int i = PySequence_Index(self->face_list,face_pyo);
     if(i >= 0){
@@ -450,7 +378,6 @@ p_canvas_remove(Canvas_t *self, PyObject *args)
     }
 
     self->__face_list_dirty__ = TRUE;
-    //PyList_Append(self->to_remove_face_list,face_pyo);
 
     Py_INCREF(Py_None);
     return Py_None;
@@ -464,6 +391,7 @@ canvas_refresh_elements(Canvas_t *self)
     PyObject *face_iter = PyObject_GetIter(self->face_list);    
     PyObject *face_item = NULL;
 
+    PySequence_DelSlice(self->element_list,0,PyList_Size(self->element_list));
     while(face_item = PyIter_Next(face_iter))
     {
         PyObject *elem_dict = PyObject_GetAttrString(face_item,"elements");
@@ -492,115 +420,6 @@ canvas_refresh_elements(Canvas_t *self)
     recalculate_clouds(self);
 
     return;
-#if 0
-    PyObject *elemList_pyo = NULL;
-    PyObject *face_pyo = NULL;
-    PyObject *face_iter = PyObject_GetIter(self->to_remove_face_list);
-
-    calculate_total_refcnt(self,__LINE__);
-
-    PyObject *elem2remove = PyList_New(0);
-
-    while(face_pyo = PyIter_Next(face_iter))
-    {
-
-        PyObject *elemDict_pyo = PyObject_GetAttrString(face_pyo,"elements");
-        
-        if(!elemDict_pyo) continue;
-    
-        elemList_pyo = PyDict_Values(elemDict_pyo);
-    
-        if(!elemList_pyo) continue;
-    
-        PyObject *iterator = PyObject_GetIter(elemList_pyo);
-        PyObject *item;
-    
-        ASSERT(iterator);
-    
-        // TODO: This is O(n^2) - fix in future
-        while(item = PyIter_Next(iterator))
-        {
-            PyObject *citer = PyObject_GetIter((self)->element_list); 
-            int ci = 0;
-            PyObject *citem = NULL;
-            while(citem = PyIter_Next(citer))
-            {
-                //
-                // If 'name' and 'id' of the elements match, then
-                // assume they are the same elements. This should be sufficient
-                // for now, but in future we can make elements hold name
-                // of the SVG file from which they were loaded and that will
-                // guarantee the unique match
-                //
-                int diff = PyUnicode_Compare(
-                    PyObject_GetAttrString(citem,"name"),
-                    PyObject_GetAttrString(item,"name"));
-    
-                diff = diff || PyUnicode_Compare(
-                    PyObject_GetAttrString(citem,"id"),
-                    PyObject_GetAttrString(item,"id"));
-    
-                if(diff == 0)
-                {
-                    LOG("Removing %s from queue at %d",
-                        PyString_AS_STRING(
-                        PyObject_GetAttrString(item,"name")),ci);
-                    //ASSERT((PySequence_DelItem(self->element_list,ci)) >= 0);
-                    PyList_Append(elem2remove,PyInt_FromLong(ci));
-                    Py_DECREF(citem);
-                    break;
-                }
-                
-                Py_DECREF(citem);
-                ci++;
-            }
-            Py_DECREF(citer);
-
-            Py_DECREF(item);
-        }  // while canvas's element_list
-
-        Py_DECREF(iterator);
-    
-    } // while to_remote_face_list
-    
-    PyObject *itm = NULL;
-    PyObject *itr = PyObject_GetIter(elem2remove);
-    LOG("len(elem_list) = %d, len(rem) = %d",
-        PyList_Size(self->element_list),PyList_Size(elem2remove));
-    while(itm = PyIter_Next(itr))
-    {
-        LOG("itm = %d",PyInt_AsLong(itm));
-        int res = 0;
-        ((res = PySequence_DelItem(self->element_list,PyInt_AsLong(itm))) >= 0);
-        LOG("result = %d",res);
-        ASSERT(res >=0);
-        Py_DECREF(itm);
-    }
-    Py_DECREF(itr);
-
-    int num_faces = PyList_Size(self->to_remove_face_list);
-    for (num_faces--; num_faces >=0 ; num_faces--)
-    {
-        PyObject *face_pyo = 
-            PyList_GetItem(self->to_remove_face_list,num_faces);
-        LOG("face_pyo refcnt %d [%d]",face_pyo->ob_refcnt,num_faces);
-
-        PyObject_CallMethod(face_pyo,"unload",NULL);
-        ASSERT(PySequence_DelItem(self->to_remove_face_list,num_faces) >= 0);
-        /*
-        while(face_pyo->ob_refcnt > 1){
-            Py_DECREF(face_pyo);
-        }
-        Py_DECREF(face_pyo);
-        */
-    }
-
-    //LOG("Queue length --> %d",PySequence_Size(self->element_list));
-
-    recalculate_clouds(self);
-
-    calculate_total_refcnt(self,__LINE__);
-#endif
 }
 
 #define INK_MAX(a,b) ((a>b)?a:b)
