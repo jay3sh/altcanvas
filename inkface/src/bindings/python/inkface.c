@@ -124,6 +124,7 @@ inkface_loadsvg(PyObject *self, PyObject *args)
         pytype = &Element_Type;
         ASSERT(pyo = (Element_t *)pytype->tp_alloc(pytype,0));
 
+        //LOG("just born element refcnt %d",pyo->ob_refcnt);
         // TODO: use standard element_init
         pyo->x = element->x;
         pyo->y = element->y;
@@ -144,6 +145,7 @@ inkface_loadsvg(PyObject *self, PyObject *args)
         PyDict_SetItem(p_edict,PyString_FromString(element->name),
                         (PyObject *)pyo);
 
+        //LOG("element refcnt %d",pyo->ob_refcnt);
         // jump to next
         elist = elist->next;
     }
@@ -223,6 +225,7 @@ inkface_create_X_canvas(PyObject *self, PyObject *args, PyObject *kwds)
     x_canvas->element_list = PyList_New(0);
     // Initialize the face list
     x_canvas->face_list = PyList_New(0);
+    x_canvas->__face_list_dirty__ = FALSE;
 
     return (PyObject *)x_canvas;
 }
@@ -322,8 +325,50 @@ inkface_exit(PyObject *self, PyObject *args)
     return Py_None;
 }
 
+static PyObject*
+inkface_release(PyObject *self, PyObject *args)
+{
+    PyObject *face = NULL;
+
+    ASSERT(PyArg_ParseTuple(args,"O",&face));
+    ASSERT(face);
+    Py_DECREF(face);
+}
+
+static PyObject *
+inkface_test_refcnt(PyObject *self, PyObject *args)
+{
+    PyObject *pyo;
+    if(!PyArg_ParseTuple(args,"O",&pyo)){
+        PyErr_Clear();
+        PyErr_SetString(PyExc_ValueError,"Invalid Arguments");
+        return NULL;
+    }
+
+    int i = PySequence_DelItem(pyo,2);
+
+    LOG("delitem returned %d",i);
+    
+    /*
+    LOG("pyo->refcnt = %d",pyo->ob_refcnt);
+    
+    PyObject *list = PyList_New(0);
+    PyList_Append(list,pyo);
+
+    LOG("pyo->refcnt = %d",pyo->ob_refcnt);
+
+    PySequence_DelItem(list,0);
+    LOG("pyo->refcnt = %d",pyo->ob_refcnt);
+    */
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
 static PyMethodDef inkface_methods[] =
 {
+    { "test_refcnt",
+        (PyCFunction)inkface_test_refcnt, METH_VARARGS, NULL },
     { "loadsvg", 
         (PyCFunction)inkface_loadsvg, METH_VARARGS, NULL },
     { "create_X_canvas", 
@@ -332,6 +377,8 @@ static PyMethodDef inkface_methods[] =
         (PyCFunction)inkface_create_GL_canvas, METH_KEYWORDS, NULL },
     { "exit", 
         (PyCFunction)inkface_exit, METH_NOARGS, NULL },
+    { "release", 
+        (PyCFunction)inkface_release, METH_VARARGS, NULL },
     { NULL, NULL, 0, NULL},
 };
 

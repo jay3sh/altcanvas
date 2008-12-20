@@ -140,6 +140,7 @@ element_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 static void
 element_dealloc(Element_t *self)
 {
+    LOG("deallocating %s\n",PyString_AS_STRING((self->name)));
     if (self->name) Py_DECREF(self->name);
     if (self->id) Py_DECREF(self->id);
     if (self->text) Py_DECREF(self->text);

@@ -6,6 +6,9 @@ Import('env')
 
 env.AppendUnique(CFLAGS=['-Isrc/lib'])
 
+env.AppendUnique(CFLAGS=['-pg'])
+
+env.AppendUnique(LINKFLAGS="-pg")
 #
 # Resolve generic library dependencies using pkg-config
 #
@@ -15,7 +18,7 @@ env.ParseConfig("pkg-config --cflags --libs pycairo")
 Import('ARCH')
 #if ARCH != 'armel':
 #    env.ParseConfig("pkg-config --cflags --libs gl")
-#    env.AppendUnique(LINKFLAGS="-lglut")
+#    #env.AppendUnique(LINKFLAGS="-lglut")
 #    env.AppendUnique(CFLAGS=['-DHAS_OPENGL'])
 
 #

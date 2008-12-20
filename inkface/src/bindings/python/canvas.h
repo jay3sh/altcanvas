@@ -18,6 +18,8 @@ typedef struct {
     PyObject *element_list;
     PyObject *face_list;
 
+    int __face_list_dirty__;
+
     // Painting control members
     unsigned int timeout;
 

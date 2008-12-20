@@ -147,9 +147,20 @@ static void dec_dirt_count(canvas_t *self, int count)
     CHK_ERRNO(pthread_mutex_unlock(&(self->dirt_mutex)));
 }
 
-static void canvas_draw_elem(canvas_t *self, Element *elem)
+static void canvas_draw_elem(canvas_t *canvas, Element *elem)
 {
+    unsigned char *surfData = NULL;
+    gl_canvas_t *self = (gl_canvas_t *)canvas;
+    ASSERT(self);
+    ASSERT(elem);
 
+    surfData = cairo_image_surface_get_data(surface);
+
+    glPushMatrix();
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, elem->width, elem->height, 
+                0, GL_RGBA, GL_UNSIGNED_BYTE, surfData);
+
+    glPopMatrix();
 }
 
 gl_canvas_t *gl_canvas_new(void)
