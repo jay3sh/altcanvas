@@ -691,7 +691,7 @@
        id="text3337"
        sodipodi:linespacing="100%"
        order="10"
-       name="keyTilde"><tspan
+       name="keySpTilde"><tspan
          sodipodi:role="line"
          id="tspan3339"
          x="67.387077"
@@ -704,7 +704,7 @@
        id="text3341"
        sodipodi:linespacing="100%"
        order="10"
-       name="keyExclMark"><tspan
+       name="keySpExclaim"><tspan
          sodipodi:role="line"
          id="tspan3343"
          x="114.48852"
@@ -717,7 +717,7 @@
        id="text3345"
        sodipodi:linespacing="100%"
        order="10"
-       name="keyAt"><tspan
+       name="keySpAt"><tspan
          sodipodi:role="line"
          id="tspan3347"
          x="161.58998"
@@ -730,7 +730,7 @@
        id="text3349"
        sodipodi:linespacing="100%"
        order="10"
-       name="keyHash"><tspan
+       name="keySpPound"><tspan
          sodipodi:role="line"
          id="tspan3351"
          x="208.69142"
@@ -743,7 +743,7 @@
        id="text3353"
        sodipodi:linespacing="100%"
        order="10"
-       name="keyDollar"><tspan
+       name="keySpDollar"><tspan
          sodipodi:role="line"
          id="tspan3355"
          x="255.79286"
@@ -756,7 +756,7 @@
        id="text3357"
        sodipodi:linespacing="100%"
        order="10"
-       name="keyPercent"><tspan
+       name="keySpPercent"><tspan
          sodipodi:role="line"
          id="tspan3359"
          x="302.89432"
@@ -769,7 +769,7 @@
        id="text3361"
        sodipodi:linespacing="100%"
        order="10"
-       name="keyCaret"><tspan
+       name="keySpCaret"><tspan
          sodipodi:role="line"
          id="tspan3363"
          x="349.99579"
@@ -782,7 +782,7 @@
        id="text3365"
        sodipodi:linespacing="100%"
        order="10"
-       name="keyAmpersand"><tspan
+       name="keySpAmp"><tspan
          sodipodi:role="line"
          id="tspan3367"
          x="397.09723"
@@ -795,7 +795,7 @@
        id="text3369"
        sodipodi:linespacing="100%"
        order="10"
-       name="keyAsterisk"><tspan
+       name="keySpAsterisk"><tspan
          sodipodi:role="line"
          id="tspan3371"
          x="444.19867"
@@ -808,7 +808,7 @@
        id="text3373"
        sodipodi:linespacing="100%"
        order="10"
-       name="keyLRoundBracket"><tspan
+       name="keySpLPara"><tspan
          sodipodi:role="line"
          id="tspan3375"
          x="491.30014"
@@ -821,7 +821,7 @@
        id="text3377"
        sodipodi:linespacing="100%"
        order="10"
-       name="keyRRoundBracket"><tspan
+       name="keySpRPara"><tspan
          sodipodi:role="line"
          id="tspan3379"
          x="538.40161"
@@ -834,7 +834,7 @@
        id="text3381"
        sodipodi:linespacing="100%"
        order="10"
-       name="keyMinus"><tspan
+       name="keySpMinus"><tspan
          sodipodi:role="line"
          id="tspan3383"
          x="465.14676"
@@ -847,7 +847,7 @@
        id="text3385"
        sodipodi:linespacing="100%"
        order="10"
-       name="keyEqual"><tspan
+       name="keySpEqual"><tspan
          sodipodi:role="line"
          id="tspan3387"
          x="512.87201"
@@ -860,7 +860,7 @@
        id="text3389"
        sodipodi:linespacing="100%"
        order="10"
-       name="keyComma"><tspan
+       name="keySpComma"><tspan
          sodipodi:role="line"
          id="tspan3391"
          x="83.344597"
@@ -873,7 +873,7 @@
        id="text3393"
        sodipodi:linespacing="100%"
        order="10"
-       name="keyPeriod"><tspan
+       name="keySpPeriod"><tspan
          sodipodi:role="line"
          id="tspan3395"
          x="131.06987"
@@ -886,7 +886,7 @@
        id="text3397"
        sodipodi:linespacing="100%"
        order="10"
-       name="keyFSlash"><tspan
+       name="keySpFSlash"><tspan
          sodipodi:role="line"
          id="tspan3399"
          x="178.79512"
@@ -899,7 +899,7 @@
        id="text3401"
        sodipodi:linespacing="100%"
        order="10"
-       name="keySemicolon"><tspan
+       name="keySpSemicolon"><tspan
          sodipodi:role="line"
          id="tspan3403"
          x="226.52039"
@@ -912,7 +912,7 @@
        id="text3405"
        sodipodi:linespacing="100%"
        order="10"
-       name="keySingleQuote"><tspan
+       name="keySpSQuote"><tspan
          sodipodi:role="line"
          id="tspan3407"
          x="274.2457"
@@ -925,7 +925,7 @@
        id="text3409"
        sodipodi:linespacing="100%"
        order="10"
-       name="keyLSquareBracket"><tspan
+       name="keySpLSqBracket"><tspan
          sodipodi:role="line"
          id="tspan3411"
          x="321.97095"
@@ -938,7 +938,7 @@
        id="text3413"
        sodipodi:linespacing="100%"
        order="10"
-       name="keyRSquareBracket"><tspan
+       name="keySpRSqBracket"><tspan
          sodipodi:role="line"
          id="tspan3415"
          x="369.69623"
@@ -951,7 +951,7 @@
        id="text3417"
        sodipodi:linespacing="100%"
        order="10"
-       name="keyBSlash"><tspan
+       name="keySpBSlash"><tspan
          sodipodi:role="line"
          id="tspan3419"
          x="417.42151"
@@ -1479,7 +1479,7 @@
        id="text2659"
        sodipodi:linespacing="100%"
        order="20"
-       name="keyTildeGlow"
+       name="keySpTildeGlow"
        transform="scale(0.9991928,1.0008078)"><tspan
          sodipodi:role="line"
          id="tspan2661"
@@ -1493,7 +1493,7 @@
        id="text2663"
        sodipodi:linespacing="100%"
        order="20"
-       name="keyExclMarkGlow"
+       name="keySpExclaimGlow"
        transform="scale(0.9991928,1.0008078)"><tspan
          sodipodi:role="line"
          id="tspan2665"
@@ -1507,7 +1507,7 @@
        id="text2667"
        sodipodi:linespacing="100%"
        order="20"
-       name="keyAtGlow"
+       name="keySpAtGlow"
        transform="scale(0.9991928,1.0008078)"><tspan
          sodipodi:role="line"
          id="tspan2669"
@@ -1521,7 +1521,7 @@
        id="text2671"
        sodipodi:linespacing="100%"
        order="20"
-       name="keyHashGlow"
+       name="keySpPoundGlow"
        transform="scale(0.9991928,1.0008078)"><tspan
          sodipodi:role="line"
          id="tspan2673"
@@ -1535,7 +1535,7 @@
        id="text2675"
        sodipodi:linespacing="100%"
        order="20"
-       name="keyDollarGlow"
+       name="keySpDollarGlow"
        transform="scale(0.9991928,1.0008078)"><tspan
          sodipodi:role="line"
          id="tspan2677"
@@ -1549,7 +1549,7 @@
        id="text2679"
        sodipodi:linespacing="100%"
        order="20"
-       name="keyPercentGlow"
+       name="keySpPercentGlow"
        transform="scale(0.9991928,1.0008078)"><tspan
          sodipodi:role="line"
          id="tspan2681"
@@ -1563,7 +1563,7 @@
        id="text2683"
        sodipodi:linespacing="100%"
        order="20"
-       name="keyCaretGlow"
+       name="keySpCaretGlow"
        transform="scale(0.9991928,1.0008078)"><tspan
          sodipodi:role="line"
          id="tspan2685"
@@ -1577,7 +1577,7 @@
        id="text2687"
        sodipodi:linespacing="100%"
        order="20"
-       name="keyAmpersandGlow"
+       name="keySpAmpGlow"
        transform="scale(0.9991928,1.0008078)"><tspan
          sodipodi:role="line"
          id="tspan2689"
@@ -1591,7 +1591,7 @@
        id="text2691"
        sodipodi:linespacing="100%"
        order="20"
-       name="keyAsteriskGlow"
+       name="keySpAsteriskGlow"
        transform="scale(0.9991928,1.0008078)"><tspan
          sodipodi:role="line"
          id="tspan2693"
@@ -1605,7 +1605,7 @@
        id="text2695"
        sodipodi:linespacing="100%"
        order="20"
-       name="keyLRoundBracketGlow"
+       name="keySpLParaGlow"
        transform="scale(0.9991928,1.0008078)"><tspan
          sodipodi:role="line"
          id="tspan2697"
@@ -1619,7 +1619,7 @@
        id="text2699"
        sodipodi:linespacing="100%"
        order="20"
-       name="keyRRoundBracketGlow"
+       name="keySpRParaGlow"
        transform="scale(0.9991928,1.0008078)"><tspan
          sodipodi:role="line"
          id="tspan2701"
@@ -1633,7 +1633,7 @@
        id="text2703"
        sodipodi:linespacing="100%"
        order="20"
-       name="keyMinusGlow"
+       name="keySpMinusGlow"
        transform="scale(0.9991928,1.0008078)"><tspan
          sodipodi:role="line"
          id="tspan2705"
@@ -1647,7 +1647,7 @@
        id="text2707"
        sodipodi:linespacing="100%"
        order="20"
-       name="keyEqualGlow"
+       name="keySpEqualGlow"
        transform="scale(0.9991928,1.0008078)"><tspan
          sodipodi:role="line"
          id="tspan2709"
@@ -1661,7 +1661,7 @@
        id="text2711"
        sodipodi:linespacing="100%"
        order="20"
-       name="keyCommaGlow"
+       name="keySpCommaGlow"
        transform="scale(0.9991928,1.0008078)"><tspan
          sodipodi:role="line"
          id="tspan2713"
@@ -1675,7 +1675,7 @@
        id="text2715"
        sodipodi:linespacing="100%"
        order="20"
-       name="keyPeriodGlow"
+       name="keySpPeriodGlow"
        transform="scale(0.9991928,1.0008078)"><tspan
          sodipodi:role="line"
          id="tspan2717"
@@ -1689,7 +1689,7 @@
        id="text2719"
        sodipodi:linespacing="100%"
        order="20"
-       name="keyFSlashGlow"
+       name="keySpFSlashGlow"
        transform="scale(0.9991928,1.0008078)"><tspan
          sodipodi:role="line"
          id="tspan2721"
@@ -1703,7 +1703,7 @@
        id="text2723"
        sodipodi:linespacing="100%"
        order="20"
-       name="keySemicolonGlow"
+       name="keySpSemicolonGlow"
        transform="scale(0.9991928,1.0008078)"><tspan
          sodipodi:role="line"
          id="tspan2725"
@@ -1717,7 +1717,7 @@
        id="text2727"
        sodipodi:linespacing="100%"
        order="20"
-       name="keySingleQuoteGlow"
+       name="keySpSingleQuoteGlow"
        transform="scale(0.9991928,1.0008078)"><tspan
          sodipodi:role="line"
          id="tspan2729"
@@ -1731,7 +1731,7 @@
        id="text2731"
        sodipodi:linespacing="100%"
        order="20"
-       name="keyLSquareBracketGlow"
+       name="keySpLSqBracketGlow"
        transform="scale(0.9991928,1.0008078)"><tspan
          sodipodi:role="line"
          id="tspan2733"
@@ -1745,7 +1745,7 @@
        id="text2735"
        sodipodi:linespacing="100%"
        order="20"
-       name="keyRSquareBracketGlow"
+       name="keySpRSqBracketGlow"
        transform="scale(0.9991928,1.0008078)"><tspan
          sodipodi:role="line"
          id="tspan2737"
@@ -1759,7 +1759,7 @@
        id="text2739"
        sodipodi:linespacing="100%"
        order="20"
-       name="keyBSlashGlow"
+       name="keySpBSlashGlow"
        transform="scale(0.9991928,1.0008078)"><tspan
          sodipodi:role="line"
          id="tspan2741"
@@ -1994,25 +1994,55 @@
        transform="translate(141.66964,165.5799)"
        name="keyCancel"
        order="10">
-      <text
-         id="text4190"
-         y="254.21904"
-         x="541.18494"
-         style="font-size:18px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans Bold"
-         xml:space="preserve"><tspan
-           y="254.21904"
+      <g
+         id="g2688">
+        <text
+           xml:space="preserve"
+           style="font-size:18px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans Bold"
            x="541.18494"
-           id="tspan4192"
-           sodipodi:role="line">cancel</tspan></text>
-      <rect
-         ry="5"
-         rx="5"
-         y="233.26031"
-         x="530.25854"
-         height="33.608616"
-         width="82.728905"
-         id="rect4194"
-         style="fill:none;stroke:#ffffff;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+           y="254.21904"
+           id="text4190"><tspan
+             sodipodi:role="line"
+             id="tspan4192"
+             x="541.18494"
+             y="254.21904">cancel</tspan></text>
+        <rect
+           style="fill:none;stroke:#ffffff;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           id="rect4194"
+           width="82.728905"
+           height="33.608616"
+           x="530.25854"
+           y="233.26031"
+           rx="5"
+           ry="5" />
+      </g>
     </g>
+    <text
+       xml:space="preserve"
+       style="font-size:60.51362991px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Courier 10 Pitch;-inkscape-font-specification:Courier 10 Pitch Bold"
+       x="566.27374"
+       y="385.96216"
+       id="text2680"
+       sodipodi:linespacing="100%"
+       order="20"
+       name="keySpPlusGlow"
+       transform="scale(0.9991928,1.0008078)"><tspan
+         sodipodi:role="line"
+         id="tspan2682"
+         x="566.27374"
+         y="385.96216">+</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:32px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Courier 10 Pitch;-inkscape-font-specification:Courier 10 Pitch Bold"
+       x="577.2157"
+       y="411.61115"
+       id="text2684"
+       sodipodi:linespacing="100%"
+       order="10"
+       name="keySpPlus"><tspan
+         sodipodi:role="line"
+         id="tspan2686"
+         x="577.2157"
+         y="411.61115">+</tspan></text>
   </g>
 </svg>
