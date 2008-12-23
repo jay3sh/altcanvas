@@ -17,7 +17,6 @@ from imgloader import ImageLoader
 
 import sys
 
-
 class TwitGui(inklib.Face):
     twtApi = None
     PUBLIC_TIMELINE = 0
@@ -71,22 +70,36 @@ class TwitGui(inklib.Face):
             self.publicButton.onDraw = self.dodraw
             self.publicFocusButton.onDraw = self.donotdraw
             self.publicButton.onTap = self.togglePublicButton
+            for name,elem in self.elements.items():
+                if name.startswith('publicCloud') or \
+                    name.startswith('publicTwt'):
+                    elem.onDraw = self.dodraw
         else:
             self.publicButton.onDraw = self.donotdraw
             self.publicFocusButton.onDraw = self.dodraw
             self.publicFocusButton.onTap = self.togglePublicButton
+            for name,elem in self.elements.items():
+                if name.startswith('publicCloud') or \
+                    name.startswith('publicTwt'):
+                    elem.onDraw = self.donotdraw
 
     def toggleFriendsButton(self,e):
         if self.friendsButton.onDraw == self.donotdraw:
-            print 'friends ON'
             self.friendsButton.onDraw = self.dodraw
             self.friendsFocusButton.onDraw = self.donotdraw
             self.friendsButton.onTap = self.toggleFriendsButton
+            for name,elem in self.elements.items():
+                if name.startswith('friendCloud') or \
+                    name.startswith('friendTwt'):
+                    elem.onDraw = self.dodraw
         else:
-            print 'friends OFF'
             self.friendsButton.onDraw = self.donotdraw
             self.friendsFocusButton.onDraw = self.dodraw
             self.friendsButton.onTap = self.toggleFriendsButton
+            for name,elem in self.elements.items():
+                if name.startswith('friendCloud') or \
+                    name.startswith('friendTwt'):
+                    elem.onDraw = self.donotdraw
 
     def dodraw(self,e):
         self.canvas.draw(e)
