@@ -16,8 +16,10 @@ class Face:
             for name,elem in self.elements.items():
                 self.__dict__[name] = elem
 
-    def unload(self):
-        print 'Unloading face '+str(self.__class__)
+    def wire(self):
+        print 'This method should be overloaded by '+str(self.__class__)
+
+    def unwire(self):
         for elem in self.elements.values():
             elem.onMouseEnter = None
             elem.onMouseLeave = None
