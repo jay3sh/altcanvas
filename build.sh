@@ -100,11 +100,32 @@ make_maemo_publishr()
 
 }
 
-make_altplayer()
+make_inklib()
 {
 	rm -rf $TMP_BLDDIR
 	mkdir $TMP_BLDDIR
 
+	(
+		cd $TMP_BLDDIR
+        ln -s $SRCDIR/inkface/inklib/python/setup.py ./setup.py
+        ln -s $SRCDIR/install/bdist_debian.py ./bdist_debian.py
+        ln -s $SRCDIR/inkface/inklib/python/inklib ./inklib
+
+		$PYTHON setup.py bdist_debian || exit
+
+		if ! [ -d $BLDDIR ]; then
+			mkdir $BLDDIR;
+		fi
+
+		mv dist/*.deb $BLDDIR/
+    )
+
+	rm -rf $TMP_BLDDIR
+}
+make_altplayer()
+{
+	rm -rf $TMP_BLDDIR
+	mkdir $TMP_BLDDIR
 
 	(
 		cd $TMP_BLDDIR
@@ -290,6 +311,9 @@ case $PACKAGE in
         ;;
     "stackless")
         make_stackless;
+        ;;
+     "inklib")
+        make_inklib;
         ;;
 esac
 
