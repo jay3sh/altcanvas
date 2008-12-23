@@ -339,6 +339,9 @@ p_canvas_add(Canvas_t *self, PyObject *args)
         Py_RETURN_FALSE;
     }
 
+    // Wire the Face object's callbacks
+    PyObject_CallMethod(face_pyo,"wire",NULL);        
+
     // Check if this Face object is already added to the canvas
     if(PySequence_Contains(self->face_list,face_pyo)) Py_RETURN_FALSE;
 
@@ -428,10 +431,10 @@ canvas_cleanup_faces_pending_removal(Canvas_t *self)
     PyObject *remface_item = NULL;
     while(remface_item = PyIter_Next(remface_iter))
     {
-        PyObject_CallMethod(remface_item,"unload",NULL);        
+        PyObject_CallMethod(remface_item,"unwire",NULL);        
         Py_DECREF(remface_item);
 
-        LOG("face refcnt after unload: %d",
+        LOG("face refcnt after unwire: %d",
             remface_item->ob_refcnt);
     }
     Py_DECREF(remface_iter);
