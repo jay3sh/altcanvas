@@ -29,27 +29,35 @@ class TwitGui(inklib.Face):
     friend_twt_pattern = 'friendTwt(\d+)'
     friend_img_pattern = 'friendImg(\d+)'
 
-    def __init__(self,canvas,svgname,api):
+    def __init__(self,canvas,svgname,api,kbd=None):
         inklib.Face.__init__(self,canvas,svgname)
 
         self.twitButton.onTap = self.onTwit
         self.quitButton.onTap = self.onExit
 
-        self.kbd = Keyboard(self.canvas)
+        if kbd:
+            self.kbd = kbd
+        else:
+            self.kbd = Keyboard(self.canvas)
 
         self.twtApi = api
 
         for name,elem in self.elements.items():
             if name.startswith('publicTwt') or name.startswith('publicCloud'):
-                elem.onTap = self.FocusPublicTwt
+                #elem.onTap = self.FocusPublicTwt
+                pass
             elif name.startswith('friendTwt') or name.startswith('friendCloud'):
-                elem.onTap = self.FocusFriendTwt
-                elem.onMouseLeave = self.lostFocusTwt
-            elif name.startswith('friendImg') or name.startswith('friendFrame'):
+                #elem.onTap = self.FocusFriendTwt
+                #elem.onMouseLeave = self.lostFocusTwt
+                pass
+            elif name.startswith('friendImg'):
+                #elem.onDraw = self.drawProfileImage
+                elem.onDraw = self.donotdraw
+            elif name.startswith('friendFrame'):
                 elem.onDraw = self.donotdraw
 
-        self.iloader = ImageLoader(None)
-        self.iloader.start()
+        #self.iloader = ImageLoader(None)
+        #self.iloader.start()
 
     def donotdraw(self,e):
         pass
@@ -58,7 +66,6 @@ class TwitGui(inklib.Face):
         self.canvas.draw(e)
 
     def drawProfileImage(self,e):
-        #print 'TG: drawProfileImage for '+e.name
         m = re.match(self.friend_img_pattern,e.name)
         if m:
             num = m.group(1)
@@ -66,15 +73,15 @@ class TwitGui(inklib.Face):
 
             if twt:
                 url = twt.GetUser().profile_image_url
-                #print 'TG: Getting cairo surface for '+url
 
                 img_surface = e.user_data
                 if not img_surface:
-                    img_surface = self.iloader.get_image_surface(url)
+                    #img_surface = self.iloader.get_image_surface(url)
                     e.user_data = img_surface
 
                 if not img_surface:
                     return
+                print 'TG: drawing img surface '+num
                 ctx = cairo.Context(e.surface)
                 sx = e.surface.get_width()*1.0/img_surface.get_width()
                 sy = e.surface.get_height()*1.0/img_surface.get_height()
@@ -83,7 +90,7 @@ class TwitGui(inklib.Face):
                 ctx.paint()
                 self.canvas.draw(e)
                 self.canvas.refresh()
-                #print 'TG: Drew the image'
+                print 'TG: Drew the image '+num
         
     def lostFocusTwt(self,e):
         m = re.match(self.friend_cloud_pattern,e.name) or \
@@ -122,15 +129,18 @@ class TwitGui(inklib.Face):
             if type == self.PUBLIC_TIMELINE:
                 LINE_LIMIT = 25 
                 elem_prefix = 'publicTwt'
+                print 'Fetching Public timeline'
                 twt_list = self.twtApi.GetPublicTimeline()
             else:
-                LINE_LIMIT = 55 
+                LINE_LIMIT = 65 
                 elem_prefix = 'friendTwt'
+                print 'Fetching Friends timeline'
                 twt_list = self.twtApi.GetFriendsTimeline()
         except urllib2.URLError, urle:
             print 'Error connecting to Twitter: '+str(urle)
             return
 
+        print 'Processing timeline'
         i = 0
         image_list = []
         for name,elem in self.elements.items():
@@ -165,13 +175,13 @@ class TwitGui(inklib.Face):
                 elem.refresh()
                 i += 1
 
-        self.iloader.add_img_url(image_list)
+        #self.iloader.add_img_url(image_list)
         self.canvas.refresh()
         
     def onExit(self,e):
-        self.iloader.stop = True
-        print 'Waiting for imageLoader to stop'
-        self.iloader.join()
+        #self.iloader.stop = True
+        #print 'Waiting for imageLoader to stop'
+        #self.iloader.join()
         self.resultProcessor()
 
     def publishTwit(self,txt=None):
@@ -193,9 +203,10 @@ class TwitGui(inklib.Face):
 class TwitterApp:
     def __init__(self):
         self.canvas = inkface.create_X_canvas()
+        self.kbd = Keyboard(self.canvas)
 
     def main(self):
-        self.loginGui = LoginGui(self.canvas,'login.svg')
+        self.loginGui = LoginGui(self.canvas,'login.svg',kbd=self.kbd)
         self.loginGui.resultProcessor = self.onLoginSuccess
         self.canvas.add(self.loginGui)
 
@@ -205,7 +216,8 @@ class TwitterApp:
         self.canvas.remove(self.loginGui)
         del self.loginGui
 
-        self.twitGui = TwitGui(self.canvas,'public.svg',twitterApi)
+        self.twitGui = TwitGui(self.canvas,'public.svg',
+                            twitterApi,kbd=self.kbd)
         self.twitGui.resultProcessor = self.onExit
         self.canvas.add(self.twitGui)
         self.canvas.refresh()
@@ -214,17 +226,14 @@ class TwitterApp:
         self.twitGui.loadTimeline(self.twitGui.PUBLIC_TIMELINE)
 
     def onExit(self,user_data=None):
-        #from time import sleep
         self.canvas.remove(self.twitGui)
-        print 'twitGui refcount %d'%sys.getrefcount(self.twitGui)
         del self.twitGui
-        #for i in range(10):
-        #    print 'waiting %d'%i
-        #    sleep(1)
-        #inkface.exit()
+        inkface.exit()
 
 
 if __name__ == '__main__':
+    #import cProfile
+    #cProfile.run('TwitterApp().main()','twit.prof')
     TwitterApp().main()
 
 

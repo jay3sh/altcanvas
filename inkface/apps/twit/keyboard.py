@@ -3,7 +3,8 @@ import inkface
 import inklib
 import re
 
-KEYBOARD_SVG='keyboard.svg'
+#KEYBOARD_SVG='keyboard.svg'
+KEYBOARD_SVG='keyboard-lite.svg'
 
 special_key_map = {
     'Tilde':'~',
@@ -43,12 +44,25 @@ class Keyboard(inklib.Face):
 
         for k,e in self.elements.items():
             if e.name.startswith('keySp') and not e.name.endswith('Glow'):
-                e.onTap = self.onSpecialKey;
+                pass
             elif e.name.startswith('key'):
                 if e.name.endswith('Glow'):
                     e.opacity = 0
-                    e.onDraw = self.glowDraw
                     self.glowing_elements[e.name] = 0
+
+        self.keyboardText.text = ''
+        self.keyboardText.refresh()
+
+        self.wire()
+
+
+    def wire(self):
+        for k,e in self.elements.items():
+            if e.name.startswith('keySp') and not e.name.endswith('Glow'):
+                e.onTap = self.onSpecialKey;
+            elif e.name.startswith('key'):
+                if e.name.endswith('Glow'):
+                    e.onDraw = self.glowDraw
                 else:
                     e.onTap = self.onAlNumTap
 
@@ -60,12 +74,10 @@ class Keyboard(inklib.Face):
 
         self.keyboardText.onTap = None
         self.keyboardEntry.onTap = None
-        self.keyboardText.text = ''
-        self.keyboardText.refresh()
 
         #self.canvas.onTimer = self.onTimer
         #self.canvas.timeout = 100
-
+       
     def onSpecialKey(self,e):
         m = re.match('keySp(\w+)',e.name)
 
@@ -87,7 +99,7 @@ class Keyboard(inklib.Face):
             self.typedtext += keyLetter
 
         self.keyboardText.refresh()
-        canvas.refresh()
+        self.canvas.refresh()
         
     def onBackspace(self,e):
         self.keyboardText.text = self.keyboardText.text[:-1]
