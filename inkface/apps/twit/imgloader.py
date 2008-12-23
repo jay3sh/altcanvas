@@ -33,7 +33,11 @@ class ImageLoader(threading.Thread):
     
     def get_image_surface(self,url):
         self.__img_map_lock__.acquire()
-        localfile = self.__img_map__[url]
+        try:
+            localfile = self.__img_map__[url]
+        except KeyError, ke:
+            self.__img_map_lock__.release()
+            return None
         self.__img_map_lock__.release()
 
         if localfile:
@@ -43,10 +47,8 @@ class ImageLoader(threading.Thread):
                     #print "PNG file doesn't exist for "+url
                     return None
                 else:
-                    #print 'IL: 1# '+png_name
                     return cairo.ImageSurface.create_from_png(png_name)
             else:
-                #print 'IL: 2# '+localfile
                 return cairo.ImageSurface.create_from_png(localfile)
         else:
             # Image is not yet loaded
@@ -77,12 +79,24 @@ class ImageLoader(threading.Thread):
             for url,localfile in map_items:
                 if localfile:
                     if not os.path.exists(localfile):
-                        urllib.urlretrieve(url,localfile)
+                        try:
+                            urllib.urlretrieve(url,localfile)
+                        except UnicodeError, ue:
+                            print 'Error fetching img URL'+str(ue)
+                            continue
 
                     if not localfile.endswith('png'):
-                        jpg = Image.open(localfile)
-                        png_name = '.'.join(localfile.split('.')[:-1]) + '.png'
-                        jpg.save(png_name)
+                        try:
+                            jpg = Image.open(localfile)
+                            png_name = \
+                                '.'.join(localfile.split('.')[:-1]) + '.png'
+                            jpg.save(png_name)
+                        except IOError,ioe:
+                            # We cannot process this image
+                            self.__img_map_lock__.acquire()
+                            del self.__img_map__[url]
+                            self.__img_map_lock__.release()
+                            print 'Error processing '+localfile+': '+str(ioe)
 
                     if self.stop:
                         return
