@@ -51,9 +51,9 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.1604167"
-     inkscape:cx="400.00001"
-     inkscape:cy="291.82036"
+     inkscape:zoom="1.15"
+     inkscape:cx="400"
+     inkscape:cy="240"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -370,7 +370,7 @@
          y="369.64426">text</tspan></text>
     <g
        id="g4789"
-       transform="translate(774.2334,18.289046)"
+       transform="translate(772.2334,18.289046)"
        name="friendsButton"
        order="1000">
       <rect
@@ -381,7 +381,7 @@
          height="157.278"
          width="35"
          id="rect4777"
-         style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
       <text
          transform="matrix(0,-1,1,0,0,0)"
          id="text4783"
@@ -396,7 +396,7 @@
     </g>
     <g
        id="g4794"
-       transform="translate(765.16697,24.393175)"
+       transform="translate(761.16697,24.393175)"
        name="publicButton"
        order="1000">
       <rect
@@ -407,7 +407,7 @@
          height="157.278"
          width="35"
          id="rect4787"
-         style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
       <text
          transform="matrix(0,-1,1,0,0,0)"
          id="text4779"
@@ -499,84 +499,91 @@
        order="100" />
     <text
        xml:space="preserve"
-       style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Purisa;-inkscape-font-specification:Purisa Light;text-anchor:start;text-align:start;writing-mode:lr;line-height:125%"
        x="37.05566"
        y="45.673252"
        id="text5557"
        name="friendTwt0"
-       order="113"><tspan
+       order="113"
+       sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan5559"
          x="37.05566"
          y="45.673252">text</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Purisa;-inkscape-font-specification:Purisa Light;text-anchor:start;text-align:start;writing-mode:lr;line-height:125%"
        x="101.12933"
        y="102.70895"
        id="text5561"
        name="friendTwt1"
-       order="111"><tspan
+       order="111"
+       sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan5563"
          x="101.12933"
          y="102.70895">text</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Purisa;-inkscape-font-specification:Purisa Light;text-anchor:start;text-align:start;writing-mode:lr;line-height:125%"
        x="24.432755"
        y="166.47914"
        id="text5565"
        name="friendTwt2"
-       order="109"><tspan
+       order="109"
+       sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan5567"
          x="24.432755"
          y="166.47914">text</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Purisa;-inkscape-font-specification:Purisa Light;text-anchor:start;text-align:start;writing-mode:lr;line-height:125%"
        x="66.658966"
        y="228.52582"
        id="text5569"
        name="friendTwt3"
-       order="107"><tspan
+       order="107"
+       sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan5571"
          x="66.658966"
          y="228.52582">text</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Purisa;-inkscape-font-specification:Purisa Light;text-anchor:start;text-align:start;writing-mode:lr;line-height:125%"
        x="108.02341"
        y="292.29602"
        id="text5573"
        name="friendTwt4"
-       order="105"><tspan
+       order="105"
+       sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan5575"
          x="108.02341"
          y="292.29602">text</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Purisa;-inkscape-font-specification:Purisa Light;text-anchor:start;text-align:start;writing-mode:lr;line-height:125%"
        x="84.75592"
        y="356.92798"
        id="text5577"
        name="friendTwt5"
-       order="103"><tspan
+       order="103"
+       sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan5579"
          x="84.75592"
          y="356.92798">text</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Purisa;-inkscape-font-specification:Purisa Light;text-anchor:start;text-align:start;writing-mode:lr;line-height:125%"
        x="39.082664"
        y="418.97464"
        id="text5581"
        name="friendTwt6"
-       order="101"><tspan
+       order="101"
+       sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan5583"
          x="39.082664"
@@ -620,7 +627,7 @@
        width="94.043297"
        height="93.88987"
        x="618.30347"
-       y="196.70856"
+       y="194.70856"
        rx="14.106494"
        ry="14.083482"
        name="friendImg3"
@@ -735,5 +742,57 @@
        ry="15"
        name="friendFrame6"
        order="150" />
+    <g
+       id="g2482"
+       transform="translate(769.41918,19.05221)"
+       name="friendsFocusButton"
+       order="1000">
+      <rect
+         ry="9"
+         rx="9"
+         y="54.219028"
+         x="-6.6894073"
+         height="157.278"
+         width="35"
+         id="rect2484"
+         style="fill:#00ffff;fill-opacity:1;stroke:#000000;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         transform="matrix(0,-1,1,0,0,0)"
+         id="text2486"
+         y="17.113012"
+         x="-168.91795"
+         style="font-size:18px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans Bold"
+         xml:space="preserve"><tspan
+           y="17.113012"
+           x="-168.91795"
+           id="tspan2488"
+           sodipodi:role="line">friends</tspan></text>
+    </g>
+    <g
+       id="g2490"
+       transform="translate(761.2971,24.606977)"
+       name="publicFocusButton"
+       order="1000">
+      <rect
+         ry="9"
+         rx="9"
+         y="238.04308"
+         x="1.2387793"
+         height="157.278"
+         width="35"
+         id="rect2492"
+         style="fill:#00ffff;fill-opacity:1;stroke:#000000;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         transform="matrix(0,-1,1,0,0,0)"
+         id="text2494"
+         y="25.693451"
+         x="-350.82111"
+         style="font-size:18px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans Bold"
+         xml:space="preserve"><tspan
+           y="25.693451"
+           x="-350.82111"
+           id="tspan2496"
+           sodipodi:role="line">public</tspan></text>
+    </g>
   </g>
 </svg>

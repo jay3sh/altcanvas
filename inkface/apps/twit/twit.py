@@ -56,8 +56,40 @@ class TwitGui(inklib.Face):
             elif name.startswith('friendFrame'):
                 elem.onDraw = self.donotdraw
 
+        self.publicButton.onDraw = self.dodraw
+        self.publicButton.onTap = self.togglePublicButton
+        self.publicFocusButton.onDraw = self.donotdraw
+        
+        self.friendsButton.onDraw = self.dodraw
+        self.friendsButton.onTap = self.toggleFriendsButton
+        self.friendsFocusButton.onDraw = self.donotdraw
         #self.iloader = ImageLoader(None)
         #self.iloader.start()
+
+    def togglePublicButton(self,e):
+        if self.publicButton.onDraw == self.donotdraw:
+            self.publicButton.onDraw = self.dodraw
+            self.publicFocusButton.onDraw = self.donotdraw
+            self.publicButton.onTap = self.togglePublicButton
+        else:
+            self.publicButton.onDraw = self.donotdraw
+            self.publicFocusButton.onDraw = self.dodraw
+            self.publicFocusButton.onTap = self.togglePublicButton
+
+    def toggleFriendsButton(self,e):
+        if self.friendsButton.onDraw == self.donotdraw:
+            print 'friends ON'
+            self.friendsButton.onDraw = self.dodraw
+            self.friendsFocusButton.onDraw = self.donotdraw
+            self.friendsButton.onTap = self.toggleFriendsButton
+        else:
+            print 'friends OFF'
+            self.friendsButton.onDraw = self.donotdraw
+            self.friendsFocusButton.onDraw = self.dodraw
+            self.friendsButton.onTap = self.toggleFriendsButton
+
+    def dodraw(self,e):
+        self.canvas.draw(e)
 
     def donotdraw(self,e):
         pass
