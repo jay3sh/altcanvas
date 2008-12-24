@@ -8,8 +8,8 @@ import os
 import sys
 
 class LoginGui(inklib.Face):
-    username = os.environ['TWT_USERNAME']
-    password = os.environ['TWT_PASSWORD']
+    username = 'username'
+    password = 'password'
     def __init__(self,canvas,svgname,kbd=None):
         inklib.Face.__init__(self,canvas,svgname)
 

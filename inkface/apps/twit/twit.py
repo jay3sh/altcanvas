@@ -262,7 +262,7 @@ class TwitGui(inklib.Face):
 
 class TwitterApp:
     def __init__(self):
-        self.canvas = inkface.create_X_canvas()
+        self.canvas = inkface.create_X_canvas(fullscreen=True)
         self.kbd = Keyboard(self.canvas)
 
     def main(self):
