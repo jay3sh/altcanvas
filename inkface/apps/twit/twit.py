@@ -91,7 +91,8 @@ class TwitGui(inklib.Face):
             self.friendsButton.onTap = self.toggleFriendsButton
             for name,elem in self.elements.items():
                 if name.startswith('friendCloud') or \
-                    name.startswith('friendTwt'):
+                    name.startswith('friendTwt') or \
+                    name.startswith('friendName'):
                     elem.onDraw = self.dodraw
         else:
             self.friendsButton.onDraw = self.donotdraw
@@ -99,7 +100,8 @@ class TwitGui(inklib.Face):
             self.friendsButton.onTap = self.toggleFriendsButton
             for name,elem in self.elements.items():
                 if name.startswith('friendCloud') or \
-                    name.startswith('friendTwt'):
+                    name.startswith('friendTwt') or \
+                    name.startswith('friendName'):
                     elem.onDraw = self.donotdraw
 
     def dodraw(self,e):
