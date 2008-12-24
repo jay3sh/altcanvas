@@ -434,8 +434,8 @@ canvas_cleanup_faces_pending_removal(Canvas_t *self)
         PyObject_CallMethod(remface_item,"unwire",NULL);        
         Py_DECREF(remface_item);
 
-        LOG("face refcnt after unwire: %d",
-            remface_item->ob_refcnt);
+        //LOG("face refcnt after unwire: %d",
+        //    remface_item->ob_refcnt);
     }
     Py_DECREF(remface_iter);
 
