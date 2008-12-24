@@ -62,6 +62,7 @@ class TwitGui(inklib.Face):
         self.friendsButton.onDraw = self.dodraw
         self.friendsButton.onTap = self.toggleFriendsButton
         self.friendsFocusButton.onDraw = self.donotdraw
+
         #self.iloader = ImageLoader(None)
         #self.iloader.start()
 
@@ -173,12 +174,12 @@ class TwitGui(inklib.Face):
         try:
             if type == self.PUBLIC_TIMELINE:
                 LINE_LIMIT = 25 
-                elem_prefix = 'publicTwt'
+                elem_prefix = 'public'
                 print 'Fetching Public timeline'
                 twt_list = self.twtApi.GetPublicTimeline()
             else:
                 LINE_LIMIT = 65 
-                elem_prefix = 'friendTwt'
+                elem_prefix = 'friend'
                 print 'Fetching Friends timeline'
                 twt_list = self.twtApi.GetFriendsTimeline()
         except urllib2.URLError, urle:
@@ -191,15 +192,25 @@ class TwitGui(inklib.Face):
         for name,elem in self.elements.items():
             j = 1
             twt_text = ''
-            if name.startswith(elem_prefix):
+            if name.startswith(elem_prefix+'Twt'):
 
                 # Iterate till we get an ascii string
                 while True:
                     try:
-                        ascii_twt = str(twt_list[i].text)
+                        twt_text = str(twt_list[i].text)
                         elem.user_data = twt_list[i]
+
+                        twt_user = twt_list[i].GetUser().screen_name
+                        m = re.match(self.friend_twt_pattern,elem.name)
+
+                        if m:
+                            num = m.group(1)
+                            fnelem = self.elements['friendName'+num]
+                            fnelem.text = '@'+twt_user
+                            fnelem.refresh()
                         image_list.append(
                             twt_list[i].GetUser().profile_image_url)
+
                     except UnicodeEncodeError, uee:
                         i += 1
                     except IndexError, ie:
@@ -209,7 +220,7 @@ class TwitGui(inklib.Face):
                         break
 
                 # Chop the ascii tweet into multiple lines
-                for c in ascii_twt:
+                for c in twt_text:
                     if j%LINE_LIMIT == 0:
                         twt_text += '\n'+c
                     else:
@@ -241,6 +252,9 @@ class TwitGui(inklib.Face):
         self.canvas.add(self.kbd)
         self.canvas.refresh()
 
+    def turnOffLoadingLabel(self):
+        self.loadingLabel.onDraw = self.donotdraw
+        self.canvas.refresh()
 #
 # Control Flow
 # 
@@ -269,6 +283,8 @@ class TwitterApp:
 
         self.twitGui.loadTimeline(self.twitGui.FRIENDS_TIMELINE)
         self.twitGui.loadTimeline(self.twitGui.PUBLIC_TIMELINE)
+
+        self.twitGui.turnOffLoadingLabel()
 
     def onExit(self,user_data=None):
         self.canvas.remove(self.twitGui)
