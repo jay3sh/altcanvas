@@ -175,18 +175,15 @@ class TwitGui(inklib.Face):
             if type == self.PUBLIC_TIMELINE:
                 LINE_LIMIT = 25 
                 elem_prefix = 'public'
-                print 'Fetching Public timeline'
                 twt_list = self.twtApi.GetPublicTimeline()
             else:
                 LINE_LIMIT = 65 
                 elem_prefix = 'friend'
-                print 'Fetching Friends timeline'
                 twt_list = self.twtApi.GetFriendsTimeline()
         except urllib2.URLError, urle:
             print 'Error connecting to Twitter: '+str(urle)
             return
 
-        print 'Processing timeline'
         i = 0
         image_list = []
         for name,elem in self.elements.items():
@@ -220,14 +217,18 @@ class TwitGui(inklib.Face):
                         break
 
                 # Chop the ascii tweet into multiple lines
+                twt_text_norm = ''
                 for c in twt_text:
+                    if c == '\n':
+                        j += 1
+                        continue
                     if j%LINE_LIMIT == 0:
-                        twt_text += '\n'+c
+                        twt_text_norm += '\n'+c
                     else:
-                        twt_text += c
+                        twt_text_norm += c
                     j += 1    
 
-                elem.text = twt_text
+                elem.text = twt_text_norm
                 elem.refresh()
                 i += 1
 
