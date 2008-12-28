@@ -152,6 +152,7 @@ class Keyboard(inklib.Face):
     def reset(self):
         self.keyboardText.text = ''
         self.typedtext = ''
+        self.hidetext = False
         self.keyboardText.refresh()
 
     def onKeyPress(self,e,txt,keycode):

@@ -36,8 +36,10 @@ class TwitGui(inklib.Face):
 
         if kbd:
             self.kbd = kbd
+            self.kbd.reset()
         else:
             self.kbd = Keyboard(self.canvas)
+
 
         self.twtApi = api
 
@@ -245,8 +247,8 @@ class TwitGui(inklib.Face):
 
     def publishTwit(self,txt=None):
         if txt:
-            #print dir(self.twtApi.PostUpdate(txt))
-            print 'Pseudo publishing: '+txt
+            print dir(self.twtApi.PostUpdate(txt))
+            #print 'Pseudo publishing: '+txt
         self.canvas.remove(self.kbd)
         self.canvas.refresh()
         

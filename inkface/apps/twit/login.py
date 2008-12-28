@@ -55,8 +55,8 @@ class LoginGui(inklib.Face):
 
     def onPasswordTap(self,e):
         self.kbd.resultProcessor = self.populatePassword
-        self.kbd.hidetext = True 
         self.kbd.reset()
+        self.kbd.hidetext = True 
         self.canvas.add(self.kbd)
         
     def onLogin(self,e):
