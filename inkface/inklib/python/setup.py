@@ -10,5 +10,6 @@ setup(name='inklib',
 	author_email='jayeshsalvi@gmail.com',
 	url='http://code.google.com/p/altcanvas/',
 	packages=['inklib'],
+    depends='inkface-python (>= 0.1.2)',
 	cmdclass={'bdist_debian': bdist_debian.bdist_debian}
 )

@@ -6,7 +6,7 @@ import os
 
 Import('env')
 Import('VERSION ARCH MAINTAINER')
-DEPENDS = 'libaltsvg (>= 0.1.0)'
+DEPENDS = 'libaltsvg (>= 0.1.2)'
 DESCRIPTION = 'UI framework based on SVG'
 
 PKGNAME = 'inkface-python'
