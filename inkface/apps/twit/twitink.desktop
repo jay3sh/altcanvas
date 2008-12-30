@@ -1,0 +1,6 @@
+[Desktop Entry]
+Version=0.1.0
+Encoding=UTF-8
+Name=AltPlayer
+Exec=/usr/bin/altplayer.py
+Type=Application
