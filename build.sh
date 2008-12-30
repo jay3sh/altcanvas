@@ -122,6 +122,37 @@ make_inklib()
 
 	rm -rf $TMP_BLDDIR
 }
+make_twitink()
+{
+	rm -rf $TMP_BLDDIR
+	mkdir $TMP_BLDDIR
+
+	(
+		cd $TMP_BLDDIR
+        ln -s $SRCDIR/inkface/apps/twit/setup.py ./setup.py
+        ln -s $SRCDIR/install/bdist_debian.py ./bdist_debian.py
+
+        ln -s $SRCDIR/inkface/apps/twit/twitink.desktop ./twitink.desktop
+        ln -s $SRCDIR/inkface/apps/twit/twitink ./twitink
+
+        ln -s $SRCDIR/inkface/apps/twit/twit.py ./twit.py
+
+        ln -s $SRCDIR/inkface/apps/twit/login.svg ./login.svg
+        ln -s $SRCDIR/inkface/apps/twit/public.svg ./public.svg
+        ln -s $SRCDIR/inkface/apps/twit/keyboard.svg ./keyboard.svg
+
+		$PYTHON setup.py bdist_debian || exit
+
+		if ! [ -d $BLDDIR ]; then
+			mkdir $BLDDIR;
+		fi
+
+		mv dist/*.deb $BLDDIR/
+    )
+
+	rm -rf $TMP_BLDDIR
+}
+
 make_altplayer()
 {
 	rm -rf $TMP_BLDDIR
@@ -196,14 +227,14 @@ make_canvasx()
     )
 }
 
-make_inkface()
+make_inkface_python()
 {
     (
         cd inkface;
-        scons -c
+        scons-1.1.0 -c 2>/dev/null
         #scons -Q native-debian
-        scons -Q python-debian
-        mv *.deb ../packages/
+        scons-1.1.0 -Q python-debian 2>/dev/null
+        mv *.deb $BLDDIR/
     )
 }
 
@@ -282,7 +313,12 @@ while getopts "p:hc" options; do
 	esac
 done
 
-case $PACKAGE in
+PACKAGE=`echo $PACKAGE | sed 's/,/ /g'`
+
+for PKG in $PACKAGE
+do
+
+case $PKG in
 	"gimp-publishr")
 		make_gimp_publishr;
 		;;
@@ -300,8 +336,8 @@ case $PACKAGE in
     "canvasx")
         make_canvasx;
 		;;
-    "inkface")
-        make_inkface;
+    "inkface-python")
+        make_inkface_python;
         ;;
     "libaltsvg")
         make_libaltsvg;
@@ -315,5 +351,9 @@ case $PACKAGE in
      "inklib")
         make_inklib;
         ;;
+     "twitink")
+        make_twitink;
+        ;;
 esac
 
+done
