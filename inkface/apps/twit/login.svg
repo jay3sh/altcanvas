@@ -36,9 +36,9 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.1604167"
-     inkscape:cx="292.28007"
-     inkscape:cy="245.72321"
+     inkscape:zoom="1.15"
+     inkscape:cx="400"
+     inkscape:cy="240"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -194,6 +194,56 @@
            x="-158.57684"
            id="tspan4888"
            sodipodi:role="line">login</tspan></text>
+    </g>
+    <g
+       id="g2421"
+       name="buttonSaved"
+       order="10"
+       transform="translate(34,200)">
+      <rect
+         ry="5"
+         rx="5"
+         y="210"
+         x="615.21741"
+         height="46.086956"
+         width="129.56522"
+         id="rect2415"
+         style="opacity:1;fill:#333333;stroke:#ffffff;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         id="text2417"
+         y="239.82608"
+         x="647.82605"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="239.82608"
+           x="647.82605"
+           id="tspan2419"
+           sodipodi:role="line">saved</tspan></text>
+    </g>
+    <g
+       id="g2426"
+       transform="translate(10,52)"
+       name="buttonSave"
+       order="10">
+      <rect
+         ry="5"
+         rx="5"
+         y="359.13043"
+         x="640.86957"
+         height="46.086956"
+         width="129.56522"
+         id="rect2409"
+         style="opacity:1;fill:#000000;stroke:#ffffff;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         id="text2411"
+         y="388.08694"
+         x="681.30432"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="388.08694"
+           x="681.30432"
+           id="tspan2413"
+           sodipodi:role="line">save</tspan></text>
     </g>
   </g>
 </svg>
