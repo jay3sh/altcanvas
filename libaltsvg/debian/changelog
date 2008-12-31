@@ -1,3 +1,9 @@
+libaltsvg (0.1.2) unstable; urgency=low
+
+  * Version bump with minor fixes.
+
+ -- Jayesh Salvi <jayesh@altfrequency.com>  Sun, 23 Dec 2008 17:34:43 +0300
+
 libaltsvg (0.1.1) unstable; urgency=low
 
   * Fixes some memory leaks

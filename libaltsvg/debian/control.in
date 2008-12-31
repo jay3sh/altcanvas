@@ -7,4 +7,5 @@ Standards-Version: 3.6.0
 
 Package: libaltsvg
 Architecture: @ARCH@
+Depends: libcairo2 (>= 1.4.10-0osso3), libxml2 (>= 2.6.27)
 Description: Modified version of librsvg to render SVG image components
