@@ -3,9 +3,6 @@ import inkface
 import inklib
 import re
 
-#KEYBOARD_SVG='keyboard.svg'
-KEYBOARD_SVG='keyboard-lite.svg'
-
 special_key_map = {
     'Tilde':'~',
     'Period':'.',
@@ -39,8 +36,8 @@ class Keyboard(inklib.Face):
     glowing_elements = {}
     hidetext = False
     typedtext = ''
-    def __init__(self,canvas):
-        inklib.Face.__init__(self,canvas,KEYBOARD_SVG)
+    def __init__(self,canvas,keyboard_svg):
+        inklib.Face.__init__(self,canvas,keyboard_svg)
 
         for k,e in self.elements.items():
             if e.name.startswith('keySp') and not e.name.endswith('Glow'):

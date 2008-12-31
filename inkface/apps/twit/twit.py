@@ -18,17 +18,22 @@ from twitink.twit import TwitGui
 
 import sys
 
+SVG_DIR         = '/usr/share/pixmaps/twitink/'
+LOGIN_SVG       = SVG_DIR+'login.svg'
+PUBLIC_SVG      = SVG_DIR+'public.svg'
+KEYBOARD_SVG    = SVG_DIR+'keyboard.svg'
+
 #
 # Control Flow
 # 
 
 class TwitterApp:
     def __init__(self):
-        self.canvas = inkface.create_X_canvas(fullscreen=False)
-        self.kbd = Keyboard(self.canvas)
+        self.canvas = inkface.create_X_canvas(fullscreen=True)
+        self.kbd = Keyboard(self.canvas,KEYBOARD_SVG)
 
     def main(self):
-        self.loginGui = LoginGui(self.canvas,'login.svg',kbd=self.kbd)
+        self.loginGui = LoginGui(self.canvas,LOGIN_SVG,kbd=self.kbd)
         self.loginGui.resultProcessor = self.onLoginSuccess
         self.canvas.add(self.loginGui)
 
@@ -38,7 +43,7 @@ class TwitterApp:
         self.canvas.remove(self.loginGui)
         del self.loginGui
 
-        self.twitGui = TwitGui(self.canvas,'public.svg',
+        self.twitGui = TwitGui(self.canvas,PUBLIC_SVG,
                             twitterApi,kbd=self.kbd)
         self.twitGui.resultProcessor = self.onExit
         self.canvas.add(self.twitGui)

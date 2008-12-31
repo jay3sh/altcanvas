@@ -13,9 +13,9 @@ setup(name='twitter-inkface',
 	scripts=['twit.py'],
     data_files=[
                 ('share/applications/hildon',['twitink.desktop']),
-                ('share/pixmaps/twitink/keyboard.svg',['keyboard.svg']),
-                ('share/pixmaps/twitink/login.svg',['login.svg']),
-                ('share/pixmaps/twitink/public.svg',['public.svg']),
+                ('share/pixmaps/twitink',['keyboard.svg']),
+                ('share/pixmaps/twitink',['login.svg']),
+                ('share/pixmaps/twitink',['public.svg']),
                 ],
     depends='inkface-python (>= 0.1.2), inklib (>= 0.1.0)',
 	cmdclass={'bdist_debian': bdist_debian.bdist_debian}
