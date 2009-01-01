@@ -6,6 +6,7 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="800"
@@ -18,6 +19,21 @@
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs4">
+    <linearGradient
+       id="linearGradient3311">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop3313" />
+      <stop
+         id="stop3319"
+         offset="0.21418524"
+         style="stop-color:#ffffff;stop-opacity:0.49803922;" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0;"
+         offset="1"
+         id="stop3315" />
+    </linearGradient>
     <linearGradient
        id="linearGradient5533">
       <stop
@@ -40,6 +56,76 @@
        inkscape:vp_z="744.09448 : 526.18109 : 1"
        inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
        id="perspective10" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3311"
+       id="linearGradient3317"
+       x1="31.304348"
+       y1="26.086956"
+       x2="99.999992"
+       y2="77.751312"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1,0,0,1.179965,-4.347826,-8.4095828)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3311"
+       id="linearGradient3323"
+       gradientUnits="userSpaceOnUse"
+       x1="31.304348"
+       y1="26.086956"
+       x2="99.999992"
+       y2="77.751312"
+       gradientTransform="matrix(1,0,0,1.1799647,64.608706,53.85117)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3311"
+       id="linearGradient3327"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1,0,0,1.1799647,-14.869555,118.02509)"
+       x1="31.304348"
+       y1="26.086956"
+       x2="99.999992"
+       y2="77.751312" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3311"
+       id="linearGradient3331"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1,0,0,1.1799647,28.95653,179.59034)"
+       x1="31.304348"
+       y1="26.086956"
+       x2="99.999992"
+       y2="77.751312" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3311"
+       id="linearGradient3335"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1,0,0,1.1799647,69.739133,243.41642)"
+       x1="31.304348"
+       y1="26.086956"
+       x2="99.999992"
+       y2="77.751312" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3311"
+       id="linearGradient3339"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1,0,0,1.1799647,46.69565,307.8512)"
+       x1="31.304348"
+       y1="26.086956"
+       x2="99.999992"
+       y2="77.751312" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3311"
+       id="linearGradient3343"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1,0,0,1.1799647,2.8695512,369.93815)"
+       x1="31.304348"
+       y1="26.086956"
+       x2="99.999992"
+       y2="77.751312" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -693,7 +779,7 @@
        width="658.38422"
        height="81.005386"
        x="7.7629995"
-       y="132.26572"
+       y="138.26572"
        rx="15"
        ry="15"
        name="friendFrame2"
@@ -979,5 +1065,96 @@
          id="tspan3336"
          x="587.65216"
          y="437.3913">@user</tspan></text>
+    <rect
+       style="opacity:0.95999995;fill:url(#linearGradient3317);fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect2539"
+       width="566.25708"
+       height="74.110001"
+       x="19.045359"
+       y="15.380555"
+       rx="15"
+       ry="17.699478"
+       name="friendLight0"
+       order="149"
+       inkscape:transform-center-x="187.82609"
+       inkscape:transform-center-y="-13.33874" />
+    <rect
+       style="opacity:0.95999995;fill:url(#linearGradient3323);fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3321"
+       width="566.25708"
+       height="74.110001"
+       x="88.001892"
+       y="77.641319"
+       rx="15"
+       ry="17.699471"
+       name="friendLight1"
+       order="149"
+       inkscape:transform-center-x="187.82609"
+       inkscape:transform-center-y="-13.338728" />
+    <rect
+       style="opacity:0.95999995;fill:url(#linearGradient3327);fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3325"
+       width="566.25708"
+       height="74.110001"
+       x="8.5236349"
+       y="141.81522"
+       rx="15"
+       ry="17.699471"
+       name="friendLight2"
+       order="149"
+       inkscape:transform-center-x="187.82609"
+       inkscape:transform-center-y="-13.338735" />
+    <rect
+       style="opacity:0.95999995;fill:url(#linearGradient3331);fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3329"
+       width="566.25708"
+       height="74.110001"
+       x="52.349731"
+       y="203.38045"
+       rx="15"
+       ry="17.699471"
+       name="friendLight3"
+       order="149"
+       inkscape:transform-center-x="187.82609"
+       inkscape:transform-center-y="-13.338735" />
+    <rect
+       style="opacity:0.95999995;fill:url(#linearGradient3335);fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3333"
+       width="566.25708"
+       height="74.110001"
+       x="93.132324"
+       y="267.20654"
+       rx="15"
+       ry="17.699471"
+       name="friendLight4"
+       order="149"
+       inkscape:transform-center-x="187.82609"
+       inkscape:transform-center-y="-13.338735" />
+    <rect
+       style="opacity:0.95999995;fill:url(#linearGradient3339);fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3337"
+       width="566.25708"
+       height="74.110001"
+       x="70.088852"
+       y="331.64133"
+       rx="15"
+       ry="17.699471"
+       name="friendLight5"
+       order="149"
+       inkscape:transform-center-x="187.82609"
+       inkscape:transform-center-y="-13.338735" />
+    <rect
+       style="opacity:0.95999995;fill:url(#linearGradient3343);fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3341"
+       width="566.25708"
+       height="74.110001"
+       x="26.26276"
+       y="393.72827"
+       rx="15"
+       ry="17.699471"
+       name="friendLight6"
+       order="149"
+       inkscape:transform-center-x="187.82609"
+       inkscape:transform-center-y="-13.338735" />
   </g>
 </svg>
