@@ -3,6 +3,8 @@ import inkface
 import inklib
 import re
 
+N810_ENTER_KEYCODE = 65421
+
 special_key_map = {
     'Tilde':'~',
     'Period':'.',
@@ -173,7 +175,7 @@ class Keyboard(inklib.Face):
             else:
                 self.keyboardText.text += ' '
                 self.typedtext += ' '
-        elif keycode == inkface.KeyEnter:
+        elif keycode == inkface.KeyEnter or keycode == N810_ENTER_KEYCODE:
             self.onEnter(e)
 
         self.keyboardText.refresh()
