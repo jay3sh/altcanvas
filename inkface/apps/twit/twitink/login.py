@@ -10,6 +10,8 @@ import sys
 class LoginGui(inklib.Face):
     username = 'username'
     password = 'password'
+    save_creds_flag = False
+
     def __init__(self,canvas,svgname,kbd=None):
         inklib.Face.__init__(self,canvas,svgname)
 
@@ -30,6 +32,27 @@ class LoginGui(inklib.Face):
         self.usernameText.refresh()
         self.passwordText.text = '*'*len(self.password)
         self.passwordText.refresh()
+
+        self.buttonSaved.onDraw = self.donotdraw
+        #self.buttonSave.onDraw = self.dodraw
+
+        self.buttonSave.onTap = self.setSaveCreds
+
+    def setSaveCreds(self,e):
+        print 'saving creds'
+        self.buttonSaved.onDraw = self.dodraw
+        self.buttonSave.onDraw = self.donotdraw
+        self.save_creds_flag = True
+        self.canvas.refresh()
+    
+    def saveCreds(self,e):
+        pass
+
+    def donotdraw(self,e):
+        pass
+
+    def dodraw(self,e):
+        self.canvas.draw(e)
 
     def populateUsername(self,txt):
         if txt:

@@ -4,6 +4,7 @@ import os
 import re
 import threading
 import urllib2
+import pickle
 
 import cairo
 
@@ -15,6 +16,7 @@ from twitink.keyboard import Keyboard
 from twitink.login import LoginGui
 from twitink.imgloader import ImageLoader
 from twitink.twit import TwitGui
+from twitink.utils import encrypt
 
 import sys
 
@@ -22,6 +24,8 @@ SVG_DIR         = '/usr/share/pixmaps/twitink/'
 LOGIN_SVG       = SVG_DIR+'login.svg'
 PUBLIC_SVG      = SVG_DIR+'public.svg'
 KEYBOARD_SVG    = SVG_DIR+'keyboard.svg'
+
+TWITINK_RC      = os.environ['HOME']+os.sep+'.twitinkrc'
 
 #
 # Control Flow
@@ -41,6 +45,14 @@ class TwitterApp:
         
     def onLoginSuccess(self,twitterApi):
         self.canvas.remove(self.loginGui)
+
+        if self.loginGui.save_creds_flag:
+            pfile = open(TWITINK_RC,'w')
+            m = {}
+            m['username'] = self.loginGui.username
+            m['password'] = encrypt(self.loginGui.password)
+            pickle.dump(m,pfile)
+
         del self.loginGui
 
         self.twitGui = TwitGui(self.canvas,PUBLIC_SVG,
