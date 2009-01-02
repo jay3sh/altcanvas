@@ -458,7 +458,7 @@
        id="g4789"
        transform="translate(772.2334,18.289046)"
        name="friendsButton"
-       order="1000">
+       order="1001">
       <rect
          ry="9"
          rx="9"
@@ -484,7 +484,7 @@
        id="g4794"
        transform="translate(761.16697,24.393175)"
        name="publicButton"
-       order="1000">
+       order="1001">
       <rect
          ry="9"
          rx="9"
