@@ -16,14 +16,15 @@ from twitink.keyboard import Keyboard
 from twitink.login import LoginGui
 from twitink.imgloader import ImageLoader
 from twitink.twit import TwitGui
-from twitink.utils import encrypt
+from twitink.utils import encrypt,decrypt
 
 import sys
 
-SVG_DIR         = '/usr/share/pixmaps/twitink/'
-LOGIN_SVG       = SVG_DIR+'login.svg'
-PUBLIC_SVG      = SVG_DIR+'public.svg'
-KEYBOARD_SVG    = SVG_DIR+'keyboard.svg'
+SVG_DIR         = '/usr/share/pixmaps/twitink'
+#SVG_DIR         = '/home/jayesh/altcanvas/inkface/apps/twit'
+LOGIN_SVG       = SVG_DIR+os.sep+'login.svg'
+PUBLIC_SVG      = SVG_DIR+os.sep+'public.svg'
+KEYBOARD_SVG    = SVG_DIR+os.sep+'keyboard.svg'
 
 TWITINK_RC      = os.environ['HOME']+os.sep+'.twitinkrc'
 
@@ -37,7 +38,22 @@ class TwitterApp:
         self.kbd = Keyboard(self.canvas,KEYBOARD_SVG)
 
     def main(self):
-        self.loginGui = LoginGui(self.canvas,LOGIN_SVG,kbd=self.kbd)
+        # If .twitinkrc file exists load creds
+        config = None
+        try:
+            pfile = open(TWITINK_RC,'r')
+            config = pickle.load(pfile)
+        except IOError,ioe:
+            print '.twitinkrc file not found'
+
+        if config:
+            print config
+            self.loginGui = LoginGui(self.canvas,LOGIN_SVG,kbd=self.kbd,
+                                username=config['username'],
+                                password=decrypt(config['password']))
+        else:
+            self.loginGui = LoginGui(self.canvas,LOGIN_SVG,kbd=self.kbd)
+
         self.loginGui.resultProcessor = self.onLoginSuccess
         self.canvas.add(self.loginGui)
 
@@ -46,6 +62,7 @@ class TwitterApp:
     def onLoginSuccess(self,twitterApi):
         self.canvas.remove(self.loginGui)
 
+        # Save the creds if asked
         if self.loginGui.save_creds_flag:
             pfile = open(TWITINK_RC,'w')
             m = {}
