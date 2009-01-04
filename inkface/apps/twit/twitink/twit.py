@@ -89,7 +89,8 @@ class TwitGui(inklib.Face):
             for name,elem in self.elements.items():
                 if name.startswith('friendCloud') or \
                     name.startswith('friendTwt') or \
-                    name.startswith('friendName'):
+                    name.startswith('friendName') or \
+                    name.startswith('friendLight'):
                     elem.onDraw = self.donotdraw
 
     def dodraw(self,e):
