@@ -139,7 +139,7 @@ make_twitink()
 
         ln -s $SRCDIR/inkface/apps/twit/login.svg ./login.svg
         ln -s $SRCDIR/inkface/apps/twit/public.svg ./public.svg
-        ln -s $SRCDIR/inkface/apps/twit/keyboard.svg ./keyboard.svg
+        ln -s $SRCDIR/inkface/apps/twit/keyboard-lite.svg ./keyboard-lite.svg
 
 		$PYTHON setup.py bdist_debian || exit
 
