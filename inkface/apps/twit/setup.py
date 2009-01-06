@@ -13,7 +13,7 @@ setup(name='twitter-inkface',
 	scripts=['twit.py'],
     data_files=[
                 ('share/applications/hildon',['twitink.desktop']),
-                ('share/pixmaps/twitink',['keyboard.svg']),
+                ('share/pixmaps/twitink',['keyboard-lite.svg']),
                 ('share/pixmaps/twitink',['login.svg']),
                 ('share/pixmaps/twitink',['public.svg']),
                 ],

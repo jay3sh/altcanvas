@@ -24,7 +24,7 @@ SVG_DIR         = '/usr/share/pixmaps/twitink'
 #SVG_DIR         = '/home/jayesh/altcanvas/inkface/apps/twit'
 LOGIN_SVG       = SVG_DIR+os.sep+'login.svg'
 PUBLIC_SVG      = SVG_DIR+os.sep+'public.svg'
-KEYBOARD_SVG    = SVG_DIR+os.sep+'keyboard.svg'
+KEYBOARD_SVG    = SVG_DIR+os.sep+'keyboard-lite.svg'
 
 TWITINK_RC      = os.environ['HOME']+os.sep+'.twitinkrc'
 
