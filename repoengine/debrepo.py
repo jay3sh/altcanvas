@@ -7,6 +7,7 @@ import logging
 code_url = 'http://altcanvas.googlecode.com/files/'
 
 repo_path = '/dists/testing/main/binary-armel/'
+tmp_path = '/binary-armel/'
 
 mime_map = { 
             'deb':'application/x-debian-package',
@@ -22,7 +23,8 @@ class FilePipe(webapp.RequestHandler):
         self.response.out.write(f.content)
 
 application = webapp.WSGIApplication(
-                     [(repo_path+'(.*)', FilePipe)],
+                     [(repo_path+'(.*)', FilePipe),
+                     (tmp_path+'(.*)', FilePipe)],
                      debug=True)
 
 def main():
