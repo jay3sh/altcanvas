@@ -20,6 +20,8 @@ PUB_INKSCAPE_DIR=$SRCDIR/inkscape/publishr
 FILTER="--exclude '.*' --exclude '*.pyc'"
 VERSION=0.5.0
 
+REPO_ROOT=/tmp/reporoot
+
 export PYTHON=/usr/bin/python2.5
 
 clean()
@@ -296,6 +298,18 @@ make_stackless()
     )
 }
 
+build_repo()
+{
+    rm -rf $REPO_ROOT && mkdir -p $REPO_ROOT
+
+    mkdir $REPO_ROOT/dists
+    mkdir $REPO_ROOT/dists/testing
+    mkdir $REPO_ROOT/dists/testing/main
+    mkdir $REPO_ROOT/dists/testing/main/binary-armel
+
+    cp BLDDIR/*armel*deb $REPO_ROOT/dists/testing/main/binary-armel/
+}
+
 if [ "$1" = "" ]; then
 	usage
 	exit 1
@@ -353,6 +367,9 @@ case $PKG in
         ;;
      "twitink")
         make_twitink;
+        ;;
+     "debrepo")
+        build_repo;
         ;;
 esac
 
