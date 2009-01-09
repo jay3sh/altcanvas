@@ -1495,7 +1495,6 @@ class _FileCache(object):
     return os.getenv('USER') or \
         os.getenv('LOGNAME') or \
         os.getenv('USERNAME') or \
-        os.getlogin() or \
         'nobody'
 
   def _GetTmpCachePath(self):
