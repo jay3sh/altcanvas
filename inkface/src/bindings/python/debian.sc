@@ -37,7 +37,7 @@ for f in DEBFILES:
 CONTROL_TEMPLATE = """
 Package: %s
 Priority: extra
-Section: misc
+Section: user/other
 Installed-Size: %s
 Maintainer: %s
 Architecture: %s
