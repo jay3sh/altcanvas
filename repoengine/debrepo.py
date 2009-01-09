@@ -8,6 +8,7 @@ code_url = 'http://altcanvas.googlecode.com/files/'
 
 repo_path = '/dists/testing/main/binary-armel/'
 tmp_path = '/binary-armel/'
+REPO_VERSION='807M'
 
 mime_map = { 
             'deb':'application/x-debian-package',
@@ -16,6 +17,8 @@ mime_map = {
 
 class FilePipe(webapp.RequestHandler):
     def get(self,filename):
+        if filename == 'Packages.gz':
+            filename = 'Packages-'+REPO_VERSION+'.gz'
         f = urlfetch.fetch(code_url+filename,method=urlfetch.GET)
         fileext = filename.split('.')[-1]
         self.response.headers['Content-Type'] = mime_map[fileext]
