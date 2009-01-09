@@ -274,27 +274,29 @@
            id="tspan2413"
            sodipodi:role="line">save</tspan></text>
     </g>
+    <path
+       transform="matrix(0.6158323,7.1783038e-4,-8.7142573e-4,1.1270997,288.28057,20.257215)"
+       d="M 783.47826,164.34783 L 689.94175,219.22072 L 596.40523,274.09362 L 595.65217,165.65218 L 594.8991,57.21073 L 689.18868,110.77928 L 783.47826,164.34783 z"
+       inkscape:randomized="0"
+       inkscape:rounded="0"
+       inkscape:flatsided="false"
+       sodipodi:arg2="1.0402532"
+       sodipodi:arg1="-0.0069443328"
+       sodipodi:r2="62.610207"
+       sodipodi:r1="125.22041"
+       sodipodi:cy="165.21739"
+       sodipodi:cx="658.26086"
+       sodipodi:sides="3"
+       id="path3203"
+       style="opacity:1;fill:#000000;stroke:none;stroke-width:4.00048685;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       sodipodi:type="star"
+       name="loginButtonShadow"
+       order="8" />
     <g
        id="g3199"
        order="9"
        name="loginButton"
        transform="translate(0,-2)">
-      <path
-         transform="matrix(0.6158323,7.1783038e-4,-8.7142573e-4,1.1270997,288.28057,20.257215)"
-         d="M 783.47826,164.34783 L 689.94175,219.22072 L 596.40523,274.09362 L 595.65217,165.65218 L 594.8991,57.21073 L 689.18868,110.77928 L 783.47826,164.34783 z"
-         inkscape:randomized="0"
-         inkscape:rounded="0"
-         inkscape:flatsided="false"
-         sodipodi:arg2="1.0402532"
-         sodipodi:arg1="-0.0069443328"
-         sodipodi:r2="62.610207"
-         sodipodi:r1="125.22041"
-         sodipodi:cy="165.21739"
-         sodipodi:cx="658.26086"
-         sodipodi:sides="3"
-         id="path3203"
-         style="opacity:1;fill:#000000;stroke:none;stroke-width:4.00048685;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         sodipodi:type="star" />
       <rect
          y="140.43478"
          x="271.73917"

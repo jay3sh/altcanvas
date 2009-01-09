@@ -87,6 +87,9 @@ class LoginGui(inklib.Face):
         self.canvas.add(self.kbd)
         
     def onLogin(self,e):
+        self.loginButtonShadow.onDraw = self.donotdraw
+        self.canvas.refresh()
+
         twitterApi = twitter.Api(username=self.username,password=self.password)
         self.resultProcessor(twitterApi)
        
