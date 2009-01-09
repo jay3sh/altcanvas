@@ -221,7 +221,8 @@ make_canvasx()
 {
     (
         cd altX;
-        dpkg-buildpackage -rfakeroot
+        #dpkg-buildpackage -rfakeroot
+        dpkg-buildpackage -rfakeroot -sa -S -i
         scp ../canvasx*deb root@192.168.1.100:/root/
 
         ssh root@192.168.1.100 \
@@ -300,6 +301,7 @@ make_stackless()
 
 build_repo()
 {
+    REPO_VERSION=`svnversion inkface`
     rm -rf $REPO_ROOT && mkdir -p $REPO_ROOT
 
     mkdir $REPO_ROOT/dists
@@ -307,7 +309,15 @@ build_repo()
     mkdir $REPO_ROOT/dists/testing/main
     mkdir $REPO_ROOT/dists/testing/main/binary-armel
 
-    cp BLDDIR/*armel*deb $REPO_ROOT/dists/testing/main/binary-armel/
+    cp $BLDDIR/*deb $REPO_ROOT/dists/testing/main/binary-armel/
+
+    cd $REPO_ROOT/dists/testing/main
+    dpkg-scanpackages binary-armel /dev/null | \
+        gzip -9c > binary-armel/Packages.gz
+
+    mv binary-armel/Packages.gz $BLDDIR/Packages-$REPO_VERSION.gz
+
+    rm -rf $REPO_ROOT 
 }
 
 if [ "$1" = "" ]; then
