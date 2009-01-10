@@ -301,7 +301,6 @@ make_stackless()
 
 build_repo()
 {
-    REPO_VERSION=`svnversion inkface`
     rm -rf $REPO_ROOT && mkdir -p $REPO_ROOT
 
     mkdir $REPO_ROOT/dists
@@ -315,7 +314,7 @@ build_repo()
     dpkg-scanpackages binary-armel /dev/null | \
         gzip -9c > binary-armel/Packages.gz
 
-    mv binary-armel/Packages.gz $BLDDIR/Packages-$REPO_VERSION.gz
+    mv binary-armel/Packages.gz $BLDDIR/
 
     rm -rf $REPO_ROOT 
 }
