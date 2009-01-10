@@ -6,7 +6,7 @@ import os
 import sys
 
 VERSION = '0.1.2'
-ARCH = os.popen('dpkg --print-architecture').read().strip()
+ARCH = os.popen('dpkg --print-architecture 2>/dev/null || uname -m').read().strip()
 MAINTAINER = 'Jayesh Salvi <jayesh@altfrequency.com>'
 Export('VERSION ARCH MAINTAINER')
 
