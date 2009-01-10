@@ -1,0 +1,4 @@
+There seems to be a problem with libtool versions during build.
+
+The HEAD version of ltmain.sh is supposed to work with libtool 2.2.4 (found on Ubuntu 8.10 systems). If you are trying to build this package for Fedora 10 or Mameo systems, where libtool version is olders (1.5.x), revert ltmain.sh to r513. Then do configure && make.
+
