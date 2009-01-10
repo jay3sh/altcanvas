@@ -1,6 +1,5 @@
 
 
-import urllib2
 import re
 import inklib
 
@@ -62,7 +61,8 @@ class TwitGui(inklib.Face):
             self.publicButton.onTap = self.togglePublicButton
             for name,elem in self.elements.items():
                 if name.startswith('publicCloud') or \
-                    name.startswith('publicTwt'):
+                    name.startswith('publicTwt') or \
+                    name.startswith('publicName'):
                     elem.onDraw = self.dodraw
         else:
             self.publicButton.onDraw = self.donotdraw
@@ -70,7 +70,8 @@ class TwitGui(inklib.Face):
             self.publicFocusButton.onTap = self.togglePublicButton
             for name,elem in self.elements.items():
                 if name.startswith('publicCloud') or \
-                    name.startswith('publicTwt'):
+                    name.startswith('publicTwt') or \
+                    name.startswith('publicName'):
                     elem.onDraw = self.donotdraw
 
     def toggleFriendsButton(self,e):
@@ -190,13 +191,16 @@ class TwitGui(inklib.Face):
                         elem.user_data = twt_list[i]
 
                         twt_user = twt_list[i].GetUser().screen_name
-                        m = re.match(self.friend_twt_pattern,elem.name)
+                        m = re.match(self.friend_twt_pattern,elem.name) \
+                            or re.match(self.public_twt_pattern,elem.name)
 
                         if m:
                             num = m.group(1)
-                            fnelem = self.elements['friendName'+num]
+                            fnelem = self.elements[elem_prefix+'Name'+num]
                             fnelem.text = '@'+twt_user
                             fnelem.refresh()
+
+
                         image_list.append(
                             twt_list[i].GetUser().profile_image_url)
 
