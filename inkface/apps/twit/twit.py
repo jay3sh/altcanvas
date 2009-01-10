@@ -92,6 +92,20 @@ class TwitterApp:
 if __name__ == '__main__':
     #import cProfile
     #cProfile.run('TwitterApp().main()','twit.prof')
-    TwitterApp().main()
+    try:
+        TwitterApp().main()
+    except:
+        import traceback
+        try:
+            logf = open('/tmp/twitter-inkface-crash.log','w')
+        except:
+            pass
+        else:
+            tb = ''
+            for line in traceback.format_exc().split('\n'):
+                tb += line+'\n'
+            logf.write(tb)
+            logf.close()
+        
 
 
