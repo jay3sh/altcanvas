@@ -1,5 +1,5 @@
 
-
+import urllib2
 import re
 import inklib
 
@@ -238,9 +238,12 @@ class TwitGui(inklib.Face):
         self.resultProcessor()
 
     def publishTwit(self,txt=None):
-        if txt:
-            print dir(self.twtApi.PostUpdate(txt))
-            #print 'Pseudo publishing: '+txt
+        try:
+            if txt:
+                self.twtApi.PostUpdate(txt)
+        except:
+            pass
+
         self.canvas.remove(self.kbd)
         self.canvas.refresh()
         
