@@ -38,14 +38,12 @@ class LoginGui(inklib.Face):
         self.passwordText.text = '*'*len(self.password)
         self.passwordText.refresh()
 
-        self.buttonSaved.onDraw = self.donotdraw
-        #self.buttonSave.onDraw = self.dodraw
+        self.saveTick.onDraw = self.donotdraw
 
         self.buttonSave.onTap = self.setSaveCreds
 
     def setSaveCreds(self,e):
-        self.buttonSaved.onDraw = self.dodraw
-        self.buttonSave.onDraw = self.donotdraw
+        self.saveTick.onDraw = self.dodraw
         self.save_creds_flag = True
         self.canvas.refresh()
     

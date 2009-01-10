@@ -69,7 +69,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="1.15"
      inkscape:cx="400"
-     inkscape:cy="264.54318"
+     inkscape:cy="194.97796"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -201,57 +201,8 @@
            sodipodi:role="line">x</tspan></text>
     </g>
     <g
-       id="g4882"
-       transform="matrix(0,1,-1,0,532.85817,347.57272)">
-      <rect
-         ry="9"
-         rx="9"
-         y="54.219028"
-         x="-8.6894073"
-         height="157.27829"
-         width="53.005386"
-         id="rect4884"
-         style="fill:#00ffff;stroke:none;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-      <text
-         transform="matrix(0,-1,1,0,0,0)"
-         id="text4886"
-         y="24.868847"
-         x="-158.57684"
-         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
-         xml:space="preserve"><tspan
-           y="24.868847"
-           x="-158.57684"
-           id="tspan4888"
-           sodipodi:role="line">login</tspan></text>
-    </g>
-    <g
-       id="g2421"
-       name="buttonSaved"
-       order="10"
-       transform="translate(34,200)">
-      <rect
-         ry="5"
-         rx="5"
-         y="210"
-         x="615.21741"
-         height="46.086956"
-         width="129.56522"
-         id="rect2415"
-         style="opacity:1;fill:#333333;stroke:#ffffff;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-      <text
-         id="text2417"
-         y="239.82608"
-         x="647.82605"
-         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
-         xml:space="preserve"><tspan
-           y="239.82608"
-           x="647.82605"
-           id="tspan2419"
-           sodipodi:role="line">saved</tspan></text>
-    </g>
-    <g
        id="g2426"
-       transform="translate(10,52)"
+       transform="translate(-309.13043,-41.043478)"
        name="buttonSave"
        order="11">
       <rect
@@ -292,6 +243,13 @@
        sodipodi:type="star"
        name="loginButtonShadow"
        order="8" />
+    <path
+       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 293.32669,341.82877 L 298.43591,340.04345 L 304.50309,346.34868 L 321.58701,330.37659 L 304.0241,351.93108 L 293.32669,341.82877 z"
+       id="path4557"
+       sodipodi:nodetypes="cccccc"
+       name="saveTick"
+       order="11" />
     <g
        id="g3199"
        order="9"
