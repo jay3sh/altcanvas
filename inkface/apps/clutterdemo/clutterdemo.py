@@ -45,30 +45,49 @@ def on_key_press_event (stage, event):
     clutter.main_quit()
 
 
-class Slider:
-    def __init__(self,actor,max_y,min_y):
-        self.motion_handler = None
-        self.actor = actor
-        self.max_y = max_y
-        self.min_y = min_y
-        self.actor.connect('button-press-event',self.on_slider_press)
-        self.actor.set_reactive(True)
+class Slider(Face):
+    def __init__(self,svgname):
+        Face.__init__(self,svgname=svgname)
 
-    def on_slider_press(self,actor, event):
+        self.handle_actor = \
+            cluttercairo.CairoTexture(width=self.handle.w,height=self.handle.h)
+        ctx = self.handle_actor.cairo_create()
+        ctx.set_source_surface(self.handle.surface)
+        ctx.paint()
+        self.handle_actor.set_position(self.handle.x,self.handle.y)
+        del(ctx)
+
+        self.scale_actor = \
+            cluttercairo.CairoTexture(width=self.scale.w,height=self.scale.h)
+        ctx = self.scale_actor.cairo_create()
+        ctx.set_source_surface(self.scale.surface)
+        ctx.paint()
+        self.scale_actor.set_position(self.scale.x,self.scale.y)
+        del(ctx)
+
+        self.motion_handler = None
+
+        self.max_y = self.scale.y+self.scale.h
+        self.min_y = self.scale.y
+
+        self.handle_actor.connect('button-press-event',self.on_handle_press)
+        self.handle_actor.set_reactive(True)
+
+    def on_handle_press(self,actor, event):
         clutter.grab_pointer(actor)
         self.motion_handler = \
-            actor.connect('motion-event',self.on_slider_motion)
-        actor.connect('button-release-event',self.on_slider_release)
+            actor.connect('motion-event',self.on_handle_motion)
+        actor.connect('button-release-event',self.on_handle_release)
     
-    def on_slider_release(self,actor,event):
+    def on_handle_release(self,actor,event):
         actor.disconnect(self.motion_handler)
         clutter.ungrab_pointer()
     
-    def on_slider_motion(self,actor, event):
+    def on_handle_motion(self,actor, event):
         ax,ay = actor.get_position()
 
-        if event.y > (self.max_y - self.actor.get_height()):
-            newy = self.max_y - self.actor.get_height()
+        if event.y > (self.max_y - actor.get_height()):
+            newy = self.max_y - actor.get_height()
         elif event.y < self.min_y:
             newy = self.min_y 
         else:
@@ -84,45 +103,14 @@ def main ():
     stage.connect('key-press-event', on_key_press_event)
     stage.connect('destroy', clutter.main_quit)
 
-    #cairo_tex = cluttercairo.CairoTexture(width=800, height=480)
-    #cairo_tex.set_position(x=0,y=0)
-    #context = cairo_tex.cairo_create()
+    slider = Slider('slider.svg')
 
-    elems = inkface.loadsvg('inkface-clutter.svg')
+    stage.add(slider.scale_actor)
+    slider.scale_actor.show()
 
-    for name,elem in elems.items():
-        elem.user_data = cluttercairo.CairoTexture(width=elem.w, height=elem.h)
-        elem.user_data.set_position(elem.x,elem.y)
-        ctx = elem.user_data.cairo_create()
-        ctx.set_source_surface(elem.surface)
-        ctx.paint()
-        del(ctx)
+    stage.add(slider.handle_actor)
+    slider.handle_actor.show()
 
-    scale = elems['scale'].user_data
-    slider = elems['slider'].user_data
-    Slider(slider,elems['scale'].y+elems['scale'].h,elems['scale'].y)
-
-    stage.add(scale)
-    scale.show()
-
-    stage.add(slider)
-    slider.show()
-
-
-    
-
-    # we scale the context to the size of the surface
-
-    #del(context) # we need to destroy the context so that the
-                 # texture gets properly updated with the result
-                 # of our operations; you can either move all the
-                 # drawing operations into their own function and
-                 # let the context go out of scope or you can
-                 # explicitly destroy it
-
-    #stage.add(cairo_tex)
-    #cairo_tex.show()
-    
     '''
     timeline = clutter.Timeline(fps=60, duration=3000)
     timeline.set_loop(True)
