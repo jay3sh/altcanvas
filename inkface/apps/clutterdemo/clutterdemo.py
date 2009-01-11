@@ -8,6 +8,11 @@ import cluttercairo
 
 import inkface
 
+############################################################################
+# @class Face 
+#   Encapsulation of an SVG file
+#   The elements of the SVG file are accessible as attributes of Face object 
+############################################################################
 class Face:
     def __init__(self,svgname,autoload=True):
         assert(os.path.exists(svgname))
@@ -21,29 +26,14 @@ class Face:
             del self.__dict__[name]
         inkface.unload(self.elements); 
 
-class BehaviourRotate (clutter.Behaviour):
-        __gtype_name__ = 'BehaviourRotate'
-        def __init__ (self, alpha=None):
-                clutter.Behaviour.__init__(self)
-                self.set_alpha(alpha)
-                self.angle_start = 0.0
-                self.angle_end = 359.0
-
-        def do_alpha_notify (self, alpha_value):
-                angle = alpha_value \
-                      * (self.angle_end - self.angle_start) \
-                      / clutter.MAX_ALPHA
-
-                for actor in self.get_actors():
-                        actor.set_rotation(clutter.Z_AXIS, angle,
-                                           actor.get_x() - 100,
-                                           actor.get_y() - 100,
-                                           0)
-
-
 def on_key_press_event (stage, event):
     clutter.main_quit()
 
+############################################################################
+# @class ClutterFace 
+#   Derivative of Face - creates Clutter Actors for each element of Face
+#   accessible as attributes by name <element_name>+'_actor'
+############################################################################
 class ClutterFace(Face):
     def __init__(self,svgname):
         Face.__init__(self,svgname=svgname)
@@ -57,7 +47,11 @@ class ClutterFace(Face):
             self.__dict__[name+'_actor'] = actor
             del(ctx)
 
-
+############################################################################
+# @class Slider
+#   Derivative of ClutterFace - Application specific
+#   Holds the logic of Slider widget
+############################################################################
 class Slider(ClutterFace):
     reading_handler = None
 
@@ -107,6 +101,11 @@ class Slider(ClutterFace):
 
         actor.set_position(ax,newy)
         
+############################################################################
+# @class Steering
+#   Derivative of ClutterFace - Application specific
+#   Holds the logic of Steering object
+############################################################################
 class Steering(ClutterFace):
     def __init__(self,svgname):
         ClutterFace.__init__(self,svgname=svgname)
@@ -120,15 +119,20 @@ class Steering(ClutterFace):
                                self.steering_center_y,
                                0)
 
-class DemoApp:
+############################################################################
+# @class Steering
+#   Main class that drives the application
+############################################################################
 
+class DemoApp:
     def convert_reading_to_rotation(self,percentage_reading):
         angle = int(120 * percentage_reading)
         self.steering.rotate(-60+angle)
 
     def main (self):
         stage = clutter.Stage()
-        stage.set_color(clutter.Color(red=0xff, green=0xff, blue=0xff, alpha=0xff))
+        stage.set_color(
+            clutter.Color(red=0xff, green=0xff, blue=0xff, alpha=0xff))
         stage.set_size(width=800, height=480)
         stage.connect('key-press-event', on_key_press_event)
         stage.connect('destroy', clutter.main_quit)
