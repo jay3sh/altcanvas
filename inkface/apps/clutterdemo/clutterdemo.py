@@ -49,21 +49,14 @@ class Slider(Face):
     def __init__(self,svgname):
         Face.__init__(self,svgname=svgname)
 
-        self.handle_actor = \
-            cluttercairo.CairoTexture(width=self.handle.w,height=self.handle.h)
-        ctx = self.handle_actor.cairo_create()
-        ctx.set_source_surface(self.handle.surface)
-        ctx.paint()
-        self.handle_actor.set_position(self.handle.x,self.handle.y)
-        del(ctx)
-
-        self.scale_actor = \
-            cluttercairo.CairoTexture(width=self.scale.w,height=self.scale.h)
-        ctx = self.scale_actor.cairo_create()
-        ctx.set_source_surface(self.scale.surface)
-        ctx.paint()
-        self.scale_actor.set_position(self.scale.x,self.scale.y)
-        del(ctx)
+        for elem in (self.handle,self.scale,self.scalebg):
+            actor = cluttercairo.CairoTexture(width=elem.w,height=elem.h)
+            ctx = actor.cairo_create()
+            ctx.set_source_surface(elem.surface)
+            ctx.paint()
+            actor.set_position(elem.x,elem.y)
+            self.__dict__[elem.name+'_actor'] = actor
+            del(ctx)
 
         self.motion_handler = None
 
@@ -105,25 +98,16 @@ def main ():
 
     slider = Slider('slider.svg')
 
+    stage.add(slider.scalebg_actor)
+    slider.scalebg_actor.show()
+
     stage.add(slider.scale_actor)
     slider.scale_actor.show()
 
     stage.add(slider.handle_actor)
     slider.handle_actor.show()
 
-    '''
-    timeline = clutter.Timeline(fps=60, duration=3000)
-    timeline.set_loop(True)
-    alpha = clutter.Alpha(timeline, clutter.sine_func)
-
-    rbehavior = BehaviourRotate(alpha)
-    rbehavior.apply(cairo_tex)
-    '''
-
     stage.show()
-
-
-    #timeline.start()
 
     clutter.main()
 
