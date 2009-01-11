@@ -44,19 +44,23 @@ class BehaviourRotate (clutter.Behaviour):
 def on_key_press_event (stage, event):
     clutter.main_quit()
 
-
-class Slider(Face):
+class ClutterFace(Face):
     def __init__(self,svgname):
         Face.__init__(self,svgname=svgname)
 
-        for elem in (self.handle,self.scale,self.scalebg):
+        for name,elem in self.elements.items():
             actor = cluttercairo.CairoTexture(width=elem.w,height=elem.h)
             ctx = actor.cairo_create()
             ctx.set_source_surface(elem.surface)
             ctx.paint()
             actor.set_position(elem.x,elem.y)
-            self.__dict__[elem.name+'_actor'] = actor
+            self.__dict__[name+'_actor'] = actor
             del(ctx)
+
+
+class Slider(ClutterFace):
+    def __init__(self,svgname):
+        ClutterFace.__init__(self,svgname=svgname)
 
         self.motion_handler = None
 
@@ -88,6 +92,10 @@ class Slider(Face):
 
         actor.set_position(ax,newy)
         
+class Steering(ClutterFace):
+    def __init__(self,svgname):
+        ClutterFace.__init__(self,svgname=svgname)
+
 
 def main ():
     stage = clutter.Stage()
@@ -106,6 +114,11 @@ def main ():
 
     stage.add(slider.handle_actor)
     slider.handle_actor.show()
+
+    steering = Steering('steering.svg')
+
+    stage.add(steering.steering_actor)
+    steering.steering_actor.show()
 
     stage.show()
 
