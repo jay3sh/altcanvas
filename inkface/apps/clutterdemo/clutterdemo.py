@@ -127,7 +127,7 @@ class Steering(ClutterFace):
 class DemoApp:
     def convert_reading_to_rotation(self,percentage_reading):
         angle = int(120 * percentage_reading)
-        self.steering.rotate(-60+angle)
+        self.steering.rotate(60-angle)
 
     def main (self):
         stage = clutter.Stage()
