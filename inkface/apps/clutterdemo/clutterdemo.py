@@ -59,8 +59,15 @@ class ClutterFace(Face):
 
 
 class Slider(ClutterFace):
+    reading_handler = None
+
     def __init__(self,svgname):
         ClutterFace.__init__(self,svgname=svgname)
+
+        self.MAX_READING = self.scale.y + self.scale.h - self.handle.h/2
+        self.MIN_READING = self.scale.y + self.handle.h/2
+        self.RANGE = self.MAX_READING - self.MIN_READING
+        self.ZERO_READING = self.MIN_READING + self.RANGE/2
 
         self.motion_handler = None
 
@@ -69,6 +76,9 @@ class Slider(ClutterFace):
 
         self.handle_actor.connect('button-press-event',self.on_handle_press)
         self.handle_actor.set_reactive(True)
+
+        ax,ay = self.handle_actor.get_position()
+        self.handle_actor.set_position(ax,self.ZERO_READING)
 
     def on_handle_press(self,actor, event):
         clutter.grab_pointer(actor)
@@ -90,41 +100,66 @@ class Slider(ClutterFace):
         else:
             newy = event.y
 
+        current_reading = newy + self.handle.h/2 -self.MIN_READING
+
+        if self.reading_handler:
+            self.reading_handler(current_reading*1./self.RANGE)
+
         actor.set_position(ax,newy)
         
 class Steering(ClutterFace):
     def __init__(self,svgname):
         ClutterFace.__init__(self,svgname=svgname)
 
+        self.steering_center_x = self.steering.w/2
+        self.steering_center_y = self.steering.h/2
 
-def main ():
-    stage = clutter.Stage()
-    stage.set_color(clutter.Color(red=0xff, green=0xff, blue=0xff, alpha=0xff))
-    stage.set_size(width=800, height=480)
-    stage.connect('key-press-event', on_key_press_event)
-    stage.connect('destroy', clutter.main_quit)
+    def rotate(self,angle):
+        self.steering_actor.set_rotation(clutter.Z_AXIS, angle,
+                               self.steering_center_x,
+                               self.steering_center_y,
+                               0)
 
-    slider = Slider('slider.svg')
+class DemoApp:
 
-    stage.add(slider.scalebg_actor)
-    slider.scalebg_actor.show()
+    def convert_reading_to_rotation(self,percentage_reading):
+        angle = int(120 * percentage_reading)
+        self.steering.rotate(-60+angle)
 
-    stage.add(slider.scale_actor)
-    slider.scale_actor.show()
-
-    stage.add(slider.handle_actor)
-    slider.handle_actor.show()
-
-    steering = Steering('steering.svg')
-
-    stage.add(steering.steering_actor)
-    steering.steering_actor.show()
-
-    stage.show()
-
-    clutter.main()
-
-    return 0
-
+    def main (self):
+        stage = clutter.Stage()
+        stage.set_color(clutter.Color(red=0xff, green=0xff, blue=0xff, alpha=0xff))
+        stage.set_size(width=800, height=480)
+        stage.connect('key-press-event', on_key_press_event)
+        stage.connect('destroy', clutter.main_quit)
+    
+        # Load Slider
+        self.slider = Slider('slider.svg')
+    
+        stage.add(self.slider.scalebg_actor)
+        self.slider.scalebg_actor.show()
+    
+        stage.add(self.slider.scale_actor)
+        self.slider.scale_actor.show()
+    
+        stage.add(self.slider.handle_actor)
+        self.slider.handle_actor.show()
+    
+        # Load Steering wheel
+        self.steering = Steering('steering.svg')
+    
+        stage.add(self.steering.steering_actor)
+        self.steering.steering_actor.show()
+    
+        # Register handler to process slider reading and convert it to 
+        # steering wheel's rotation
+        self.slider.reading_handler = self.convert_reading_to_rotation
+    
+        stage.show()
+    
+        clutter.main()
+    
+        return 0
+    
 if __name__ == '__main__':
-    sys.exit(main())
+    sys.exit(DemoApp().main())
