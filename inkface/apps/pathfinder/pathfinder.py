@@ -64,20 +64,16 @@ class PathFinderApp:
         stage.connect('key-press-event', on_key_press_event)
         stage.connect('destroy', clutter.main_quit)
 
-        timeline = clutter.Timeline(fps=60, duration=3000)
+        timeline = clutter.Timeline(fps=60, duration=6000)
         timeline.set_loop(True)
         
-        knots = ( \
-            (   0,   0 ),   \
-            ( 300,   0 ),   \
-            ( 300, 300 ),   \
-            (   0, 300 ),   \
-        )
+        knots = ((0,0),(0,150),(250,300),(300,300))
 
         alpha = clutter.Alpha(timeline, clutter.sine_func)
 
         p_behavior = clutter.BehaviourBspline(alpha=alpha,knots=knots)
-        p_behavior.append_knots((0,0))
+        p_behavior.append_knots((300,300),(300,350),(350,400),(400,400))
+
         p_behavior.apply(self.face.ball_actor)
 
 
