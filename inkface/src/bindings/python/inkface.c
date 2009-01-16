@@ -133,10 +133,16 @@ inkface_loadsvg(PyObject *self, PyObject *args)
         pyo->order = element->order;
         pyo->name = PyString_FromString(element->name);
         pyo->id = PyString_FromString(element->id);
-        pyo->clouds = PyList_New(0);
+
         if(element->text){
             pyo->text = PyString_FromString(element->text->str);
         }
+        if(element->d){
+            pyo->d = PyString_FromString(element->d);
+        }
+ 
+        pyo->clouds = PyList_New(0);
+
         pyo->p_surface = PycairoSurface_FromSurface(element->surface,NULL);
 
         pyo->element = element;

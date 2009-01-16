@@ -23,6 +23,7 @@ struct _Element{
     int h;
     int order;
     char *name;
+    char *d;
     char id[32];
     element_type_t type;
     char *on_mouse_over;
@@ -48,6 +49,7 @@ typedef struct _InkfaceState InkfaceState;
 
 struct _InkfaceState {
     char *name;                 /* user friendly name */
+    char *d;                    /* Path data (specific to path elements) */
     guint16 order;              /* Order to draw */
     char *on_mouse_over;
     element_type_t type; 

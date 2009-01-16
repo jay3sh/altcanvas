@@ -343,6 +343,11 @@ inkface_get_element(Element *element,int push)
             element->name = strdup(drawsub->istate->name);
         }
 
+        if(drawsub->istate->d){
+            if(element->d) free(element->d);
+            element->d = strdup(drawsub->istate->d);
+        }
+
         if(!strcmp(drawsub->type->str,"text")){
             if(push){
                 // This means that element is already populated

@@ -19,6 +19,7 @@ typedef struct {
     PyObject *name;
     PyObject *id;
     PyObject *text;
+    PyObject *d;
 
     int opacity;
 

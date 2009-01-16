@@ -109,6 +109,7 @@ static PyMemberDef element_members[] = {
     { "h", T_INT, offsetof(Element_t,h),0,"height"},
     { "order", T_INT, offsetof(Element_t,order),0,"order to draw"},
     { "name", T_OBJECT,offsetof(Element_t,name),0,"Name of the element"},
+    { "d", T_OBJECT,offsetof(Element_t,d),0,"Path of the element"},
     { "id", T_OBJECT,offsetof(Element_t,id),0,"Id of the element"},
     { "text", T_OBJECT,offsetof(Element_t,text),0,"Text of a text element"},
     { "opacity", T_INT, offsetof(Element_t,opacity),0,"Opacity of element"},

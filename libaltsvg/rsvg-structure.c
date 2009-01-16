@@ -636,6 +636,9 @@ inkface_parse_attrs(RsvgNode *self, RsvgPropertyBag *atts)
     if ((value = rsvg_property_bag_lookup (atts, "name"))) {
         self->istate->name = strdup(value);
     }
+    if ((value = rsvg_property_bag_lookup (atts, "d"))) {
+        self->istate->d = strdup(value);
+    }
     if ((value = rsvg_property_bag_lookup (atts, "order"))) {
         self->istate->order = atoi(value);
     }
@@ -662,7 +665,16 @@ inkface_istate_init(InkfaceState *istate)
 void
 inkface_istate_finalize (InkfaceState *istate)
 {
-    if(istate->name) free(istate->name);
+    if(istate->name) {
+        free(istate->name);
+        istate->name = NULL;
+    }
+
+    if(istate->d) {
+        free(istate->d);
+        istate->d = NULL;
+    }
+
     // we should not free istate->data, because it is passed to
     // element object, which will free it
 }
