@@ -73,5 +73,15 @@
        d="M 146.95652,218.26087 L 306.95652,133.91304 L 473.04348,126.95652 L 675.65217,40 C 675.65217,40 890.43478,511.30435 610.43478,363.47826 C 330.43478,215.65217 147.82609,219.13043 146.95652,218.26087 z"
        id="path3327"
        name="path0" />
+    <path
+       sodipodi:type="arc"
+       style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path2388"
+       sodipodi:cx="97.826088"
+       sodipodi:cy="128.26086"
+       sodipodi:rx="32.608696"
+       sodipodi:ry="32.608696"
+       d="M 130.43478,128.26086 A 32.608696,32.608696 0 1 1 65.217392,128.26086 A 32.608696,32.608696 0 1 1 130.43478,128.26086 z"
+       name="ball" />
   </g>
 </svg>
