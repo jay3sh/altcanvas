@@ -15,7 +15,7 @@ xml.etree.ElementTree._namespace_map['http://www.w3.org/2000/svg']='svg'
 
 def search_elem(elem,name):
     try:
-        if elem.attrib['inkface_label'] == name:
+        if elem.attrib[TAG_INKSCAPE_LABEL] == name:
             return elem
     except KeyError, ke:
         pass
