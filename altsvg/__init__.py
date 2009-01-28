@@ -1,44 +1,31 @@
 '''An alternative implementation of libaltsvg. This one is in python'''
 
-import xml.dom.minidom
+from xml.etree.ElementTree import ElementTree
 
 ns = "{http://www.w3.org/2000/svg}"
-depth = 0
+TAG_G = ns+'g'
+TAG_PATH = ns+'path'
+TAG_RECT = ns+'rect'
 
-def process_element(node):
-    global depth 
-    depth += 1
-    if node.nodeName == 'g':
-        for n in node.childNodes:
-            process_element(n)
-    elif node.nodeName.startswith('#'):
-        pass
-    else:
-        print '  '*depth+node.getAttribute('id')
+def process_path(elem):
+    print elem.get('id')
 
-    depth -= 1
+def process_rect(elem):
+    print elem.get('id')
 
-def process_tree(element):
-    global depth 
-    depth += 1
-    for e in element.getchildren():
-        if e.tag[len(ns):] == 'g':
-            process_tree(e)
-        else:
-            print '  '*depth+e.get('id')
-    depth -= 1
+def process_group(elem):
+    for e in elem.getchildren():
+        elem_processor_map[e.tag](e)
 
+elem_processor_map = {
+                        TAG_G:process_group,
+                        TAG_PATH:process_path,
+                        TAG_RECT:process_rect
+                    }
 
 def parse(filename):
-    '''
-    dom = xml.dom.minidom.parse(filename)
-    root = dom.getElementsByTagName('g')[0]
-    process_element(root)
-    '''
-
-    from xml.etree.ElementTree import ElementTree
     tree = ElementTree()
     tree.parse(filename)
-    rootelem = tree.find(ns+'g')
-    process_tree(rootelem)
+    root_g = tree.find(TAG_G)
+    process_group(root_g)
 
