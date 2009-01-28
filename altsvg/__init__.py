@@ -1,31 +1,49 @@
 '''An alternative implementation of libaltsvg. This one is in python'''
 
 from xml.etree.ElementTree import ElementTree
+import xml.etree
 
-ns = "{http://www.w3.org/2000/svg}"
-TAG_G = ns+'g'
-TAG_PATH = ns+'path'
-TAG_RECT = ns+'rect'
+svg_ns = "{http://www.w3.org/2000/svg}"
+inkscape_ns = "{http://www.inkscape.org/namespaces/inkscape}"
 
-def process_path(elem):
-    print elem.get('id')
+TAG_G = svg_ns+'g'
+TAG_PATH = svg_ns+'path'
+TAG_RECT = svg_ns+'rect'
+TAG_INKSCAPE_LABEL = inkscape_ns+'label'
 
-def process_rect(elem):
-    print elem.get('id')
+xml.etree.ElementTree._namespace_map['http://www.w3.org/2000/svg']='svg'
 
-def process_group(elem):
+def search_elem(elem,name):
+    try:
+        if elem.attrib['inkface_label'] == name:
+            return elem
+    except KeyError, ke:
+        pass
+
+
+def search_group(elem,name):
+    try:
+        if elem.attrib[TAG_INKSCAPE_LABEL] == name:
+            return elem
+    except KeyError, ke:
+        pass
+
     for e in elem.getchildren():
-        elem_processor_map[e.tag](e)
+        if e.tag == TAG_G:
+            res = search_group(e,name)
+        else:
+            res = search_elem(e,name)
 
-elem_processor_map = {
-                        TAG_G:process_group,
-                        TAG_PATH:process_path,
-                        TAG_RECT:process_rect
-                    }
+        if res: return res
+
 
 def parse(filename):
     tree = ElementTree()
     tree.parse(filename)
     root_g = tree.find(TAG_G)
-    process_group(root_g)
+    elem = search_group(root_g,'gObject')
+    if elem:    
+        print elem.attrib['id']
+    else:
+        print 'no elem found'
 
