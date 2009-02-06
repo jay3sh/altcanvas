@@ -115,23 +115,23 @@ def render_path(cr,node):
     pathdata = node.attrib.get('d')
     pathdata = pathdata.replace(',',' ')
 
+    dx,dy = cr.get_current_point()
+
     tokens = pathdata.split()
     i = 0
-    print tokens
-    print len(tokens)
     while i < len(tokens):
         if tokens[i].isalpha():
             if tokens[i] == 'L':
                 x = int(float(tokens[i+1]))
                 y = int(float(tokens[i+2]))
                 i += 3
-                cr.line_to(x,y)
+                cr.line_to(x+dx,y+dy)
                 continue
             elif tokens[i] == 'M':
                 x = int(float(tokens[i+1]))
                 y = int(float(tokens[i+2]))
                 i += 3
-                cr.move_to(x,y)
+                cr.move_to(x+dx,y+dy)
                 continue
             elif tokens[i] == 'C':
                 x1 = int(float(tokens[i+1]))
@@ -141,7 +141,7 @@ def render_path(cr,node):
                 x = int(float(tokens[i+5]))
                 y = int(float(tokens[i+6]))
                 i += 7
-                cr.curve_to(x1,y1,x2,y2,x,y)
+                cr.curve_to(x1+dx,y1+dy,x2+dx,y2+dy,x+dx,y+dy)
                 continue
             elif tokens[i] == 'z':
                 break

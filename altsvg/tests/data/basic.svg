@@ -36,9 +36,9 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.35"
-     inkscape:cx="375"
-     inkscape:cy="520"
+     inkscape:zoom="0.79"
+     inkscape:cx="200"
+     inkscape:cy="350"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -64,33 +64,37 @@
     <g
        id="g3163"
        inkscape:label="gObject"
-       transform="translate(-68.571429,-151.42857)">
+       transform="translate(-63.508138,-131.1754)">
       <rect
-         y="198.07646"
-         x="111.42857"
+         y="183.01317"
+         x="111.70705"
          height="254.28572"
          width="297.14285"
          id="rect2389"
          style="opacity:1;fill:#ffff00;fill-opacity:1;stroke:#000000;stroke-width:5.9000001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
       <rect
-         y="309.50504"
-         x="208.57143"
+         y="221.58087"
+         x="139.96381"
          height="91.428574"
          width="154.28572"
          id="rect3161"
          style="opacity:1;fill:#ffff00;fill-opacity:1;stroke:#000000;stroke-width:5.9000001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     </g>
-    <rect
-       style="opacity:1;fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:5.9000001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect3167"
-       width="174.28572"
-       height="125.71429"
-       x="85.714287"
-       y="446.64786" />
-    <path
-       style="fill:#800080;fill-rule:evenodd;stroke:#000000;stroke-width:6.69999981;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 211.42857,395.21932 L 254.28571,252.36218 C 254.28571,252.36218 417.14285,46.647901 377.14285,315.21932 C 337.14285,583.79075 282.85714,566.6479 282.85714,566.6479 L 211.42857,395.21932 z"
-       id="path3169"
-       inkscape:label="crazypath" />
+    <g
+       id="g2430"
+       transform="translate(-75.949371,74.683541)">
+      <rect
+         y="459.30609"
+         x="202.16998"
+         height="125.71429"
+         width="174.28572"
+         id="rect3167"
+         style="opacity:1;fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:5.9000001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:label="crazypath"
+         id="path3169"
+         d="M 211.42857,395.21932 L 254.28571,252.36218 C 254.28571,252.36218 417.14285,46.647901 377.14285,315.21932 C 337.14285,583.79075 282.85714,566.6479 282.85714,566.6479 L 211.42857,395.21932 z"
+         style="fill:#800080;fill-rule:evenodd;stroke:#000000;stroke-width:6.69999981;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
   </g>
 </svg>
