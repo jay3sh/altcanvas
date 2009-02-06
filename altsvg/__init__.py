@@ -51,12 +51,18 @@ def get_elements(root_g,name=None):
             else:
                 continue
 
-def render_rect(node):
-    print 'Drawing rect '+\
-            ' w:'+str(node.attrib.get('width'))+\
-            ' h:'+str(node.attrib.get('height'))
+def render_rect(cr,node):
+    cr.save()
+    x = float(node.attrib.get('x'))
+    y = float(node.attrib.get('y'))
+    w = float(node.attrib.get('width'))
+    h = float(node.attrib.get('height'))
+    cr.rectangle(x,y,w,h)
+    cr.stroke()
+    print 'Drawing rect %f,%f,%f,%f'%(x,y,w,h)
+    cr.restore()
 
-def render_path(node):
+def render_path(cr,node):
     print 'Drawing path '+node.attrib.get('id')
     
 node_renderer = \
@@ -155,6 +161,6 @@ def render(cr,node):
         else:
             r = node_renderer.get(e.tag,None)
             if r:
-                r(e)
+                r(cr,e)
             else:
                 print e.tag
