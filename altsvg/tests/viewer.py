@@ -20,22 +20,25 @@ class ViewWindow(gtk.Window):
         self.resize(width,height)
 
 class App:
+    tree = None
     def __init__(self):
         pass
 
     def do_expose(self,event,data):
         cr = self.widget.window.cairo_create()
-        draw(cr)
+
+        altsvg.render_full(cr,self.tree)
 
     def main(self):
-        tree = altsvg.load('data/basic.svg')
-        w,h = altsvg.extract_doc_data(tree)
+        self.tree = altsvg.load('data/basic.svg')
+        w,h = altsvg.extract_doc_data(self.tree)
         window = ViewWindow(int(w),int(h))
     
         window.connect("destroy", gtk.main_quit)
         window.show()
     
         self.widget = ViewingArea(self.do_expose)
+
         window.add(self.widget)
         self.widget.show()
 

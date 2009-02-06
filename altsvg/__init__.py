@@ -135,15 +135,23 @@ def extract_doc_data(tree):
 #
 # @return elementlist
 #
-def extract(tree):
+def extract_svg_elements(tree):
     root_g = tree.find(TAG_G)
     for e in root_g.getchildren():
         if e.attrib.has_key(TAG_INKSCAPE_LABEL):
             # Create SVG element for this node
             print e.attrib.get('id')
 
+def render_full(cr,tree):
+    root_g = tree.find(TAG_G)
+    render(cr,root_g)
+        
 def walk(tree):
     pass
 
 def render(cr,node):
-    pass
+    for e in node.getchildren():
+        if e.tag == TAG_G:
+            render(cr,e)
+        else:
+            print 'rendering '+e.tag
