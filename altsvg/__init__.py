@@ -86,7 +86,6 @@ class SVGElement:
             r(self.xmlnode)
         else:
             print self.xmlnode.tag
-        pass
 
 def parse(filename):
     tree = ElementTree()
@@ -154,4 +153,8 @@ def render(cr,node):
         if e.tag == TAG_G:
             render(cr,e)
         else:
-            print 'rendering '+e.tag
+            r = node_renderer.get(e.tag,None)
+            if r:
+                r(e)
+            else:
+                print e.tag
