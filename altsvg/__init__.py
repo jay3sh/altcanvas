@@ -101,7 +101,6 @@ def render_rect(cr,node):
     y = float(node.attrib.get('y'))
     w = float(node.attrib.get('width'))
     h = float(node.attrib.get('height'))
-    #cr.rectangle(x,y,w,h)
     cr.rel_move_to(x,y)
     cr.rel_line_to(w,0)
     cr.rel_line_to(0,h)
@@ -112,7 +111,48 @@ def render_rect(cr,node):
     cr.restore()
 
 def render_path(cr,node):
-    print 'Drawing path '+node.attrib.get('id')
+    pathdata = node.attrib.get('d')
+    pathdata = pathdata.replace(',',' ')
+
+    tokens = pathdata.split()
+    i = 0
+    print tokens
+    print len(tokens)
+    while i < len(tokens):
+        if tokens[i].isalpha():
+            if tokens[i] == 'L':
+                x = int(float(tokens[i+1]))
+                y = int(float(tokens[i+2]))
+                i += 3
+                #line
+                print 'line to %d %d'%(x,y)
+                continue
+            elif tokens[i] == 'M':
+                x = int(float(tokens[i+1]))
+                y = int(float(tokens[i+2]))
+                i += 3
+                #move
+                print 'move to %d %d'%(x,y)
+                continue
+            elif tokens[i] == 'C':
+                x1 = int(float(tokens[i+1]))
+                y1 = int(float(tokens[i+2]))
+                x2 = int(float(tokens[i+3]))
+                y2 = int(float(tokens[i+4]))
+                x = int(float(tokens[i+5]))
+                y = int(float(tokens[i+6]))
+                i += 7
+                print 'curve to %d %d'%(x,y)
+                continue
+            elif tokens[i] == 'z':
+                break
+
+        # This should never be reached; 
+        # but if the path data is malformed this will help from 
+        # getting stuck in an infinite loop
+        i += 1
+
+
     
 node_renderer = \
     {
@@ -169,7 +209,6 @@ def render(cr,node):
         dy = 0
         transform = e.attrib.get('transform')
         if transform:
-            print transform
             pattern = '(\w+)\(([0-9-.]+),([0-9-.]+)\)'
             m = re.search(pattern,transform)
             if m: 
