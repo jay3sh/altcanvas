@@ -2,12 +2,6 @@
 import gtk
 import altsvg
 
-def draw(cr):
-    cr.set_source_rgb(1,1,0)
-    cr.move_to(1,1)
-    cr.line_to(10,10)
-    cr.stroke()
-
 class ViewingArea(gtk.DrawingArea):
     def __init__(self,expose_handler):
         gtk.DrawingArea.__init__(self)
@@ -19,6 +13,35 @@ class ViewWindow(gtk.Window):
         gtk.Window.__init__(self)
         self.resize(width,height)
 
+def drawexp(cr):
+    #cr.move_to(10,10)
+    #cr.line_to(200,200)
+    #cr.stroke()
+
+    cr.move_to(200,200)
+
+    cr.set_source_rgb(1,0,0)
+
+    cr.save()
+    
+    width = 60
+    height = 60
+    cr.set_source_rgb(1,1,0)
+    cr.rel_move_to(20,20)
+    cr.rel_line_to(width,0)
+    cr.rel_line_to(0,height)
+    cr.rel_line_to(-width,0)
+    cr.rel_line_to(0,-height)
+    cr.stroke()
+    
+    cr.restore()
+
+    cr.rel_move_to(0,0)
+    cr.rel_line_to(200,10)
+    cr.stroke()
+
+
+    
 class App:
     tree = None
     def __init__(self):
@@ -27,6 +50,7 @@ class App:
     def do_expose(self,event,data):
         cr = self.widget.window.cairo_create()
 
+        #drawexp(cr)
         altsvg.render_full(cr,self.tree)
 
     def main(self):

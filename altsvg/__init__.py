@@ -5,6 +5,8 @@
 from xml.etree.ElementTree import ElementTree
 import xml.etree
 
+import re
+
 svg_ns = "{http://www.w3.org/2000/svg}"
 inkscape_ns = "{http://www.inkscape.org/namespaces/inkscape}"
 
@@ -51,26 +53,6 @@ def get_elements(root_g,name=None):
             else:
                 continue
 
-def render_rect(cr,node):
-    cr.save()
-    x = float(node.attrib.get('x'))
-    y = float(node.attrib.get('y'))
-    w = float(node.attrib.get('width'))
-    h = float(node.attrib.get('height'))
-    cr.rectangle(x,y,w,h)
-    cr.stroke()
-    print 'Drawing rect %f,%f,%f,%f'%(x,y,w,h)
-    cr.restore()
-
-def render_path(cr,node):
-    print 'Drawing path '+node.attrib.get('id')
-    
-node_renderer = \
-    {
-        TAG_RECT:render_rect,
-        TAG_PATH:render_path
-    }
-
 class SVGElement:
     surface = None
     def __init__(self,name,xmlnode):
@@ -112,6 +94,26 @@ class SVGParser:
             print e.attrib.get('id')
 
 #---------------------- FORMAL -------------------------------
+
+def render_rect(cr,node):
+    cr.save()
+    x = float(node.attrib.get('x'))
+    y = float(node.attrib.get('y'))
+    w = float(node.attrib.get('width'))
+    h = float(node.attrib.get('height'))
+    cr.rectangle(x,y,w,h)
+    cr.stroke()
+    cr.restore()
+
+def render_path(cr,node):
+    print 'Drawing path '+node.attrib.get('id')
+    
+node_renderer = \
+    {
+        TAG_RECT:render_rect,
+        TAG_PATH:render_path
+    }
+
 
 #
 # INTERFACE
@@ -156,6 +158,7 @@ def walk(tree):
 
 def render(cr,node):
     for e in node.getchildren():
+        transform = e.attrib.get('transform')
         if e.tag == TAG_G:
             render(cr,e)
         else:
