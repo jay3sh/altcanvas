@@ -103,9 +103,9 @@ def load_style(style_str):
     return style
 
 def apply_style(cr,style):
-    if style.get('stroke-width',None):
+    if style.has_key('stroke-width'):
         cr.set_line_width(float(style['stroke-width']))
-    if style.get('stroke-miterlimit',None):
+    if style.has_key('stroke-miterlimit'):
         cr.set_miter_limit(float(style['stroke-miterlimit']))
 
 def render_rect(cr,node):
@@ -134,6 +134,13 @@ def render_rect(cr,node):
 
 def render_path(cr,node):
     cr.save()
+
+    style_str = node.attrib.get('style')
+    if style_str:
+        style = load_style(style_str)
+        if style:
+            apply_style(cr,style)
+
     pathdata = node.attrib.get('d')
     pathdata = pathdata.replace(',',' ')
 
