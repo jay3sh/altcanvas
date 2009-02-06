@@ -111,6 +111,7 @@ def render_rect(cr,node):
     cr.restore()
 
 def render_path(cr,node):
+    cr.save()
     pathdata = node.attrib.get('d')
     pathdata = pathdata.replace(',',' ')
 
@@ -124,15 +125,13 @@ def render_path(cr,node):
                 x = int(float(tokens[i+1]))
                 y = int(float(tokens[i+2]))
                 i += 3
-                #line
-                print 'line to %d %d'%(x,y)
+                cr.line_to(x,y)
                 continue
             elif tokens[i] == 'M':
                 x = int(float(tokens[i+1]))
                 y = int(float(tokens[i+2]))
                 i += 3
-                #move
-                print 'move to %d %d'%(x,y)
+                cr.move_to(x,y)
                 continue
             elif tokens[i] == 'C':
                 x1 = int(float(tokens[i+1]))
@@ -142,7 +141,7 @@ def render_path(cr,node):
                 x = int(float(tokens[i+5]))
                 y = int(float(tokens[i+6]))
                 i += 7
-                print 'curve to %d %d'%(x,y)
+                cr.curve_to(x1,y1,x2,y2,x,y)
                 continue
             elif tokens[i] == 'z':
                 break
@@ -152,6 +151,8 @@ def render_path(cr,node):
         # getting stuck in an infinite loop
         i += 1
 
+    cr.stroke_preserve()
+    cr.restore()
 
     
 node_renderer = \
