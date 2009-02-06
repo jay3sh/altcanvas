@@ -101,8 +101,14 @@ def render_rect(cr,node):
     y = float(node.attrib.get('y'))
     w = float(node.attrib.get('width'))
     h = float(node.attrib.get('height'))
-    cr.rectangle(x,y,w,h)
-    cr.stroke()
+    #cr.rectangle(x,y,w,h)
+    cr.rel_move_to(x,y)
+    cr.rel_line_to(w,0)
+    cr.rel_line_to(0,h)
+    cr.rel_line_to(-w,0)
+    cr.rel_line_to(0,-h)
+    cr.stroke_preserve()
+    cr.rel_move_to(-x,-y)
     cr.restore()
 
 def render_path(cr,node):
@@ -151,6 +157,7 @@ def extract_svg_elements(tree):
 
 def render_full(cr,tree):
     root_g = tree.find(TAG_G)
+    cr.move_to(0,0)
     render(cr,root_g)
         
 def walk(tree):
@@ -158,7 +165,19 @@ def walk(tree):
 
 def render(cr,node):
     for e in node.getchildren():
+        dx = 0
+        dy = 0
         transform = e.attrib.get('transform')
+        if transform:
+            print transform
+            pattern = '(\w+)\(([0-9-.]+),([0-9-.]+)\)'
+            m = re.search(pattern,transform)
+            if m: 
+                dx = float(m.group(2))
+                dy = float(m.group(3))
+
+        cr.rel_move_to(int(dx),int(dy))
+
         if e.tag == TAG_G:
             render(cr,e)
         else:
@@ -167,3 +186,5 @@ def render(cr,node):
                 r(cr,e)
             else:
                 print e.tag
+
+        cr.rel_move_to(-int(dx),-int(dy))
