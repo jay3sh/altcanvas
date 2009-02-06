@@ -1,5 +1,7 @@
 '''An alternative implementation of libaltsvg. This one is in python'''
 
+#---------------------- EXPERIMENTAL -------------------------------
+
 from xml.etree.ElementTree import ElementTree
 import xml.etree
 
@@ -49,7 +51,9 @@ def get_elements(root_g,name=None):
                 continue
 
 def render_rect(node):
-    print 'Drawing rect '+node.attrib.get('id')
+    print 'Drawing rect '+\
+            ' w:'+str(node.attrib.get('width'))+\
+            ' h:'+str(node.attrib.get('height'))
 
 def render_path(node):
     print 'Drawing path '+node.attrib.get('id')
@@ -91,3 +95,42 @@ def parse(filename):
     for e in get_elements(root_g):
         print e.get_surface()
 
+class SVGParser:
+    def __init__(self,docname):
+        self.tree = ElementTree()
+        self.tree.parse(docname)
+
+        #Find the first "g" tag and treat it as root "g" node
+        root_g = self.tree.find(TAG_G)
+        for e in root_g.getchildren():
+            print e.attrib.get('id')
+
+#---------------------- FORMAL -------------------------------
+
+#
+# INTERFACE
+#
+
+#
+# @return tree
+#
+def load(svgname):
+    tree = ElementTree()
+    tree.parse(svgname)
+    return tree
+
+#
+# @return elementlist
+#
+def extract(tree):
+    root_g = tree.find(TAG_G)
+    for e in root_g.getchildren():
+        if e.attrib.has_key(TAG_INKSCAPE_LABEL):
+            # Create SVG element for this node
+            print e.attrib.get('id')
+
+def walk(tree):
+    pass
+
+def render(cr,node):
+    pass

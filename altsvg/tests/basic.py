@@ -1,4 +1,5 @@
 
 import altsvg
 
-altsvg.parse('data/basic.svg')
+tree = altsvg.load('data/basic.svg')
+altsvg.extract(tree)
