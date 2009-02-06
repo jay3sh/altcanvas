@@ -95,8 +95,29 @@ class SVGParser:
 
 #---------------------- FORMAL -------------------------------
 
+def load_style(style_str):
+    style = {}
+    for style_attr in style_str.strip().split(';'):
+        name,value = style_attr.split(':')
+        style[name] = value
+    return style
+
+def apply_style(cr,style):
+    if style.get('stroke-width',None):
+        cr.set_line_width(float(style['stroke-width']))
+    if style.get('stroke-miterlimit',None):
+        cr.set_miter_limit(float(style['stroke-miterlimit']))
+
 def render_rect(cr,node):
+
     cr.save()
+
+    style_str = node.attrib.get('style')
+    if style_str:
+        style = load_style(style_str)
+        if style:
+            apply_style(cr,style)
+
     x = float(node.attrib.get('x'))
     y = float(node.attrib.get('y'))
     w = float(node.attrib.get('width'))
@@ -108,6 +129,7 @@ def render_rect(cr,node):
     cr.rel_line_to(0,-h)
     cr.stroke_preserve()
     cr.rel_move_to(-x,-y)
+
     cr.restore()
 
 def render_path(cr,node):
