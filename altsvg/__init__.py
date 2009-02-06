@@ -8,6 +8,7 @@ import xml.etree
 svg_ns = "{http://www.w3.org/2000/svg}"
 inkscape_ns = "{http://www.inkscape.org/namespaces/inkscape}"
 
+TAG_SVG=svg_ns+'svg'
 TAG_G = svg_ns+'g'
 TAG_PATH = svg_ns+'path'
 TAG_RECT = svg_ns+'rect'
@@ -118,6 +119,18 @@ def load(svgname):
     tree = ElementTree()
     tree.parse(svgname)
     return tree
+
+#
+# @return extract properties of the doc - returns a simple tuple for now
+#
+def extract_doc_data(tree):
+    root = tree.getroot()
+    try: 
+        return(float(root.attrib.get('width')),
+            float(root.attrib.get('height')))
+    except ValueError,ve:
+        print 'Error extracting SVG doc dimensions, falling back to 300x300'
+        return ((300,300))
 
 #
 # @return elementlist

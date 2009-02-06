@@ -8,13 +8,14 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="744.09448819"
-   height="1052.3622047"
+   width="400"
+   height="700"
    id="svg2"
    sodipodi:version="0.32"
    inkscape:version="0.46"
    sodipodi:docname="basic.svg"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   version="1.0">
   <defs
      id="defs4">
     <inkscape:perspective
@@ -62,14 +63,15 @@
      id="layer1">
     <g
        id="g3163"
-       inkscape:label="gObject">
+       inkscape:label="gObject"
+       transform="translate(-68.571429,-151.42857)">
       <rect
          y="198.07646"
          x="111.42857"
          height="254.28572"
          width="297.14285"
          id="rect2389"
-         style="opacity:1;fill:#ffff00;fill-opacity:1;stroke:#000000;stroke-width:5.90000000000000036;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="opacity:1;fill:#ffff00;fill-opacity:1;stroke:#000000;stroke-width:5.9000001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
       <rect
          y="309.50504"
          x="208.57143"
@@ -79,15 +81,15 @@
          style="opacity:1;fill:#ffff00;fill-opacity:1;stroke:#000000;stroke-width:5.9000001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     </g>
     <rect
-       style="opacity:1;fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:5.90000009999999975;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="opacity:1;fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:5.9000001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect3167"
        width="174.28572"
        height="125.71429"
-       x="262.85715"
-       y="695.2193" />
+       x="85.714287"
+       y="446.64786" />
     <path
-       style="fill:#800080;fill-rule:evenodd;stroke:#000000;stroke-width:6.70000000000000018;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
-       d="M 497.14286,603.79075 L 540,460.93361 C 540,460.93361 702.85714,255.21933 662.85714,523.79075 C 622.85714,792.36218 568.57143,775.21933 568.57143,775.21933 L 497.14286,603.79075 z"
+       style="fill:#800080;fill-rule:evenodd;stroke:#000000;stroke-width:6.69999981;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 211.42857,395.21932 L 254.28571,252.36218 C 254.28571,252.36218 417.14285,46.647901 377.14285,315.21932 C 337.14285,583.79075 282.85714,566.6479 282.85714,566.6479 L 211.42857,395.21932 z"
        id="path3169"
        inkscape:label="crazypath" />
   </g>

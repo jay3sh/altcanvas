@@ -9,34 +9,37 @@ def draw(cr):
     cr.stroke()
 
 class ViewingArea(gtk.DrawingArea):
-    def __init__(self):
+    def __init__(self,expose_handler):
         gtk.DrawingArea.__init__(self)
-        self.connect("expose-event",self.do_expose)
-        self.connect("key-press-event",self.do_expose)
+        self.connect("expose-event",expose_handler)
 
-    def do_expose(self,event,data):
-        cr = self.window.cairo_create()
-        draw(cr)
 
 class ViewWindow(gtk.Window):
     def __init__(self,width,height):
         gtk.Window.__init__(self)
         self.resize(width,height)
 
-def main():
-    window = ViewWindow(300,300)
-    window.connect("destroy", gtk.main_quit)
-    window.show()
+class App:
+    def __init__(self):
+        pass
 
-    widget = ViewingArea()
-    window.add(widget)
-    widget.show()
+    def do_expose(self,event,data):
+        cr = self.widget.window.cairo_create()
+        draw(cr)
 
-    gtk.main()
+    def main(self):
+        tree = altsvg.load('data/basic.svg')
+        w,h = altsvg.extract_doc_data(tree)
+        window = ViewWindow(int(w),int(h))
+    
+        window.connect("destroy", gtk.main_quit)
+        window.show()
+    
+        self.widget = ViewingArea(self.do_expose)
+        window.add(self.widget)
+        self.widget.show()
 
-def main2():
-    import altsvg
-    altsvg.SVGParser('data/basic.svg')
+        gtk.main()
 
 if __name__ == '__main__':
-    main2()
+    App().main()
