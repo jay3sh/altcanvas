@@ -46,73 +46,38 @@ class ClutterFace(Face):
             del(ctx)
 
 
-def on_key_press_event (stage, event):
-    clutter.main_quit()
-
-
-def hard_coded_path(alpha):
-    p_behavior = clutter.BehaviourBspline(alpha=alpha)
-    #p_behavior.append_knots((0,100),(100,0),(200,0),(300,100))
-    #p_behavior.append_knots((131, 378), (178.0, 297.5), (272.0, 136.5), (319, 56))
-    #p_behavior.append_knots((319, 56), (405.25, 104.5), (577.75, 201.5), (664, 250))
-    #p_behavior.append_knots((664, 250), (630.75, 291.0), (564.25, 373.0), (531, 414))
-    #p_behavior.append_knots((531, 414), (431.0, 405.0), (231.0, 387.0), (131, 378))
-
-    p_behavior.append_knots((100,100))
-    p_behavior.append_knots((220,200),(480,200),(600,100))
-    p_behavior.append_knots((500,200),(500,300),(600,400))
-
-    p_behavior.append_knots((48,59))
-    p_behavior.append_knots((48, 59), (356, 444), (640, 60))
-    p_behavior.append_knots((690, 421), (497, 444), (497, 444))
-    p_behavior.append_knots((384.75, 347.75), (160.25, 155.25), (48, 59))
-    return p_behavior
-    
 
 def element_to_bspline(alpha,elem):
     if not elem.d:
         return None
     path = elem.d.replace(',',' ')
-    print path
     i = 0
     tokens = path.split()
-    print tokens
     xs,ys = (0,0)
     p_behavior = clutter.BehaviourBspline(alpha=alpha)
 
     while i < len(tokens) and tokens[i].lower() != 'z':
-        print "--> "+tokens[i]
         if tokens[i].upper() == 'M':
-            print 'moveto '+tokens[i+1]+' '+tokens[i+2]
             xs = int(float(tokens[i+1]))
             ys = int(float(tokens[i+2]))
             p_behavior.append_knots((xs,ys))
             i += 2
         elif tokens[i].upper() == 'L':
-            print 'lineto '+tokens[i+1]+' '+tokens[i+2]
             xe = int(float(tokens[i+1]))
             ye = int(float(tokens[i+2]))
-            knot = (
-                    (xs+(xe-xs)/4.0,ys+(ye-ys)/4.0),
-                    (xs+3.0*(xe-xs)/4,ys+3.0*(ye-ys)/4),
-                    (xe,ye))
 
-            print knot
             p_behavior.append_knots((xs+(xe-xs)/4.0,ys+(ye-ys)/4.0),
                                     (xs+3.0*(xe-xs)/4,ys+3.0*(ye-ys)/4),
                                     (xe,ye))
             xs,ys = (xe,ye)
             i += 2
         elif tokens[i].upper() == 'C':
-            print 'curveto '+str(tokens[i+1:i+7])
             x1 = int(float(tokens[i+1]))
             y1 = int(float(tokens[i+2]))
             x2 = int(float(tokens[i+3]))
             y2 = int(float(tokens[i+4]))
             xe = int(float(tokens[i+5]))
             ye = int(float(tokens[i+6]))
-            knot = ((x1,y1),(x2,y2),(xe,ye))
-            print knot
             p_behavior.append_knots((x1,y1),(x2,y2),(xe,ye))
             xs,ys = (xe,ye)
             i += 6
@@ -124,48 +89,62 @@ def element_to_bspline(alpha,elem):
 class PathFinderApp:
     def __init__(self):
         self.face = ClutterFace(svgname='paths.svg')
+        self.paths = [self.face.path0,
+                self.face.path1,
+                self.face.path2,
+                self.face.path3]
 
-    def main(self):
-        stage = clutter.Stage()
-        stage.set_color(
-            clutter.Color(red=0xff, green=0xff, blue=0xff, alpha=0xff))
-        stage.set_size(width=800, height=480)
-        stage.connect('key-press-event', on_key_press_event)
-        stage.connect('destroy', clutter.main_quit)
+        self.pathactors = [self.face.path0_actor,
+                self.face.path1_actor,
+                self.face.path2_actor,
+                self.face.path3_actor]
+ 
+    def on_key_press_event(self,stage, event):
+        if event.keyval == clutter.keysyms._0:
+            self.refresh_path(0)
+        elif event.keyval == clutter.keysyms._1:
+            self.refresh_path(1)
+        elif event.keyval == clutter.keysyms._2:
+            self.refresh_path(2)
+        elif event.keyval == clutter.keysyms._3:
+            self.refresh_path(3)
+        else:
+            clutter.main_quit()
 
-        timeline = clutter.Timeline(fps=60, duration=6000)
+    def refresh_path(self,pnum):
+        self.stage.remove_all()
+        timeline = clutter.Timeline(fps=60, duration=12000)
         timeline.set_loop(True)
-        
-
-        alpha = clutter.Alpha(timeline, clutter.sine_func)
-
+        self.alpha = clutter.Alpha(timeline, clutter.sine_func)
         try:
-            p_behavior = element_to_bspline(alpha,self.face.path1)
-            #p_behavior = hard_coded_path(alpha)
+            self.p_behavior = element_to_bspline(self.alpha,self.paths[pnum])
         except Exception,e:
             import traceback
             print traceback.format_exc()
             return
 
-        '''
-        p_behavior = clutter.BehaviourBspline(alpha=alpha)
-        knots = ((0,0),(0,150),(250,300),(300,300))
-        p_behavior.append_knots(knots)
-        p_behavior.append_knots((300,300),(300,350),(350,400),(400,400))
-        '''
+        self.p_behavior.apply(self.face.star_actor)
 
-        p_behavior.apply(self.face.ball_actor)
+        self.face.star_actor.show()
+        self.pathactors[pnum].show()
 
-        #self.face.ball_actor.set_position(0,0)
-        self.face.ball_actor.show()
-        self.face.path1_actor.show()
+        self.stage.add(self.face.star_actor)
+        self.stage.add(self.pathactors[pnum])
 
-        stage.add(self.face.ball_actor)
-        stage.add(self.face.path1_actor)
-        stage.show()
+        self.stage.show()
 
-    
         timeline.start()
+
+    def main(self):
+        self.stage = clutter.Stage()
+        self.stage.set_color(
+            clutter.Color(red=0xff, green=0xff, blue=0xff, alpha=0xff))
+        self.stage.set_size(width=800, height=480)
+        self.stage.connect('key-press-event', self.on_key_press_event)
+        self.stage.connect('destroy', clutter.main_quit)
+
+        self.refresh_path(0)
+
         try:
             clutter.main()
         except:
@@ -173,7 +152,6 @@ class PathFinderApp:
             print traceback.format_exc()
     
         return 0
-
 
 
 if __name__ == '__main__':
