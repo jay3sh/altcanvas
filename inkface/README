@@ -1,0 +1,16 @@
+Build instructions
+---------------------------------
+
+Inkface uses SCons for its build mechanism. To compile Inkface using SCons follow these steps:
+
+0. Make sure you have latest SCons version (I have tested with v1.0.0) (Do scons -v). Any desktop distributions should have latest versions. For Maemo SDK developers it's not straightforward. (Maemo developers check: http://errorjournal.blogspot.com/2008/11/scons-on-maemo-is-old.html and https://bugs.maemo.org/show_bug.cgi?id=3849)
+
+1. "scons -Q python-lib" will build the binaries for Inkface
+
+2. "scons -Q python-debian" will build .deb packages on debian systems.
+
+3. To clean "scons -c"
+
+Tips:
+
+* You must have compiled and installed libaltsvg before building Inkface. If you have installed it in non-standard path, make sure you specify it in PKG_CONFIG_PATH env variable.
