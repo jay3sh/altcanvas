@@ -119,6 +119,10 @@ class PathFinderApp:
             self.anum = 'b'    # Ball
         elif event.keyval == clutter.keysyms.s:
             self.anum = 's'    # Star
+        elif event.keyval == clutter.keysyms.Down:
+            self.duration -= 1000
+        elif event.keyval == clutter.keysyms.Up:
+            self.duration += 1000
         else:
             clutter.main_quit()
 
@@ -126,6 +130,7 @@ class PathFinderApp:
 
     def refresh_path(self):
         self.stage.remove_all()
+        print 'Duration of animation = '+str(self.duration)
         timeline = clutter.Timeline(fps=60, duration=self.duration)
         timeline.set_loop(True)
         self.alpha = clutter.Alpha(timeline, clutter.sine_func)
