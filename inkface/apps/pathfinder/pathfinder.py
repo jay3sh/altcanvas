@@ -99,37 +99,50 @@ class PathFinderApp:
                 self.face.path2_actor,
                 self.face.path3_actor]
  
+        self.actors = {'b':self.face.ball_actor,
+                        's':self.face.star_actor}
+
+        self.anum = 'b'
+        self.pnum = 0
+        self.duration = 8000
+
     def on_key_press_event(self,stage, event):
         if event.keyval == clutter.keysyms._0:
-            self.refresh_path(0)
+            self.pnum = 0
         elif event.keyval == clutter.keysyms._1:
-            self.refresh_path(1)
+            self.pnum = 1
         elif event.keyval == clutter.keysyms._2:
-            self.refresh_path(2)
+            self.pnum = 2
         elif event.keyval == clutter.keysyms._3:
-            self.refresh_path(3)
+            self.pnum = 3
+        elif event.keyval == clutter.keysyms.b:
+            self.anum = 'b'    # Ball
+        elif event.keyval == clutter.keysyms.s:
+            self.anum = 's'    # Star
         else:
             clutter.main_quit()
 
-    def refresh_path(self,pnum):
+        self.refresh_path()
+
+    def refresh_path(self):
         self.stage.remove_all()
-        timeline = clutter.Timeline(fps=60, duration=12000)
+        timeline = clutter.Timeline(fps=60, duration=self.duration)
         timeline.set_loop(True)
         self.alpha = clutter.Alpha(timeline, clutter.sine_func)
         try:
-            self.p_behavior = element_to_bspline(self.alpha,self.paths[pnum])
+            self.p_behavior = element_to_bspline(self.alpha,self.paths[self.pnum])
         except Exception,e:
             import traceback
             print traceback.format_exc()
             return
 
-        self.p_behavior.apply(self.face.star_actor)
+        self.p_behavior.apply(self.actors[self.anum])
 
-        self.face.star_actor.show()
-        self.pathactors[pnum].show()
+        self.actors[self.anum].show()
+        self.pathactors[self.pnum].show()
 
-        self.stage.add(self.face.star_actor)
-        self.stage.add(self.pathactors[pnum])
+        self.stage.add(self.actors[self.anum])
+        self.stage.add(self.pathactors[self.pnum])
 
         self.stage.show()
 
@@ -143,7 +156,7 @@ class PathFinderApp:
         self.stage.connect('key-press-event', self.on_key_press_event)
         self.stage.connect('destroy', clutter.main_quit)
 
-        self.refresh_path(0)
+        self.refresh_path()
 
         try:
             clutter.main()
