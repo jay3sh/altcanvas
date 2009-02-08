@@ -32,15 +32,11 @@ def draw_rect(ctx, node):
     ctx.rel_line_to(-w, 0)
     ctx.rel_line_to(0, -h)
 
-    if style:
-        apply_fill_style(ctx, style)
+    if style and apply_fill_style(ctx, style):
+        ctx.fill_preserve()
 
-    ctx.fill_preserve()
-
-    if style:
-        apply_stroke_style(ctx, style)
-
-    ctx.stroke()
+    if style and apply_stroke_style(ctx, style):
+        ctx.stroke()
 
     ctx.move_to(save_x,save_y)
     ctx.restore()
@@ -93,15 +89,11 @@ def draw_path(ctx, node):
         # getting stuck in an infinite loop
         i += 1
 
-    if style:
-        apply_fill_style(ctx, style)
+    if style and apply_fill_style(ctx, style):
+        ctx.fill_preserve()
 
-    ctx.fill_preserve()
-
-    if style:
-        apply_stroke_style(ctx, style)
-
-    ctx.stroke()
+    if style and apply_stroke_style(ctx, style):
+        ctx.stroke()
 
     ctx.move_to(save_x,save_y)
     ctx.restore()
