@@ -36,10 +36,6 @@ TAG_INKSCAPE_LABEL  = INKSCAPE_NS+'label'
 
 import draw
 
-#
-# INTERFACE
-#
-
 def load(svgname):
     ''' load and parse SVG document, create ElementTree from the same '''
     tree = ElementTree()
@@ -57,9 +53,6 @@ def extract_doc_data(tree):
             falling back to 300x300' % str(ve)
         return ((300, 300))
 
-#
-# @return elementlist
-#
 def extract_svg_elements(tree):
     ''' 
     find SVG elements with INKSCAPE_LABEL set and export them as SVGElement 
