@@ -33,6 +33,11 @@ def draw_rect(ctx, node):
     ctx.rel_line_to(0, -h)
 
     if style:
+        apply_fill_style(ctx, style)
+
+    ctx.fill_preserve()
+
+    if style:
         apply_stroke_style(ctx, style)
 
     ctx.stroke()
@@ -43,17 +48,16 @@ def draw_rect(ctx, node):
 def draw_path(ctx, node):
     ''' Render 'path' SVG element '''
     ctx.save()
+    save_x, save_y = ctx.get_current_point()
 
+    style = None
     style_str = node.attrib.get('style')
     if style_str:
         style = load_style(style_str)
-        if style:
-            apply_stroke_style(ctx, style)
 
     pathdata = node.attrib.get('d')
     pathdata = pathdata.replace(',',' ')
 
-    dx, dy = ctx.get_current_point()
 
     tokens = pathdata.split()
     i = 0
@@ -63,13 +67,13 @@ def draw_path(ctx, node):
                 x = int(float(tokens[i+1]))
                 y = int(float(tokens[i+2]))
                 i += 3
-                ctx.line_to(x+dx, y+dy)
+                ctx.line_to(x+save_x, y+save_y)
                 continue
             elif tokens[i] == 'M':
                 x = int(float(tokens[i+1]))
                 y = int(float(tokens[i+2]))
                 i += 3
-                ctx.move_to(x+dx, y+dy)
+                ctx.move_to(x+save_x, y+save_y)
                 continue
             elif tokens[i] == 'C':
                 x1 = int(float(tokens[i+1]))
@@ -79,7 +83,7 @@ def draw_path(ctx, node):
                 x = int(float(tokens[i+5]))
                 y = int(float(tokens[i+6]))
                 i += 7
-                ctx.curve_to(x1+dx, y1+dy, x2+dx, y2+dy, x+dx, y+dy)
+                ctx.curve_to(x1+save_x, y1+save_y, x2+save_x, y2+save_y, x+save_x, y+save_y)
                 continue
             elif tokens[i] == 'z':
                 break
@@ -89,7 +93,17 @@ def draw_path(ctx, node):
         # getting stuck in an infinite loop
         i += 1
 
-    ctx.stroke_preserve()
+    if style:
+        apply_fill_style(ctx, style)
+
+    ctx.fill_preserve()
+
+    if style:
+        apply_stroke_style(ctx, style)
+
+    ctx.stroke()
+
+    ctx.move_to(save_x,save_y)
     ctx.restore()
 
     
