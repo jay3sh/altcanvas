@@ -34,9 +34,17 @@ def draw_rect(ctx, node):
 
     if style and apply_fill_style(ctx, style):
         ctx.fill_preserve()
+    else:
+        ctx.set_source_rgba(0,0,0,0)
+        ctx.fill_preserve()
+
 
     if style and apply_stroke_style(ctx, style):
         ctx.stroke()
+    else:
+        ctx.set_source_rgba(0,0,0,0)
+        ctx.stroke()
+
 
     ctx.move_to(save_x,save_y)
     ctx.restore()
@@ -53,7 +61,6 @@ def draw_path(ctx, node):
 
     pathdata = node.attrib.get('d')
     pathdata = pathdata.replace(',',' ')
-
 
     tokens = pathdata.split()
     i = 0
@@ -91,8 +98,14 @@ def draw_path(ctx, node):
 
     if style and apply_fill_style(ctx, style):
         ctx.fill_preserve()
+    else:
+        ctx.set_source_rgba(0,0,0,0)
+        ctx.fill_preserve()
 
     if style and apply_stroke_style(ctx, style):
+        ctx.stroke()
+    else:
+        ctx.set_source_rgba(0,0,0,0)
         ctx.stroke()
 
     ctx.move_to(save_x,save_y)
