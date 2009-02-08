@@ -7,6 +7,10 @@
 # Distributed under GNU General Public License version 3
 #
 
+'''
+    Routines for parsing and loading of SVG style attributes.
+'''
+
 def load_style(style_str):
     ''' Parse and load style from style string '''
     style = {}
@@ -16,9 +20,10 @@ def load_style(style_str):
     return style
 
 def html2rgb(html_color):
-    r = int(html_color[1:3],16)
-    g = int(html_color[3:5],16)
-    b = int(html_color[5:7],16)
+    ''' Converts HTML color code to normalized RGB values '''
+    r = int(html_color[1:3], 16)
+    g = int(html_color[3:5], 16)
+    b = int(html_color[5:7], 16)
     return (r/256., g/256., b/256.)
 
 def apply_stroke_style(ctx, style):

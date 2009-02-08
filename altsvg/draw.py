@@ -7,8 +7,13 @@
 # Distributed under GNU General Public License version 3
 #
 
+'''
+    Rendering routines for individual nodes
+'''
+
 import altsvg
-from altsvg.style import *
+from altsvg.style import \
+    load_style, apply_stroke_style, apply_fill_style
 
 def draw_rect(ctx, node):
     ''' Render 'rect' SVG element '''
@@ -35,18 +40,18 @@ def draw_rect(ctx, node):
     if style and apply_fill_style(ctx, style):
         ctx.fill_preserve()
     else:
-        ctx.set_source_rgba(0,0,0,0)
+        ctx.set_source_rgba(0, 0, 0, 0)
         ctx.fill_preserve()
 
 
     if style and apply_stroke_style(ctx, style):
         ctx.stroke()
     else:
-        ctx.set_source_rgba(0,0,0,0)
+        ctx.set_source_rgba(0, 0, 0, 0)
         ctx.stroke()
 
 
-    ctx.move_to(save_x,save_y)
+    ctx.move_to(save_x, save_y)
     ctx.restore()
 
 def draw_path(ctx, node):
@@ -86,7 +91,8 @@ def draw_path(ctx, node):
                 x = int(float(tokens[i+5]))
                 y = int(float(tokens[i+6]))
                 i += 7
-                ctx.curve_to(x1+save_x, y1+save_y, x2+save_x, y2+save_y, x+save_x, y+save_y)
+                ctx.curve_to(x1+save_x, y1+save_y, \
+                    x2+save_x, y2+save_y, x+save_x, y+save_y)
                 continue
             elif tokens[i] == 'z':
                 break
@@ -99,16 +105,16 @@ def draw_path(ctx, node):
     if style and apply_fill_style(ctx, style):
         ctx.fill_preserve()
     else:
-        ctx.set_source_rgba(0,0,0,0)
+        ctx.set_source_rgba(0, 0, 0, 0)
         ctx.fill_preserve()
 
     if style and apply_stroke_style(ctx, style):
         ctx.stroke()
     else:
-        ctx.set_source_rgba(0,0,0,0)
+        ctx.set_source_rgba(0, 0, 0, 0)
         ctx.stroke()
 
-    ctx.move_to(save_x,save_y)
+    ctx.move_to(save_x, save_y)
     ctx.restore()
 
     
