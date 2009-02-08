@@ -32,11 +32,17 @@ def apply_stroke_style(ctx, style):
         @return True if stroke is specified
                 False if stroke is not specified 
     '''
+    r = g = b = 0.0
+    a = 1.0
     if style.has_key('stroke'):
         if style['stroke'] == 'none':
             return False
         r, g, b = html2rgb(style['stroke'])
-        ctx.set_source_rgb(r, g, b)
+    if style.has_key('stroke-opacity'):
+        a = float(style['stroke-opacity'])
+
+    ctx.set_source_rgba(r, g, b, a)
+
     if style.has_key('stroke-width'):
         ctx.set_line_width(float(style['stroke-width']))
     if style.has_key('stroke-miterlimit'):
@@ -50,11 +56,17 @@ def apply_fill_style(ctx, style):
     @return True if fill is specified
             False if fill is not specified
     '''
+    r = g = b = 0.0
+    a = 1.0
     if style.has_key('fill'):
         if style['fill'] == 'none':
             return False
         r, g, b = html2rgb(style['fill'])
-        ctx.set_source_rgb(r, g, b)
+
+    if style.has_key('fill-opacity'):
+        a = float(style['fill-opacity'])
+
+    ctx.set_source_rgba(r, g, b, a)
 
     return True
 
