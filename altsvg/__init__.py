@@ -1,4 +1,8 @@
+#
 # This file is part of altcanvas.
+#
+# altcanvas - SVG based GUI framework
+# Copyright (C) 2009  Jayesh Salvi <jayeshsalvi@gmail.com>
 #
 # altcanvas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,6 +24,7 @@ from xml.etree.ElementTree import ElementTree
 import xml.etree
 import re
 
+
 SVG_NS      = "{http://www.w3.org/2000/svg}"
 INKSCAPE_NS = "{http://www.inkscape.org/namespaces/inkscape}"
 
@@ -29,104 +34,7 @@ TAG_PATH            = SVG_NS+'path'
 TAG_RECT            = SVG_NS+'rect'
 TAG_INKSCAPE_LABEL  = INKSCAPE_NS+'label'
 
-def load_style(style_str):
-    ''' Parse and load style from style string '''
-    style = {}
-    for style_attr in style_str.strip().split(';'):
-        name, value = style_attr.split(':')
-        style[name] = value
-    return style
-
-def apply_style(ctx, style):
-    ''' Modify given contex according to the style '''
-    if style.has_key('stroke-width'):
-        ctx.set_line_width(float(style['stroke-width']))
-    if style.has_key('stroke-miterlimit'):
-        ctx.set_miter_limit(float(style['stroke-miterlimit']))
-
-def render_rect(ctx, node):
-    ''' Render 'rect' SVG element '''
-    ctx.save()
-
-    style_str = node.attrib.get('style')
-    if style_str:
-        style = load_style(style_str)
-        if style:
-            apply_style(ctx, style)
-
-    x = float(node.attrib.get('x'))
-    y = float(node.attrib.get('y'))
-    w = float(node.attrib.get('width'))
-    h = float(node.attrib.get('height'))
-    ctx.rel_move_to(x, y)
-    ctx.rel_line_to(w, 0)
-    ctx.rel_line_to(0, h)
-    ctx.rel_line_to(-w, 0)
-    ctx.rel_line_to(0, -h)
-    ctx.stroke_preserve()
-    ctx.rel_move_to(-x, -y)
-
-    ctx.restore()
-
-def render_path(ctx, node):
-    ''' Render 'path' SVG element '''
-    ctx.save()
-
-    style_str = node.attrib.get('style')
-    if style_str:
-        style = load_style(style_str)
-        if style:
-            apply_style(ctx, style)
-
-    pathdata = node.attrib.get('d')
-    pathdata = pathdata.replace(',',' ')
-
-    dx, dy = ctx.get_current_point()
-
-    tokens = pathdata.split()
-    i = 0
-    while i < len(tokens):
-        if tokens[i].isalpha():
-            if tokens[i] == 'L':
-                x = int(float(tokens[i+1]))
-                y = int(float(tokens[i+2]))
-                i += 3
-                ctx.line_to(x+dx, y+dy)
-                continue
-            elif tokens[i] == 'M':
-                x = int(float(tokens[i+1]))
-                y = int(float(tokens[i+2]))
-                i += 3
-                ctx.move_to(x+dx, y+dy)
-                continue
-            elif tokens[i] == 'C':
-                x1 = int(float(tokens[i+1]))
-                y1 = int(float(tokens[i+2]))
-                x2 = int(float(tokens[i+3]))
-                y2 = int(float(tokens[i+4]))
-                x = int(float(tokens[i+5]))
-                y = int(float(tokens[i+6]))
-                i += 7
-                ctx.curve_to(x1+dx, y1+dy, x2+dx, y2+dy, x+dx, y+dy)
-                continue
-            elif tokens[i] == 'z':
-                break
-
-        # This should never be reached; 
-        # but if the path data is malformed this will help from 
-        # getting stuck in an infinite loop
-        i += 1
-
-    ctx.stroke_preserve()
-    ctx.restore()
-
-    
-NODE_RENDERER = \
-    {
-        TAG_RECT:render_rect,
-        TAG_PATH:render_path
-    }
-
+import draw
 
 #
 # INTERFACE
@@ -187,7 +95,7 @@ def render(ctx, node):
         if e.tag == TAG_G:
             render(ctx, e)
         else:
-            r = NODE_RENDERER.get(e.tag, None)
+            r = draw.NODE_DRAW_MAP.get(e.tag, None)
             if r:
                 r(ctx, e)
             else:
