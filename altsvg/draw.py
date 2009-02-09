@@ -11,10 +11,11 @@
     Rendering routines for individual nodes
 '''
 
+import cairo
 import altsvg
 from altsvg.style import \
     load_style, apply_stroke_style, apply_fill_style, \
-    has_fill, has_stroke
+    has_fill, has_stroke, has_opacity, get_prop
 
 def draw_rect(ctx, node):
     ''' Render 'rect' SVG element '''
@@ -103,27 +104,59 @@ def draw_path(ctx, node):
         # getting stuck in an infinite loop
         i += 1
 
-    #
-    # We do fill before stroke (the way Inkscape seems to do it)
-    # We don't want to reset path data after doing fill,
-    # we want to use same path data for stroke as well.
-    # Hence, we fill_preserve if there is a stroke to be done
-    #
-    if style and has_fill(style):
-        apply_fill_style(ctx,style)
-        if has_stroke(style):
-            ctx.fill_preserve()
-        else:
-            ctx.fill()
+    if has_opacity(style):
+        # We need to draw on temporary surface
+        ex1, ey1, ex2, ey2 = map(lambda x: int(x)+1, ctx.stroke_extents())
+        
+        px, py = ctx.get_current_point()
+        tmp_surface = cairo.ImageSurface(
+                        cairo.FORMAT_ARGB32,
+                        int(ex2)-int(ex1),int(ey2)-int(ey1))
+        tmp_ctx = cairo.Context(tmp_surface)
 
-    if style and has_stroke(style):
-        apply_stroke_style(ctx,style)
-        ctx.stroke()
+        path = ctx.copy_path()
+        tmp_ctx.new_path()
+        tmp_ctx.translate(-ex1,-ey1)
+        tmp_ctx.append_path(path)
 
+        if style and has_fill(style):
+            apply_fill_style(tmp_ctx,style)
+            if has_stroke(style):
+                tmp_ctx.fill_preserve()
+            else:
+                tmp_ctx.fill()
+
+        if style and has_stroke(style):
+            apply_stroke_style(tmp_ctx,style)
+            tmp_ctx.stroke()
+
+        opacity = float(get_prop(style,'opacity'))
+        ctx.set_source_surface(tmp_surface,ex1,ey1)
+        ctx.paint_with_alpha(opacity)
+        ctx.new_path()
+
+    else:
+        #
+        # We do fill before stroke (the way Inkscape seems to do it)
+        # We don't want to reset path data after doing fill,
+        # we want to use same path data for stroke as well.
+        # Hence, we fill_preserve if there is a stroke to be done
+        #
+        if style and has_fill(style):
+            apply_fill_style(ctx,style)
+            if has_stroke(style):
+                ctx.fill_preserve()
+            else:
+                ctx.fill()
+    
+        if style and has_stroke(style):
+            apply_stroke_style(ctx,style)
+            ctx.stroke()
+    
     ctx.move_to(save_x, save_y)
     ctx.restore()
-
     
+        
 NODE_DRAW_MAP = \
     {
         altsvg.TAG_RECT:draw_rect,

@@ -25,6 +25,12 @@ def has_stroke(style):
 def has_fill(style):
     return style.has_key('fill') and style['fill'] != 'none'
     
+def has_opacity(style):
+    return style.has_key('opacity') and style['opacity'] != '1'
+
+def get_prop(style,propname):
+    return style.get(propname,None)
+
 def html2rgb(html_color):
     ''' Converts HTML color code to normalized RGB values '''
     r = int(html_color[1:3], 16)
