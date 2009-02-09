@@ -11,73 +11,85 @@
     Routines for parsing and loading of SVG style attributes.
 '''
 
-def load_style(style_str):
-    ''' Parse and load style from style string '''
-    style = {}
-    for style_attr in style_str.strip().split(';'):
-        name, value = style_attr.split(':')
-        style[name] = value
-    return style
+class Style:
+    def __init__(self,style_str):
+        ''' Parse and load style from style string '''
+        self.__style__ = {}
+        for style_attr in style_str.strip().split(';'):
+            name, value = style_attr.split(':')
+            self.__style__[name] = value
 
-def has_stroke(style):
-    return style.has_key('stroke') and style['stroke'] != 'none'
-        
-def has_fill(style):
-    return style.has_key('fill') and style['fill'] != 'none'
+    def __getattr__(self,key):
+        ''' Override the getter to provide easy access to style attributes '''
+        if self.__dict__.has_key(key): return self.__dict__[key]
+
+        modkey = key.replace('_','-')
+
+        if self.__style__.has_key(modkey): return self.__style__[modkey]
+
+        raise AttributeError('Unknown attr '+key)
+
+    def __html2rgb(self,html_color):
+        ''' Converts HTML color code to normalized RGB values '''
+        r = int(html_color[1:3], 16)
+        g = int(html_color[3:5], 16)
+        b = int(html_color[5:7], 16)
+        return (r/256., g/256., b/256.)
+
+
+    def apply_stroke(self,ctx):
+        ''' 
+        Modify given context according to the style
+            @return True if stroke is specified
+                    False if stroke is not specified 
+        '''
+        r = g = b = 0.0
+        a = 1.0
+        if self.__style__.has_key('stroke'):
+            if self.__style__['stroke'] == 'none':
+                return False
+            r, g, b = self.__html2rgb(self.__style__['stroke'])
+        if self.__style__.has_key('stroke-opacity'):
+            a = float(self.__style__['stroke-opacity'])
     
-def has_opacity(style):
-    return style.has_key('opacity') and style['opacity'] != '1'
+        ctx.set_source_rgba(r, g, b, a)
+    
+        if self.__style__.has_key('stroke-width'):
+            ctx.set_line_width(float(self.__style__['stroke-width']))
+        if self.__style__.has_key('stroke-miterlimit'):
+            ctx.set_miter_limit(float(self.__style__['stroke-miterlimit']))
+            
+        return True
+    
+    def apply_fill(self, ctx):
+        ''' 
+        Modify given context according to the fill style parameters
+        @return True if fill is specified
+                False if fill is not specified
+        '''
+        r = g = b = 0.0
+        a = 1.0
+        if self.__style__.has_key('fill'):
+            if self.__style__['fill'] == 'none':
+                return False
+            r, g, b = self.__html2rgb(self.__style__['fill'])
+        if self.__style__.has_key('fill-opacity'):
+            a = float(self.__style__['fill-opacity'])
+    
+        ctx.set_source_rgba(r, g, b, a)
+    
+        return True
 
-def get_prop(style,propname):
-    return style.get(propname,None)
+    def has_fill(self):
+        return self.__style__.has_key('fill') and \
+                self.__style__['fill'] != 'none'
 
-def html2rgb(html_color):
-    ''' Converts HTML color code to normalized RGB values '''
-    r = int(html_color[1:3], 16)
-    g = int(html_color[3:5], 16)
-    b = int(html_color[5:7], 16)
-    return (r/256., g/256., b/256.)
+    def has_stroke(self):
+        return self.__style__.has_key('stroke') and \
+                self.__style__['stroke'] != 'none'
 
-def apply_stroke_style(ctx, style):
-    ''' 
-    Modify given context according to the style
-        @return True if stroke is specified
-                False if stroke is not specified 
-    '''
-    r = g = b = 0.0
-    a = 1.0
-    if style.has_key('stroke'):
-        if style['stroke'] == 'none':
-            return False
-        r, g, b = html2rgb(style['stroke'])
-    if style.has_key('stroke-opacity'):
-        a = float(style['stroke-opacity'])
+    def has_opacity(self):
+        return self.__style__.has_key('opacity') and \
+                self.__style__['opacity'] != '1'
 
-    ctx.set_source_rgba(r, g, b, a)
-
-    if style.has_key('stroke-width'):
-        ctx.set_line_width(float(style['stroke-width']))
-    if style.has_key('stroke-miterlimit'):
-        ctx.set_miter_limit(float(style['stroke-miterlimit']))
-        
-    return True
-
-def apply_fill_style(ctx, style):
-    ''' 
-    Modify given context according to the fill style parameters
-    @return True if fill is specified
-            False if fill is not specified
-    '''
-    r = g = b = 0.0
-    a = 1.0
-    if style.has_key('fill'):
-        if style['fill'] == 'none':
-            return False
-        r, g, b = html2rgb(style['fill'])
-    if style.has_key('fill-opacity'):
-        a = float(style['fill-opacity'])
-
-    ctx.set_source_rgba(r, g, b, a)
-
-    return True
 

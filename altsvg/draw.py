@@ -13,16 +13,14 @@
 
 import cairo
 import altsvg
-from altsvg.style import \
-    load_style, apply_stroke_style, apply_fill_style, \
-    has_fill, has_stroke, has_opacity, get_prop
+from altsvg.style import Style
 
 def draw(ctx,style):
-    if has_opacity(style):
+    if style.has_opacity():
         # We need to draw on temporary surface
         ex1, ey1, ex2, ey2 = ctx.stroke_extents()
 
-        sw = float(style['stroke-width'])
+        sw = float(style.stroke_width)
 
         tmp_surface = cairo.ImageSurface(
                         cairo.FORMAT_ARGB32,
@@ -35,32 +33,32 @@ def draw(ctx,style):
         tmp_ctx.translate(-ex1+int(sw),-ey1+int(sw))
         tmp_ctx.append_path(path)
 
-        if style and has_fill(style):
-            apply_fill_style(tmp_ctx,style)
-            if has_stroke(style):
+        if style and style.has_fill():
+            style.apply_fill(tmp_ctx)
+            if style.has_stroke():
                 tmp_ctx.fill_preserve()
             else:
                 tmp_ctx.fill()
 
-        if style and has_stroke(style):
-            apply_stroke_style(tmp_ctx,style)
+        if style and style.has_stroke():
+            style.apply_stroke(tmp_ctx)
             tmp_ctx.stroke()
 
-        opacity = float(get_prop(style,'opacity'))
+        opacity = float(style.opacity)
         ctx.set_source_surface(tmp_surface,ex1,ey1)
         ctx.paint_with_alpha(opacity)
         ctx.new_path()
 
     else:
-        if style and has_fill(style):
-            apply_fill_style(ctx,style)
-            if has_stroke(style):
+        if style and style.has_fill():
+            style.apply_fill(ctx)
+            if style.has_stroke():
                 ctx.fill_preserve()
             else:
                 ctx.fill()
 
-        if style and has_stroke(style):
-            apply_stroke_style(ctx,style)
+        if style and style.has_stroke():
+            style.apply_stroke(ctx)
             ctx.stroke()
 
 
@@ -74,7 +72,7 @@ def draw_rect(ctx, node):
 
     style_str = node.attrib.get('style')
     if style_str:
-        style = load_style(style_str)
+        style = Style(style_str)
 
 
     x = float(node.attrib.get('x'))
@@ -100,7 +98,7 @@ def draw_path(ctx, node):
     style = None
     style_str = node.attrib.get('style')
     if style_str:
-        style = load_style(style_str)
+        style = Style(style_str)
 
     pathdata = node.attrib.get('d')
     pathdata = pathdata.replace(',',' ')
