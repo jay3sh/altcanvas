@@ -32,6 +32,13 @@ def print_cmd_line(s, target, src, env):
 if 'verbose' not in ARGUMENTS.keys():
     env['PRINT_CMD_LINE_FUNC'] = print_cmd_line
 
+if 'prefix' in ARGUMENTS.keys():
+    PREFIX = ARGUMENTS['prefix']
+else:
+    PREFIX = ''
+
+Export('PREFIX')
+
 Export('env')
 
 #

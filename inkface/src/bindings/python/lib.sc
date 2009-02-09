@@ -46,10 +46,14 @@ pythonlib = env.SharedLibrary(target='inkface',
 
 if type(pythonlib) == type([]): pythonlib = pythonlib[0]
 
-env.Command('inkface.so','libinkface.so',
+inkface_module = env.Command('inkface.so','libinkface.so',
             [
                 Move("$TARGET","$SOURCE"),
             ])
 
 env.Alias('python-lib','inkface.so')
 
+Import('PREFIX')
+env.Install(dir = PREFIX+distutils.sysconfig.get_python_lib(), source=inkface_module)
+
+env.Alias('install', PREFIX+distutils.sysconfig.get_python_lib())
