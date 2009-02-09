@@ -17,6 +17,54 @@ from altsvg.style import \
     load_style, apply_stroke_style, apply_fill_style, \
     has_fill, has_stroke, has_opacity, get_prop
 
+def draw(ctx,style):
+    if has_opacity(style):
+        # We need to draw on temporary surface
+        ex1, ey1, ex2, ey2 = ctx.stroke_extents()
+
+        sw = float(style['stroke-width'])
+
+        tmp_surface = cairo.ImageSurface(
+                        cairo.FORMAT_ARGB32,
+                        int(ex2)-int(ex1)+int(2*sw),
+                        int(ey2)-int(ey1)+int(2*sw))
+        tmp_ctx = cairo.Context(tmp_surface)
+
+        # Copy path from original context and use it with tmp context
+        path = ctx.copy_path()
+        tmp_ctx.translate(-ex1+int(sw),-ey1+int(sw))
+        tmp_ctx.append_path(path)
+
+        if style and has_fill(style):
+            apply_fill_style(tmp_ctx,style)
+            if has_stroke(style):
+                tmp_ctx.fill_preserve()
+            else:
+                tmp_ctx.fill()
+
+        if style and has_stroke(style):
+            apply_stroke_style(tmp_ctx,style)
+            tmp_ctx.stroke()
+
+        opacity = float(get_prop(style,'opacity'))
+        ctx.set_source_surface(tmp_surface,ex1,ey1)
+        ctx.paint_with_alpha(opacity)
+        ctx.new_path()
+
+    else:
+        if style and has_fill(style):
+            apply_fill_style(ctx,style)
+            if has_stroke(style):
+                ctx.fill_preserve()
+            else:
+                ctx.fill()
+
+        if style and has_stroke(style):
+            apply_stroke_style(ctx,style)
+            ctx.stroke()
+
+
+   
 def draw_rect(ctx, node):
     ''' Render 'rect' SVG element '''
     ctx.save()
@@ -39,19 +87,7 @@ def draw_rect(ctx, node):
     ctx.rel_line_to(-w, 0)
     ctx.rel_line_to(0, -h)
 
-    if style and apply_fill_style(ctx, style):
-        ctx.fill_preserve()
-    else:
-        ctx.set_source_rgba(0, 0, 0, 0)
-        ctx.fill_preserve()
-
-
-    if style and apply_stroke_style(ctx, style):
-        ctx.stroke()
-    else:
-        ctx.set_source_rgba(0, 0, 0, 0)
-        ctx.stroke()
-
+    draw(ctx,style)
 
     ctx.move_to(save_x, save_y)
     ctx.restore()
@@ -104,59 +140,8 @@ def draw_path(ctx, node):
         # getting stuck in an infinite loop
         i += 1
 
-    if has_opacity(style):
-        # We need to draw on temporary surface
-        ex1, ey1, ex2, ey2 = ctx.stroke_extents()
-
-        # TODO A coarse hack to avoid clipping of curved paths at edges
-        #   A hard coded value of 6 is added to the size of surface
-        #   This seems to give enough space to accomodate the shape.
-        #   Also a fixed offset of 3 is added to translate the context
-        #   so that it comes in the middle of tmp surface avoiding clipping
-        tmp_surface = cairo.ImageSurface(
-                        cairo.FORMAT_ARGB32,
-                        int(ex2)-int(ex1)+6,int(ey2)-int(ey1)+6)
-        tmp_ctx = cairo.Context(tmp_surface)
-
-        # Copy path from original context and use it with tmp context
-        path = ctx.copy_path()
-        tmp_ctx.translate(-ex1+3,-ey1+3)
-        tmp_ctx.append_path(path)
-
-        if style and has_fill(style):
-            apply_fill_style(tmp_ctx,style)
-            if has_stroke(style):
-                tmp_ctx.fill_preserve()
-            else:
-                tmp_ctx.fill()
-
-        if style and has_stroke(style):
-            apply_stroke_style(tmp_ctx,style)
-            tmp_ctx.stroke()
-
-        opacity = float(get_prop(style,'opacity'))
-        ctx.set_source_surface(tmp_surface,ex1,ey1)
-        ctx.paint_with_alpha(opacity)
-        ctx.new_path()
-
-    else:
-        #
-        # We do fill before stroke (the way Inkscape seems to do it)
-        # We don't want to reset path data after doing fill,
-        # we want to use same path data for stroke as well.
-        # Hence, we fill_preserve if there is a stroke to be done
-        #
-        if style and has_fill(style):
-            apply_fill_style(ctx,style)
-            if has_stroke(style):
-                ctx.fill_preserve()
-            else:
-                ctx.fill()
-    
-        if style and has_stroke(style):
-            apply_stroke_style(ctx,style)
-            ctx.stroke()
-    
+    draw(ctx, style)
+   
     ctx.move_to(save_x, save_y)
     ctx.restore()
     
