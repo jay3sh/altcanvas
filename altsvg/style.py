@@ -24,7 +24,6 @@ class Style:
         if self.__dict__.has_key(key): return self.__dict__[key]
 
         modkey = key.replace('_','-')
-
         if self.__style__.has_key(modkey): return self.__style__[modkey]
 
         raise AttributeError('Unknown attr '+key)
@@ -80,16 +79,15 @@ class Style:
     
         return True
 
-    def has_fill(self):
-        return self.__style__.has_key('fill') and \
-                self.__style__['fill'] != 'none'
+    __noval = {
+                'fill':'none',
+                'stroke':'none',
+                'opacity':1
+            }
 
-    def has_stroke(self):
-        return self.__style__.has_key('stroke') and \
-                self.__style__['stroke'] != 'none'
 
-    def has_opacity(self):
-        return self.__style__.has_key('opacity') and \
-                self.__style__['opacity'] != '1'
+    def has(self,prop):
+        return self.__style__.has_key(prop) and \
+            self.__style__[prop] != self.__noval[prop]
 
 

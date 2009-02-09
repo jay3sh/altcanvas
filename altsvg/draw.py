@@ -16,7 +16,7 @@ import altsvg
 from altsvg.style import Style
 
 def draw(ctx,style):
-    if style.has_opacity():
+    if style.has('opacity'):
         # We need to draw on temporary surface
         ex1, ey1, ex2, ey2 = ctx.stroke_extents()
 
@@ -33,14 +33,14 @@ def draw(ctx,style):
         tmp_ctx.translate(-ex1+int(sw),-ey1+int(sw))
         tmp_ctx.append_path(path)
 
-        if style and style.has_fill():
+        if style and style.has('fill'):
             style.apply_fill(tmp_ctx)
-            if style.has_stroke():
+            if style.has('stroke'):
                 tmp_ctx.fill_preserve()
             else:
                 tmp_ctx.fill()
 
-        if style and style.has_stroke():
+        if style and style.has('stroke'):
             style.apply_stroke(tmp_ctx)
             tmp_ctx.stroke()
 
@@ -50,14 +50,14 @@ def draw(ctx,style):
         ctx.new_path()
 
     else:
-        if style and style.has_fill():
+        if style and style.has('fill'):
             style.apply_fill(ctx)
-            if style.has_stroke():
+            if style.has('stroke'):
                 ctx.fill_preserve()
             else:
                 ctx.fill()
 
-        if style and style.has_stroke():
+        if style and style.has('stroke'):
             style.apply_stroke(ctx)
             ctx.stroke()
 
