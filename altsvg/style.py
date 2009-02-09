@@ -19,6 +19,12 @@ def load_style(style_str):
         style[name] = value
     return style
 
+def has_stroke(style):
+    return style.has_key('stroke') and style['stroke'] != 'none'
+        
+def has_fill(style):
+    return style.has_key('fill') and style['fill'] != 'none'
+    
 def html2rgb(html_color):
     ''' Converts HTML color code to normalized RGB values '''
     r = int(html_color[1:3], 16)
@@ -28,7 +34,7 @@ def html2rgb(html_color):
 
 def apply_stroke_style(ctx, style):
     ''' 
-    Modify given contex according to the style
+    Modify given context according to the style
         @return True if stroke is specified
                 False if stroke is not specified 
     '''
@@ -62,7 +68,6 @@ def apply_fill_style(ctx, style):
         if style['fill'] == 'none':
             return False
         r, g, b = html2rgb(style['fill'])
-
     if style.has_key('fill-opacity'):
         a = float(style['fill-opacity'])
 

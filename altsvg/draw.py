@@ -13,7 +13,8 @@
 
 import altsvg
 from altsvg.style import \
-    load_style, apply_stroke_style, apply_fill_style
+    load_style, apply_stroke_style, apply_fill_style, \
+    has_fill, has_stroke
 
 def draw_rect(ctx, node):
     ''' Render 'rect' SVG element '''
@@ -102,16 +103,21 @@ def draw_path(ctx, node):
         # getting stuck in an infinite loop
         i += 1
 
-    if style and apply_fill_style(ctx, style):
-        ctx.fill_preserve()
-    else:
-        ctx.set_source_rgba(0, 0, 0, 0)
-        ctx.fill_preserve()
+    #
+    # We do fill before stroke (the way Inkscape seems to do it)
+    # We don't want to reset path data after doing fill,
+    # we want to use same path data for stroke as well.
+    # Hence, we fill_preserve if there is a stroke to be done
+    #
+    if style and has_fill(style):
+        apply_fill_style(ctx,style)
+        if has_stroke(style):
+            ctx.fill_preserve()
+        else:
+            ctx.fill()
 
-    if style and apply_stroke_style(ctx, style):
-        ctx.stroke()
-    else:
-        ctx.set_source_rgba(0, 0, 0, 0)
+    if style and has_stroke(style):
+        apply_stroke_style(ctx,style)
         ctx.stroke()
 
     ctx.move_to(save_x, save_y)
