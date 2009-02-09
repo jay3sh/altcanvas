@@ -106,17 +106,21 @@ def draw_path(ctx, node):
 
     if has_opacity(style):
         # We need to draw on temporary surface
-        ex1, ey1, ex2, ey2 = map(lambda x: int(x)+1, ctx.stroke_extents())
-        
-        px, py = ctx.get_current_point()
+        ex1, ey1, ex2, ey2 = ctx.stroke_extents()
+
+        # TODO A coarse hack to avoid clipping of curved paths at edges
+        #   A hard coded value of 6 is added to the size of surface
+        #   This seems to give enough space to accomodate the shape.
+        #   Also a fixed offset of 3 is added to translate the context
+        #   so that it comes in the middle of tmp surface avoiding clipping
         tmp_surface = cairo.ImageSurface(
                         cairo.FORMAT_ARGB32,
-                        int(ex2)-int(ex1),int(ey2)-int(ey1))
+                        int(ex2)-int(ex1)+6,int(ey2)-int(ey1)+6)
         tmp_ctx = cairo.Context(tmp_surface)
 
+        # Copy path from original context and use it with tmp context
         path = ctx.copy_path()
-        tmp_ctx.new_path()
-        tmp_ctx.translate(-ex1,-ey1)
+        tmp_ctx.translate(-ex1+3,-ey1+3)
         tmp_ctx.append_path(path)
 
         if style and has_fill(style):
