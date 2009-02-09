@@ -23,7 +23,7 @@ BuildRequires:    libgsf >= 1.6.0
 
 
 %description
-Solves great problems like world peace.
+libaltsvg is a modified version of librsvg. 
 
 %prep
 %setup -q

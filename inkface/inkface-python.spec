@@ -15,7 +15,8 @@ Requires: libaltsvg
 %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")
 
 %description
-Solves great problems like world peace.
+Python bindings for inkface.
+Inkface is an SVG based GUI framework.
 
 %prep
 %setup -q
