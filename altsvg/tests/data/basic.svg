@@ -20,6 +20,21 @@
   <defs
      id="defs4">
     <linearGradient
+       id="linearGradient3174">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop3176" />
+      <stop
+         id="stop3182"
+         offset="0.21937041"
+         style="stop-color:#000000;stop-opacity:0.49803922;" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop3178" />
+    </linearGradient>
+    <linearGradient
        inkscape:collect="always"
        id="linearGradient2399">
       <stop
@@ -47,6 +62,15 @@
        x2="343.70761"
        y2="517.40533"
        gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3174"
+       id="linearGradient3180"
+       x1="113.27831"
+       y1="218.9575"
+       x2="187.85857"
+       y2="161.6147"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -58,9 +82,9 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.1172287"
-     inkscape:cx="22.415389"
-     inkscape:cy="301.53889"
+     inkscape:zoom="0.79"
+     inkscape:cx="-51.898734"
+     inkscape:cy="350"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -164,5 +188,20 @@
        inkscape:rounded="0"
        inkscape:randomized="0"
        d="M 343.7076,514.72012 L 309.84819,513.904 L 285.54318,537.49198 L 275.85623,505.03757 L 245.91207,489.21121 L 273.78461,469.96941 L 279.58311,436.60021 L 306.49625,457.16253 L 340.02408,452.36558 L 328.78477,484.3156 L 343.7076,514.72012 z" />
+    <path
+       sodipodi:type="star"
+       style="opacity:1;fill:none;fill-opacity:1;stroke:url(#linearGradient3180);stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path2402"
+       sodipodi:sides="5"
+       sodipodi:cx="135.44304"
+       sodipodi:cy="163.29114"
+       sodipodi:r1="57.396374"
+       sodipodi:r2="25.551482"
+       sodipodi:arg1="0.72297935"
+       sodipodi:arg2="1.7424231"
+       inkscape:flatsided="false"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="M 178.48101,201.26582 L 131.07922,188.46722 L 112.62643,215.95751 L 110.15066,166.92074 L 78.303628,157.86606 L 124.17531,140.35827 L 122.94555,107.27189 L 153.77158,145.48825 L 184.85857,134.09441 L 158.03842,175.22122 L 178.48101,201.26582 z" />
   </g>
 </svg>

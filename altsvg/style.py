@@ -70,22 +70,27 @@ class Style:
             @return True if stroke is specified
                     False if stroke is not specified 
         '''
-        r = g = b = 0.0
-        a = 1.0
-        if self.__style__.has_key('stroke'):
-            if self.__style__['stroke'] == 'none':
-                return False
-            r, g, b = self.__html2rgb(self.__style__['stroke'])
-        if self.__style__.has_key('stroke-opacity'):
-            a = float(self.__style__['stroke-opacity'])
-    
-        ctx.set_source_rgba(r, g, b, a)
-    
+
         if self.__style__.has_key('stroke-width'):
             ctx.set_line_width(float(self.__style__['stroke-width']))
         if self.__style__.has_key('stroke-miterlimit'):
             ctx.set_miter_limit(float(self.__style__['stroke-miterlimit']))
             
+        r = g = b = 0.0
+        a = 1.0
+        if self.__style__.has_key('stroke'):
+            if self.__style__['stroke'] == 'none':
+                return False
+            if self.__is_url(self.__style__['stroke']):
+                self.__apply_pattern(self.__style__['stroke'],ctx)
+                return True
+            else:
+                r, g, b = self.__html2rgb(self.__style__['stroke'])
+        if self.__style__.has_key('stroke-opacity'):
+            a = float(self.__style__['stroke-opacity'])
+    
+        ctx.set_source_rgba(r, g, b, a)
+    
         return True
     
     def apply_fill(self, ctx):
