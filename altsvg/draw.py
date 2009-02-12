@@ -63,7 +63,7 @@ def draw(ctx,style):
 
 
    
-def draw_rect(ctx, node):
+def draw_rect(ctx, node, defs):
     ''' Render 'rect' SVG element '''
     ctx.save()
     save_x, save_y = ctx.get_current_point()
@@ -72,7 +72,7 @@ def draw_rect(ctx, node):
 
     style_str = node.attrib.get('style')
     if style_str:
-        style = Style(style_str)
+        style = Style(style_str, defs)
 
 
     x = float(node.attrib.get('x'))
@@ -90,7 +90,7 @@ def draw_rect(ctx, node):
     ctx.move_to(save_x, save_y)
     ctx.restore()
 
-def draw_path(ctx, node):
+def draw_path(ctx, node, defs):
     ''' Render 'path' SVG element '''
     ctx.save()
     save_x, save_y = ctx.get_current_point()
@@ -98,7 +98,7 @@ def draw_path(ctx, node):
     style = None
     style_str = node.attrib.get('style')
     if style_str:
-        style = Style(style_str)
+        style = Style(style_str, defs)
 
     pathdata = node.attrib.get('d')
     pathdata = pathdata.replace(',',' ')

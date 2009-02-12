@@ -27,20 +27,58 @@ import re
 
 SVG_NS      = "{http://www.w3.org/2000/svg}"
 INKSCAPE_NS = "{http://www.inkscape.org/namespaces/inkscape}"
+XLINK_NS    = "{http://www.w3.org/1999/xlink}"
 
-TAG_SVG             = SVG_NS+'svg'
+TAG_DEFS            = SVG_NS+'defs'
+TAG_LINEARGRAD      = SVG_NS+'linearGradient'
+TAG_STOP            = SVG_NS+'stop'
 TAG_G               = SVG_NS+'g'
 TAG_PATH            = SVG_NS+'path'
 TAG_RECT            = SVG_NS+'rect'
 TAG_INKSCAPE_LABEL  = INKSCAPE_NS+'label'
+TAG_HREF            = XLINK_NS+'href'
 
 import draw
 
+class Gradient:
+    x1 = 0
+    x2 = 0
+    y1 = 0
+    y2 = 0
+    stops = ()
+    href = None
+
 class VectorDoc:
+    defs = {}
     def __init__(self,svgname):
         ''' load and parse SVG document, create ElementTree from the same '''
         self.tree = ElementTree()
         self.tree.parse(svgname)
+
+        defs_node = self.tree.find(TAG_DEFS)
+        #
+        # Gradient are defined by a tuple of stops.
+        # Each stop is a tuple with first element offset and 
+        # second being the style string
+        #
+        for e in defs_node.getchildren():
+            if e.tag == TAG_LINEARGRAD:
+                if e.attrib.get(TAG_HREF):
+                    grad = Gradient()
+                    grad.x1 = float(e.attrib.get('x1'))
+                    grad.x2 = float(e.attrib.get('x2'))
+                    grad.y1 = float(e.attrib.get('y1'))
+                    grad.y2 = float(e.attrib.get('y2'))
+                    grad.href = e.attrib.get(TAG_HREF)
+                else:
+                    stops = filter( \
+                        lambda x: x.tag == TAG_STOP, e.getchildren())
+                    grad = Gradient()
+                    grad.stops = map ( \
+                        lambda x: (x.attrib.get('offset'),
+                                    x.attrib.get('style')),
+                        stops)
+                self.defs[e.attrib.get('id')] = grad
 
     def get_doc_props(self):
         ''' extract properties of the doc - returns a simple tuple for now '''
@@ -55,10 +93,10 @@ class VectorDoc:
 
     def get_svg_elements(self):
         ''' 
-        find SVG elements with INKSCAPE_LABEL set and export them as SVGElement 
-        objects 
+        find SVG elements with INKSCAPE_LABEL set and export them as 
+        SVGElement objects 
         '''
-        root_g = tree.find(TAG_G)
+        root_g = self.tree.find(TAG_G)
         for e in root_g.getchildren():
             if e.attrib.has_key(TAG_INKSCAPE_LABEL):
                 # Create SVG element for this node
@@ -90,7 +128,7 @@ class VectorDoc:
             else:
                 r = draw.NODE_DRAW_MAP.get(e.tag, None)
                 if r:
-                    r(ctx, e)
+                    r(ctx, e, self.defs)
                 else:
                     print e.tag
     
