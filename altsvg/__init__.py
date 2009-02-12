@@ -36,62 +36,67 @@ TAG_INKSCAPE_LABEL  = INKSCAPE_NS+'label'
 
 import draw
 
-def load(svgname):
-    ''' load and parse SVG document, create ElementTree from the same '''
-    tree = ElementTree()
-    tree.parse(svgname)
-    return tree
+class VectorDoc:
+    def __init__(self,svgname):
+        ''' load and parse SVG document, create ElementTree from the same '''
+        self.tree = ElementTree()
+        self.tree.parse(svgname)
 
-def extract_doc_data(tree):
-    ''' extract properties of the doc - returns a simple tuple for now '''
-    root = tree.getroot()
-    try: 
-        return(float(root.attrib.get('width')),
-            float(root.attrib.get('height')))
-    except ValueError, ve:
-        print 'Error extracting SVG doc dimensions "%s", \
-            falling back to 300x300' % str(ve)
-        return ((300, 300))
+    def get_doc_props(self):
+        ''' extract properties of the doc - returns a simple tuple for now '''
+        root = self.tree.getroot()
+        try: 
+            return(float(root.attrib.get('width')),
+                float(root.attrib.get('height')))
+        except ValueError, ve:
+            print 'Error extracting SVG doc dimensions "%s", \
+                falling back to 300x300' % str(ve)
+            return ((300, 300))
 
-def extract_svg_elements(tree):
-    ''' 
-    find SVG elements with INKSCAPE_LABEL set and export them as SVGElement 
-    objects 
-    '''
-    root_g = tree.find(TAG_G)
-    for e in root_g.getchildren():
-        if e.attrib.has_key(TAG_INKSCAPE_LABEL):
-            # Create SVG element for this node
-            print e.attrib.get('id')
+    def get_svg_elements(self):
+        ''' 
+        find SVG elements with INKSCAPE_LABEL set and export them as SVGElement 
+        objects 
+        '''
+        root_g = tree.find(TAG_G)
+        for e in root_g.getchildren():
+            if e.attrib.has_key(TAG_INKSCAPE_LABEL):
+                # Create SVG element for this node
+                print e.attrib.get('id')
 
-def render_full(ctx, tree):
-    ''' render the full SVG tree '''
-    root_g = tree.find(TAG_G)
-    ctx.move_to(0, 0)
-    render(ctx, root_g)
-        
-def render(ctx, node):
-    ''' render individual SVG node '''
-    for e in node.getchildren():
-        dx = 0
-        dy = 0
-        transform = e.attrib.get('transform')
-        if transform:
-            pattern = '(\w+)\(([0-9-.]+),([0-9-.]+)\)'
-            m = re.search(pattern, transform)
-            if m: 
-                dx = float(m.group(2))
-                dy = float(m.group(3))
-
-        ctx.rel_move_to(int(dx), int(dy))
-
-        if e.tag == TAG_G:
-            render(ctx, e)
-        else:
-            r = draw.NODE_DRAW_MAP.get(e.tag, None)
-            if r:
-                r(ctx, e)
+    def render_full(self,ctx):
+        ''' render the full SVG tree '''
+        root_g = self.tree.find(TAG_G)
+        ctx.move_to(0, 0)
+        self.__render(ctx, root_g)
+            
+    def __render(self,ctx, node):
+        ''' render individual SVG node '''
+        for e in node.getchildren():
+            dx = 0
+            dy = 0
+            transform = e.attrib.get('transform')
+            if transform:
+                pattern = '(\w+)\(([0-9-.]+),([0-9-.]+)\)'
+                m = re.search(pattern, transform)
+                if m: 
+                    dx = float(m.group(2))
+                    dy = float(m.group(3))
+    
+            ctx.rel_move_to(int(dx), int(dy))
+    
+            if e.tag == TAG_G:
+                self.__render(ctx, e)
             else:
-                print e.tag
+                r = draw.NODE_DRAW_MAP.get(e.tag, None)
+                if r:
+                    r(ctx, e)
+                else:
+                    print e.tag
+    
+            ctx.rel_move_to(-int(dx), -int(dy))
 
-        ctx.rel_move_to(-int(dx), -int(dy))
+
+
+
+
