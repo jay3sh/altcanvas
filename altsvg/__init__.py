@@ -39,12 +39,13 @@ TAG_RECT            = SVG_NS+'rect'
 TAG_INKSCAPE_LABEL  = INKSCAPE_NS+'label'
 TAG_HREF            = XLINK_NS+'href'
 
-import draw
-from style import LinearGradient, RadialGradient
+import altsvg.draw
+from altsvg.style import LinearGradient, RadialGradient
 
 class VectorDoc:
+    ''' Class encapsulating a single SVG document '''
     defs = {}
-    def __init__(self,svgname):
+    def __init__(self, svgname):
         ''' load and parse SVG document, create ElementTree from the same '''
         self.tree = ElementTree()
         self.tree.parse(svgname)
@@ -60,38 +61,9 @@ class VectorDoc:
             if e.tag == TAG_LINEARGRAD:
                 self.defs[e.attrib.get('id')] = \
                     LinearGradient(e)
-                '''
-                if e.attrib.get(TAG_HREF):
-                    grad = Gradient()
-                    grad.type = Gradient.TYPE_LINEAR
-                    grad.x1 = float(e.attrib.get('x1'))
-                    grad.x2 = float(e.attrib.get('x2'))
-                    grad.y1 = float(e.attrib.get('y1'))
-                    grad.y2 = float(e.attrib.get('y2'))
-                    grad.href = e.attrib.get(TAG_HREF)
-                else:
-                    stops = filter( \
-                        lambda x: x.tag == TAG_STOP, e.getchildren())
-                    grad = Gradient()
-                    grad.stops = map ( \
-                        lambda x: (x.attrib.get('offset'),
-                                    x.attrib.get('style')),
-                        stops)
-                self.defs[e.attrib.get('id')] = grad
-                '''
             elif e.tag == TAG_RADIALGRAD:
                 self.defs[e.attrib.get('id')] = \
                     RadialGradient(e)
-                '''
-                if e.attrib.get(TAG_HREF):
-                    grad = Gradient()
-                    grad.type = Gradient.TYPE_RADIAL
-                    grad.x1 = float(e.attrib.get('cx'))
-                    grad.x2 = float(e.attrib.get('cy'))
-                    grad.y1 = float(e.attrib.get('fx'))
-                    grad.y2 = float(e.attrib.get('fy'))
-                    grad.href = e.attrib.get(TAG_HREF)
-                '''
  
     def get_doc_props(self):
         ''' extract properties of the doc - returns a simple tuple for now '''
@@ -115,13 +87,13 @@ class VectorDoc:
                 # Create SVG element for this node
                 print e.attrib.get('id')
 
-    def render_full(self,ctx):
+    def render_full(self, ctx):
         ''' render the full SVG tree '''
         root_g = self.tree.find(TAG_G)
         ctx.move_to(0, 0)
         self.__render(ctx, root_g)
             
-    def __render(self,ctx, node):
+    def __render(self, ctx, node):
         ''' render individual SVG node '''
         for e in node.getchildren():
             dx = 0
@@ -139,7 +111,7 @@ class VectorDoc:
             if e.tag == TAG_G:
                 self.__render(ctx, e)
             else:
-                r = draw.NODE_DRAW_MAP.get(e.tag, None)
+                r = altsvg.draw.NODE_DRAW_MAP.get(e.tag, None)
                 if r:
                     r(ctx, e, self.defs)
                 else:

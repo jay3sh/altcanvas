@@ -16,6 +16,7 @@ import cairo
 import altsvg
 
 class Style:
+    ''' Class to encapsulate style strings '''
     def __init__(self, style_str, defs):
         ''' Parse and load style from style string '''
         self.__style__ = {}
@@ -28,10 +29,12 @@ class Style:
 
     def __getattr__(self, key):
         ''' Override the getter to provide easy access to style attributes '''
-        if self.__dict__.has_key(key): return self.__dict__[key]
+        if self.__dict__.has_key(key): 
+            return self.__dict__[key]
 
         modkey = key.replace('_','-')
-        if self.__style__.has_key(modkey): return self.__style__[modkey]
+        if self.__style__.has_key(modkey): 
+            return self.__style__[modkey]
 
         raise AttributeError('Unknown attr '+key)
 
@@ -47,7 +50,7 @@ class Style:
             grad = self.defs[grad_id]
             grad.resolve_href(self.defs)
 
-            if isinstance(grad,LinearGradient):
+            if isinstance(grad, LinearGradient):
                 cairo_grad = cairo.LinearGradient( \
                     grad.x1,grad.y1,grad.x2,grad.y2)
             elif isinstance(grad,RadialGradient):
@@ -55,8 +58,8 @@ class Style:
                     grad.fx, grad.fy, 0,
                     grad.fx, grad.fy, grad.r)
                     
-            for offset,style in grad.stops:
-                stop_style = Style(style,None)
+            for offset, style in grad.stops:
+                stop_style = Style(style, None)
                 r, g, b = self.__html2rgb(stop_style.stop_color)
                 a = float(stop_style.stop_opacity)
                 cairo_grad.add_color_stop_rgba(float(offset), r, g, b, a)
@@ -71,20 +74,19 @@ class Style:
             b = int(html_color[5:7], 16)
             return (r/256., g/256., b/256.)
         except Exception, e:
-            print 'Error parsing color code [%s]: %s'%(html_color,str(e))
+            print 'Error parsing color code [%s]: %s'% (html_color, str(e))
             return (0, 0, 0)
 
-    def __is_url(self,s):
+    def __is_url(self, colorstr):
         ''' simple check '''
-        return s.startswith('url')
+        return colorstr.startswith('url')
 
-    def apply_stroke(self,ctx):
+    def apply_stroke(self, ctx):
         ''' 
         Modify given context according to the style
             @return True if stroke is specified
                     False if stroke is not specified 
         '''
-
         if self.__style__.has_key('stroke-width'):
             ctx.set_line_width(float(self.__style__['stroke-width']))
         if self.__style__.has_key('stroke-miterlimit'):
@@ -96,7 +98,7 @@ class Style:
             if self.__style__['stroke'] == 'none':
                 return False
             if self.__is_url(self.__style__['stroke']):
-                self.__apply_pattern(self.__style__['stroke'],ctx)
+                self.__apply_pattern(self.__style__['stroke'], ctx)
                 return True
             else:
                 r, g, b = self.__html2rgb(self.__style__['stroke'])
@@ -119,7 +121,7 @@ class Style:
             if self.__style__['fill'] == 'none':
                 return False
             if self.__is_url(self.__style__['fill']):
-                self.__apply_pattern(self.__style__['fill'],ctx)
+                self.__apply_pattern(self.__style__['fill'], ctx)
                 return True
             else:
                 r, g, b = self.__html2rgb(self.__style__['fill'])
@@ -138,7 +140,8 @@ class Style:
             }
 
 
-    def has(self,prop):
+    def has(self, prop):
+        ''' check if prop is present and has active value '''
         return self.__style__.has_key(prop) and \
             self.__style__[prop] != self.__noval[prop]
 
@@ -149,9 +152,10 @@ class Style:
 #
 # I like to think of later as the instance of former.
 #
-from altsvg import TAG_HREF,TAG_STOP
+from altsvg import TAG_HREF, TAG_STOP
 
 class Gradient:
+    ''' Class to encapsulate definition of Gradients '''
     stops = ()
     href = None
     def __init__(self, defnode):

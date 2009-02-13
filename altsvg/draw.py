@@ -15,7 +15,8 @@ import cairo
 import altsvg
 from altsvg.style import Style
 
-def draw(ctx,style):
+def draw(ctx, style):
+    ''' Generic draw routine '''
     if style.has('opacity'):
         # We need to draw on temporary surface
         ex1, ey1, ex2, ey2 = ctx.stroke_extents()
@@ -30,7 +31,7 @@ def draw(ctx,style):
 
         # Copy path from original context and use it with tmp context
         path = ctx.copy_path()
-        tmp_ctx.translate(-ex1+int(sw),-ey1+int(sw))
+        tmp_ctx.translate(-ex1+int(sw), -ey1+int(sw))
         tmp_ctx.append_path(path)
 
         if style and style.has('fill'):
@@ -45,7 +46,7 @@ def draw(ctx,style):
             tmp_ctx.stroke()
 
         opacity = float(style.opacity)
-        ctx.set_source_surface(tmp_surface,ex1,ey1)
+        ctx.set_source_surface(tmp_surface, ex1, ey1)
         ctx.paint_with_alpha(opacity)
         ctx.new_path()
 
@@ -61,8 +62,6 @@ def draw(ctx,style):
             style.apply_stroke(ctx)
             ctx.stroke()
 
-
-   
 def draw_rect(ctx, node, defs):
     ''' Render 'rect' SVG element '''
     ctx.save()
@@ -84,8 +83,9 @@ def draw_rect(ctx, node, defs):
     ctx.rel_line_to(0, h)
     ctx.rel_line_to(-w, 0)
     ctx.rel_line_to(0, -h)
+    ctx.close_path()
 
-    draw(ctx,style)
+    draw(ctx, style)
 
     ctx.move_to(save_x, save_y)
     ctx.restore()
@@ -100,10 +100,7 @@ def draw_path(ctx, node, defs):
     if style_str:
         style = Style(style_str, defs)
 
-    pathdata = node.attrib.get('d')
-    pathdata = pathdata.replace(',',' ')
-
-    tokens = pathdata.split()
+    tokens = node.attrib.get('d').replace(',','').split()
     i = 0
     while i < len(tokens):
         if tokens[i].isalpha():
@@ -131,6 +128,7 @@ def draw_path(ctx, node, defs):
                     x2+save_x, y2+save_y, x+save_x, y+save_y)
                 continue
             elif tokens[i] == 'z':
+                ctx.close_path()
                 break
 
         # This should never be reached; 
