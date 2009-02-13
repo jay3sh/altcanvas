@@ -31,6 +31,7 @@ XLINK_NS    = "{http://www.w3.org/1999/xlink}"
 
 TAG_DEFS            = SVG_NS+'defs'
 TAG_LINEARGRAD      = SVG_NS+'linearGradient'
+TAG_RADIALGRAD      = SVG_NS+'radialGradient'
 TAG_STOP            = SVG_NS+'stop'
 TAG_G               = SVG_NS+'g'
 TAG_PATH            = SVG_NS+'path'
@@ -39,14 +40,7 @@ TAG_INKSCAPE_LABEL  = INKSCAPE_NS+'label'
 TAG_HREF            = XLINK_NS+'href'
 
 import draw
-
-class Gradient:
-    x1 = 0
-    x2 = 0
-    y1 = 0
-    y2 = 0
-    stops = ()
-    href = None
+from style import LinearGradient, RadialGradient
 
 class VectorDoc:
     defs = {}
@@ -56,6 +50,7 @@ class VectorDoc:
         self.tree.parse(svgname)
 
         defs_node = self.tree.find(TAG_DEFS)
+
         #
         # Gradient are defined by a tuple of stops.
         # Each stop is a tuple with first element offset and 
@@ -63,8 +58,12 @@ class VectorDoc:
         #
         for e in defs_node.getchildren():
             if e.tag == TAG_LINEARGRAD:
+                self.defs[e.attrib.get('id')] = \
+                    LinearGradient(e)
+                '''
                 if e.attrib.get(TAG_HREF):
                     grad = Gradient()
+                    grad.type = Gradient.TYPE_LINEAR
                     grad.x1 = float(e.attrib.get('x1'))
                     grad.x2 = float(e.attrib.get('x2'))
                     grad.y1 = float(e.attrib.get('y1'))
@@ -79,7 +78,21 @@ class VectorDoc:
                                     x.attrib.get('style')),
                         stops)
                 self.defs[e.attrib.get('id')] = grad
-
+                '''
+            elif e.tag == TAG_RADIALGRAD:
+                self.defs[e.attrib.get('id')] = \
+                    RadialGradient(e)
+                '''
+                if e.attrib.get(TAG_HREF):
+                    grad = Gradient()
+                    grad.type = Gradient.TYPE_RADIAL
+                    grad.x1 = float(e.attrib.get('cx'))
+                    grad.x2 = float(e.attrib.get('cy'))
+                    grad.y1 = float(e.attrib.get('fx'))
+                    grad.y2 = float(e.attrib.get('fy'))
+                    grad.href = e.attrib.get(TAG_HREF)
+                '''
+ 
     def get_doc_props(self):
         ''' extract properties of the doc - returns a simple tuple for now '''
         root = self.tree.getroot()

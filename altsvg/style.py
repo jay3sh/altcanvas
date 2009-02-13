@@ -13,16 +13,18 @@
 
 import re
 import cairo
+import altsvg
 
 class Style:
     def __init__(self, style_str, defs):
         ''' Parse and load style from style string '''
         self.__style__ = {}
         self.defs = defs
-        for style_attr in style_str.strip().split(';'):
-            if style_attr.strip():
-                name, value = style_attr.split(':')
-                self.__style__[name] = value
+        if style_str:
+            for style_attr in style_str.strip().split(';'):
+                if style_attr.strip():
+                    name, value = style_attr.split(':')
+                    self.__style__[name] = value
 
     def __getattr__(self, key):
         ''' Override the getter to provide easy access to style attributes '''
@@ -34,21 +36,32 @@ class Style:
         raise AttributeError('Unknown attr '+key)
 
     def __apply_pattern(self, pattern_url, ctx):
+        '''
+            TODO: It remains to be implemented when fill-opacity is 
+            defined in addition to gradient. It will probably involve 
+            rendering the gradient on a temp surface.
+        '''
         m = re.search("url\((\S+)\)", pattern_url)
         if m:
             grad_id = m.group(1).replace('#','')
             grad = self.defs[grad_id]
-            if grad.href:
-                grad_def = self.defs[grad.href.replace('#','')]
+            grad.resolve_href(self.defs)
 
-                lgrad = cairo.LinearGradient(grad.x1,grad.y1,grad.x2,grad.y2)
-                for offset,style in grad_def.stops:
-                    stop_style = Style(style,None)
-                    r, g, b = self.__html2rgb(stop_style.stop_color)
-                    a = float(stop_style.stop_opacity)
-                    lgrad.add_color_stop_rgba(float(offset), r, g, b, a)
+            if isinstance(grad,LinearGradient):
+                cairo_grad = cairo.LinearGradient( \
+                    grad.x1,grad.y1,grad.x2,grad.y2)
+            elif isinstance(grad,RadialGradient):
+                cairo_grad = cairo.RadialGradient( \
+                    grad.fx, grad.fy, 0,
+                    grad.fx, grad.fy, grad.r)
+                    
+            for offset,style in grad.stops:
+                stop_style = Style(style,None)
+                r, g, b = self.__html2rgb(stop_style.stop_color)
+                a = float(stop_style.stop_opacity)
+                cairo_grad.add_color_stop_rgba(float(offset), r, g, b, a)
 
-                ctx.set_source(lgrad)
+            ctx.set_source(cairo_grad)
         
     def __html2rgb(self, html_color):
         ''' Converts HTML color code to normalized RGB values '''
@@ -62,6 +75,7 @@ class Style:
             return (0, 0, 0)
 
     def __is_url(self,s):
+        ''' simple check '''
         return s.startswith('url')
 
     def apply_stroke(self,ctx):
@@ -128,4 +142,57 @@ class Style:
         return self.__style__.has_key(prop) and \
             self.__style__[prop] != self.__noval[prop]
 
+#
+# There are two kinds of Gradient def nodes
+# 1. that define stops as their children
+# 2. that define position of gradient and have link to first kind
+#
+# I like to think of later as the instance of former.
+#
+from altsvg import TAG_HREF,TAG_STOP
+
+class Gradient:
+    stops = ()
+    href = None
+    def __init__(self, defnode):
+        self.href = defnode.attrib.get(TAG_HREF)
+        if self.href: self.href = self.href.replace('#','')
+        self.stops = filter( \
+            lambda x: x.tag == TAG_STOP, defnode.getchildren())
+        self.stops = map ( \
+            lambda x: (x.attrib.get('offset'), x.attrib.get('style')),
+            self.stops)
+
+    def resolve_href(self, defs):
+        if self.href:
+            self.stops = defs[self.href].stops
+        
+ 
+class LinearGradient(Gradient):
+    x1 = 0
+    x2 = 0
+    y1 = 0
+    y2 = 0
+    def __init__(self, defnode):
+        Gradient.__init__(self, defnode)
+        self.x1 = float(defnode.attrib.get('x1', 0))
+        self.x2 = float(defnode.attrib.get('x2', 0))
+        self.y1 = float(defnode.attrib.get('y1', 0))
+        self.y2 = float(defnode.attrib.get('y2', 0))
+
+class RadialGradient(Gradient):
+    cx = 0
+    cy = 0
+    fx = 0
+    fy = 0
+    r = 0
+    def __init__(self, defnode):
+        Gradient.__init__(self, defnode)
+        self.cx = float(defnode.attrib.get('cx', 0))
+        self.cy = float(defnode.attrib.get('cy', 0))
+        self.fx = float(defnode.attrib.get('fx', 0))
+        self.fy = float(defnode.attrib.get('fy', 0))
+        self.r = float(defnode.attrib.get('r', 0))
+    
+        
 
