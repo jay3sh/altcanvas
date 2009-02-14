@@ -131,7 +131,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.79"
-     inkscape:cx="-51.898734"
+     inkscape:cx="200"
      inkscape:cy="350"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -155,6 +155,13 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
+    <rect
+       style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect2418"
+       width="400"
+       height="700"
+       x="0"
+       y="0" />
     <g
        id="g3163"
        inkscape:label="gObject"
