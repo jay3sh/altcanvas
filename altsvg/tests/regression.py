@@ -48,16 +48,12 @@ class SlideShow:
         self.svgfiles = svgfiles
         svgname = svgfiles[0]
         pygame.init()
-        w, h = (840,520)
-        self.window = pygame.display.set_mode((w,h),pygame.DOUBLEBUF )
+        self.w, self.h = (840,740)
+        self.window = pygame.display.set_mode(
+                        (self.w,self.h),pygame.RESIZABLE )
         self.screen = pygame.display.get_surface()
 
-        #surface = self.load_fresh_image(svgname)
-        #surface = self.load_saved_image(svgname.replace('svg','png'))
-
         self.counter = 0
-
-        #self.refresh_slide(surface)
 
         while True: 
             self.input(pygame.event.wait())
@@ -67,6 +63,7 @@ class SlideShow:
 
         image = pygame.image.frombuffer(buf.tostring(),
                     (surface.get_width(),surface.get_height()),"RGBA")
+
         self.screen.blit(image, (20,20))
         pygame.display.flip() 
 
