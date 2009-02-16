@@ -25,13 +25,13 @@ def draw(ctx, style):
 
         tmp_surface = cairo.ImageSurface(
                         cairo.FORMAT_ARGB32,
-                        int(ex2)-int(ex1)+int(2*sw),
-                        int(ey2)-int(ey1)+int(2*sw))
+                        int(ex2-ex1+2*sw),
+                        int(ey2-ey1+2*sw))
         tmp_ctx = cairo.Context(tmp_surface)
 
         # Copy path from original context and use it with tmp context
         path = ctx.copy_path()
-        tmp_ctx.translate(-ex1+int(sw), -ey1+int(sw))
+        tmp_ctx.translate(-ex1+sw, -ey1+sw)
         tmp_ctx.append_path(path)
 
         if style and style.has('fill'):
@@ -46,7 +46,7 @@ def draw(ctx, style):
             tmp_ctx.stroke()
 
         opacity = float(style.opacity)
-        ctx.set_source_surface(tmp_surface, ex1, ey1)
+        ctx.set_source_surface(tmp_surface, ex1-sw, ey1-sw)
         ctx.paint_with_alpha(opacity)
         ctx.new_path()
 
@@ -65,7 +65,6 @@ def draw(ctx, style):
 def draw_rect(ctx, node, defs):
     ''' Render 'rect' SVG element '''
     ctx.save()
-    save_x, save_y = ctx.get_current_point()
 
     style = None
 
@@ -87,7 +86,6 @@ def draw_rect(ctx, node, defs):
 
     draw(ctx, style)
 
-    ctx.move_to(save_x, save_y)
     ctx.restore()
 
 def draw_path(ctx, node, defs):
