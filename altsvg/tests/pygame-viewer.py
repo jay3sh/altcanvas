@@ -8,6 +8,61 @@ import numpy
 from copy import copy
 
 def draw(surface):
+    cr = cairo.Context(surface)
+    cr.select_font_face("Bitman Vera Sans",
+        cairo.FONT_SLANT_NORMAL,
+        cairo.FONT_WEIGHT_BOLD)
+    cr.set_font_size(16)
+
+    index = [0, 0xffff, 0x1ffff, -1L, 70,68,76,85,82]
+    glyphs = []
+
+    cr.translate(100,100)
+    for i in range(9):
+        x = 10 * i
+        y = 25
+        glyph = (index[i], x, y)
+        x_bearing, y_bearing, width, height, x_advance, y_advance = \
+            cr.glyph_extents((glyph,))
+
+        cr.move_to(x, y)
+        cr.set_line_width(1.0)
+
+        cr.rectangle(x+x_bearing-0.5,
+                    y+y_bearing-0.5,
+                    width+1,
+                    height+1)
+        
+        cr.set_source_rgb(1,0,0)
+        cr.stroke()
+
+        cr.set_source_rgb(1,1,1)
+        cr.show_glyphs((glyph,))
+        
+        y = 55
+        cr.move_to(x,y)
+        cr.glyph_path((glyph,))
+        cr.fill()
+
+
+    '''
+    glyphs = []
+    index = 20
+    for y in range(5):
+        for x in range(5):
+            glyphs.append ((index, (x+1)*30, (y+1)*30))
+            index += 1
+    
+    cr.glyph_path (glyphs)
+    cr.set_source_rgb (1,1,0)
+    cr.fill_preserve ()
+    cr.set_source_rgb (1,1,0)
+    cr.set_line_width (1.0)
+    cr.stroke ()
+    '''
+
+    
+def draw_shapes(surface):
     xc,yc, radius = (300,300, 50)
     x,y,w,h = (30,30,150,150)
     ctx = cairo.Context(surface)
@@ -71,9 +126,9 @@ class App:
 
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,self.w,self.h)
 
-        cr = cairo.Context(surface)
-        self.vectorDoc.render_full(cr)
-        #draw(surface)
+        #cr = cairo.Context(surface)
+        #self.vectorDoc.render_full(cr)
+        draw(surface)
 
         buf = self.rgb_voodo(surface)
 
