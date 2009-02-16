@@ -69,7 +69,7 @@ class App:
         self.vectorDoc.render_full(cr)
 
     def main(self):
-        self.vectorDoc = altsvg.VectorDoc('data/basic.svg')
+        self.vectorDoc = altsvg.VectorDoc('data/shape-1.svg')
         w,h = self.vectorDoc.get_doc_props()
         window = ViewWindow(int(w),int(h))
     
