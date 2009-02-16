@@ -23,6 +23,7 @@
 from xml.etree.ElementTree import ElementTree
 import xml.etree
 import re
+import cairo
 
 
 SVG_NS      = "{http://www.w3.org/2000/svg}"
@@ -99,14 +100,29 @@ class VectorDoc:
             dx = 0
             dy = 0
             transform = e.attrib.get('transform')
+            transform_type = None
             if transform:
-                pattern = '(\w+)\(([0-9-.]+),([0-9-.]+)\)'
+                pattern = '(\w+)\s*\(([0-9-.,]+)\)'
                 m = re.search(pattern, transform)
                 if m: 
-                    dx = float(m.group(2))
-                    dy = float(m.group(3))
+                    transform_type = m.group(1)
+                    transform_values = m.group(2)
+
+                    if transform_type == 'translate':
+                        dx, dy = \
+                        map(lambda x: float(x), transform_values.split(','))
+                    elif transform_type == 'matrix':
+                        xx, xy, yx, yy, x0, y0 = \
+                        map(lambda x: float(x), transform_values.split(','))
+                else:
+                    raise Exception('Unable to match transform')
     
-            ctx.rel_move_to(int(dx), int(dy))
+            ctx.save()
+
+            if transform_type == 'translate':
+                ctx.set_matrix(cairo.Matrix(1,0,0,1,dx,dy))
+            elif transform_type == 'matrix':
+                ctx.set_matrix(cairo.Matrix(xx,xy,yx,yy,x0,y0))
     
             if e.tag == TAG_G:
                 self.__render(ctx, e)
@@ -115,9 +131,9 @@ class VectorDoc:
                 if r:
                     r(ctx, e, self.defs)
                 else:
-                    print e.tag
+                    raise Exception("Shape not implemented: "+e.tag)
     
-            ctx.rel_move_to(-int(dx), -int(dy))
+            ctx.restore()
 
 
 

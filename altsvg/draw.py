@@ -17,7 +17,7 @@ from altsvg.style import Style
 
 def draw(ctx, style):
     ''' Generic draw routine '''
-    if style.has('opacity'):
+    if style.has('opacity') and float(style.opacity) < 1.0:
         # We need to draw on temporary surface
         ex1, ey1, ex2, ey2 = ctx.stroke_extents()
 
@@ -78,11 +78,11 @@ def draw_rect(ctx, node, defs):
     y = float(node.attrib.get('y'))
     w = float(node.attrib.get('width'))
     h = float(node.attrib.get('height'))
-    ctx.rel_move_to(x, y)
-    ctx.rel_line_to(w, 0)
-    ctx.rel_line_to(0, h)
-    ctx.rel_line_to(-w, 0)
-    ctx.rel_line_to(0, -h)
+    ctx.move_to(x, y)
+    ctx.line_to(x+w, y)
+    ctx.line_to(x+w, y+h)
+    ctx.line_to(x, y+h)
+    ctx.line_to(x, y)
     ctx.close_path()
 
     draw(ctx, style)
@@ -93,14 +93,13 @@ def draw_rect(ctx, node, defs):
 def draw_path(ctx, node, defs):
     ''' Render 'path' SVG element '''
     ctx.save()
-    save_x, save_y = ctx.get_current_point()
 
     style = None
     style_str = node.attrib.get('style')
     if style_str:
         style = Style(style_str, defs)
 
-    tokens = node.attrib.get('d').replace(',','').split()
+    tokens = node.attrib.get('d').replace(',',' ').split()
     i = 0
     while i < len(tokens):
         if tokens[i].isalpha():
@@ -108,13 +107,13 @@ def draw_path(ctx, node, defs):
                 x = int(float(tokens[i+1]))
                 y = int(float(tokens[i+2]))
                 i += 3
-                ctx.line_to(x+save_x, y+save_y)
+                ctx.line_to(x, y)
                 continue
             elif tokens[i] == 'M':
                 x = int(float(tokens[i+1]))
                 y = int(float(tokens[i+2]))
                 i += 3
-                ctx.move_to(x+save_x, y+save_y)
+                ctx.move_to(x, y)
                 continue
             elif tokens[i] == 'C':
                 x1 = int(float(tokens[i+1]))
@@ -124,8 +123,7 @@ def draw_path(ctx, node, defs):
                 x = int(float(tokens[i+5]))
                 y = int(float(tokens[i+6]))
                 i += 7
-                ctx.curve_to(x1+save_x, y1+save_y, \
-                    x2+save_x, y2+save_y, x+save_x, y+save_y)
+                ctx.curve_to(x1, y1, x2, y2, x, y)
                 continue
             elif tokens[i] == 'z':
                 ctx.close_path()
@@ -138,7 +136,6 @@ def draw_path(ctx, node, defs):
 
     draw(ctx, style)
    
-    ctx.move_to(save_x, save_y)
     ctx.restore()
     
         
