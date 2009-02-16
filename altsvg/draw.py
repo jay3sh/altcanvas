@@ -88,6 +88,85 @@ def draw_rect(ctx, node, defs):
 
     ctx.restore()
 
+from math import pi, sin, cos, ceil, fabs, sqrt, atan2
+
+def draw_arc_segment(ctx, xc, yc, th0, th1, rx, ry, xrot):
+    sin_th = sin (xrot * (pi/180.0))
+    cos_th = cos (xrot * (pi/180.0))
+
+    # inverse transform
+    a00 = cos_th * rx
+    a01 = -sin_th * ry
+    a10 = sin_th * rx
+    a11 = cos_th * ry
+
+    th_half = 0.5 * (th1 - th0)
+    t = (8.0/3.0) * sin(th_half *0.5) * sin(th_half * 0.5)/sin(th_half)
+
+    x1 = xc + cos(th0) - t * sin(th0)
+    y1 = yc + sin(th0) + t * cos(th0)
+    x3 = xc + cos(th1)
+    y3 = yc + sin(th1)
+    x2 = x3 + t * sin(th1)
+    y2 = y3 - t * cos(th1)
+
+    ctx.curve_to(
+                a00 * x1 + a01 * y1, a10 * x1 + a11 * y1,
+                a00 * x2 + a01 * y2, a10 * x2 + a11 * y2,
+                a00 * x3 + a01 * y3, a10 * x3 + a11 * y3)
+
+def draw_arc(ctx, rx, ry, xrot, laflag, swflag, x, y):
+    if rx == 0.0 or ry == 0.0:
+       return
+
+    sin_th = sin (xrot * (pi/180.0))
+    cos_th = cos (xrot * (pi/180.0))
+    a00 = cos_th / rx
+    a01 = sin_th / rx
+    a10 = -sin_th / ry
+    a11 = cos_th / ry
+
+    cpx, cpy = ctx.get_current_point()
+    x0 = a00 * cpx + a01 * cpy
+    y0 = a10 * cpx + a11 * cpy
+    x1 = a00 * x + a01 * y
+    y1 = a10 * x + a11 * y
+
+    d = (x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0)
+    sfactor_sq = 1.0 / d - 0.25 # XXX
+    if sfactor_sq < 0:
+        sfactor_sq = 0
+
+    sfactor = sqrt(sfactor_sq)
+    if swflag == laflag:
+        sfactor = -sfactor
+
+    xc = 0.5 * (x0 + x1) - sfactor * (y1 - y0)
+    yc = 0.5 * (y0 + y1) + sfactor * (x1 - x0)
+
+    th0 = atan2(y0 - yc, x0 - xc)
+    th1 = atan2(y1 - yc, x1 - xc)
+
+    th_arc =  th1 - th0
+
+    if th_arc < 0 and swflag:
+        th_arc += 2 * pi
+    elif th_arc > 0 and not swflag:
+        th_arc -= 2 * pi
+        
+    n_segs = ceil(fabs(th_arc / (pi * 0.5 + 0.001)))
+
+    i = 0
+    while i < n_segs:
+        draw_arc_segment(ctx, xc, yc,
+            th0 + i * th_arc / n_segs,
+            th0 + (i+1) * th_arc / n_segs,
+            rx, ry, xrot)
+        i += 1
+
+    # XXX ctx.set_current_point(x, y)
+
+
 def draw_path(ctx, node, defs):
     ''' Render 'path' SVG element '''
     ctx.save()
@@ -122,6 +201,17 @@ def draw_path(ctx, node, defs):
                 y = int(float(tokens[i+6]))
                 i += 7
                 ctx.curve_to(x1, y1, x2, y2, x, y)
+                continue
+            elif tokens[i] == 'A':
+                rx = float(tokens[i+1]) 
+                ry = float(tokens[i+2]) 
+                xrot = float(tokens[i+3])
+                laflag = int(tokens[i+4])
+                swflag = int(tokens[i+5])
+                x = float(tokens[i+6])
+                y = float(tokens[i+7])
+                i += 8
+                draw_arc(ctx,rx,ry,xrot,laflag,swflag,x,y)
                 continue
             elif tokens[i] == 'z':
                 ctx.close_path()
