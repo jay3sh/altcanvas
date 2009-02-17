@@ -168,7 +168,7 @@ def draw_arc(ctx, rx, ry, xrot, laflag, swflag, x, y):
 
 
 def draw_tspan(ctx, node):
-    ctx.translate(
+    ctx.move_to(
             int(float(node.attrib.get('x'))),
             int(float(node.attrib.get('y'))))
     ctx.show_text(node.text)

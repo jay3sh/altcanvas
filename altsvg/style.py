@@ -107,11 +107,14 @@ class Style:
             }[self.__style__['font-weight']]
 
         if self.__style__.has_key('font-style'):
-            font_slant = {
-                'normal':cairo.FONT_SLANT_NORMAL,
-                'italic':cairo.FONT_SLANT_ITALIC,
-                'oblique':cairo.FONT_SLANT_OBLIQUE
-            }[self.__style__['font-style']]
+            try:
+                font_slant = {
+                    'normal':cairo.FONT_SLANT_NORMAL,
+                    'italic':cairo.FONT_SLANT_ITALIC,
+                    'oblique':cairo.FONT_SLANT_OBLIQUE
+                }[self.__style__['font-style']]
+            except KeyError, ke:
+                font_slant = cairo.FONT_SLANT_NORMAL
 
         if not font_family:
             font_family = "Sans"
