@@ -45,6 +45,9 @@ TAG_HREF            = XLINK_NS+'href'
 import altsvg.draw
 from altsvg.style import LinearGradient, RadialGradient
 
+class Element:
+    surface = None
+
 class VectorDoc:
     ''' Class encapsulating a single SVG document '''
     defs = {}
@@ -67,6 +70,19 @@ class VectorDoc:
             elif e.tag == TAG_RADIALGRAD:
                 self.defs[e.attrib.get('id')] = \
                     RadialGradient(e)
+
+    def __getattr__(self,key):
+        if self.__dict__.has_key(key):
+            return self.__dict__[key]
+
+        if self.tree:
+            root = self.tree.getroot()
+            val = root.attrib.get(key)
+            if val:
+                return val
+            else:
+                raise AttributeError('Unknown attribute '+key)
+                
  
     def get_doc_props(self):
         ''' extract properties of the doc - returns a simple tuple for now '''
@@ -90,6 +106,33 @@ class VectorDoc:
                 # Create SVG element for this node
                 print e.attrib.get('id')
 
+    def get_elements(self):
+        backdrop_surface = cairo.ImageSurface(
+            cairo.FORMAT_ARGB32,
+            int(float(self.width)),
+            int(float(self.height)))
+        backdrop_ctx = cairo.Context(backdrop_surface)
+        backdrop_ctx.move_to(0,0)
+        root_g = self.tree.find(TAG_G)
+        in_backdrop = True
+        elements = []
+        for e in root_g.getchildren():
+            if in_backdrop and e.attrib.has_key(TAG_INKSCAPE_LABEL):
+                in_backdrop = False
+                elem = Element()
+                elem.surface = backdrop_surface
+                elements.append(elem)
+                break
+
+            if in_backdrop:
+                r = altsvg.draw.NODE_DRAW_MAP.get(e.tag, None)
+                if r:
+                    r(backdrop_ctx, e, self.defs)
+                else:
+                    raise Exception("Shape not implemented: "+e.tag)
+
+        return elements
+        
     def render_full(self, ctx):
         ''' render the full SVG tree '''
         root_g = self.tree.find(TAG_G)
