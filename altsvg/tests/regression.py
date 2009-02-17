@@ -90,7 +90,7 @@ class SlideShow:
 def main():
     op = sys.argv[1]
 
-    SVG_FILES = map(lambda x: 'data/shape-%d.svg'%x, range(10))
+    SVG_FILES = map(lambda x: 'data/shape-%d.svg'%x, range(11))
     SVG_FILES += (map(lambda x: 'data/composite-%d.svg'%x, range(2)))
 
     if op == 'genpng':

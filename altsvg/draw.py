@@ -77,12 +77,33 @@ def draw_rect(ctx, node, defs):
     y = float(node.attrib.get('y'))
     w = float(node.attrib.get('width'))
     h = float(node.attrib.get('height'))
-    ctx.move_to(x, y)
-    ctx.line_to(x+w, y)
-    ctx.line_to(x+w, y+h)
-    ctx.line_to(x, y+h)
-    ctx.line_to(x, y)
-    ctx.close_path()
+
+    rx = node.attrib.get('rx')
+    ry = node.attrib.get('ry')
+
+    if rx:
+        rx = float(rx)
+    if ry:
+        ry = float(ry)
+
+    if rx or ry:
+        ctx.move_to(x+rx,y)
+        ctx.line_to(x+w-rx,y)
+        draw_arc(ctx,rx,ry,0,0,1,x+w,y+ry)
+        ctx.line_to(x+w,y+h-ry)
+        draw_arc(ctx,rx,ry,0,0,1,x+w-rx,y+h)
+        ctx.line_to(x+rx,y+h)
+        draw_arc(ctx,rx,ry,0,0,1,x,y+h-ry)
+        ctx.line_to(x,y+ry)
+        draw_arc(ctx,rx,ry,0,0,1,x+rx,y)
+        ctx.close_path()
+    else:
+        ctx.move_to(x, y)
+        ctx.line_to(x+w, y)
+        ctx.line_to(x+w, y+h)
+        ctx.line_to(x, y+h)
+        ctx.line_to(x, y)
+        ctx.close_path()
 
     draw(ctx, style)
 
