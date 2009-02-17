@@ -125,11 +125,7 @@ class VectorDoc:
                 break
 
             if in_backdrop:
-                r = altsvg.draw.NODE_DRAW_MAP.get(e.tag, None)
-                if r:
-                    r(backdrop_ctx, e, self.defs)
-                else:
-                    raise Exception("Shape not implemented: "+e.tag)
+                self.__render(backdrop_ctx, e)
 
         return elements
         
@@ -137,48 +133,49 @@ class VectorDoc:
         ''' render the full SVG tree '''
         root_g = self.tree.find(TAG_G)
         ctx.move_to(0, 0)
-        self.__render(ctx, root_g)
+        for e in root_g.getchildren():
+            self.__render(ctx, e)
             
-    def __render(self, ctx, node):
+    def __render(self, ctx, e):
         ''' render individual SVG node '''
-        for e in node.getchildren():
-            dx = 0
-            dy = 0
-            transform = e.attrib.get('transform')
-            transform_type = None
-            if transform:
-                pattern = '(\w+)\s*\(([0-9-.,]+)\)'
-                m = re.search(pattern, transform)
-                if m: 
-                    transform_type = m.group(1)
-                    transform_values = m.group(2)
+        dx = 0
+        dy = 0
+        transform = e.attrib.get('transform')
+        transform_type = None
+        if transform:
+            pattern = '(\w+)\s*\(([0-9-.,]+)\)'
+            m = re.search(pattern, transform)
+            if m: 
+                transform_type = m.group(1)
+                transform_values = m.group(2)
 
-                    if transform_type == 'translate':
-                        dx, dy = \
-                        map(lambda x: float(x), transform_values.split(','))
-                    elif transform_type == 'matrix':
-                        xx, xy, yx, yy, x0, y0 = \
-                        map(lambda x: float(x), transform_values.split(','))
-                else:
-                    raise Exception('Unable to match transform')
-    
-            ctx.save()
-
-            if transform_type == 'translate':
-                ctx.set_matrix(cairo.Matrix(1,0,0,1,dx,dy))
-            elif transform_type == 'matrix':
-                ctx.set_matrix(cairo.Matrix(xx,xy,yx,yy,x0,y0))
-    
-            if e.tag == TAG_G:
-                self.__render(ctx, e)
+                if transform_type == 'translate':
+                    dx, dy = \
+                    map(lambda x: float(x), transform_values.split(','))
+                elif transform_type == 'matrix':
+                    xx, xy, yx, yy, x0, y0 = \
+                    map(lambda x: float(x), transform_values.split(','))
             else:
-                r = altsvg.draw.NODE_DRAW_MAP.get(e.tag, None)
-                if r:
-                    r(ctx, e, self.defs)
-                else:
-                    raise Exception("Shape not implemented: "+e.tag)
-    
-            ctx.restore()
+                raise Exception('Unable to match transform')
+
+        ctx.save()
+
+        if transform_type == 'translate':
+            ctx.set_matrix(cairo.Matrix(1,0,0,1,dx,dy))
+        elif transform_type == 'matrix':
+            ctx.set_matrix(cairo.Matrix(xx,xy,yx,yy,x0,y0))
+
+        if e.tag == TAG_G:
+            for sub_e in e.getchildren():
+                self.__render(ctx, sub_e)
+        else:
+            r = altsvg.draw.NODE_DRAW_MAP.get(e.tag, None)
+            if r:
+                r(ctx, e, self.defs)
+            else:
+                raise Exception("Shape not implemented: "+e.tag)
+
+        ctx.restore()
 
 
 
