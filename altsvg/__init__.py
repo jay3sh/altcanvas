@@ -37,6 +37,8 @@ TAG_STOP            = SVG_NS+'stop'
 TAG_G               = SVG_NS+'g'
 TAG_PATH            = SVG_NS+'path'
 TAG_RECT            = SVG_NS+'rect'
+TAG_TEXT            = SVG_NS+'text'
+TAG_TSPAN           = SVG_NS+'tspan'
 TAG_INKSCAPE_LABEL  = INKSCAPE_NS+'label'
 TAG_HREF            = XLINK_NS+'href'
 

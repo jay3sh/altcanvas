@@ -167,6 +167,27 @@ def draw_arc(ctx, rx, ry, xrot, laflag, swflag, x, y):
     # XXX ctx.set_current_point(x, y)
 
 
+def draw_tspan(ctx, node):
+    ctx.translate(
+            int(float(node.attrib.get('x'))),
+            int(float(node.attrib.get('y'))))
+    ctx.show_text(node.text)
+    
+def draw_text(ctx, node, defs):
+    style = None
+    style_str = node.attrib.get('style')
+    if style_str:
+        style = Style(style_str, defs)
+
+    ctx.save()
+
+    tspan_node = node.find(altsvg.TAG_TSPAN)
+    if tspan_node != None:
+        style.apply_font(ctx)
+        draw_tspan(ctx,tspan_node)
+
+    ctx.restore()
+
 def draw_path(ctx, node, defs):
     ''' Render 'path' SVG element '''
     ctx.save()
@@ -230,7 +251,8 @@ def draw_path(ctx, node, defs):
 NODE_DRAW_MAP = \
     {
         altsvg.TAG_RECT:draw_rect,
-        altsvg.TAG_PATH:draw_path
+        altsvg.TAG_PATH:draw_path,
+        altsvg.TAG_TEXT:draw_text
     }
 
 

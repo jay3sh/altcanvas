@@ -81,6 +81,49 @@ class Style:
         ''' simple check '''
         return colorstr.startswith('url')
 
+    def __parse_length(self, value_str):
+        if value_str.endswith('px'):
+            value_str = value_str.replace('px','')
+
+        return float(value_str)
+
+    def apply_font(self, ctx):
+
+        font_family = None
+        font_weight = None
+        font_slant = None
+
+        if self.__style__.has_key('font-size'):
+            ctx.set_font_size(self.__parse_length(
+                                self.__style__['font-size']))
+
+        if self.__style__.has_key('font-family'):
+            font_family = self.__style__['font-family']
+
+        if self.__style__.has_key('font-weight'):
+            font_weight = {
+                'normal':cairo.FONT_WEIGHT_NORMAL,
+                'bold'  :cairo.FONT_WEIGHT_BOLD
+            }[self.__style__['font-weight']]
+
+        if self.__style__.has_key('font-style'):
+            font_slant = {
+                'normal':cairo.FONT_SLANT_NORMAL,
+                'italic':cairo.FONT_SLANT_ITALIC,
+                'oblique':cairo.FONT_SLANT_OBLIQUE
+            }[self.__style__['font-style']]
+
+        if not font_family:
+            font_family = "Sans"
+
+        if not font_weight:
+            font_weight = cairo.FONT_WEIGHT_NORMAL
+
+        if not font_slant:
+            font_slant = cairo.FONT_SLANT_NORMAL
+
+        ctx.select_font_face(font_family, font_slant, font_weight)
+
     def apply_stroke(self, ctx):
         ''' 
         Modify given context according to the style
@@ -88,7 +131,8 @@ class Style:
                     False if stroke is not specified 
         '''
         if self.__style__.has_key('stroke-width'):
-            ctx.set_line_width(float(self.__style__['stroke-width']))
+            ctx.set_line_width(self.__parse_length(
+                                    self.__style__['stroke-width']))
         if self.__style__.has_key('stroke-miterlimit'):
             ctx.set_miter_limit(float(self.__style__['stroke-miterlimit']))
             
