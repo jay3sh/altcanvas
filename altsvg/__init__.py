@@ -47,6 +47,9 @@ from altsvg.style import LinearGradient, RadialGradient
 
 class Element:
     surface = None
+    id = None
+    x = 0
+    y = 0
 
 class VectorDoc:
     ''' Class encapsulating a single SVG document '''
@@ -84,28 +87,6 @@ class VectorDoc:
                 raise AttributeError('Unknown attribute '+key)
                 
  
-    def get_doc_props(self):
-        ''' extract properties of the doc - returns a simple tuple for now '''
-        root = self.tree.getroot()
-        try: 
-            return(float(root.attrib.get('width')),
-                float(root.attrib.get('height')))
-        except ValueError, ve:
-            print 'Error extracting SVG doc dimensions "%s", \
-                falling back to 300x300' % str(ve)
-            return ((300, 300))
-
-    def get_svg_elements(self):
-        ''' 
-        find SVG elements with INKSCAPE_LABEL set and export them as 
-        SVGElement objects 
-        '''
-        root_g = self.tree.find(TAG_G)
-        for e in root_g.getchildren():
-            if e.attrib.has_key(TAG_INKSCAPE_LABEL):
-                # Create SVG element for this node
-                print e.attrib.get('id')
-
     def get_elements(self):
         backdrop_surface = cairo.ImageSurface(
             cairo.FORMAT_ARGB32,
@@ -121,12 +102,37 @@ class VectorDoc:
                 in_backdrop = False
                 elem = Element()
                 elem.surface = backdrop_surface
+                elem.id = 'backdrop'
                 elements.append(elem)
-                break
 
             if in_backdrop:
                 self.__render(backdrop_ctx, e)
+            else:
+                # simulate rendering and get the extents
+                ex1, ey1, ex2, ey2 = \
+                    self.__render(backdrop_ctx, e, simulate=True)
+                print e.get('id')+' - %d %d'%((ex2-ex1),(ey2-ey1))
+                elem_surface = cairo.ImageSurface(
+                    cairo.FORMAT_ARGB32, int(ex2-ex1), int(ey2-ey1))
+                elem_ctx = cairo.Context(elem_surface)
+                elem_ctx.translate(-ex1,-ey1)
+                # actually render the element
+                self.__render(elem_ctx, e)
+                elem = Element()
+                elem.surface = elem_surface
+                elem.x = ex1
+                elem.y = ey1
+                elem.id = e.get('id')
+                elements.append(elem)
 
+        if len(elements) == 0:
+            ''' That means there were no TAG_INKSCAPE_LABEL elems 
+                everything is in backdrop '''
+            elem = Element()
+            elem.surface = backdrop_surface
+            elements.append(elem)
+            
+        print map(lambda x: (x.id,x.surface.get_width(),x.surface.get_height()), elements)
         return elements
         
     def render_full(self, ctx):
@@ -136,7 +142,7 @@ class VectorDoc:
         for e in root_g.getchildren():
             self.__render(ctx, e)
             
-    def __render(self, ctx, e):
+    def __render(self, ctx, e, simulate=False):
         ''' render individual SVG node '''
         dx = 0
         dy = 0
@@ -160,24 +166,77 @@ class VectorDoc:
 
         ctx.save()
 
+        extents = None
+
+        transform_matrix = None
+
         if transform_type == 'translate':
-            ctx.set_matrix(cairo.Matrix(1,0,0,1,dx,dy))
+            transform_matrix = cairo.Matrix(1,0,0,1,dx,dy)
         elif transform_type == 'matrix':
-            ctx.set_matrix(cairo.Matrix(xx,xy,yx,yy,x0,y0))
+            transform_matrix = cairo.Matrix(xx,xy,yx,yy,x0,y0)
+
+        if transform_matrix:
+            ctx.set_matrix(transform_matrix)
+
 
         if e.tag == TAG_G:
             for sub_e in e.getchildren():
-                self.__render(ctx, sub_e)
+                new_extents = self.__render(ctx, sub_e, simulate)
+
+                if simulate:
+                    ex1, ey1 , ex2, ey2 = new_extents
+                    if transform_matrix:
+                        new_extents = \
+                            transform_matrix.transform_point(ex1,ey1)+\
+                            transform_matrix.transform_point(ex2,ey2)
+                    extents = self.__union(extents,new_extents)
+
         else:
             r = altsvg.draw.NODE_DRAW_MAP.get(e.tag, None)
             if r:
-                r(ctx, e, self.defs)
+                new_extents = r(ctx, e, self.defs, simulate)
+                if simulate:
+                    ex1, ey1 , ex2, ey2 = new_extents
+                    if transform_matrix:
+                        new_extents = \
+                            transform_matrix.transform_point(ex1,ey1)+\
+                            transform_matrix.transform_point(ex2,ey2)
+                    extents = self.__union(extents,new_extents)
             else:
                 raise Exception("Shape not implemented: "+e.tag)
 
         ctx.restore()
 
+        if simulate:
+            return extents
 
 
 
+    def __union(self, extents,new_extents):
+        if not extents:
+            return new_extents
 
+        ox1,oy1,ox2,oy2 = extents
+        nx1,ny1,nx2,ny2 = new_extents
+
+        if nx1 < ox1:
+            x1 = nx1
+        else:
+            x1 = ox1
+
+        if ny1 < oy1:
+            y1 = ny1
+        else:
+            y1 = oy1
+
+        if nx2 > ox2:
+            x2 = nx2
+        else:
+            x2 = ox2
+
+        if ny2 > oy2:
+            y2 = ny2
+        else:
+            y2 = oy2
+
+        return (x1, y1, x2, y2)

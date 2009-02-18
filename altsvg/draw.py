@@ -62,7 +62,7 @@ def draw(ctx, style):
             style.apply_stroke(ctx)
             ctx.stroke()
 
-def draw_rect(ctx, node, defs):
+def draw_rect(ctx, node, defs, simulate=False):
     ''' Render 'rect' SVG element '''
     ctx.save()
 
@@ -105,7 +105,13 @@ def draw_rect(ctx, node, defs):
         ctx.line_to(x, y)
         ctx.close_path()
 
-    draw(ctx, style)
+    if simulate:
+        extents = ctx.stroke_extents()
+        ctx.new_path()
+        ctx.restore()
+        return extents
+    else:
+        draw(ctx, style)
 
     ctx.restore()
 
@@ -194,7 +200,7 @@ def draw_tspan(ctx, node):
             int(float(node.attrib.get('y'))))
     ctx.show_text(node.text)
     
-def draw_text(ctx, node, defs):
+def draw_text(ctx, node, defs, simulate=False):
     style = None
     style_str = node.attrib.get('style')
     if style_str:
@@ -209,7 +215,7 @@ def draw_text(ctx, node, defs):
 
     ctx.restore()
 
-def draw_path(ctx, node, defs):
+def draw_path(ctx, node, defs, simulate=False):
     ''' Render 'path' SVG element '''
     ctx.save()
 
@@ -264,7 +270,13 @@ def draw_path(ctx, node, defs):
         # getting stuck in an infinite loop
         i += 1
 
-    draw(ctx, style)
+    if simulate:
+        extents = ctx.stroke_extents()
+        ctx.new_path()
+        ctx.restore()
+        return extents
+    else:
+        draw(ctx, style)
    
     ctx.restore()
     

@@ -101,8 +101,10 @@ def main():
                 continue
 
             vdoc = altsvg.VectorDoc(file)
-            w,h = map(lambda x: int(x), vdoc.get_doc_props())
-            surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,w,h)
+            #w,h = map(lambda x: int(x), vdoc.get_doc_props())
+            surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,
+                int(self.vdoc.width),
+                int(self.vdoc.height))
             ctx = cairo.Context(surface)
             vdoc.render_full(ctx)
 
@@ -114,8 +116,10 @@ def main():
         for file in SVG_FILES:
             sys.stdout.write('Checking '+file+' ')
             vdoc = altsvg.VectorDoc(file)
-            w,h = map(lambda x: int(x), vdoc.get_doc_props())
-            surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,w,h)
+            #w,h = map(lambda x: int(x), vdoc.get_doc_props())
+            surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,
+                int(vdoc.width),
+                int(vdoc.height))
             ctx = cairo.Context(surface)
             vdoc.render_full(ctx)
             
