@@ -29,8 +29,9 @@ class SlideShow:
  
     def load_fresh_image(self,svgname):
         self.vectorDoc = altsvg.VectorDoc(svgname)
-        self.iw,self.ih = map(lambda x: int(x), self.vectorDoc.get_doc_props())
-        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,self.iw,self.ih)
+        #self.iw,self.ih = map(lambda x: int(x), self.vectorDoc.get_doc_props())
+        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,
+            int(self.vectorDoc.width),int(self.vectorDoc.height))
         ctx = cairo.Context(surface)
         self.vectorDoc.render_full(ctx)
 
