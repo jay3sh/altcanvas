@@ -88,6 +88,26 @@ class VectorDoc:
                 
  
     def get_elements(self):
+        '''
+            Algorithm to create Element objects from SVG doc:
+
+            Start from the bottom most SVG node (i.e. beginning of doc),
+            Keep looking for node with "inkscape:label" attr set. Until we
+            get one of those, keep drawing the SVG nodes on the same cairo
+            surface. This surface will make a single Element object with
+            id "backdrop".
+
+            After we find first "inkscape:label" attr in a node, we render
+            each node on separate cairo surfaces (irrespective of "inkscape:
+            label" attr is set for each of them or not)
+
+            Creating a single backdrop element will help save memory on cairo
+            surfaces. The fact that none of the bottom elements are named with
+            "inkscape:label" by the designer, means that the program logic
+            doesn't want to address to them programmatically, so they are
+            essentially immutable.
+        '''
+
         backdrop_surface = cairo.ImageSurface(
             cairo.FORMAT_ARGB32,
             int(float(self.width)),
@@ -131,7 +151,6 @@ class VectorDoc:
             elem.surface = backdrop_surface
             elements.append(elem)
             
-        print map(lambda x: (x.id,x.surface.get_width(),x.surface.get_height()), elements)
         return elements
         
     def render_full(self, ctx):
@@ -190,9 +209,9 @@ class VectorDoc:
                     extents = self.__union(extents,new_extents)
 
         else:
-            r = altsvg.draw.NODE_DRAW_MAP.get(e.tag, None)
-            if r:
-                new_extents = r(ctx, e, self.defs, simulate)
+            draw = altsvg.draw.NODE_DRAW_MAP.get(e.tag, None)
+            if draw:
+                new_extents = draw(ctx, e, self.defs, simulate)
                 if simulate:
                     ex1, ey1, ex2, ey2 = new_extents
                     if transform_matrix:
@@ -207,8 +226,6 @@ class VectorDoc:
 
         if simulate:
             return extents
-
-
 
     def __union(self, extents,new_extents):
         if not extents:
