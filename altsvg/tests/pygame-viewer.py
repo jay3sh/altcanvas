@@ -119,16 +119,28 @@ class App:
         pygame.init()
 
         self.vectorDoc = altsvg.VectorDoc(sys.argv[1])
-        self.w,self.h = map(lambda x: int(x), self.vectorDoc.get_doc_props())
+
+        self.w,self.h = (int(self.vectorDoc.width), int(self.vectorDoc.height))
 
         self.window = pygame.display.set_mode((self.w,self.h),pygame.DOUBLEBUF )
         self.screen = pygame.display.get_surface()
 
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,self.w,self.h)
 
+        # Test full rendering
+        cr = cairo.Context(surface)
+        self.vectorDoc.render_full(cr)
+
+        # Test custom cairo commands
+        #draw(surface)
+
+        # Test elements interface
         #cr = cairo.Context(surface)
-        #self.vectorDoc.render_full(cr)
-        draw(surface)
+        #elems = self.vectorDoc.get_elements()
+        #surface = elems[6].surface
+
+        self.w = surface.get_width()
+        self.h = surface.get_height()
 
         buf = self.rgb_voodo(surface)
 

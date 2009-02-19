@@ -136,6 +136,7 @@ class VectorDoc:
 
                 elem_ctx = cairo.Context(elem_surface)
                 elem_ctx.translate(-ex1,-ey1)
+
                 # actually render the element
                 self.__render(elem_ctx, e)
                 elem = Element()
