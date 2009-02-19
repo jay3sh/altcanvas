@@ -111,7 +111,6 @@ class VectorDoc:
                 # simulate rendering and get the extents
                 ex1, ey1, ex2, ey2 = \
                     self.__render(backdrop_ctx, e, simulate=True)
-                print e.get('id')+' - %d %d'%((ex2-ex1),(ey2-ey1))
                 elem_surface = cairo.ImageSurface(
                     cairo.FORMAT_ARGB32, int(ex2-ex1), int(ey2-ey1))
                 elem_ctx = cairo.Context(elem_surface)
@@ -176,8 +175,7 @@ class VectorDoc:
             transform_matrix = cairo.Matrix(xx,xy,yx,yy,x0,y0)
 
         if transform_matrix:
-            ctx.set_matrix(transform_matrix)
-
+            ctx.transform(transform_matrix)
 
         if e.tag == TAG_G:
             for sub_e in e.getchildren():
@@ -196,7 +194,7 @@ class VectorDoc:
             if r:
                 new_extents = r(ctx, e, self.defs, simulate)
                 if simulate:
-                    ex1, ey1 , ex2, ey2 = new_extents
+                    ex1, ey1, ex2, ey2 = new_extents
                     if transform_matrix:
                         new_extents = \
                             transform_matrix.transform_point(ex1,ey1)+\
