@@ -196,11 +196,22 @@ def draw_arc(ctx, rx, ry, xrot, laflag, swflag, x, y):
     # XXX ctx.set_current_point(x, y)
 
 
-def draw_tspan(ctx, node):
-    ctx.move_to(
-            int(float(node.attrib.get('x'))),
-            int(float(node.attrib.get('y'))))
-    ctx.show_text(node.text)
+def draw_tspan(ctx, node, simulate):
+    x = float(node.attrib.get('x'))
+    y = float(node.attrib.get('y'))
+    if simulate:
+        xb, yb, w, h, xa, ya = \
+            ctx.text_extents(node.text)
+        ex1 = x
+        ey1 = y
+        ex2 = ex1 + w
+        ey2 = ey1 + h
+        return (ex1, ey1, ex2, ey2)
+    else:
+        xb, yb, w, h, xa, ya = \
+            ctx.text_extents(node.text)
+        ctx.move_to(int(x), int(y+h))
+        ctx.show_text(node.text)
     
 def draw_text(ctx, node, defs, simulate=False):
     style = None
@@ -213,9 +224,12 @@ def draw_text(ctx, node, defs, simulate=False):
     tspan_node = node.find(altsvg.TAG_TSPAN)
     if tspan_node != None:
         style.apply_font(ctx)
-        draw_tspan(ctx,tspan_node)
+        extents = draw_tspan(ctx,tspan_node,simulate)
 
     ctx.restore()
+
+    if simulate:
+        return extents
 
 def draw_path(ctx, node, defs, simulate=False):
     ''' Render 'path' SVG element '''
