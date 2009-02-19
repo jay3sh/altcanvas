@@ -202,15 +202,15 @@ def draw_tspan(ctx, node, simulate):
     if simulate:
         xb, yb, w, h, xa, ya = \
             ctx.text_extents(node.text)
-        ex1 = x
-        ey1 = y
+        ex1 = x + xb
+        ey1 = y + yb
         ex2 = ex1 + w
         ey2 = ey1 + h
         return (ex1, ey1, ex2, ey2)
     else:
         xb, yb, w, h, xa, ya = \
             ctx.text_extents(node.text)
-        ctx.move_to(int(x), int(y+h))
+        ctx.move_to(int(x), int(y))
         ctx.show_text(node.text)
     
 def draw_text(ctx, node, defs, simulate=False):
