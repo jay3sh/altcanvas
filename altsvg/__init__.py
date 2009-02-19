@@ -133,6 +133,7 @@ class VectorDoc:
                     self.__render(backdrop_ctx, e, simulate=True)
                 elem_surface = cairo.ImageSurface(
                     cairo.FORMAT_ARGB32, int(ex2-ex1), int(ey2-ey1))
+
                 elem_ctx = cairo.Context(elem_surface)
                 elem_ctx.translate(-ex1,-ey1)
                 # actually render the element
@@ -162,8 +163,8 @@ class VectorDoc:
             
     def __render(self, ctx, e, simulate=False):
         ''' render individual SVG node '''
-        dx = 0
-        dy = 0
+        x0 = None
+        y0 = None
         transform = e.attrib.get('transform')
         transform_type = None
         if transform:
@@ -174,7 +175,7 @@ class VectorDoc:
                 transform_values = m.group(2)
 
                 if transform_type == 'translate':
-                    dx, dy = \
+                    x0, y0 = \
                     map(lambda x: float(x), transform_values.split(','))
                 elif transform_type == 'matrix':
                     xx, xy, yx, yy, x0, y0 = \
@@ -189,7 +190,7 @@ class VectorDoc:
         transform_matrix = None
 
         if transform_type == 'translate':
-            transform_matrix = cairo.Matrix(1,0,0,1,dx,dy)
+            transform_matrix = cairo.Matrix(1,0,0,1,x0,y0)
         elif transform_type == 'matrix':
             transform_matrix = cairo.Matrix(xx,xy,yx,yy,x0,y0)
 
@@ -201,23 +202,31 @@ class VectorDoc:
                 new_extents = self.__render(ctx, sub_e, simulate)
 
                 if simulate:
-                    ex1, ey1 , ex2, ey2 = new_extents
+                    ex1, ey1, ex2, ey2 = new_extents
+
+                    # The following adjustment is questionable
+                    # TODO
                     if transform_matrix:
                         new_extents = \
                             transform_matrix.transform_point(ex1,ey1)+\
                             transform_matrix.transform_point(ex2,ey2)
-                    extents = self.__union(extents,new_extents)
 
+                    # /TODO
+
+                    extents = self.__union(extents,new_extents)
         else:
             draw = altsvg.draw.NODE_DRAW_MAP.get(e.tag, None)
             if draw:
                 new_extents = draw(ctx, e, self.defs, simulate)
                 if simulate:
                     ex1, ey1, ex2, ey2 = new_extents
+                    # The following adjustment is questionable
+                    # TODO
                     if transform_matrix:
                         new_extents = \
                             transform_matrix.transform_point(ex1,ey1)+\
                             transform_matrix.transform_point(ex2,ey2)
+                    # /TODO
                     extents = self.__union(extents,new_extents)
             else:
                 raise Exception("Shape not implemented: "+e.tag)
