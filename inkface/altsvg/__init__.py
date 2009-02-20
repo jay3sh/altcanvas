@@ -42,8 +42,9 @@ TAG_TSPAN           = SVG_NS+'tspan'
 TAG_INKSCAPE_LABEL  = INKSCAPE_NS+'label'
 TAG_HREF            = XLINK_NS+'href'
 
-import altsvg.draw
-from altsvg.style import LinearGradient, RadialGradient
+import inkface.altsvg.draw
+from inkface.altsvg.style import LinearGradient, RadialGradient
+from inkface.altsvg.draw import NODE_DRAW_MAP
 
 class Element:
     surface = None
@@ -216,7 +217,7 @@ class VectorDoc:
 
                     extents = self.__union(extents,new_extents)
         else:
-            draw = altsvg.draw.NODE_DRAW_MAP.get(e.tag, None)
+            draw = NODE_DRAW_MAP.get(e.tag, None)
             if draw:
                 new_extents = draw(ctx, e, self.defs, simulate)
                 if simulate:

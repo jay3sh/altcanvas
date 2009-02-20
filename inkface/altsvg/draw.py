@@ -12,8 +12,9 @@
 '''
 
 import cairo
-import altsvg
-from altsvg.style import Style
+
+from inkface.altsvg.style import Style
+from inkface.altsvg import TAG_RECT, TAG_PATH, TAG_TEXT, TAG_TSPAN
 
 def draw(ctx, style):
     ''' Generic draw routine '''
@@ -221,7 +222,7 @@ def draw_text(ctx, node, defs, simulate=False):
 
     ctx.save()
 
-    tspan_node = node.find(altsvg.TAG_TSPAN)
+    tspan_node = node.find(TAG_TSPAN)
     if tspan_node != None:
         style.apply_font(ctx)
         extents = draw_tspan(ctx,tspan_node,simulate)
@@ -301,9 +302,9 @@ def draw_path(ctx, node, defs, simulate=False):
         
 NODE_DRAW_MAP = \
     {
-        altsvg.TAG_RECT:draw_rect,
-        altsvg.TAG_PATH:draw_path,
-        altsvg.TAG_TEXT:draw_text
+        TAG_RECT:draw_rect,
+        TAG_PATH:draw_path,
+        TAG_TEXT:draw_text
     }
 
 

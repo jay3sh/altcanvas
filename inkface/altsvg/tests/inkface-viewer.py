@@ -3,7 +3,7 @@ import sys
 import numpy
 from copy import copy
 import pygame
-import altsvg
+from inkface.altsvg import VectorDoc
 
 class App:
     def rgb_voodo(self,surface):
@@ -18,7 +18,7 @@ class App:
     def main(self):
         pygame.init()
 
-        self.vDoc = altsvg.VectorDoc(sys.argv[1])
+        self.vDoc = VectorDoc(sys.argv[1])
 
         self.window = pygame.display.set_mode(
             (int(self.vDoc.width),int(self.vDoc.height)),pygame.DOUBLEBUF )

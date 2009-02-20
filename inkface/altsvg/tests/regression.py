@@ -5,9 +5,11 @@ import md5
 import pygame
 import cairo
 import numpy
-import altsvg
 from copy import copy
 import os
+
+import inkface
+from inkface.altsvg import VectorDoc
 
 def usage():
     print 'regression.py [options]'
@@ -28,7 +30,7 @@ class SlideShow:
         return a
  
     def load_fresh_image(self,svgname):
-        self.vectorDoc = altsvg.VectorDoc(svgname)
+        self.vectorDoc = VectorDoc(svgname)
         #self.iw,self.ih = map(lambda x: int(x), self.vectorDoc.get_doc_props())
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,
             int(self.vectorDoc.width),int(self.vectorDoc.height))
@@ -101,7 +103,7 @@ def main():
                 print 'Skipping '+file
                 continue
 
-            vdoc = altsvg.VectorDoc(file)
+            vdoc = VectorDoc(file)
             #w,h = map(lambda x: int(x), vdoc.get_doc_props())
             surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,
                 int(self.vdoc.width),
@@ -116,7 +118,7 @@ def main():
 
         for file in SVG_FILES:
             sys.stdout.write('Checking '+file+' ')
-            vdoc = altsvg.VectorDoc(file)
+            vdoc = VectorDoc(file)
             #w,h = map(lambda x: int(x), vdoc.get_doc_props())
             surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,
                 int(vdoc.width),

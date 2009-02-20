@@ -1,4 +1,3 @@
-import altsvg
 import pygame
 import array
 import cairo
@@ -6,6 +5,7 @@ import sys
 import math
 import numpy
 from copy import copy
+from inkface.altsvg import VectorDoc
 
 def draw(surface):
     cr = cairo.Context(surface)
@@ -118,7 +118,7 @@ class App:
     def main(self):
         pygame.init()
 
-        self.vectorDoc = altsvg.VectorDoc(sys.argv[1])
+        self.vectorDoc = VectorDoc(sys.argv[1])
 
         self.w,self.h = (int(self.vectorDoc.width), int(self.vectorDoc.height))
 

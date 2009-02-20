@@ -13,7 +13,7 @@
 
 import re
 import cairo
-import altsvg
+import inkface.altsvg
 
 class Style:
     ''' Class to encapsulate style strings '''
@@ -199,7 +199,7 @@ class Style:
 #
 # I like to think of later as the instance of former.
 #
-from altsvg import TAG_HREF, TAG_STOP
+from inkface.altsvg import TAG_HREF, TAG_STOP
 
 class Gradient:
     ''' Class to encapsulate definition of Gradients '''
