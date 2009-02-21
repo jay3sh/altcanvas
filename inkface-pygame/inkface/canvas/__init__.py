@@ -84,7 +84,7 @@ class PygameCanvas(Canvas):
 
         Canvas.__init__(self)
 
-        # TODO check int of resolution
+        resolution = map(lambda x: int(x), resolution)
 
         pygame.init()
         self.screen = pygame.display.set_mode(resolution,pygame.DOUBLEBUF)
