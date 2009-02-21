@@ -47,11 +47,11 @@ class CanvasElement:
         self.onMouseOver = None
         self.onKeyPress = None
 
-    def occupies(self,x,y):
+    def occupies(self,(x,y)):
         return ((x > self.svg.x) and (y > self.svg.y) and \
                 (x < self.svg.x+self.svg.w) and (y < self.svg.y+self.svg.h))
 
-    def clouded(self,x,y):
+    def clouded(self,(x,y)):
         rx = x - self.svg.x
         ry = y - self.svg.y
 
@@ -196,8 +196,8 @@ class PygameCanvas(Canvas):
         if event.type == pygame.MOUSEBUTTONDOWN:
             # do onClick
             for elem in self.elementQ:
-                if elem.occupies(event.pos[0], event.pos[1]) and \
-                    not elem.clouded(event.pos[0], event.pos[1]):
+                if elem.occupies(event.pos) and \
+                    not elem.clouded(event.pos):
 
                     if elem.onClick:
                         elem.onClick()
@@ -205,8 +205,8 @@ class PygameCanvas(Canvas):
         elif event.type == pygame.MOUSEMOTION:
             # do onTap
             for elem in self.elementQ:
-                if elem.occupies(event.pos[0], event.pos[1]) and \
-                    not elem.clouded(event.pos[0], event.pos[1]):
+                if elem.occupies(event.pos) and \
+                    not elem.clouded(event.pos):
 
                     if elem.onTap:
                         elem.onTap()
