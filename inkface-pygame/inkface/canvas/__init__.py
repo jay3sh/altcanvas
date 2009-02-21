@@ -45,7 +45,11 @@ class CanvasElement:
         self.onMouseOver = None
         self.onKeyPress = None
 
-    def is_clouded(self,x,y):
+    def occupies(self,x,y):
+        return ((x > self.svg.x) and (y > self.svg.y) and \
+                (x < self.svg.x+self.svg.w) and (y < self.svg.y+self.svg.h))
+
+    def clouded(self,x,y):
         rx = x - self.svg.x
         ry = y - self.svg.y
 
@@ -185,9 +189,34 @@ class PygameCanvas(Canvas):
         self.recalculate_clouds()
 
     def __handle_event(self,event):
-        if event.type == pygame.QUIT:
-            sys.exit(0)
-        elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+        #print event
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            # do onClick
+            for elem in self.elementQ:
+                if elem.occupies(event.pos[0], event.pos[1]) and \
+                    not elem.clouded(event.pos[0], event.pos[1]):
+
+                    if elem.svg.id: print elem.svg.id+' clicked'
+                    if elem.onClick:
+                        elem.onClick()
+        elif event.type == pygame.MOUSEMOTION:
+            # do onTap
+            for elem in self.elementQ:
+                if elem.occupies(event.pos[0], event.pos[1]) and \
+                    not elem.clouded(event.pos[0], event.pos[1]):
+
+                    if elem.svg.id: print elem.svg.id+' tapped'
+                    if elem.onTap:
+                        elem.onTap()
+        elif event.type == pygame.MOUSEBUTTONUP:
+            pass
+        elif event.type == pygame.KEYDOWN:
+            # do Keydown
+            # temp escape
+            if event.key == pygame.K_ESCAPE:
+                sys.exit(0)
+        elif event.type == pygame.QUIT:
             sys.exit(0)
 
     def eventloop(self):
