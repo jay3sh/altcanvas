@@ -65,12 +65,13 @@ class Element:
     def __getattr__(self,key):
         if self.__dict__.has_key(key):
             return self.__dict__[key]
-        elif self.node and key == 'label':
+        elif self.node != None and key == 'label' and \
+            self.node.attrib.has_key(TAG_INKSCAPE_LABEL):
             return self.node.attrib.get(TAG_INKSCAPE_LABEL)
-        elif self.node and self.node.attrib.has_key(key):
+        elif self.node != None and self.node.attrib.has_key(key):
             return self.node.attrib.get(key)
 
-        return None
+        raise AttributeError('Unknown attribute: '+key)
 
 
 class VectorDoc:
@@ -151,6 +152,11 @@ class VectorDoc:
                 # simulate rendering and get the extents
                 ex1, ey1, ex2, ey2 = \
                     self.__render(backdrop_ctx, e, simulate=True)
+
+                if (ex2-ex1) < 0 or (ey2-ey1) < 0:
+                    raise Exception('Invalid surface dim for %s: %f,%f'%\
+                        (e.get('id'),(ex2-ex1),(ey2-ey1)))
+
                 elem_surface = cairo.ImageSurface(
                     cairo.FORMAT_RGB24, int(ex2-ex1), int(ey2-ey1))
 

@@ -20,10 +20,11 @@ class PygameFace(Face):
 
         for svge in self.svgelements:
             pElement = PygameCanvasElement(svge)
-            if svge.label:
+            try:
                 self.__dict__[svge.label] = pElement 
-            elif svge.id:
-                self.__dict__[svge.id] = pElement
+            except AttributeError, ae:
+                pass
+
             self.elements.append(pElement)
 
 
@@ -42,7 +43,8 @@ class CanvasElement:
         self.svg = svgelem
         self.clouds = []
 
-        self.onClick = None
+        self.onLeftClick = None
+        self.onRightClick = None
         self.onTap = None
         self.onMouseOver = None
         self.onKeyPress = None
@@ -194,14 +196,18 @@ class PygameCanvas(Canvas):
         #print event
 
         if event.type == pygame.MOUSEBUTTONDOWN:
+            print event
             # do onClick
             for elem in self.elementQ:
                 if elem.occupies(event.pos) and \
                     not elem.clouded(event.pos):
 
-                    if elem.onClick:
-                        elem.onClick()
+                    if event.button == 1 and elem.onLeftClick:
+                        elem.onLeftClick()
+                    elif event.button == 3 and elem.onRightClick:
+                        elem.onRightClick()
 
+        
         elif event.type == pygame.MOUSEMOTION:
             # do onTap
             for elem in self.elementQ:
