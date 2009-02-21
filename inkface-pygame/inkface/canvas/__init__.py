@@ -49,6 +49,8 @@ class CanvasElement:
         self.onMouseOver = None
         self.onKeyPress = None
 
+        self.onDraw = None
+
     def occupies(self,(x,y)):
         return ((x > self.svg.x) and (y > self.svg.y) and \
                 (x < self.svg.x+self.svg.w) and (y < self.svg.y+self.svg.h))
@@ -181,8 +183,10 @@ class PygameCanvas(Canvas):
         
     def paint(self):
         for elem in self.elementQ:
-            self.screen.blit(elem.sprite.image,
-                (elem.svg.x,elem.svg.y))
+            if elem.onDraw == None:
+                self.screen.blit(elem.sprite.image,(elem.svg.x,elem.svg.y))
+            else:
+                elem.onDraw(elem,self.screen)
 
         pygame.display.flip()
 
@@ -193,7 +197,6 @@ class PygameCanvas(Canvas):
         self.recalculate_clouds()
 
     def __handle_event(self,event):
-        #print event
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             print event
