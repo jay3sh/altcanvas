@@ -3,7 +3,7 @@ import array
 import cairo
 import sys
 import math
-import numpy
+#import _numpy as numpy
 from copy import copy
 from inkface.altsvg import VectorDoc
 
@@ -108,6 +108,7 @@ def draw_shapes(surface):
 class App:
     def rgb_voodo(self,surface):
         buf = surface.get_data()
+        return buf
         a = numpy.frombuffer(buf,numpy.uint8)
         a.shape = (self.w,self.h,4)
         tmp = copy(a[:,:,0])
@@ -115,6 +116,18 @@ class App:
         a[:,:,2] = tmp
         return a
         
+    def ARGBtoRGBA(self,str_buf):
+        # cairo's ARGB is interpreted by pygame as BGRA due to 
+        # then endian-format difference this routine swaps B and R 
+        # (0th and 2nd) byte converting it to RGBA format.
+        byte_buf = array.array("B", str_buf)
+        num_quads = len(byte_buf)/4
+        for i in xrange(num_quads):
+            tmp = byte_buf[i*4 + 0]
+            byte_buf[i*4 + 0] = byte_buf[i*4 + 2]
+            byte_buf[i*4 + 2] = tmp
+        return byte_buf.tostring()
+
     def main(self):
         pygame.init()
 
@@ -125,11 +138,18 @@ class App:
         self.window = pygame.display.set_mode((self.w,self.h),pygame.DOUBLEBUF )
         self.screen = pygame.display.get_surface()
 
-        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,self.w,self.h)
+        #surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,self.w,self.h)
+
+        data = array.array('B', chr(0) * self.w * self.h * 4)
+        stride = self.w * 4
+        surface = cairo.ImageSurface.create_for_data(
+                    data, cairo.FORMAT_ARGB32,self.w, self.h, stride)
 
         # Test full rendering
         cr = cairo.Context(surface)
         self.vectorDoc.render_full(cr)
+        
+        buf = self.ARGBtoRGBA(data)
 
         # Test custom cairo commands
         #draw(surface)
@@ -142,9 +162,7 @@ class App:
         self.w = surface.get_width()
         self.h = surface.get_height()
 
-        buf = self.rgb_voodo(surface)
-
-        image = pygame.image.frombuffer(buf.tostring(),(self.w,self.h),"RGBA")
+        image = pygame.image.frombuffer(buf,(self.w,self.h),"RGBA")
         #image = image.convert()
         self.screen.blit(image, (0,0))
         pygame.display.flip() 
