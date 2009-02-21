@@ -4,20 +4,26 @@ import unittest
 import pygame
 
 class Face:
+    svg = None
+    svgelements = []
+
     def __init__(self,svgname,autoload=True):
         from inkface.altsvg import VectorDoc
         self.svg = VectorDoc(svgname)
-
-        self.elements = self.svg.get_elements()
-        
-        if autoload:
-            for elem in self.elements:
-                self.__dict__[elem.id] = elem
+        self.svgelements = self.svg.get_elements()
 
 class PygameFace(Face):
+    elements = []
 
     def __init__(self,svgname):
         Face.__init__(self,svgname)
+
+        for svge in self.svgelements:
+            pElement = PygameCanvasElement(svge)
+            if svge.id:
+                self.__dict__[svge.id] = pElement
+            self.elements.append(pElement)
+
 
         # Separate the sprites 
         #self.mutable_group = pygame.sprite.RenderPlain()
@@ -31,8 +37,27 @@ class PygameFace(Face):
 
 class CanvasElement:
     def __init__(self,svgelem):
-        self.svgelem = svgelem
+        self.svg = svgelem
         self.clouds = []
+
+        self.onClick = None
+        self.onTap = None
+        self.onMouseOver = None
+        self.onKeyPress = None
+
+    def is_clouded(self,x,y):
+        rx = x - self.svg.x
+        ry = y - self.svg.y
+
+        for cloud in self.clouds:
+            cx0, cy0, cx1, cy1 = cloud 
+            if ((rx > cx0) and (rx < cx1) and (ry > cy0) and (ry < cy1)):
+                return True
+
+        return False
+
+
+
 
 class PygameCanvasElement(CanvasElement):
     def ARGBtoRGBA(self,str_buf):
@@ -51,10 +76,10 @@ class PygameCanvasElement(CanvasElement):
     def __init__(self,svgelem):
         CanvasElement.__init__(self,svgelem)
         self.sprite = pygame.sprite.Sprite()
-        buf = self.ARGBtoRGBA(self.svgelem.surface.get_data())
+        buf = self.ARGBtoRGBA(self.svg.surface.get_data())
         image = pygame.image.frombuffer(buf.tostring(),
-                    (self.svgelem.surface.get_width(),
-                    self.svgelem.surface.get_height()),"RGBA")
+                    (self.svg.surface.get_width(),
+                    self.svg.surface.get_height()),"RGBA")
         self.sprite.image = image
         self.sprite.rect = image.get_rect()
 
@@ -65,8 +90,48 @@ class Canvas:
     def __init__(self):
         pass
 
-    def __recalculate_clouds(self):
-        pass
+    def recalculate_clouds(self):
+        # Cleanup all the clouds before recalculating
+        for e in self.elementQ:
+            e.clouds = []
+            
+        for top in xrange(len(self.elementQ)):
+        
+            newElem = self.elementQ[top]
+            newE = newElem.svg
+            
+            for i in xrange(top):
+                oldElem = self.elementQ[i]
+                oldE = oldElem.svg
+                ox0 = oldE.x
+                oy0 = oldE.y
+                ox1 = ox0 + oldE.w
+                oy1 = oy0 + oldE.h
+               
+                nx0 = newE.x
+                ny0 = newE.y
+                nx1 = nx0 + newE.w
+                ny1 = ny0 + newE.h
+                
+                if (ox0 < nx0 and ox1 < nx0) or (ox0 > nx1 and ox1 > nx1) or \
+                    (oy0 < ny0 and oy1 < ny0) or (oy0 > ny1 and  oy1 > ny1):
+                    # There is no overlap
+                    continue
+                else:
+                    '''
+                    There is an overlap
+                    Calculate the intersection of two widgets' extents
+                    and add it to the cloud list of the old widget
+                    Also translate them into widget's coordinate system
+                    
+                    These are top-left and bottom-right vertices of the rectangular
+                    intersection of two widgets.
+                    '''
+                    oldElem.clouds.append((max(ox0,nx0)-ox0,
+                                            max(oy0,ny0)-oy0,
+                                            min(ox1,nx1)-ox0,
+                                            min(oy1,ny1)-oy0))
+ 
 
     def add(self, face):
         pass
@@ -109,15 +174,15 @@ class PygameCanvas(Canvas):
     def paint(self):
         for elem in self.elementQ:
             self.screen.blit(elem.sprite.image,
-                (elem.svgelem.x,elem.svgelem.y))
+                (elem.svg.x,elem.svg.y))
 
         pygame.display.flip()
 
     def add(self,face):
         Canvas.add(self,face)
         for elem in face.elements:  
-            self.elementQ.append(PygameCanvasElement(elem))
-
+            self.elementQ.append(elem)
+        self.recalculate_clouds()
 
     def __handle_event(self,event):
         if event.type == pygame.QUIT:

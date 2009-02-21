@@ -50,7 +50,17 @@ class Element:
     surface = None
     x = 0
     y = 0
+    w = 0
+    h = 0
     node = None
+
+    def __init__(self,node,surface,x,y):
+        self.node = node
+        self.surface = surface
+        self.x = x
+        self.y = y
+        self.w = self.surface.get_width()
+        self.h = self.surface.get_height()
 
     def __getattr__(self,key):
         if self.__dict__.has_key(key):
@@ -128,8 +138,7 @@ class VectorDoc:
         for e in root_g.getchildren():
             if in_backdrop and e.attrib.has_key(TAG_INKSCAPE_LABEL):
                 in_backdrop = False
-                elem = Element()
-                elem.surface = backdrop_surface
+                elem = Element(None,backdrop_surface,0,0)
                 elements.append(elem)
 
             if in_backdrop:
@@ -146,18 +155,13 @@ class VectorDoc:
 
                 # actually render the element
                 self.__render(elem_ctx, e)
-                elem = Element()
-                elem.surface = elem_surface
-                elem.x = ex1
-                elem.y = ey1
-                elem.node = e
+                elem = Element(e,elem_surface,ex1,ey1)
                 elements.append(elem)
 
         if len(elements) == 0:
             ''' That means there were no TAG_INKSCAPE_LABEL elems 
                 everything is in backdrop '''
-            elem = Element()
-            elem.surface = backdrop_surface
+            elem = Element(None,backdrop_surface,0,0)
             elements.append(elem)
             
         return elements
