@@ -65,8 +65,12 @@ class Element:
     def __getattr__(self,key):
         if self.__dict__.has_key(key):
             return self.__dict__[key]
+        elif self.node and key == 'label':
+            return self.node.attrib.get(TAG_INKSCAPE_LABEL)
         elif self.node and self.node.attrib.has_key(key):
             return self.node.attrib.get(key)
+
+        return None
 
 
 class VectorDoc:

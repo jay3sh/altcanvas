@@ -20,7 +20,9 @@ class PygameFace(Face):
 
         for svge in self.svgelements:
             pElement = PygameCanvasElement(svge)
-            if svge.id:
+            if svge.label:
+                self.__dict__[svge.label] = pElement 
+            elif svge.id:
                 self.__dict__[svge.id] = pElement
             self.elements.append(pElement)
 
@@ -197,25 +199,27 @@ class PygameCanvas(Canvas):
                 if elem.occupies(event.pos[0], event.pos[1]) and \
                     not elem.clouded(event.pos[0], event.pos[1]):
 
-                    if elem.svg.id: print elem.svg.id+' clicked'
                     if elem.onClick:
                         elem.onClick()
+
         elif event.type == pygame.MOUSEMOTION:
             # do onTap
             for elem in self.elementQ:
                 if elem.occupies(event.pos[0], event.pos[1]) and \
                     not elem.clouded(event.pos[0], event.pos[1]):
 
-                    if elem.svg.id: print elem.svg.id+' tapped'
                     if elem.onTap:
                         elem.onTap()
+
         elif event.type == pygame.MOUSEBUTTONUP:
             pass
+
         elif event.type == pygame.KEYDOWN:
             # do Keydown
             # temp escape
             if event.key == pygame.K_ESCAPE:
                 sys.exit(0)
+
         elif event.type == pygame.QUIT:
             sys.exit(0)
 
