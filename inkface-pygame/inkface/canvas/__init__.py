@@ -2,8 +2,6 @@
 import sys
 import unittest
 import pygame
-import numpy
-from copy import copy
 
 class Face:
     def __init__(self,svgname,autoload=True):
@@ -19,15 +17,18 @@ class Face:
 class PygameFace(Face):
     sprites = {}
 
-    def __rgb_voodo(self, surface):
-        buf = surface.get_data()
-        a = numpy.frombuffer(buf,numpy.uint8)
-        a.shape = (surface.get_width(),
-                    surface.get_height(),4)
-        tmp = copy(a[:,:,0])
-        a[:,:,0] = a[:,:,2]
-        a[:,:,2] = tmp
-        return a
+    def ARGBtoRGBA(self,str_buf):
+        # cairo's ARGB is interpreted by pygame as BGRA due to 
+        # then endian-format difference this routine swaps B and R 
+        # (0th and 2nd) byte converting it to RGBA format.
+        import array
+        byte_buf = array.array("c", str_buf)
+        num_quads = len(byte_buf)/4
+        for i in xrange(num_quads):
+            tmp = byte_buf[i*4 + 0]
+            byte_buf[i*4 + 0] = byte_buf[i*4 + 2]
+            byte_buf[i*4 + 2] = tmp
+        return byte_buf
 
     def __init__(self,svgname):
         Face.__init__(self,svgname)
@@ -36,7 +37,7 @@ class PygameFace(Face):
         for element in self.elements:
             if element.surface:
                 self.sprites[element.id] = pygame.sprite.Sprite()
-                buf = self.__rgb_voodo(element.surface)
+                buf = self.ARGBtoRGBA(element.surface.get_data())
                 image = pygame.image.frombuffer(buf.tostring(),
                         (element.surface.get_width(),
                         element.surface.get_height()),"RGBA")
