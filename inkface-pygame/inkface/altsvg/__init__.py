@@ -48,9 +48,16 @@ from inkface.altsvg.draw import NODE_DRAW_MAP
 
 class Element:
     surface = None
-    id = None
     x = 0
     y = 0
+    node = None
+
+    def __getattr__(self,key):
+        if self.__dict__.has_key(key):
+            return self.__dict__[key]
+        elif self.node and self.node.attrib.has_key(key):
+            return self.node.attrib.get(key)
+
 
 class VectorDoc:
     ''' Class encapsulating a single SVG document '''
@@ -110,7 +117,7 @@ class VectorDoc:
         '''
 
         backdrop_surface = cairo.ImageSurface(
-            cairo.FORMAT_ARGB32,
+            cairo.FORMAT_RGB24,
             int(float(self.width)),
             int(float(self.height)))
         backdrop_ctx = cairo.Context(backdrop_surface)
@@ -123,7 +130,6 @@ class VectorDoc:
                 in_backdrop = False
                 elem = Element()
                 elem.surface = backdrop_surface
-                elem.id = 'backdrop'
                 elements.append(elem)
 
             if in_backdrop:
@@ -133,7 +139,7 @@ class VectorDoc:
                 ex1, ey1, ex2, ey2 = \
                     self.__render(backdrop_ctx, e, simulate=True)
                 elem_surface = cairo.ImageSurface(
-                    cairo.FORMAT_ARGB32, int(ex2-ex1), int(ey2-ey1))
+                    cairo.FORMAT_RGB24, int(ex2-ex1), int(ey2-ey1))
 
                 elem_ctx = cairo.Context(elem_surface)
                 elem_ctx.translate(-ex1,-ey1)
@@ -144,7 +150,7 @@ class VectorDoc:
                 elem.surface = elem_surface
                 elem.x = ex1
                 elem.y = ey1
-                elem.id = e.get('id')
+                elem.node = e
                 elements.append(elem)
 
         if len(elements) == 0:

@@ -15,8 +15,26 @@ class Face:
                 self.__dict__[elem.id] = elem
 
 class PygameFace(Face):
-    sprites = {}
 
+    def __init__(self,svgname):
+        Face.__init__(self,svgname)
+
+        # Separate the sprites 
+        #self.mutable_group = pygame.sprite.RenderPlain()
+        #self.immutable_group = pygame.sprite.RenderPlain()
+
+        #for element in self.elements:
+        #    if element.label != None:
+        #        self.mutable_group.add(element.sprite)
+        #    else:   
+        #        self.immutable_group.add(element.sprite)
+
+class CanvasElement:
+    def __init__(self,svgelem):
+        self.svgelem = svgelem
+        self.clouds = []
+
+class PygameCanvasElement(CanvasElement):
     def ARGBtoRGBA(self,str_buf):
         # cairo's ARGB is interpreted by pygame as BGRA due to 
         # then endian-format difference this routine swaps B and R 
@@ -30,30 +48,18 @@ class PygameFace(Face):
             byte_buf[i*4 + 2] = tmp
         return byte_buf
 
-    def __init__(self,svgname):
-        Face.__init__(self,svgname)
+    def __init__(self,svgelem):
+        CanvasElement.__init__(self,svgelem)
+        self.sprite = pygame.sprite.Sprite()
+        buf = self.ARGBtoRGBA(self.svgelem.surface.get_data())
+        image = pygame.image.frombuffer(buf.tostring(),
+                    (self.svgelem.surface.get_width(),
+                    self.svgelem.surface.get_height()),"RGBA")
+        self.sprite.image = image
+        self.sprite.rect = image.get_rect()
 
-        # Create sprites
-        for element in self.elements:
-            if element.surface:
-                self.sprites[element.id] = pygame.sprite.Sprite()
-                buf = self.ARGBtoRGBA(element.surface.get_data())
-                image = pygame.image.frombuffer(buf.tostring(),
-                        (element.surface.get_width(),
-                        element.surface.get_height()),"RGBA")
-                self.sprites[element.id].image = image
-                self.sprites[element.id].rect = image.get_rect()
 
-        # Separate the sprites 
-        self.mutable_group = pygame.sprite.RenderPlain()
-        self.immutable_group = pygame.sprite.RenderPlain()
-
-        #for element in self.elements:
-        #    if element.label != None:
-        #        self.mutable_group.add(element.sprite)
-        #    else:   
-        #        self.immutable_group.add(element.sprite)
-
+    
 class Canvas:
     elementQ = [] 
     def __init__(self):
@@ -63,7 +69,6 @@ class Canvas:
         pass
 
     def add(self, face):
-        self.elementQ += face.elements
         pass
 
     def remove(self, face):
@@ -103,14 +108,16 @@ class PygameCanvas(Canvas):
         
     def paint(self):
         for elem in self.elementQ:
-            sprite = self.sprites[elem.id]
-            self.screen.blit(sprite.image,(elem.x,elem.y))
+            self.screen.blit(elem.sprite.image,
+                (elem.svgelem.x,elem.svgelem.y))
 
         pygame.display.flip()
 
     def add(self,face):
         Canvas.add(self,face)
-        self.sprites = face.sprites.copy()
+        for elem in face.elements:  
+            self.elementQ.append(PygameCanvasElement(elem))
+
 
     def __handle_event(self,event):
         if event.type == pygame.QUIT:
