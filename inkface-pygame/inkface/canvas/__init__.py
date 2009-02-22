@@ -51,13 +51,16 @@ class CanvasElement:
 
         self.onDraw = None
 
+        self.x = self.svg.x
+        self.y = self.svg.y
+
     def occupies(self,(x,y)):
-        return ((x > self.svg.x) and (y > self.svg.y) and \
-                (x < self.svg.x+self.svg.w) and (y < self.svg.y+self.svg.h))
+        return ((x > self.x) and (y > self.y) and \
+                (x < self.x+self.svg.w) and (y < self.svg.y+self.svg.h))
 
     def clouded(self,(x,y)):
-        rx = x - self.svg.x
-        ry = y - self.svg.y
+        rx = x - self.x
+        ry = y - self.y
 
         for cloud in self.clouds:
             cx0, cy0, cx1, cy1 = cloud 
@@ -184,7 +187,7 @@ class PygameCanvas(Canvas):
     def paint(self):
         for elem in self.elementQ:
             if elem.onDraw == None:
-                self.screen.blit(elem.sprite.image,(elem.svg.x,elem.svg.y))
+                self.screen.blit(elem.sprite.image,(elem.x,elem.y))
             else:
                 elem.onDraw(elem,self.screen)
 
@@ -199,15 +202,14 @@ class PygameCanvas(Canvas):
     def __handle_event(self,event):
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-            print event
             # do onClick
             for elem in self.elementQ:
                 if elem.occupies(event.pos) and \
                     not elem.clouded(event.pos):
 
-                    if event.button == 1 and elem.onLeftClick:
+                    if event.button == 1 and elem.onLeftClick != None:
                         elem.onLeftClick()
-                    elif event.button == 3 and elem.onRightClick:
+                    elif event.button == 3 and elem.onRightClick != None:
                         elem.onRightClick()
 
         
@@ -217,7 +219,7 @@ class PygameCanvas(Canvas):
                 if elem.occupies(event.pos) and \
                     not elem.clouded(event.pos):
 
-                    if elem.onTap:
+                    if elem.onTap != None:
                         elem.onTap()
 
         elif event.type == pygame.MOUSEBUTTONUP:
