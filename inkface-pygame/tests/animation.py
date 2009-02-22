@@ -18,8 +18,9 @@ class App:
         for plate in self.plates:
             plate.onDraw = self.drawPlate
 
-        face.upArrow.onLeftClick = self.moveUp
-        face.downArrow.onLeftClick = self.moveDown
+        if gbl.FRAMERATE > 0:
+            face.upArrow.onLeftClick = self.moveUp
+            face.downArrow.onLeftClick = self.moveDown
 
         self.moveStep = self.plates[0].svg.h
         self.moveDir = 0

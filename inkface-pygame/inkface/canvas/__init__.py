@@ -70,8 +70,6 @@ class CanvasElement:
         return False
 
 
-
-
 class PygameCanvasElement(CanvasElement):
     def ARGBtoRGBA(self,str_buf):
         # cairo's ARGB is interpreted by pygame as BGRA due to 
@@ -168,22 +166,29 @@ class PygameCanvas(Canvas):
         self.screen = pygame.display.set_mode(resolution,pygame.DOUBLEBUF)
         self.dispsurf = pygame.Surface(self.screen.get_size())
         pygame.display.set_caption(caption)
-        self.clock = pygame.time.Clock()
-        self.framerate = framerate
 
-        self.painter = self.PainterThread(self)
-        self.painter.start()
+        self.framerate = framerate
+        if self.framerate > 0:
+            self.clock = pygame.time.Clock()
+            self.painter = self.PainterThread(self)
+            self.painter.start()
 
     class PainterThread(threading.Thread):
         def __init__(self,canvas):
             threading.Thread.__init__(self)
             self.canvas = canvas
+            self.stopflag = False
 
         def run(self):
             while True:
                 self.canvas.clock.tick(self.canvas.framerate)
                 self.canvas.paint()
+                if self.stopflag: 
+                    return
         
+        def stop(self):
+            self.stopflag = True
+
     def paint(self):
         for elem in self.elementQ:
             if elem.onDraw == None:
@@ -229,14 +234,24 @@ class PygameCanvas(Canvas):
             # do Keydown
             # temp escape
             if event.key == pygame.K_ESCAPE:
-                sys.exit(0)
+                self.painter.stop()
+                self.painter.join()
+                return True
 
         elif event.type == pygame.QUIT:
-            sys.exit(0)
+            return True
+
+        return False
 
     def eventloop(self):
         while True:
-            self.__handle_event(pygame.event.wait())
+            stop_signal = self.__handle_event(pygame.event.wait())
+
+            if self.framerate == 0:
+                self.paint()
+
+            if stop_signal: 
+                return
 
     
     
