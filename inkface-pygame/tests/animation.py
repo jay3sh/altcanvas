@@ -24,7 +24,7 @@ class App:
         self.moveStep = self.plates[0].svg.h
         self.moveDir = 0
 
-        self.canvas = PygameCanvas((800,480),framerate=15)
+        self.canvas = PygameCanvas((800,480),framerate=gbl.FRAMERATE)
         self.canvas.add(face)
         self.canvas.eventloop()
 
