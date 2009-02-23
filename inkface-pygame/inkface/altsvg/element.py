@@ -31,6 +31,10 @@ class Element:
             if node != None and key == 'label' and \
                 node.attrib.has_key(TAG_INKSCAPE_LABEL):
                 return node.attrib.get(TAG_INKSCAPE_LABEL)
+            elif node != None and key == 'text':
+                tspan = node.find('.//'+TAG_TSPAN)
+                if tspan != None: 
+                    return tspan.text
             elif node != None and self.node.attrib.has_key(key):
                 return node.attrib.get(key)
 
@@ -46,7 +50,10 @@ class Element:
 
             if key == 'text':
                 tspan = node.find('.//'+TAG_TSPAN)
-                tspan.text = value
+                if tspan != None:
+                    tspan.text = value
+                else:
+                    raise Exception('No text element found')
             elif key == 'label':
                 node.set(TAG_INKSCAPE_LABEL,value)
             
