@@ -1,7 +1,8 @@
 
+import sys
 from inkface.canvas import PygameFace, PygameCanvas
 
-face = PygameFace('data/gui-0.svg')
+face = PygameFace(sys.argv[1])
 
 canvas = PygameCanvas((int(face.svg.width),int(face.svg.height)))
 
