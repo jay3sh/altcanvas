@@ -38,6 +38,22 @@ class PygameFace(Face):
         #    else:   
         #        self.immutable_group.add(element.sprite)
 
+    def clone(self, curNodeName, newNodeName, new_x=-1, new_y=-1):
+
+        if not self.__dict__.has_key(curNodeName):
+            raise Exception(curNodeName+' does not exist for cloning')
+
+        curNode = self.__dict__[curNodeName]
+
+        newNode = curNode.clone(newNodeName)
+
+        if new_x > 0: newNode.x = new_x
+        if new_y > 0: newNode.y = new_y
+
+        curNodePos = self.elements.index(curNode)
+        self.elements.insert(curNodePos+1,newNode)
+        self.__dict__[newNodeName] = newNode
+
 class CanvasElement:
     def __init__(self,svgelem):
         self.svg = svgelem
@@ -90,7 +106,7 @@ class PygameCanvasElement(CanvasElement):
         self.refresh()
 
     def refresh(self,svg_reload=False):
-        if svg_reload:
+        if svg_reload or self.svg.surface == None:
             self.svg.render()
         buf = self.ARGBtoRGBA(self.svg.surface.get_data())
         image = pygame.image.frombuffer(buf.tostring(),
@@ -99,6 +115,20 @@ class PygameCanvasElement(CanvasElement):
         self.sprite.image = image
         self.sprite.rect = image.get_rect()
 
+    def clone(self, newName):
+        # Clone the svg element first, it has to be a new instance and not
+        # just a new reference to the same svg element
+        # The new instance's SVG attributes should be changeable without
+        # affecting the original svg element
+
+        import xml.etree.ElementTree
+        from inkface.altsvg.element import Element
+        node_str = xml.etree.ElementTree.tostring(self.svg.node)
+        new_node = xml.etree.ElementTree.fromstring(node_str)
+        new_svg = Element(new_node,self.svg.vdoc)
+        new_svg.label = newName
+        return PygameCanvasElement(new_svg)
+        
        
 
     

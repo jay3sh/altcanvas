@@ -38,13 +38,18 @@ class Element:
 
     def __setattr__(self,key,value):
         # Search into the SVG node for the key
-        if key == 'text':
+        if key == 'text' or key == 'label':
             if self.__dict__.has_key('node'):
                 node = self.__dict__['node']
             else:
                 raise Exception('node member is not set')
-            tspan = node.find(TAG_TSPAN)
-            tspan.text = value
+
+            if key == 'text':
+                tspan = node.find('.//'+TAG_TSPAN)
+                tspan.text = value
+            elif key == 'label':
+                node.set(TAG_INKSCAPE_LABEL,value)
+            
         else:
             self.__dict__[key] = value
 
