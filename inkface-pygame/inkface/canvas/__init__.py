@@ -87,6 +87,11 @@ class PygameCanvasElement(CanvasElement):
     def __init__(self,svgelem):
         CanvasElement.__init__(self,svgelem)
         self.sprite = pygame.sprite.Sprite()
+        self.refresh()
+
+    def refresh(self,svg_reload=False):
+        if svg_reload:
+            self.svg.render()
         buf = self.ARGBtoRGBA(self.svg.surface.get_data())
         image = pygame.image.frombuffer(buf.tostring(),
                     (self.svg.surface.get_width(),
@@ -94,6 +99,7 @@ class PygameCanvasElement(CanvasElement):
         self.sprite.image = image
         self.sprite.rect = image.get_rect()
 
+       
 
     
 class Canvas:

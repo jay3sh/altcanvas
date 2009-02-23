@@ -3,7 +3,7 @@
 import re
 
 import cairo
-from inkface.altsvg import TAG_INKSCAPE_LABEL,TAG_G
+from inkface.altsvg import TAG_INKSCAPE_LABEL,TAG_G,TAG_TSPAN
 from inkface.altsvg.draw import NODE_DRAW_MAP
 
 class Element:
@@ -12,7 +12,6 @@ class Element:
     y = 0
     w = 0
     h = 0
-    node = None
 
     def __init__(self,node,vdoc):
         self.node = node
@@ -23,13 +22,31 @@ class Element:
     def __getattr__(self,key):
         if self.__dict__.has_key(key):
             return self.__dict__[key]
-        elif self.node != None and key == 'label' and \
-            self.node.attrib.has_key(TAG_INKSCAPE_LABEL):
-            return self.node.attrib.get(TAG_INKSCAPE_LABEL)
-        elif self.node != None and self.node.attrib.has_key(key):
-            return self.node.attrib.get(key)
+        else:
+            if self.__dict__.has_key('node'):
+                node = self.__dict__['node']
+            else:
+                raise AttributeError('Unknown attribute: '+key)
+
+            if node != None and key == 'label' and \
+                node.attrib.has_key(TAG_INKSCAPE_LABEL):
+                return node.attrib.get(TAG_INKSCAPE_LABEL)
+            elif node != None and self.node.attrib.has_key(key):
+                return node.attrib.get(key)
 
         raise AttributeError('Unknown attribute: '+key)
+
+    def __setattr__(self,key,value):
+        # Search into the SVG node for the key
+        if key == 'text':
+            if self.__dict__.has_key('node'):
+                node = self.__dict__['node']
+            else:
+                raise Exception('node member is not set')
+            tspan = node.find(TAG_TSPAN)
+            tspan.text = value
+        else:
+            self.__dict__[key] = value
 
     def add_node(self, node):
         if self.node == None:
@@ -51,7 +68,7 @@ class Element:
 
             self.__render(ctx, node)
 
-    def render(self, scratch_surface):
+    def render(self, scratch_surface=None):
 
         # If there was no old surface to scratch on, create one 
         if scratch_surface == None:
