@@ -1,5 +1,7 @@
 
 from inkface.canvas import PygameFace, PygameCanvas
+from twitter import twitter
+import os
 
 class App:
     GAP = 10
@@ -8,6 +10,24 @@ class App:
     FRAMERATE = 20
     roll = []
     moveflag = False
+    stopflag = False
+    twtcnt = 0
+    twtlist = None
+
+    def __init__(self):
+        self.twtApi = twitter.Api(
+                username=os.environ['TWT_USERNAME'],
+                password=os.environ['TWT_PASSWORD'])
+        self.twtlist = self.twtApi.GetFriendsTimeline()
+
+    def get_twt(self):
+        if self.twtcnt >= len(self.twtlist):
+            self.twtlist = self.twtApi.GetFriendsTimeline()
+            self.twtcnt = 0
+        twt = self.twtlist[self.twtcnt]
+        self.twtcnt += 1
+        return twt
+
     def main(self):
         self.canvas = PygameCanvas((800,480),framerate=self.FRAMERATE)
         self.face = PygameFace('data/gui-6.svg')
@@ -26,8 +46,11 @@ class App:
                                 ((i+1)*(self.base_h + self.GAP)))
 
         for i in range(self.MAX_TWT_NUM + 1):
-            self.roll.append(self.face.get('twt'+str(i)))
-            self.roll[i].onDraw = self.drawTwt
+            elem = self.face.get('twt'+str(i))
+            elem.onDraw = self.drawTwt
+            elem.svg.text = self.get_twt().text
+            elem.refresh(svg_reload=True)
+            self.roll.append(elem)
 
         self.roll[self.index].onDraw = self.doNotDraw
         
@@ -38,10 +61,12 @@ class App:
             self.canvas.eventloop()
         except Exception, e:
             print 'Caught '+str(e)
+            self.canvas.stop()
+            self.stopflag = True
 
     def drawTwt(self, elem, screen):
         if self.moveflag:
-            elem.y -= (self.base_h + self.GAP)/self.FRAMERATE
+            elem.y -= self.moveStep/self.FRAMERATE
             self.twtAnimCounter += 1
 
             if self.twtAnimCounter >= self.MAX_TWT_NUM:
@@ -54,12 +79,32 @@ class App:
 
     def doNotDraw(self, elem, screen):
         if self.moveflag:
-            elem.y -= (self.base_h + self.GAP)/self.FRAMERATE
+            elem.y -= self.moveStep/self.FRAMERATE
+
+    def normalize(self, text):
+        LINE_LIMIT = 10 
+        j = 0
+        new_text = ''
+        for c in text:
+            if c == '\n':
+                j += 1
+                continue
+            if j%LINE_LIMIT == 0:
+                new_text += '\n'+c
+            else:
+                new_text += c
+            j += 1
+        return new_text
 
     def rollToNext(self):
-        self.roll[self.index].onDraw = self.drawTwt
-        self.roll[self.index].y = self.base_x + self.MAX_TWT_NUM*self.moveStep
+        incoming = self.roll[self.index]
+        incoming.onDraw = self.drawTwt
+        incoming.y = self.base_x + self.MAX_TWT_NUM*self.moveStep
+        incoming.svg.text = self.get_twt().text
+        incoming.refresh(svg_reload=True)
+
         self.index = (self.index + 1)%(self.MAX_TWT_NUM + 1)
+
         self.roll[self.index].onDraw = self.doNotDraw
 
         self.moveAmount = self.moveStep
@@ -68,9 +113,6 @@ class App:
 
 
 App().main()
-
-
-
 
 
 
