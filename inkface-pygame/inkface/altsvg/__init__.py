@@ -112,7 +112,10 @@ class VectorDoc:
         for e in root_g.getchildren():
             if in_backdrop and e.attrib.has_key(TAG_INKSCAPE_LABEL):
                 in_backdrop = False
-                elements.append(element)
+
+                if element.surface != None:
+                    # Nothing got drawn on this element
+                    elements.append(element)
 
                 # Keep a reference to the backdrop surface, we will use
                 # it as a scratch surface later

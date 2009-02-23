@@ -52,6 +52,14 @@ class Element:
             self.__render(ctx, node)
 
     def render(self, scratch_surface):
+
+        # If there was no old surface to scratch on, create one 
+        if scratch_surface == None:
+            scratch_surface = cairo.ImageSurface(
+                cairo.FORMAT_RGB24,
+                int(float(self.vdoc.width)),
+                int(float(self.vdoc.height)))
+            
         scratch_ctx = cairo.Context(scratch_surface)
         ex1, ey1, ex2, ey2 = \
             self.__render(scratch_ctx, self.node, simulate=True)
