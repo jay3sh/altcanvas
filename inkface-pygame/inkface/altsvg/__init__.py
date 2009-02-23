@@ -129,8 +129,7 @@ class VectorDoc:
         if len(elements) == 0:
             ''' That means there were no TAG_INKSCAPE_LABEL elems 
                 everything is in backdrop '''
-            elem = Element(None,backdrop_surface,0,0)
-            elements.append(elem)
+            elements.append(element)
             
         return elements
         
