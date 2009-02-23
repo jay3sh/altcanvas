@@ -2,6 +2,7 @@
 import sys
 import unittest
 import pygame
+from inkface.altsvg.element import Element
 
 class Face:
     svg = None
@@ -27,7 +28,6 @@ class PygameFace(Face):
 
             self.elements.append(pElement)
 
-
         # Separate the sprites 
         #self.mutable_group = pygame.sprite.RenderPlain()
         #self.immutable_group = pygame.sprite.RenderPlain()
@@ -37,6 +37,15 @@ class PygameFace(Face):
         #        self.mutable_group.add(element.sprite)
         #    else:   
         #        self.immutable_group.add(element.sprite)
+
+
+    def get(self,key):
+        try:
+            return self.__dict__[key] 
+        except AttributeError,ae:
+            pass
+
+        return None
 
     def clone(self, curNodeName, newNodeName, new_x=-1, new_y=-1):
 
@@ -122,7 +131,6 @@ class PygameCanvasElement(CanvasElement):
         # affecting the original svg element
 
         import xml.etree.ElementTree
-        from inkface.altsvg.element import Element
         node_str = xml.etree.ElementTree.tostring(self.svg.node)
         new_node = xml.etree.ElementTree.fromstring(node_str)
         new_svg = Element(new_node,self.svg.vdoc)
