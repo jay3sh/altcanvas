@@ -9,6 +9,8 @@ class App:
         self.face.clone('newsFlash','newsFlash2',new_x=50,new_y=200)
 
         self.face.newsFlash2.svg.text = 'Any colorful news?!'
+
+        print 'Updated text: '+self.face.newsFlash2.svg.text
         self.face.newsFlash2.refresh(svg_reload=True)
         
         
