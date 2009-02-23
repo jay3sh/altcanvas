@@ -105,42 +105,26 @@ class VectorDoc:
             essentially immutable.
         '''
 
-        backdrop_surface = cairo.ImageSurface(
-            cairo.FORMAT_RGB24,
-            int(float(self.width)),
-            int(float(self.height)))
-        backdrop_ctx = cairo.Context(backdrop_surface)
-        backdrop_ctx.move_to(0,0)
+        element = Element(None,self)
         root_g = self.tree.find(TAG_G)
         in_backdrop = True
         elements = []
         for e in root_g.getchildren():
             if in_backdrop and e.attrib.has_key(TAG_INKSCAPE_LABEL):
                 in_backdrop = False
-                elem = Element(None,backdrop_surface,0,0)
-                elements.append(elem)
+                elements.append(element)
+
+                # Keep a reference to the backdrop surface, we will use
+                # it as a scratch surface later
+                backdrop_surface = element.surface
+
 
             if in_backdrop:
-                self.__render(backdrop_ctx, e)
+                element.add_node(e)
             else:
-                # simulate rendering and get the extents
-                ex1, ey1, ex2, ey2 = \
-                    self.__render(backdrop_ctx, e, simulate=True)
-
-                if (ex2-ex1) < 0 or (ey2-ey1) < 0:
-                    raise Exception('Invalid surface dim for %s: %f,%f'%\
-                        (e.get('id'),(ex2-ex1),(ey2-ey1)))
-
-                elem_surface = cairo.ImageSurface(
-                    cairo.FORMAT_RGB24, int(ex2-ex1), int(ey2-ey1))
-
-                elem_ctx = cairo.Context(elem_surface)
-                elem_ctx.translate(-ex1,-ey1)
-
-                # actually render the element
-                self.__render(elem_ctx, e)
-                elem = Element(e,elem_surface,ex1,ey1)
-                elements.append(elem)
+                element = Element(e,self) 
+                element.render(scratch_surface=backdrop_surface)
+                elements.append(element)
 
         if len(elements) == 0:
             ''' That means there were no TAG_INKSCAPE_LABEL elems 
@@ -158,7 +142,10 @@ class VectorDoc:
             self.__render(ctx, e)
             
     def __render(self, ctx, e, simulate=False):
-        ''' render individual SVG node '''
+        ''' 
+            [Deprecated] Used only by render_full
+            render individual SVG node 
+        '''
         x0 = None
         y0 = None
         transform = e.attrib.get('transform')
