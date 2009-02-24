@@ -2,6 +2,9 @@
 from inkface.canvas import PygameFace, PygameCanvas
 from twitter import twitter
 import os
+import pygame.image
+import cairo
+import array
 
 class App:
     GAP = 7
@@ -32,42 +35,63 @@ class App:
         self.canvas = PygameCanvas((800,480),framerate=self.FRAMERATE)
         self.face = PygameFace('data/gui-6.svg')
 
+        # Calculate some constants
         self.base_x = self.face.twt0.x
-        self.base_img_x = self.face.img0.x
         self.base_y = self.face.twt0.y
-        self.base_img_y = self.face.img0.y
         self.base_w = self.face.twt0.svg.w
         self.base_h = self.face.twt0.svg.h
 
         self.moveStep = self.base_h + self.GAP
         
+        # Clone elements
         for i in range(self.MAX_TWT_NUM):
             self.face.clone('twt0','twt'+str(i+1),
                             new_x = self.base_x,
                             new_y = self.base_y+\
                                 ((i+1)*(self.base_h + self.GAP)))
-            self.face.clone('img0','img'+str(i+1),
-                            new_x = self.base_img_x,
-                            new_y = self.base_img_y+\
-                                ((i+1)*(self.base_h + self.GAP)))
+
+        # Set the waitIcon to rotating effect
+        self.face.waitIcon.onDraw = self.rotateIcon
+
+        # Show the face on canvas
+        self.canvas.add(self.face)
 
         for i in range(self.MAX_TWT_NUM + 1):
             elem = self.face.get('twt'+str(i))
-            eimg = self.face.get('img'+str(i))
             elem.onDraw = self.drawTwt
             twt = self.get_twt()
-            img = self.load_image(twt)
 
-            eimg.sprite.image.blit(img,(0,0))
+            '''
+            eimg = self.face.get('img'+str(i))
+            data = pygame.image.tostring(img,"RGBA")
+            buf = array.array("B", data)
+            s = cairo.ImageSurface.create_for_data(
+                    buf,cairo.FORMAT_ARGB32,img.get_width(),img.get_height(),4)
+
+            ctx = cairo.Context(eimg.svg.surface)
+            ctx.set_source_surface(s)
+            ctx.paint()
+            eimg.refresh()
+
+            #eimg.sprite.image.blit(img,(0,0))
+            '''
+
             elem.svg.text = twt.text
             elem.refresh(svg_reload=True)
+
+            img = self.load_image(twt)
+            iw = img.get_width()
+            elem.sprite.image.blit(img,(self.base_w-iw,0))
+
             self.roll.append(elem)
 
-        self.roll[self.index].onDraw = self.doNotDraw
+        self.roll[self.index].onDraw = self.processOffline
         
         self.face.nextButton.onLeftClick = self.rollToNext
 
-        self.canvas.add(self.face)
+        # waitIcon can disappear now
+        self.face.waitIcon.onDraw = self.doNotDraw
+
         try:
             self.canvas.eventloop()
         except Exception, e:
@@ -88,7 +112,15 @@ class App:
 
         screen.blit(elem.sprite.image,(elem.x,elem.y))
 
+    def rotateIcon(self, elem, screen):
+        #rot_icon = pygame.transform.rotate(elem.sprite.image,20.0)
+        #screen.blit(rot_icon,(elem.x,elem.y))
+        screen.blit(elem.sprite.image,(elem.x,elem.y))
+
     def doNotDraw(self, elem, screen):
+        pass
+
+    def processOffline(self, elem, screen):
         if self.moveflag:
             elem.y -= self.moveStep/self.FRAMERATE
 
@@ -109,7 +141,6 @@ class App:
 
     def load_image(self,twt):
         import urllib
-        import pygame.image
         imgurl = twt.GetUser().profile_image_url
         localfile = '/tmp/'+imgurl.split('/')[-1]
         try:
@@ -125,13 +156,15 @@ class App:
         incoming.onDraw = self.drawTwt
         incoming.y = self.base_x + self.MAX_TWT_NUM*self.moveStep
         twt = self.get_twt()
-        #img = self.load_image(twt)
         incoming.svg.text = twt.text
         incoming.refresh(svg_reload=True)
+        img = self.load_image(twt)
+        iw = img.get_width()
+        incoming.sprite.image.blit(img,(self.base_w-iw,0))
 
         self.index = (self.index + 1)%(self.MAX_TWT_NUM + 1)
 
-        self.roll[self.index].onDraw = self.doNotDraw
+        self.roll[self.index].onDraw = self.processOffline
 
         self.moveAmount = self.moveStep
         self.moveflag = True
