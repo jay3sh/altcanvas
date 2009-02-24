@@ -84,6 +84,7 @@ class App:
             eimg.sprite.image.blit(img,
                 ((self.base_img_w - iw)/2,(self.base_img_h - ih)/2))
 
+            # Now the twit and image are ready to show
             elem.onDraw = self.drawTwt
             eimg.onDraw = self.drawTwt
 
@@ -143,6 +144,7 @@ class App:
         
     def rollToNext(self):
 
+        self.face.waitIcon.onDraw = self.rotateIcon
         # incoming twit (invisible -> visible)
         incoming,incoming_img = self.roll[self.index]
         incoming.onDraw = self.drawTwt
@@ -171,6 +173,7 @@ class App:
         self.moveAmount = self.moveStep
         self.moveflag = True
         self.twtAnimCounter = 0
+        self.face.waitIcon.onDraw = self.doNotDraw
 
 
 App().main()
