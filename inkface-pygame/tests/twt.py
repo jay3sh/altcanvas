@@ -58,6 +58,11 @@ class App:
                             new_y = self.base_img_y+\
                                 ((i+1)*(self.base_h + self.GAP)))
 
+        # Make all the twits and imageFrames invisible to start with
+        for i in range(self.MAX_TWT_NUM + 1):
+            self.face.get('twt'+str(i)).onDraw = self.doNotDraw
+            self.face.get('imgFrame'+str(i)).onDraw = self.doNotDraw
+
         # Set the waitIcon to rotating effect
         self.face.waitIcon.onDraw = self.rotateIcon
 
@@ -66,7 +71,6 @@ class App:
 
         for i in range(self.MAX_TWT_NUM + 1):
             elem = self.face.get('twt'+str(i))
-            elem.onDraw = self.drawTwt
             twt = self.get_twt()
 
             elem.svg.text = twt.text
@@ -74,12 +78,14 @@ class App:
 
             # render profile image
             eimg = self.face.get('imgFrame'+str(i))
-            eimg.onDraw = self.drawTwt
             img = self.load_image(twt)
             iw = img.get_width()
             ih = img.get_height()
             eimg.sprite.image.blit(img,
                 ((self.base_img_w - iw)/2,(self.base_img_h - ih)/2))
+
+            elem.onDraw = self.drawTwt
+            eimg.onDraw = self.drawTwt
 
             self.roll.append((elem,eimg))
 
@@ -126,7 +132,6 @@ class App:
     def load_image(self,twt):
         import urllib
         imgurl = twt.GetUser().profile_image_url
-        print twt.GetUser().screen_name
         localfile = '/tmp/'+imgurl.split('/')[-1]
         try:
             urllib.urlretrieve(imgurl,localfile)
