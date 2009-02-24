@@ -38,8 +38,12 @@ class App:
         # Calculate some constants
         self.base_x = self.face.twt0.x
         self.base_y = self.face.twt0.y
+        self.base_img_x = self.face.imgFrame0.x
+        self.base_img_y = self.face.imgFrame0.y
         self.base_w = self.face.twt0.svg.w
         self.base_h = self.face.twt0.svg.h
+        self.base_img_w = self.face.imgFrame0.svg.w
+        self.base_img_h = self.face.imgFrame0.svg.h
 
         self.moveStep = self.base_h + self.GAP
         
@@ -48,6 +52,10 @@ class App:
             self.face.clone('twt0','twt'+str(i+1),
                             new_x = self.base_x,
                             new_y = self.base_y+\
+                                ((i+1)*(self.base_h + self.GAP)))
+            self.face.clone('imgFrame0','imgFrame'+str(i+1),
+                            new_x = self.base_img_x,
+                            new_y = self.base_img_y+\
                                 ((i+1)*(self.base_h + self.GAP)))
 
         # Set the waitIcon to rotating effect
@@ -64,13 +72,19 @@ class App:
             elem.svg.text = twt.text
             elem.refresh(svg_reload=True)
 
+            # render profile image
+            eimg = self.face.get('imgFrame'+str(i))
+            eimg.onDraw = self.drawTwt
             img = self.load_image(twt)
             iw = img.get_width()
-            elem.sprite.image.blit(img,(self.base_w-iw,0))
+            ih = img.get_height()
+            eimg.sprite.image.blit(img,
+                ((self.base_img_w - iw)/2,(self.base_img_h - ih)/2))
 
-            self.roll.append(elem)
+            self.roll.append((elem,eimg))
 
-        self.roll[self.index].onDraw = self.processOffline
+        self.roll[self.index][0].onDraw = self.processOffline
+        self.roll[self.index][1].onDraw = self.processOffline
         
         self.face.nextButton.onLeftClick = self.rollToNext
 
@@ -89,7 +103,7 @@ class App:
             elem.y -= self.moveStep/self.FRAMERATE
             self.twtAnimCounter += 1
 
-            if self.twtAnimCounter >= self.MAX_TWT_NUM:
+            if self.twtAnimCounter >= 2*self.MAX_TWT_NUM:
                 self.twtAnimCounter = 0
                 self.moveAmount -= int(self.moveStep/self.FRAMERATE)
                 if self.moveAmount < int(self.moveStep/self.FRAMERATE):
@@ -112,6 +126,7 @@ class App:
     def load_image(self,twt):
         import urllib
         imgurl = twt.GetUser().profile_image_url
+        print twt.GetUser().screen_name
         localfile = '/tmp/'+imgurl.split('/')[-1]
         try:
             urllib.urlretrieve(imgurl,localfile)
@@ -122,19 +137,31 @@ class App:
         return image
         
     def rollToNext(self):
-        incoming = self.roll[self.index]
+
+        # incoming twit (invisible -> visible)
+        incoming,incoming_img = self.roll[self.index]
         incoming.onDraw = self.drawTwt
-        incoming.y = self.base_x + self.MAX_TWT_NUM*self.moveStep
+        incoming_img.onDraw = self.drawTwt
+        incoming.y = self.base_y + self.MAX_TWT_NUM*self.moveStep
+        incoming_img.y = self.base_img_y + self.MAX_TWT_NUM*self.moveStep
+
         twt = self.get_twt()
         incoming.svg.text = twt.text
         incoming.refresh(svg_reload=True)
+
         img = self.load_image(twt)
         iw = img.get_width()
-        incoming.sprite.image.blit(img,(self.base_w-iw,0))
+        ih = img.get_height()
+        incoming_img.sprite.image.blit(img,
+            ((self.base_img_w - iw)/2,(self.base_img_h - ih)/2))
 
+        # index++
         self.index = (self.index + 1)%(self.MAX_TWT_NUM + 1)
 
-        self.roll[self.index].onDraw = self.processOffline
+        # outgoing twit (visible -> invisible)
+
+        self.roll[self.index][0].onDraw = self.processOffline
+        self.roll[self.index][1].onDraw = self.processOffline
 
         self.moveAmount = self.moveStep
         self.moveflag = True
