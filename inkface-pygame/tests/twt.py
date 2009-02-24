@@ -61,21 +61,6 @@ class App:
             elem.onDraw = self.drawTwt
             twt = self.get_twt()
 
-            '''
-            eimg = self.face.get('img'+str(i))
-            data = pygame.image.tostring(img,"RGBA")
-            buf = array.array("B", data)
-            s = cairo.ImageSurface.create_for_data(
-                    buf,cairo.FORMAT_ARGB32,img.get_width(),img.get_height(),4)
-
-            ctx = cairo.Context(eimg.svg.surface)
-            ctx.set_source_surface(s)
-            ctx.paint()
-            eimg.refresh()
-
-            #eimg.sprite.image.blit(img,(0,0))
-            '''
-
             elem.svg.text = twt.text
             elem.refresh(svg_reload=True)
 
@@ -123,21 +108,6 @@ class App:
     def processOffline(self, elem, screen):
         if self.moveflag:
             elem.y -= self.moveStep/self.FRAMERATE
-
-    def normalize(self, text):
-        LINE_LIMIT = 10 
-        j = 0
-        new_text = ''
-        for c in text:
-            if c == '\n':
-                j += 1
-                continue
-            if j%LINE_LIMIT == 0:
-                new_text += '\n'+c
-            else:
-                new_text += c
-            j += 1
-        return new_text
 
     def load_image(self,twt):
         import urllib
