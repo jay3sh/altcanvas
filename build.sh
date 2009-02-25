@@ -319,6 +319,44 @@ build_repo()
     rm -rf $REPO_ROOT 
 }
 
+package_tarball()
+{
+    PACKAGE=$1
+    VERSION=$2
+
+    TMP_PKG_TGZ=$PACKAGE-tmp.tgz
+
+    tar czf $TMP_PKG_TGZ $PACKAGE
+    TMP_PKG_DIR=/tmp/$PACKAGE-$RANDOM
+    mkdir $TMP_PKG_DIR
+    mv $TMP_PKG_TGZ $TMP_PKG_DIR/
+    (
+        cd $TMP_PKG_DIR
+        tar xzf $TMP_PKG_TGZ
+        find $PACKAGE -type d -name '.svn' -exec rm -rf {} \;
+        tar czf "$PACKAGE"_"$VERSION".tar.gz $PACKAGE
+    )
+    mv $TMP_PKG_DIR/"$PACKAGE"_"$VERSION".tar.gz .
+    echo "$PACKAGE"_"$VERSION".tar.gz is ready.
+    rm -rf $TMP_PKG_DIR
+}
+
+build_tarballs()
+{
+    # libaltsvg
+    #( cd libaltsvg; make distclean )
+    #package_tarball libaltsvg 0.1.3
+
+    # inkface
+    #( cd inkface; PKG_CONFIG_PATH=$HOME/usr/lib/pkgconfig scons -c verbose=1 )
+    #package_tarball inkface 0.1.3
+
+    # inkface pygame
+    ( cd inkface-pygame; )
+    package_tarball inkface-pygame 0.2.0
+}
+
+
 if [ "$1" = "" ]; then
 	usage
 	exit 1
@@ -379,6 +417,9 @@ case $PKG in
         ;;
      "debrepo")
         build_repo;
+        ;;
+     "tarballs")
+        build_tarballs;
         ;;
 esac
 
