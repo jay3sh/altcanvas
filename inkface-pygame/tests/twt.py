@@ -9,7 +9,7 @@ import array
 
 class App:
     GAP = 2
-    FRAMERATE = 20
+    FRAMERATE = 12 
     roll = []
     moveflag = False
     stopflag = False
@@ -51,7 +51,6 @@ class App:
         
         self.MAX_TWT_NUM = (self.height / self.moveStep) + 1
         self.index = self.MAX_TWT_NUM 
-        print self.MAX_TWT_NUM
         # Clone elements
         for i in range(self.MAX_TWT_NUM):
             self.face.clone('twt0','twt'+str(i+1),
@@ -70,7 +69,7 @@ class App:
         self.face.nextButton.onDraw = self.doNotDraw
 
         # Set the waitIcon to rotating effect
-        self.face.waitIcon.onDraw = self.rotateIcon
+        self.face.waitIcon.onDraw = self.showWaitIcon
 
         # Show the face on canvas
         self.canvas.add(self.face)
@@ -126,10 +125,7 @@ class App:
 
         screen.blit(elem.sprite.image,(elem.x,elem.y))
 
-    def rotateIcon(self, elem, screen):
-        #self.rotation += 2.0
-        #rot_icon = pygame.transform.rotate(elem.sprite.image,self.rotation)
-        #screen.blit(rot_icon,(elem.x,elem.y))
+    def showWaitIcon(self, elem, screen):
         screen.blit(elem.sprite.image,(elem.x,elem.y))
 
     def doNotDraw(self, elem, screen):
@@ -153,7 +149,7 @@ class App:
         
     def rollToNext(self):
 
-        self.face.waitIcon.onDraw = self.rotateIcon
+        self.face.waitIcon.onDraw = self.showWaitIcon
         # incoming twit (invisible -> visible)
         incoming,incoming_img = self.roll[self.index]
         incoming.onDraw = self.drawTwt
