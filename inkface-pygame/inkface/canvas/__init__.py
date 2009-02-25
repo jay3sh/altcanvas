@@ -287,14 +287,20 @@ class PygameCanvas(Canvas):
 
         return False
 
+    def stop(self):
+        self.stop_signal = True
+        if self.painter != None:
+            self.painter.stop()
+            self.painter.join()
+
     def eventloop(self):
         while True:
-            stop_signal = self.__handle_event(pygame.event.wait())
+            self.stop_signal = self.__handle_event(pygame.event.wait())
 
             if self.framerate == 0:
                 self.paint()
 
-            if stop_signal: 
+            if self.stop_signal: 
                 return
 
     
