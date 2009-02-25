@@ -2,14 +2,13 @@
 from inkface.canvas import PygameFace, PygameCanvas
 from twitter import twitter
 import os
+import sys
 import pygame.image
 import cairo
 import array
 
 class App:
-    GAP = 7
-    MAX_TWT_NUM = 7
-    index = MAX_TWT_NUM 
+    GAP = 2
     FRAMERATE = 20
     roll = []
     moveflag = False
@@ -33,9 +32,11 @@ class App:
         return twt
 
     def main(self):
-        self.canvas = PygameCanvas((800,480),framerate=self.FRAMERATE)
-        self.face = PygameFace('data/gui-6.svg')
+        self.face = PygameFace(sys.argv[1])
 
+        self.width = int(float(self.face.svg.width))
+        self.height = int(float(self.face.svg.height))
+        self.canvas = PygameCanvas((self.width,self.height),framerate=self.FRAMERATE)
         # Calculate some constants
         self.base_x = self.face.twt0.x
         self.base_y = self.face.twt0.y
@@ -48,6 +49,9 @@ class App:
 
         self.moveStep = self.base_h + self.GAP
         
+        self.MAX_TWT_NUM = (self.height / self.moveStep) + 1
+        self.index = self.MAX_TWT_NUM 
+        print self.MAX_TWT_NUM
         # Clone elements
         for i in range(self.MAX_TWT_NUM):
             self.face.clone('twt0','twt'+str(i+1),
