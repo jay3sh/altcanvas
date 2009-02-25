@@ -16,6 +16,7 @@ class App:
     stopflag = False
     twtcnt = 0
     twtlist = None
+    rotation = 0.0
 
     def __init__(self):
         self.twtApi = twitter.Api(
@@ -62,6 +63,7 @@ class App:
         for i in range(self.MAX_TWT_NUM + 1):
             self.face.get('twt'+str(i)).onDraw = self.doNotDraw
             self.face.get('imgFrame'+str(i)).onDraw = self.doNotDraw
+        self.face.nextButton.onDraw = self.doNotDraw
 
         # Set the waitIcon to rotating effect
         self.face.waitIcon.onDraw = self.rotateIcon
@@ -95,6 +97,8 @@ class App:
         
         self.face.nextButton.onLeftClick = self.rollToNext
 
+        self.face.nextButton.onDraw = None
+
         # waitIcon can disappear now
         self.face.waitIcon.onDraw = self.doNotDraw
 
@@ -119,7 +123,8 @@ class App:
         screen.blit(elem.sprite.image,(elem.x,elem.y))
 
     def rotateIcon(self, elem, screen):
-        #rot_icon = pygame.transform.rotate(elem.sprite.image,20.0)
+        #self.rotation += 2.0
+        #rot_icon = pygame.transform.rotate(elem.sprite.image,self.rotation)
         #screen.blit(rot_icon,(elem.x,elem.y))
         screen.blit(elem.sprite.image,(elem.x,elem.y))
 
