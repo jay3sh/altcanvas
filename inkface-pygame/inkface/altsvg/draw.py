@@ -108,7 +108,10 @@ def draw_rect(ctx, node, defs, simulate=False):
 
     if simulate:
         ex1, ey1, ex2, ey2 = ctx.stroke_extents()
-        sw = float(style.stroke_width)
+        try:
+            sw = float(style.stroke_width)
+        except AttributeError, ae:
+            sw = 0
         extents = (ex1-sw, ey1-sw, ex2+sw, ey2+sw)
         ctx.new_path()
         ctx.restore()
@@ -289,7 +292,10 @@ def draw_path(ctx, node, defs, simulate=False):
 
     if simulate:
         ex1, ey1, ex2, ey2 = ctx.stroke_extents()
-        sw = float(style.stroke_width)
+        try:
+            sw = float(style.stroke_width)
+        except AttributeError, ae:
+            sw = 0
         extents = (ex1-sw, ey1-sw, ex2+sw, ey2+sw)
         ctx.new_path()
         ctx.restore()
