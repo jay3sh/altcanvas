@@ -28,17 +28,6 @@ class PygameFace(Face):
 
             self.elements.append(pElement)
 
-        # Separate the sprites 
-        #self.mutable_group = pygame.sprite.RenderPlain()
-        #self.immutable_group = pygame.sprite.RenderPlain()
-
-        #for element in self.elements:
-        #    if element.label != None:
-        #        self.mutable_group.add(element.sprite)
-        #    else:   
-        #        self.immutable_group.add(element.sprite)
-
-
     def get(self,key):
         try:
             return self.__dict__[key] 
