@@ -85,7 +85,7 @@ class CanvasElement:
 
 
 class PygameCanvasElement(CanvasElement):
-    def ARGBtoRGBA(self,str_buf):
+    def _ARGBtoRGBA(self,str_buf):
         # cairo's ARGB is interpreted by pygame as BGRA due to 
         # then endian-format difference this routine swaps B and R 
         # (0th and 2nd) byte converting it to RGBA format.
@@ -106,7 +106,7 @@ class PygameCanvasElement(CanvasElement):
     def refresh(self,svg_reload=False):
         if svg_reload or self.svg.surface == None:
             self.svg.render()
-        buf = self.ARGBtoRGBA(self.svg.surface.get_data())
+        buf = self._ARGBtoRGBA(self.svg.surface.get_data())
         image = pygame.image.frombuffer(buf.tostring(),
                     (self.svg.surface.get_width(),
                     self.svg.surface.get_height()),"RGBA")
@@ -203,10 +203,10 @@ class PygameCanvas(Canvas):
         self.framerate = framerate
         if self.framerate > 0:
             self.clock = pygame.time.Clock()
-            self.painter = self.PainterThread(self)
+            self.painter = self._PainterThread(self)
             self.painter.start()
 
-    class PainterThread(threading.Thread):
+    class _PainterThread(threading.Thread):
         def __init__(self,canvas):
             threading.Thread.__init__(self)
             self.canvas = canvas
@@ -215,14 +215,14 @@ class PygameCanvas(Canvas):
         def run(self):
             while True:
                 self.canvas.clock.tick(self.canvas.framerate)
-                self.canvas.paint()
+                self.canvas._paint()
                 if self.stopflag: 
                     return
         
         def stop(self):
             self.stopflag = True
 
-    def paint(self):
+    def _paint(self):
         for elem in self.elementQ:
             if elem.onDraw == None:
                 self.screen.blit(elem.sprite.image,(elem.x,elem.y))
@@ -240,7 +240,7 @@ class PygameCanvas(Canvas):
     def draw(self, element):
         self.screen.blit(element.sprite.image,(element.x, element.y))
 
-    def __handle_event(self,event):
+    def _handle_event(self,event):
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             # do onClick
@@ -287,10 +287,10 @@ class PygameCanvas(Canvas):
 
     def eventloop(self):
         while True:
-            self.stop_signal = self.__handle_event(pygame.event.wait())
+            self.stop_signal = self._handle_event(pygame.event.wait())
 
             if self.framerate == 0:
-                self.paint()
+                self._paint()
 
             if self.stop_signal: 
                 return
