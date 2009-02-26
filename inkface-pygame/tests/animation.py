@@ -29,10 +29,10 @@ class App:
         self.canvas.add(face)
         self.canvas.eventloop()
 
-    def drawPlate(self, elem, screen):
+    def drawPlate(self, elem):
         if self.moveDir != 0:
 
-            elem.svg.y += self.moveDir * int(self.moveStep/gbl.FRAMERATE)
+            elem.y += self.moveDir * int(self.moveStep/gbl.FRAMERATE)
             self.plateCounter += 1
 
             if self.plateCounter >= 5:  
@@ -43,7 +43,7 @@ class App:
                     self.moveDir = 0
                     self.moveAmount = 0
             
-        screen.blit(elem.sprite.image,(elem.svg.x,elem.svg.y))
+        self.canvas.draw(elem)
 
     def moveUp(self):
         self.moveDir += -1

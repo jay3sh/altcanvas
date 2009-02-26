@@ -227,7 +227,7 @@ class PygameCanvas(Canvas):
             if elem.onDraw == None:
                 self.screen.blit(elem.sprite.image,(elem.x,elem.y))
             else:
-                elem.onDraw(elem,self.screen)
+                elem.onDraw(elem)
 
         pygame.display.flip()
 
@@ -236,6 +236,9 @@ class PygameCanvas(Canvas):
         for elem in face.elements:  
             self.elementQ.append(elem)
         self.recalculate_clouds()
+
+    def draw(self, element):
+        self.screen.blit(element.sprite.image,(element.x, element.y))
 
     def __handle_event(self,event):
 

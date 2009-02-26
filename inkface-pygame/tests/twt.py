@@ -112,7 +112,7 @@ class App:
             self.canvas.stop()
             self.stopflag = True
 
-    def drawTwt(self, elem, screen):
+    def drawTwt(self, elem):
         if self.moveflag:
             elem.y -= self.moveStep/self.FRAMERATE
             self.twtAnimCounter += 1
@@ -123,15 +123,15 @@ class App:
                 if self.moveAmount < int(self.moveStep/self.FRAMERATE):
                     self.moveflag = False
 
-        screen.blit(elem.sprite.image,(elem.x,elem.y))
+        self.canvas.draw(elem)
 
-    def showWaitIcon(self, elem, screen):
-        screen.blit(elem.sprite.image,(elem.x,elem.y))
+    def showWaitIcon(self, elem):
+        self.canvas.draw(elem)
 
-    def doNotDraw(self, elem, screen):
+    def doNotDraw(self, elem):
         pass
 
-    def processOffline(self, elem, screen):
+    def processOffline(self, elem):
         if self.moveflag:
             elem.y -= self.moveStep/self.FRAMERATE
 
@@ -150,7 +150,8 @@ class App:
     def rollToNext(self):
 
         self.face.waitIcon.onDraw = self.showWaitIcon
-        # incoming twit (invisible -> visible)
+
+        # incoming twit (invisible to visible)
         incoming,incoming_img = self.roll[self.index]
         incoming.onDraw = self.drawTwt
         incoming_img.onDraw = self.drawTwt
@@ -167,10 +168,10 @@ class App:
         incoming_img.sprite.image.blit(img,
             ((self.base_img_w - iw)/2,(self.base_img_h - ih)/2))
 
-        # index++
+        # Increment Index
         self.index = (self.index + 1)%(self.MAX_TWT_NUM + 1)
 
-        # outgoing twit (visible -> invisible)
+        # outgoing twit (visible to invisible)
 
         self.roll[self.index][0].onDraw = self.processOffline
         self.roll[self.index][1].onDraw = self.processOffline
