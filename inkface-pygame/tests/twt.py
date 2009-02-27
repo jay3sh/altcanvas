@@ -51,6 +51,8 @@ class App:
         
         self.MAX_TWT_NUM = (self.height / self.moveStep) + 1
         self.index = self.MAX_TWT_NUM 
+
+        print 'step: %d'%(self.moveStep)
         # Clone elements
         for i in range(self.MAX_TWT_NUM):
             self.face.clone('twt0','twt'+str(i+1),
@@ -74,6 +76,8 @@ class App:
         # Show the face on canvas
         self.canvas.add(self.face)
 
+        self.canvas.paint()
+
         for i in range(self.MAX_TWT_NUM + 1):
             elem = self.face.get('twt'+str(i))
             twt = self.get_twt()
@@ -95,6 +99,8 @@ class App:
 
             self.roll.append((elem,eimg))
 
+            self.canvas.paint()
+
         self.roll[self.index][0].onDraw = self.processOffline
         self.roll[self.index][1].onDraw = self.processOffline
         
@@ -104,7 +110,10 @@ class App:
 
         # waitIcon can disappear now
         self.face.waitIcon.onDraw = self.doNotDraw
+        self.canvas.paint()
 
+        print 'step decrement = %f'%(self.moveStep/self.FRAMERATE)
+        print 'rollOver adj. = %f'%(self.base_y + self.MAX_TWT_NUM*self.moveStep)
         try:
             self.canvas.eventloop()
         except Exception, e:
@@ -181,6 +190,7 @@ class App:
         self.twtAnimCounter = 0
         self.face.waitIcon.onDraw = self.doNotDraw
 
+        self.canvas.animate(self.FRAMERATE,self.FRAMERATE)
 
 App().main()
 

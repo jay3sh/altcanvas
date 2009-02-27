@@ -186,6 +186,7 @@ class Canvas:
 import threading
 
 class PygameCanvas(Canvas):
+    animateflag = False
     def __init__(self,
                 resolution = (640,480),
                 caption='Inkface App',
@@ -211,18 +212,47 @@ class PygameCanvas(Canvas):
             threading.Thread.__init__(self)
             self.canvas = canvas
             self.stopflag = False
+            self.framerate = 0
+            self.maxcount = 0
 
         def run(self):
             while True:
-                self.canvas.clock.tick(self.canvas.framerate)
-                self.canvas._paint()
                 if self.stopflag: 
                     return
+
+                # If the app has specified a framerate at which it wants
+                # to animate and the max number of frames till which it 
+                # wants to animate then tick at that framerate
+                if self.framerate > 0 and self.maxcount > 0:
+                    self.canvas.clock.tick(self.framerate)
+
+                # If app hasn't specified any framerate, then also we tick
+                # at a base framerate, because we don't want this thread to
+                # busywait in infinite loop
+                else:
+                    self.canvas.clock.tick(self.canvas.framerate)
+
+                # We don't paint if we have run out app-speficied max number
+                # of frames
+                if self.maxcount <= 0:
+                    continue
+
+                self.canvas.paint()
+
+                self.maxcount -= 1
+
+
+        def animate(self, framerate, maxcount):
+            self.framerate = framerate
+            self.maxcount = maxcount
         
         def stop(self):
             self.stopflag = True
 
-    def _paint(self):
+    def animate(self, framerate, maxcount):
+        self.painter.animate(framerate, maxcount)
+
+    def paint(self):
         for elem in self.elementQ:
             if elem.onDraw == None:
                 self.screen.blit(elem.sprite.image,(elem.x,elem.y))
@@ -288,9 +318,6 @@ class PygameCanvas(Canvas):
     def eventloop(self):
         while True:
             self.stop_signal = self._handle_event(pygame.event.wait())
-
-            if self.framerate == 0:
-                self._paint()
 
             if self.stop_signal: 
                 return
