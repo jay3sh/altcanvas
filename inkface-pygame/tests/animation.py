@@ -27,6 +27,9 @@ class App:
 
         self.canvas = PygameCanvas((800,480),framerate=gbl.FRAMERATE)
         self.canvas.add(face)
+
+        self.canvas.paint()
+
         self.canvas.eventloop()
 
     def drawPlate(self, elem):
@@ -48,10 +51,12 @@ class App:
     def moveUp(self):
         self.moveDir += -1
         self.moveAmount = self.moveStep
+        self.canvas.animate(gbl.FRAMERATE,gbl.FRAMERATE)
 
     def moveDown(self):
         self.moveDir += +1
         self.moveAmount = self.moveStep
+        self.canvas.animate(gbl.FRAMERATE,gbl.FRAMERATE)
 
 
 App().main()
