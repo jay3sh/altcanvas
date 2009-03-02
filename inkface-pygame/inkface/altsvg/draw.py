@@ -14,7 +14,8 @@
 import cairo
 
 from inkface.altsvg.style import Style
-from inkface.altsvg import TAG_RECT, TAG_PATH, TAG_TEXT, TAG_TSPAN
+from inkface.altsvg import TAG_RECT, TAG_PATH, \
+    TAG_TEXT, TAG_TSPAN, TAG_IMAGE, TAG_HREF
 
 def draw(ctx, style):
     ''' Generic draw routine '''
@@ -305,12 +306,54 @@ def draw_path(ctx, node, defs, simulate=False):
    
     ctx.restore()
     
+def draw_image(ctx, node, defs, simulate=False):
+    ''' Render 'image' SVG element '''
+    import os
+    ctx.save()
+
+    if simulate:
+        ex1 = float(node.get('x'))
+        ey1 = float(node.get('y'))
+        ex2 = ex1 + float(node.get('width'))
+        ey2 = ey1 + float(node.get('height'))
+        print (ex1,ey1,ex2,ey2)
+        return(ex1,ey1,ex2,ey2)
+
+
+    href = node.get(TAG_HREF)
+    if href == None:
+        raise Exception("link to image resource absent")
+
+    if not href.lower().endswith('png'):
+        raise Exception("Only PNG support is implemented \
+                            for embedded images")
+
+    search_path = defs['docpath'].rpartition(os.sep)[0]
+
+    if os.path.exists(href):
+        img_path = href
+    elif os.path.exists(os.path.join(search_path,href)):
+        img_path = os.path.join(search_path,href)
+    else:
+        raise Exception('Cannot open image '+href)
+
+    # Load the image 
+    img_surface = cairo.ImageSurface.create_from_png(img_path)
+        
+    x = float(node.get('x'))
+    y = float(node.get('y'))
+    ctx.set_source_surface(img_surface,x,y)
+
+    ctx.paint()
+        
+    ctx.restore()
         
 NODE_DRAW_MAP = \
     {
         TAG_RECT:draw_rect,
         TAG_PATH:draw_path,
-        TAG_TEXT:draw_text
+        TAG_TEXT:draw_text,
+        TAG_IMAGE:draw_image
     }
 
 

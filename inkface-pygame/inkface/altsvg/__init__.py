@@ -39,6 +39,7 @@ TAG_PATH            = SVG_NS+'path'
 TAG_RECT            = SVG_NS+'rect'
 TAG_TEXT            = SVG_NS+'text'
 TAG_TSPAN           = SVG_NS+'tspan'
+TAG_IMAGE           = SVG_NS+'image'
 TAG_INKSCAPE_LABEL  = INKSCAPE_NS+'label'
 TAG_HREF            = XLINK_NS+'href'
 
@@ -53,10 +54,16 @@ class VectorDoc:
     defs = {}
     def __init__(self, svgname):
         ''' load and parse SVG document, create ElementTree from the same '''
+        self.svgfilepath = svgname
         self.tree = ElementTree()
         self.tree.parse(svgname)
 
         defs_node = self.tree.find(TAG_DEFS)
+
+        # Add full path of SVG doc into defs. It is required for rendering
+        # image elements, where linked image files need to be searched w.r.t. 
+        # relative paths
+        self.defs['docpath'] = svgname
 
         #
         # Gradient are defined by a tuple of stops.
