@@ -12,6 +12,7 @@ class Element:
     y = 0
     w = 0
     h = 0
+    scale_factor = -1
 
     def __init__(self,node,vdoc):
         self.node = node
@@ -60,6 +61,9 @@ class Element:
         else:
             self.__dict__[key] = value
 
+    def scale(self, factor):
+        self.scale_factor = factor
+
     def add_node(self, node):
         if self.node == None:
             if self.surface == None:
@@ -80,6 +84,7 @@ class Element:
 
             self.__render(ctx, node)
 
+
     def render(self, scratch_surface=None):
 
         # If there was no old surface to scratch on, create one 
@@ -92,6 +97,10 @@ class Element:
         scratch_ctx = cairo.Context(scratch_surface)
         ex1, ey1, ex2, ey2 = \
             self.__render(scratch_ctx, self.node, simulate=True)
+
+        if self.scale_factor > 0:
+            ex1,y1,ex2,ey2 = \
+                map(lambda x: x*self.scale_factor,(ex1,ey1,ex2,ey2))
 
         if (ex2-ex1) < 0 or (ey2-ey1) < 0:
             raise Exception('Invalid surface dim for %s: %f,%f'%\
@@ -108,6 +117,7 @@ class Element:
         self.y = ey1
         self.w = self.surface.get_width()
         self.h = self.surface.get_height()
+
 
     def __render(self, ctx, e, simulate=False):
         ''' render individual SVG node '''
@@ -132,6 +142,9 @@ class Element:
                 raise Exception('Unable to match transform')
 
         ctx.save()
+
+        if self.scale_factor > 0:
+            ctx.scale(self.scale_factor,self.scale_factor)
 
         extents = None
 
