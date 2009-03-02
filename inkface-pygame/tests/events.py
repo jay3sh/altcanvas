@@ -8,6 +8,7 @@ class App:
         face.okButton.onLeftClick = self.handleOk
         face.cancelButton.onLeftClick = self.handleCancel
         self.canvas.add(face)
+        self.canvas.paint()
         self.canvas.eventloop()
 
     def handleOk(self):

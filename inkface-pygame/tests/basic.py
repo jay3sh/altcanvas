@@ -8,4 +8,6 @@ canvas = PygameCanvas((int(face.svg.width),int(face.svg.height)))
 
 canvas.add(face)
 
+canvas.paint()
+
 canvas.eventloop()

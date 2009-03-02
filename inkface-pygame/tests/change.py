@@ -9,11 +9,13 @@ class App:
         self.face.changeButton.onLeftClick = self.change
         
         self.canvas.add(self.face)
+        self.canvas.paint()
         self.canvas.eventloop()
 
     def change(self):
         self.face.changeText.svg.text = 'This is new text!'
         self.face.changeText.refresh(svg_reload=True)
+        self.canvas.paint()
 
 
 

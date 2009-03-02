@@ -15,6 +15,9 @@ class App:
         
         
         self.canvas.add(self.face)
+
+        self.canvas.paint()
+
         self.canvas.eventloop()
 
 
