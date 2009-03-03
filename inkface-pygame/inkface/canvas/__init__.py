@@ -43,7 +43,7 @@ class PygameFace(Face):
 
         curNode = self.__dict__[curNodeName]
 
-        newNode = curNode.clone(newNodeName)
+        newNode = curNode.dup(newNodeName)
 
         if new_x > 0: newNode.x = new_x
         if new_y > 0: newNode.y = new_y
@@ -113,7 +113,7 @@ class PygameCanvasElement(CanvasElement):
         self.sprite.image = image
         self.sprite.rect = image.get_rect()
 
-    def clone(self, newName):
+    def dup(self, newName):
         # Clone the svg element first, it has to be a new instance and not
         # just a new reference to the same svg element
         # The new instance's SVG attributes should be changeable without
@@ -255,6 +255,11 @@ class PygameCanvas(Canvas):
     def paint(self):
         for elem in self.elementQ:
             if elem.onDraw == None:
+                #try:
+                #    print 'Drawing %s at x=%d, y=%d, w=%d, h=%d'%(
+                #        elem.svg.id,elem.x,elem.y,elem.svg.w,elem.svg.h)
+                #except AttributeError, ae:
+                #    pass
                 self.screen.blit(elem.sprite.image,(elem.x,elem.y))
             else:
                 elem.onDraw(elem)
