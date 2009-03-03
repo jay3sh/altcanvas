@@ -9,6 +9,24 @@ from inkface.altsvg import VectorDoc
 
 def draw(surface):
     cr = cairo.Context(surface)
+
+    cr.scale(2,2)
+
+    cr.set_source_rgb(1,1,1)
+    cr.rectangle(100,100,200,200)
+    print cr.stroke_extents()
+    cr.stroke()
+
+    #cr.scale(2,2)
+
+    #cr.rectangle(120,120,50,50)
+    #cr.move_to(120,120)
+    #cr.line_to(170,170)
+
+    #cr.stroke()
+    
+
+    '''
     cr.select_font_face("Bitman Vera Sans",
         cairo.FONT_SLANT_NORMAL,
         cairo.FONT_WEIGHT_BOLD)
@@ -44,6 +62,7 @@ def draw(surface):
         cr.glyph_path((glyph,))
         cr.fill()
 
+    '''
 
     '''
     glyphs = []
@@ -146,13 +165,14 @@ class App:
                     data, cairo.FORMAT_ARGB32,self.w, self.h, stride)
 
         # Test full rendering
-        cr = cairo.Context(surface)
-        self.vectorDoc.render_full(cr)
+        #cr = cairo.Context(surface)
+        #self.vectorDoc.render_full(cr)
         
-        buf = self.ARGBtoRGBA(data)
+        #buf = self.ARGBtoRGBA(data)
 
         # Test custom cairo commands
-        #draw(surface)
+        draw(surface)
+        buf = self.ARGBtoRGBA(data)
 
         # Test elements interface
         #cr = cairo.Context(surface)
