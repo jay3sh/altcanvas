@@ -99,7 +99,7 @@ class Element:
             self.__render(scratch_ctx, self.node, simulate=True)
 
         if self.scale_factor > 0:
-            ex1,y1,ex2,ey2 = \
+            ex1,ey1,ex2,ey2 = \
                 map(lambda x: x*self.scale_factor,(ex1,ey1,ex2,ey2))
 
         if (ex2-ex1) < 0 or (ey2-ey1) < 0:
