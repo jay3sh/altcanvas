@@ -27,6 +27,9 @@ class Style:
                     name, value = style_attr.split(':')
                     self.__style__[name] = value
 
+    def _is_type_length(self,attr):
+        return attr == 'stroke-width' 
+
     def __getattr__(self, key):
         ''' Override the getter to provide easy access to style attributes '''
         if self.__dict__.has_key(key): 
@@ -34,8 +37,12 @@ class Style:
 
         modkey = key.replace('_','-')
         if self.__style__.has_key(modkey): 
-            return self.__style__[modkey]
-
+            val = self.__style__[modkey]
+            if self._is_type_length(modkey):
+                return self.__parse_length(val)
+            else:
+                return self.__style__[modkey]
+ 
         raise AttributeError('Unknown attr '+key)
 
     def __apply_pattern(self, pattern_url, ctx):
