@@ -95,8 +95,15 @@ class Element:
                 int(float(self.vdoc.height)))
             
         scratch_ctx = cairo.Context(scratch_surface)
-        ex1, ey1, ex2, ey2 = \
-            self.__render(scratch_ctx, self.node, simulate=True)
+        extents = self.__render(scratch_ctx, self.node, simulate=True)
+        if extents == None:
+            # There can be empty group nodes, hence no extents were returned
+            # easy way to deal with them is to create surface of smallest
+            # positive dimension on which nothing will be drawn
+            # TODO: this might be handled in better way
+            ex1, ey1, ex2, ey2 = (0, 0, 1, 1)
+        else:
+            ex1, ey1, ex2, ey2 = extents
 
         if self.scale_factor > 0:
             ex1,ey1,ex2,ey2 = \
@@ -163,7 +170,10 @@ class Element:
                 new_extents = self.__render(ctx, sub_e, simulate)
 
                 if simulate:
-                    ex1, ey1, ex2, ey2 = new_extents
+                    if new_extents == None:
+                        ex1, ey1, ex2, ey2 = (0,0,0,0)
+                    else:
+                        ex1, ey1, ex2, ey2 = new_extents
 
                     # The following adjustment is questionable
                     # TODO
