@@ -71,7 +71,7 @@ class Element:
                 # nodes later on. Create a surface of the size of whole
                 # document. The oncoming nodes can be drawn on it
                 self.surface = cairo.ImageSurface(
-                    cairo.FORMAT_RGB24,
+                    cairo.FORMAT_ARGB32,
                     int(float(self.vdoc.width)),
                     int(float(self.vdoc.height)))
                 self.x = 0
@@ -90,7 +90,7 @@ class Element:
         # If there was no old surface to scratch on, create one 
         if scratch_surface == None:
             scratch_surface = cairo.ImageSurface(
-                cairo.FORMAT_RGB24,
+                cairo.FORMAT_ARGB32,
                 int(float(self.vdoc.width)),
                 int(float(self.vdoc.height)))
             
@@ -114,7 +114,7 @@ class Element:
                 (self.node.get('id'),(ex2-ex1),(ey2-ey1)))
 
         self.surface = cairo.ImageSurface(
-            cairo.FORMAT_RGB24, int(ex2-ex1), int(ey2-ey1))
+            cairo.FORMAT_ARGB32, int(ex2-ex1), int(ey2-ey1))
         elem_ctx = cairo.Context(self.surface)
         elem_ctx.translate(-ex1,-ey1)
 
