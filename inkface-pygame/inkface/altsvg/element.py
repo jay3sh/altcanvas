@@ -118,6 +118,9 @@ class Element:
         elem_ctx = cairo.Context(self.surface)
         elem_ctx.translate(-ex1,-ey1)
 
+        if self.scale_factor > 0:
+            elem_ctx.scale(self.scale_factor,self.scale_factor)
+
         self.__render(elem_ctx, self.node)
 
         self.x = ex1
@@ -149,9 +152,6 @@ class Element:
                 raise Exception('Unable to match transform')
 
         ctx.save()
-
-        if self.scale_factor > 0:
-            ctx.scale(self.scale_factor,self.scale_factor)
 
         extents = None
 
