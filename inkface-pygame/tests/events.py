@@ -11,10 +11,10 @@ class App:
         self.canvas.paint()
         self.canvas.eventloop()
 
-    def handleOk(self):
+    def handleOk(self, elem):
         print 'Handling OK'
 
-    def handleCancel(self):
+    def handleCancel(self, elem):
         print 'Handling Cancel'
 
 

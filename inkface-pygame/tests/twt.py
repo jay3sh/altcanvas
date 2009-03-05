@@ -156,7 +156,7 @@ class App:
         image = pygame.image.load(localfile)
         return image
         
-    def rollToNext(self):
+    def rollToNext(self, elem):
 
         self.face.waitIcon.onDraw = self.showWaitIcon
 

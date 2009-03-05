@@ -12,7 +12,7 @@ class App:
         self.canvas.paint()
         self.canvas.eventloop()
 
-    def change(self):
+    def change(self, elem):
         self.face.changeText.svg.text = 'This is new text!'
         self.face.changeText.refresh(svg_reload=True)
         self.canvas.paint()

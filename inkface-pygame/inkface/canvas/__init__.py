@@ -284,9 +284,9 @@ class PygameCanvas(Canvas):
                     not elem.clouded(event.pos):
 
                     if event.button == 1 and elem.onLeftClick != None:
-                        elem.onLeftClick()
+                        elem.onLeftClick(elem)
                     elif event.button == 3 and elem.onRightClick != None:
-                        elem.onRightClick()
+                        elem.onRightClick(elem)
 
         
         elif event.type == pygame.MOUSEMOTION:
@@ -296,7 +296,7 @@ class PygameCanvas(Canvas):
                     not elem.clouded(event.pos):
 
                     if elem.onTap != None:
-                        elem.onTap()
+                        elem.onTap(elem)
 
         elif event.type == pygame.MOUSEBUTTONUP:
             pass

@@ -48,12 +48,12 @@ class App:
             
         self.canvas.draw(elem)
 
-    def moveUp(self):
+    def moveUp(self, elem):
         self.moveDir += -1
         self.moveAmount = self.moveStep
         self.canvas.animate(gbl.FRAMERATE,gbl.FRAMERATE)
 
-    def moveDown(self):
+    def moveDown(self, elem):
         self.moveDir += +1
         self.moveAmount = self.moveStep
         self.canvas.animate(gbl.FRAMERATE,gbl.FRAMERATE)
