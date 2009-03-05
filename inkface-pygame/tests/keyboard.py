@@ -4,19 +4,57 @@ from inkface.canvas import PygameFace, PygameCanvas
 
 
 class App:
+    FRAMERATE = 5
+
     def main(self):
         self.canvas = PygameCanvas((800,480))
-        face = PygameFace('data/gui-11.svg')
+        self.face = PygameFace('data/gui-11.svg')
 
-        face.clone('keyQ','keyQ2x')
-        face.keyQ2x.svg.scale(2)
-        face.keyQ2x.refresh(svg_reload=True)
-        #face.keyQ2x.x = 100
-        #face.keyQ2x.y = 100
 
-        self.canvas.add(face)
+        for i in range(26):
+            keyChr = chr(ord('A')+i)
+            smlKey = self.face.get('key'+keyChr)
+            smlKey.onLeftClick = self.onLeftClick
+
+            self.face.clone('key'+keyChr, 'key'+keyChr+'med')
+            self.face.clone('key'+keyChr, 'key'+keyChr+'big')
+
+            medKey = self.face.get('key'+keyChr+'med')
+            bigKey = self.face.get('key'+keyChr+'big')
+
+            medKey.svg.scale(1.5)
+            bigKey.svg.scale(2)
+
+            medKey.refresh(svg_reload=True)
+            bigKey.refresh(svg_reload=True)
+
+            medKey.onDraw = self.doNotDraw
+            bigKey.onDraw = self.doNotDraw
+
+            medKey.x = smlKey.x + smlKey.svg.w/2 - medKey.svg.w/2
+            bigKey.x = smlKey.x + smlKey.svg.w/2 - bigKey.svg.w/2
+
+            bigKey.y = smlKey.y - 70
+            medKey.y = smlKey.y - 30
+
+        self.canvas.add(self.face)
         self.canvas.paint()
         self.canvas.eventloop()
 
+    def doNotDraw(self, elem):
+        pass
+
+    def doDraw(self, elem):
+        self.canvas.draw(elem)
+        elem.onDraw = self.doNotDraw
+
+        if elem.svg.label.endswith('med'):
+            bigkeyLabel = elem.svg.label.replace('med','big')
+            self.face.get(bigkeyLabel).onDraw = self.doDraw
+
+    def onLeftClick(self, elem):
+        medkeyLabel = elem.svg.label+'med'
+        self.face.get(medkeyLabel).onDraw = self.doDraw
+        self.canvas.animate(self.FRAMERATE,3)
 
 App().main()
