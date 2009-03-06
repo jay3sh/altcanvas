@@ -123,6 +123,16 @@ class Style:
             except KeyError, ke:
                 font_slant = cairo.FONT_SLANT_NORMAL
 
+        r = g = b = 0.0
+        a = 1.0
+        if self.__style__.has_key('fill'):
+            r, g, b = self.__html2rgb(self.__style__['fill'])
+            
+        if self.__style__.has_key('fill-opacity'):
+            a = float(self.__style__['fill-opacity'])
+
+        ctx.set_source_rgba(r, g, b, a)
+
         if not font_family:
             font_family = "Sans"
 
