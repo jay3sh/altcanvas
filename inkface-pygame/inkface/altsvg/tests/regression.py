@@ -93,7 +93,7 @@ class SlideShow:
 def main():
     op = sys.argv[1]
 
-    SVG_FILES = map(lambda x: 'data/shape-%d.svg'%x, range(11))
+    SVG_FILES = map(lambda x: 'data/shape-%d.svg'%x, range(13))
     SVG_FILES += (map(lambda x: 'data/composite-%d.svg'%x, range(2)))
 
     if op == 'genpng':
@@ -106,8 +106,8 @@ def main():
             vdoc = VectorDoc(file)
             #w,h = map(lambda x: int(x), vdoc.get_doc_props())
             surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,
-                int(self.vdoc.width),
-                int(self.vdoc.height))
+                int(vdoc.width),
+                int(vdoc.height))
             ctx = cairo.Context(surface)
             vdoc.render_full(ctx)
 
