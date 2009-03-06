@@ -1,5 +1,6 @@
 
 
+import sys
 from inkface.canvas import PygameFace, PygameCanvas
 
 
@@ -8,7 +9,7 @@ class App:
 
     def main(self):
         self.canvas = PygameCanvas((800,480))
-        self.face = PygameFace('data/gui-11.svg')
+        self.face = PygameFace(sys.argv[1])
 
 
         for i in range(26):
