@@ -41,6 +41,9 @@ class PygameFace(Face):
         if not self.__dict__.has_key(curNodeName):
             raise Exception(curNodeName+' does not exist for cloning')
 
+        if curNodeName == newNodeName:
+            raise Exception('New node should have different name')
+
         curNode = self.__dict__[curNodeName]
 
         newNode = curNode.dup(newNodeName)
