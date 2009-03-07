@@ -82,7 +82,7 @@ class Element:
             ctx = cairo.Context(self.surface)
             ctx.move_to(0,0)
 
-            self.__render(ctx, node)
+            self.raw_render(ctx, node)
 
 
     def render(self, scratch_surface=None):
@@ -95,7 +95,7 @@ class Element:
                 int(float(self.vdoc.height)))
             
         scratch_ctx = cairo.Context(scratch_surface)
-        extents = self.__render(scratch_ctx, self.node, simulate=True)
+        extents = self.raw_render(scratch_ctx, self.node, simulate=True)
         if extents == None:
             # There can be empty group nodes, hence no extents were returned
             # easy way to deal with them is to create surface of smallest
@@ -121,7 +121,7 @@ class Element:
         if self.scale_factor > 0:
             elem_ctx.scale(self.scale_factor,self.scale_factor)
 
-        self.__render(elem_ctx, self.node)
+        self.raw_render(elem_ctx, self.node)
 
         self.x = ex1
         self.y = ey1
@@ -129,7 +129,7 @@ class Element:
         self.h = self.surface.get_height()
 
 
-    def __render(self, ctx, e, simulate=False):
+    def raw_render(self, ctx, e, simulate=False):
         ''' render individual SVG node '''
         x0 = None
         y0 = None
@@ -167,7 +167,7 @@ class Element:
 
         if e.tag == TAG_G:
             for sub_e in e.getchildren():
-                new_extents = self.__render(ctx, sub_e, simulate)
+                new_extents = self.raw_render(ctx, sub_e, simulate)
 
                 if simulate:
                     if new_extents == None:
