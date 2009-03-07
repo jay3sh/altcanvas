@@ -9,6 +9,7 @@ from inkface.altsvg import VectorDoc
 
 import math
 
+    
 def draw(surface):
     cr = cairo.Context(surface)
 
@@ -16,10 +17,20 @@ def draw(surface):
 
     ax = 200
     ay = 200
+    
+    # --------------------------------
     #cr.rectangle(ax,ay,100,100)
+
     cr.move_to(ax,ay)
     cr.curve_to(ax+30,ay+30,ax+60,ay+30,ax+90,ay)
     cr.curve_to(ax+60,ay-30,ax+30,ay-30,ax,ay)
+
+    #cr.move_to(ax,ay)
+    #cr.line_to(ax+200,ay)
+    #cr.line_to(ax+200,ay+100)
+    #cr.line_to(ax,ay+100)
+    #cr.line_to(ax,ay)
+    # --------------------------------
     
 
     ex1,ey1,ex2,ey2 = cr.stroke_extents()
@@ -51,10 +62,20 @@ def draw(surface):
     
     cr.set_source_rgb(1,1,1)
 
+    # --------------------------------
+    #cr.move_to(cx,cy)
+    #cr.line_to(cx+200,cy)
+    #cr.line_to(cx+200,cy+100)
+    #cr.line_to(cx,cy+100)
+    #cr.line_to(cx,cy)
+
     cr.move_to(cx,cy)
     cr.curve_to(cx+30,cy+30,cx+60,cy+30,cx+90,cy)
     cr.curve_to(cx+60,cy-30,cx+30,cy-30,cx,cy)
+
     #cr.rectangle(cx,cy,100,100)
+
+    # --------------------------------
     cr.stroke()
     
 
