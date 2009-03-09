@@ -4,6 +4,7 @@ from inkface.canvas import PygameFace, PygameCanvas
 
 class TextBox:
     counter_dir = 1
+    inFocus = False
     def __init__(self, border_elem, txt_elem, cursor_elem, framerate=20):
         self.border_elem = border_elem
         self.txt_elem = txt_elem
@@ -28,12 +29,10 @@ class TextBox:
         self._onKeyPress(self.txt_elem, event)
 
     def _onGainFocus(self, elem):
-        print 'gained focus'
-        pass
+        self.inFocus = True
 
     def _onLoseFocus(self, elem):
-        print 'lost focus'
-        pass
+        self.inFocus = False
 
     def _onKeyPress(self, elem, event):
         if event.key >= pygame.K_SPACE and event.key <= pygame.K_DELETE:
@@ -62,6 +61,9 @@ class TextBox:
             pass
 
     def _onCursorDraw(self, elem):
+        if not self.inFocus:
+            elem.hide()
+            return
         txt_x, txt_y = self.txt_elem.get_position()
         elem_x = txt_x + self.txt_elem.svg.w + 2
         elem_y = txt_y
