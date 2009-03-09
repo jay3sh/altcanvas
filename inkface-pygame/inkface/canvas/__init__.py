@@ -48,8 +48,8 @@ class PygameFace(Face):
 
         newNode = curNode.dup(newNodeName)
 
-        if new_x > 0: newNode.x = new_x
-        if new_y > 0: newNode.y = new_y
+        if new_x > 0: newNode._x = new_x
+        if new_y > 0: newNode._y = new_y
 
         curNodePos = self.elements.index(curNode)
         self.elements.insert(curNodePos+1,newNode)
@@ -68,16 +68,23 @@ class CanvasElement:
 
         self.onDraw = None
 
-        self.x = self.svg.x
-        self.y = self.svg.y
+        self._x = self.svg.x
+        self._y = self.svg.y
+
+    def set_position(self, (x, y)):
+        self._x = x
+        self._y = y
+
+    def get_position(self):
+        return (self._x, self._y)
 
     def occupies(self,(x,y)):
-        return ((x > self.x) and (y > self.y) and \
-                (x < self.x+self.svg.w) and (y < self.svg.y+self.svg.h))
+        return ((x > self._x) and (y > self._y) and \
+                (x < self._x+self.svg.w) and (y < self._y+self.svg.h))
 
     def clouded(self,(x,y)):
-        rx = x - self.x
-        ry = y - self.y
+        rx = x - self._x
+        ry = y - self._y
 
         for cloud in self.clouds:
             cx0, cy0, cx1, cy1 = cloud 
@@ -88,6 +95,33 @@ class CanvasElement:
 
 
 class PygameCanvasElement(CanvasElement):
+
+    class ElementSprite(pygame.sprite.DirtySprite):
+        def __init__(self,parent):
+            pygame.sprite.DirtySprite.__init__(self)
+            self.parent = parent
+
+        def update(self,*args):
+            if self.parent.onDraw != None:
+                self.parent.onDraw(self.parent)
+
+    def set_position(self, (x, y)):
+        CanvasElement.set_position(self, (x, y))
+        self.sprite.rect.center = (self._x + self.svg.w/2, \
+                                    self._y + self.svg.h/2)
+        if self.sprite.visible == 1:
+            self.sprite.dirty = 1
+        
+    def hide(self):
+        if self.sprite.visible == 1:   
+            self.sprite.visible = 0
+            self.sprite.dirty = 1
+
+    def unhide(self):
+        if self.sprite.visible == 0:
+            self.sprite.visible = 1
+            self.sprite.dirty = 1
+        
     def _ARGBtoRGBA(self,str_buf):
         # cairo's ARGB is interpreted by pygame as BGRA due to 
         # then endian-format difference this routine swaps B and R 
@@ -103,7 +137,7 @@ class PygameCanvasElement(CanvasElement):
 
     def __init__(self,svgelem):
         CanvasElement.__init__(self,svgelem)
-        self.sprite = pygame.sprite.Sprite()
+        self.sprite = self.ElementSprite(self)
         self.refresh()
 
     def refresh(self,svg_reload=False):
@@ -115,6 +149,9 @@ class PygameCanvasElement(CanvasElement):
                     self.svg.surface.get_height()),"RGBA")
         self.sprite.image = image
         self.sprite.rect = image.get_rect()
+        self.sprite.rect.center = (self._x + self.svg.w/2, \
+                                    self._y + self.svg.h/2)
+        self.sprite.dirty = 1
 
     def dup(self, newName):
         # Clone the svg element first, it has to be a new instance and not
@@ -202,7 +239,12 @@ class PygameCanvas(Canvas):
         pygame.init()
         self.screen = pygame.display.set_mode(resolution,pygame.DOUBLEBUF)
         self.dispsurf = pygame.Surface(self.screen.get_size())
+        self.dispsurf.convert()
         pygame.display.set_caption(caption)
+
+        self.elem_group = pygame.sprite.LayeredDirty(
+                            _use_update=True, _time_threshold=1000./framerate)
+        #self.passive_elem_group = pygame.sprite.LayeredDirty()
 
         self.framerate = framerate
         if self.framerate > 0:
@@ -223,60 +265,31 @@ class PygameCanvas(Canvas):
                 if self.stopflag: 
                     return
 
-                # If the app has specified a framerate at which it wants
-                # to animate and the max number of frames till which it 
-                # wants to animate then tick at that framerate
-                if self.framerate > 0 and self.maxcount > 0:
-                    self.canvas.clock.tick(self.framerate)
-
-                # If app hasn't specified any framerate, then also we tick
-                # at a base framerate, because we don't want this thread to
-                # busywait in infinite loop
-                else:
-                    self.canvas.clock.tick(self.canvas.framerate)
-
-                # We don't paint if we have run out app-speficied max number
-                # of frames
-                if self.maxcount <= 0:
-                    continue
+                self.canvas.clock.tick(self.canvas.framerate)
 
                 self.canvas.paint()
 
-                self.maxcount -= 1
 
-
-        def animate(self, framerate, maxcount):
-            self.framerate = framerate
-            self.maxcount = maxcount
-        
         def stop(self):
             self.stopflag = True
 
-    def animate(self, framerate, maxcount):
-        self.painter.animate(framerate, maxcount)
-
     def paint(self):
-        for elem in self.elementQ:
-            if elem.onDraw == None:
-                #try:
-                #    print 'Drawing %s at x=%d, y=%d, w=%d, h=%d'%(
-                #        elem.svg.id,elem.x,elem.y,elem.svg.w,elem.svg.h)
-                #except AttributeError, ae:
-                #    pass
-                self.screen.blit(elem.sprite.image,(elem.x,elem.y))
-            else:
-                elem.onDraw(elem)
+        self.elem_group.update()
 
+        rectlist = self.elem_group.draw(self.dispsurf)
+        self.screen.blit(self.dispsurf,(0,0))
+                    
         pygame.display.flip()
 
     def add(self,face):
         Canvas.add(self,face)
         for elem in face.elements:  
             self.elementQ.append(elem)
+            self.elem_group.add(elem.sprite)
         self.recalculate_clouds()
 
-    def draw(self, element):
-        self.screen.blit(element.sprite.image,(element.x, element.y))
+    def update(self):
+        self.elem_group.update()
 
     def _handle_event(self,event):
 
@@ -305,18 +318,18 @@ class PygameCanvas(Canvas):
             pass
 
         elif event.type == pygame.KEYDOWN:
-            # do Keydown
-            # temp escape
-            if event.key == pygame.K_ESCAPE:
-                self.painter.stop()
-                self.painter.join()
-                return True
+            for elem in self.elementQ:
+                # TODO put hasFocus logic
+                if elem.onKeyPress != None:
+                    elem.onKeyPress(elem, event)
 
         elif event.type == pygame.QUIT:
+            self.stop()
             return True
 
         return False
 
+    # TODO rename to cleanup
     def stop(self):
         self.stop_signal = True
         if self.painter != None:
