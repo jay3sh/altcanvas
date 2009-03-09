@@ -3,15 +3,15 @@ import sys
 
 
 class TextBox:
-    FLASH_COUNT = 10
     counter_dir = 1
-    def __init__(self, border_elem, txt_elem, cursor_elem):
+    def __init__(self, border_elem, txt_elem, cursor_elem, framerate=20):
         self.border_elem = border_elem
         self.txt_elem = txt_elem
         self.cursor_elem = cursor_elem
+        self.flash_count = framerate/3
 
         self.cursor_elem.onDraw = self._onCursorDraw
-        self.cursor_elem.flash_counter = 0
+        self.cursor_elem.flcounter = 0
 
         self.txt_elem.onKeyPress = self._onKeyPress
         self.txt_elem.svg.text = "_"
@@ -37,27 +37,27 @@ class TextBox:
         elem_y = txt_y
         elem.set_position((elem_x,elem_y))
 
-        if abs(elem.flash_counter) >= self.FLASH_COUNT:
+        if abs(elem.flcounter) >= self.flash_count:
             if self.counter_dir > 0:
                 elem.hide()
             else:
                 elem.unhide()
             self.counter_dir = -1 * self.counter_dir
 
-        elem.flash_counter += self.counter_dir
+        elem.flcounter += self.counter_dir
  
         
 class App:
-    FLASH_COUNT = 10
-    dir = 1
+    FRAMERATE = 25
     def main(self):
         try:
-            self.canvas = PygameCanvas((800,480))
+            self.canvas = PygameCanvas((800,480),framerate = self.FRAMERATE)
             self.face = PygameFace('data/gui-14.svg')
 
             tb = TextBox(border_elem=self.face.border,
                         txt_elem=self.face.txt,
-                        cursor_elem=self.face.cursor)
+                        cursor_elem=self.face.cursor,
+                        framerate=self.FRAMERATE)
 
             self.canvas.add(self.face)
             self.canvas.eventloop()
