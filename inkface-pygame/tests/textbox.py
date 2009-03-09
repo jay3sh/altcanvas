@@ -5,14 +5,20 @@ from inkface.canvas import PygameFace, PygameCanvas
 class TextBox:
     counter_dir = 1
     inFocus = False
-    def __init__(self, border_elem, txt_elem, cursor_elem, framerate=20):
+    def __init__(self, 
+        border_elem, txt_elem, cursor_elem, focus_elem, 
+        framerate=20):
+
         self.border_elem = border_elem
         self.txt_elem = txt_elem
         self.cursor_elem = cursor_elem
+        self.focus_elem = focus_elem
         self.flash_count = framerate/3
 
         self.cursor_elem.onDraw = self._onCursorDraw
         self.cursor_elem.flcounter = 0
+
+        self.focus_elem.hide()
 
         self.txt_elem.onKeyPress = self._onKeyPress
         self.border_elem.onKeyPress = self._onKeyPress_proxy
@@ -20,6 +26,10 @@ class TextBox:
 
         self.border_elem.onGainFocus = self._onGainFocus
         self.border_elem.onLoseFocus = self._onLoseFocus
+        self.txt_elem.onGainFocus = self._onGainFocus
+        self.txt_elem.onLoseFocus = self._onLoseFocus
+        self.cursor_elem.onGainFocus = self._onGainFocus
+        self.cursor_elem.onLoseFocus = self._onLoseFocus
 
         self.txt_elem.svg.text = "_"
         self.txt_elem.text = self.txt_elem.svg.text
@@ -29,9 +39,11 @@ class TextBox:
         self._onKeyPress(self.txt_elem, event)
 
     def _onGainFocus(self, elem):
+        self.focus_elem.unhide()
         self.inFocus = True
 
     def _onLoseFocus(self, elem):
+        self.focus_elem.hide()
         self.inFocus = False
 
     def _onKeyPress(self, elem, event):
@@ -91,6 +103,7 @@ class App:
             tb = TextBox(border_elem=self.face.border,
                         txt_elem=self.face.txt,
                         cursor_elem=self.face.cursor,
+                        focus_elem=self.face.borderfocus,
                         framerate=self.FRAMERATE)
 
             self.canvas.add(self.face)

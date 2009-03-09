@@ -6,6 +6,7 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="800"
@@ -18,6 +19,18 @@
    version="1.0">
   <defs
      id="defs4">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient2576">
+      <stop
+         style="stop-color:#ff0000;stop-opacity:1;"
+         offset="0"
+         id="stop2578" />
+      <stop
+         style="stop-color:#ff0000;stop-opacity:0;"
+         offset="1"
+         id="stop2580" />
+    </linearGradient>
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
        inkscape:vp_x="0 : 526.18109 : 1"
@@ -25,6 +38,15 @@
        inkscape:vp_z="744.09448 : 526.18109 : 1"
        inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
        id="perspective10" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient2576"
+       id="linearGradient2582"
+       x1="144.08679"
+       y1="128.46294"
+       x2="716.96204"
+       y2="195.29837"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -69,13 +91,23 @@
        x="0"
        y="0" />
     <rect
+       style="opacity:1;fill:url(#linearGradient2582);fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect2574"
+       width="581.55518"
+       height="73.779388"
+       x="139.74684"
+       y="126.72694"
+       rx="5"
+       ry="5"
+       inkscape:label="borderfocus" />
+    <rect
        style="fill:#ffffff;fill-opacity:0.78294576;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect2380"
        width="545.09949"
        height="48.607594"
        x="155.37071"
        y="138.01085"
-       inkscape:label="textbox" />
+       inkscape:label="border" />
     <text
        inkscape:label="txt"
        xml:space="preserve"
