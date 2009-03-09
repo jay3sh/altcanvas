@@ -172,7 +172,10 @@ class PygameCanvasElement(CanvasElement):
 
     
 class Canvas:
+
     elementQ = [] 
+    focusElement = None
+
     def __init__(self):
         pass
 
@@ -301,6 +304,8 @@ class PygameCanvas(Canvas):
                 if elem.occupies(event.pos) and \
                     not elem.clouded(event.pos):
 
+                    self.focusElement = elem
+
                     if event.button == 1 and elem.onLeftClick != None:
                         elem.onLeftClick(elem)
                     elif event.button == 3 and elem.onRightClick != None:
@@ -313,6 +318,8 @@ class PygameCanvas(Canvas):
                 if elem.occupies(event.pos) and \
                     not elem.clouded(event.pos):
 
+                    self.focusElement = elem
+
                     if elem.onTap != None:
                         elem.onTap(elem)
 
@@ -321,8 +328,9 @@ class PygameCanvas(Canvas):
 
         elif event.type == pygame.KEYDOWN:
             for elem in self.elementQ:
-                # TODO put hasFocus logic
-                if elem.onKeyPress != None:
+                if self.focusElement == elem and \
+                    elem.onKeyPress != None:
+
                     elem.onKeyPress(elem, event)
 
         elif event.type == pygame.QUIT:

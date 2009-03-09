@@ -14,9 +14,15 @@ class TextBox:
         self.cursor_elem.flcounter = 0
 
         self.txt_elem.onKeyPress = self._onKeyPress
+        self.border_elem.onKeyPress = self._onKeyPress_proxy
+        self.cursor_elem.onKeyPress = self._onKeyPress_proxy
+
         self.txt_elem.svg.text = "_"
         self.txt_elem.text = self.txt_elem.svg.text
         self.txt_elem.refresh(svg_reload=True)
+
+    def _onKeyPress_proxy(self, elem, event):
+        self._onKeyPress(self.txt_elem, event)
 
     def _onKeyPress(self, elem, event):
         if event.key >= pygame.K_SPACE and event.key <= pygame.K_DELETE:
@@ -24,20 +30,22 @@ class TextBox:
             elem.svg.text += event.unicode
             elem.refresh(svg_reload=True)
     
+            # If the text exceeds width of widget, trim it
             elem_x, elem_y = elem.get_position()
             textbox_x, textbox_y = self.border_elem.get_position()
             elem_x_offset = elem_x - textbox_x
 
-            # If the text exceeds width of widget, trim it
             textbox_width = self.border_elem.svg.w - \
                     self.cursor_elem.svg.w - elem_x_offset
             while (elem_x_offset + elem.svg.w) > textbox_width:
                 elem.svg.text = elem.svg.text[1:]
                 elem.refresh(svg_reload=True)
+
         elif event.key == pygame.K_BACKSPACE:
             elem.text = elem.text[:-1]
             elem.svg.text = elem.svg.text[:-1]
             elem.refresh(svg_reload=True)
+            # TODO handle underrun
 
         elif event.key == pygame.K_ESCAPE:
             pass
