@@ -1,6 +1,6 @@
-from inkface.canvas import PygameFace, PygameCanvas
 import sys
-
+import pygame
+from inkface.canvas import PygameFace, PygameCanvas
 
 class TextBox:
     counter_dir = 1
@@ -19,17 +19,28 @@ class TextBox:
         self.txt_elem.refresh(svg_reload=True)
 
     def _onKeyPress(self, elem, event):
-        elem.text += event.unicode
-        elem.svg.text += event.unicode
-        elem.refresh(svg_reload=True)
-
-        elem_x, elem_y = elem.get_position()
-        textbox_x, textbox_y = self.border_elem.get_position()
-        elem_x_offset = elem_x - textbox_x
-        textbox_width = self.border_elem.svg.w - self.cursor_elem.svg.w - elem_x_offset
-        while (elem_x_offset + elem.svg.w) > textbox_width:
-            elem.svg.text = elem.svg.text[1:]
+        if event.key >= pygame.K_SPACE and event.key <= pygame.K_DELETE:
+            elem.text += event.unicode
+            elem.svg.text += event.unicode
             elem.refresh(svg_reload=True)
+    
+            elem_x, elem_y = elem.get_position()
+            textbox_x, textbox_y = self.border_elem.get_position()
+            elem_x_offset = elem_x - textbox_x
+
+            # If the text exceeds width of widget, trim it
+            textbox_width = self.border_elem.svg.w - \
+                    self.cursor_elem.svg.w - elem_x_offset
+            while (elem_x_offset + elem.svg.w) > textbox_width:
+                elem.svg.text = elem.svg.text[1:]
+                elem.refresh(svg_reload=True)
+        elif event.key == pygame.K_BACKSPACE:
+            elem.text = elem.text[:-1]
+            elem.svg.text = elem.svg.text[:-1]
+            elem.refresh(svg_reload=True)
+
+        elif event.key == pygame.K_ESCAPE:
+            pass
 
     def _onCursorDraw(self, elem):
         txt_x, txt_y = self.txt_elem.get_position()
@@ -46,6 +57,8 @@ class TextBox:
 
         elem.flcounter += self.counter_dir
  
+    def get_text(self):
+        return self.txt.svg.text
         
 class App:
     FRAMERATE = 25
