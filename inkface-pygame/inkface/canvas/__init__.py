@@ -67,6 +67,8 @@ class CanvasElement:
         self.onTap = None
         self.onMouseOver = None
         self.onKeyPress = None
+        self.onGainFocus = None
+        self.onLoseFocus = None
 
         self.onDraw = None
 
@@ -299,13 +301,24 @@ class PygameCanvas(Canvas):
     def _handle_event(self,event):
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-            # do onClick
+            # do onClick and adjust focus
             for elem in self.elementQ:
                 if elem.occupies(event.pos) and \
                     not elem.clouded(event.pos):
 
+                    # If the element is newly acquiring focus
+                    # call relevant callback handlers
+                    if self.focusElement != elem:
+                        if self.focusElement != None and \
+                            self.focusElement.onLoseFocus != None:
+                            self.focusElement.onLoseFocus(elem)
+
+                        if elem.onGainFocus != None:
+                            elem.onGainFocus(elem)
+
                     self.focusElement = elem
 
+                    # Call click callback handlers
                     if event.button == 1 and elem.onLeftClick != None:
                         elem.onLeftClick(elem)
                     elif event.button == 3 and elem.onRightClick != None:
@@ -313,13 +326,24 @@ class PygameCanvas(Canvas):
 
         
         elif event.type == pygame.MOUSEMOTION:
-            # do onTap
+            # do onTap and adjust focus
             for elem in self.elementQ:
                 if elem.occupies(event.pos) and \
                     not elem.clouded(event.pos):
 
+                    # If the element is newly acquiring focus
+                    # call relevant callback handlers
+                    if self.focusElement != elem:
+                        if self.focusElement != None and \
+                            self.focusElement.onLoseFocus != None:
+                            self.focusElement.onLoseFocus(elem)
+
+                        if elem.onGainFocus != None:
+                            elem.onGainFocus(elem)
+
                     self.focusElement = elem
 
+                    # Call tap callback handlers
                     if elem.onTap != None:
                         elem.onTap(elem)
 

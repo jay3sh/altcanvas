@@ -17,12 +17,23 @@ class TextBox:
         self.border_elem.onKeyPress = self._onKeyPress_proxy
         self.cursor_elem.onKeyPress = self._onKeyPress_proxy
 
+        self.border_elem.onGainFocus = self._onGainFocus
+        self.border_elem.onLoseFocus = self._onLoseFocus
+
         self.txt_elem.svg.text = "_"
         self.txt_elem.text = self.txt_elem.svg.text
         self.txt_elem.refresh(svg_reload=True)
 
     def _onKeyPress_proxy(self, elem, event):
         self._onKeyPress(self.txt_elem, event)
+
+    def _onGainFocus(self, elem):
+        print 'gained focus'
+        pass
+
+    def _onLoseFocus(self, elem):
+        print 'lost focus'
+        pass
 
     def _onKeyPress(self, elem, event):
         if event.key >= pygame.K_SPACE and event.key <= pygame.K_DELETE:
