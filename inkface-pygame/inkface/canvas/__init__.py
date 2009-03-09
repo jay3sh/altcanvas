@@ -51,6 +51,8 @@ class PygameFace(Face):
         if new_x > 0: newNode._x = new_x
         if new_y > 0: newNode._y = new_y
 
+        newNode.refresh()
+
         curNodePos = self.elements.index(curNode)
         self.elements.insert(curNodePos+1,newNode)
         self.__dict__[newNodeName] = newNode
