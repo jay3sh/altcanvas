@@ -30,3 +30,7 @@ python twt.py data/gui-7.svg
 python twt.py data/gui-8.svg
 
 python magnify.py
+
+python keyboard.py data/gui-11.svg
+python keyboard.py data/gui-12.svg
+python keyboard.py data/gui-13.svg
