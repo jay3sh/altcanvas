@@ -3,10 +3,11 @@
 import sys
 import getopt
 
-def generate_project(destdir):
+def generate_project(destdir,name):
     import os
     SEP = os.path.sep
 
+    '''
     if not os.path.exists(destdir):
         path_segments = destdir.split(SEP)
         destdir_parent = SEP.join(path_segments[:-1])
@@ -20,9 +21,10 @@ def generate_project(destdir):
             except Exception, e:
                 print 'Error creating project dir: '+str(e)
                 sys.exit(1)
+    '''
     
-    os.mkdir(destdir+SEP+'svg')
-    os.mkdir(destdir+SEP+'code')
+    os.makedirs(destdir+SEP+name+SEP+'svg')
+    os.makedirs(destdir+SEP+name+SEP+'code')
 
     # write a template .svg file under svg
 
@@ -41,7 +43,7 @@ def main():
     args = sys.argv[1:]
 
     try:
-        optlist, args = getopt.getopt(args,'hd:',['help','dir='])
+        optlist, args = getopt.getopt(args,'hd:n:',['help','dir=','name='])
     except getopt.GetoptError, err:
         print str(err)
         usage()
@@ -52,8 +54,12 @@ def main():
             usage()
             break
         elif o in ('-d','--dir'):
-            generate_project(a)
+            destdir = a
+        elif o in ('-n','--name'):
+            name = a
             
+    if destdir and name:
+        generate_project(name=name, destdir=destdir)
 
 if __name__ == '__main__':
     main()
