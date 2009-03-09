@@ -28,14 +28,13 @@ class App:
         self.canvas = PygameCanvas((800,480),framerate=gbl.FRAMERATE)
         self.canvas.add(face)
 
-        self.canvas.paint()
-
         self.canvas.eventloop()
 
     def drawPlate(self, elem):
         if self.moveDir != 0:
-
-            elem.y += self.moveDir * int(self.moveStep/gbl.FRAMERATE)
+            elem_x, elem_y = elem.get_position()
+            elem_y += self.moveDir * int(self.moveStep/gbl.FRAMERATE)
+            elem.set_position((elem_x,elem_y))
             self.plateCounter += 1
 
             if self.plateCounter >= 5:  
@@ -45,20 +44,20 @@ class App:
                 if self.moveAmount < int(self.moveStep/gbl.FRAMERATE):
                     self.moveDir = 0
                     self.moveAmount = 0
-            
-        self.canvas.draw(elem)
+
 
     def moveUp(self, elem):
         self.moveDir += -1
         self.moveAmount = self.moveStep
-        self.canvas.animate(gbl.FRAMERATE,gbl.FRAMERATE)
+        self.canvas.update()
 
     def moveDown(self, elem):
         self.moveDir += +1
         self.moveAmount = self.moveStep
-        self.canvas.animate(gbl.FRAMERATE,gbl.FRAMERATE)
+        self.canvas.update()
 
 
+#import cProfile
+#cProfile.run('App().main()','animation.txt')
 App().main()
-
 

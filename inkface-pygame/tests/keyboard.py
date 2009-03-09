@@ -29,33 +29,44 @@ class App:
             medKey.refresh(svg_reload=True)
             bigKey.refresh(svg_reload=True)
 
-            medKey.onDraw = self.doNotDraw
-            bigKey.onDraw = self.doNotDraw
+            medKey.hide()
+            bigKey.hide()
 
-            medKey.x = smlKey.x + smlKey.svg.w/2 - medKey.svg.w/2
-            bigKey.x = smlKey.x + smlKey.svg.w/2 - bigKey.svg.w/2
+            smlKey_x,smlKey_y = smlKey.get_position()
+            medKey_x,medKey_y = medKey.get_position()
+            bigKey_x,bigKey_y = bigKey.get_position()
 
-            bigKey.y = smlKey.y - 70
-            medKey.y = smlKey.y - 30
+            medKey_x = smlKey_x + smlKey.svg.w/2 - medKey.svg.w/2
+            medKey_y = smlKey_y - 30
+            medKey.set_position((medKey_x,medKey_y))
+
+            bigKey_x = smlKey_x + smlKey.svg.w/2 - bigKey.svg.w/2
+            bigKey_y = smlKey_y - 70
+            bigKey.set_position((bigKey_x,bigKey_y))
+
 
         self.canvas.add(self.face)
-        self.canvas.paint()
         self.canvas.eventloop()
 
-    def doNotDraw(self, elem):
-        pass
-
     def doDraw(self, elem):
-        self.canvas.draw(elem)
-        elem.onDraw = self.doNotDraw
+        if elem.visibility_counter > 0:
+            elem.visibility_counter -= 1
+        else:
+            elem.hide()
+            elem.onDraw = None
 
-        if elem.svg.label.endswith('med'):
-            bigkeyLabel = elem.svg.label.replace('med','big')
-            self.face.get(bigkeyLabel).onDraw = self.doDraw
+            if elem.svg.label.endswith('med'):
+                bigkeyLabel = elem.svg.label.replace('med','big')
+                bigKey = self.face.get(bigkeyLabel)
+                bigKey.onDraw = self.doDraw
+                bigKey.unhide()
+                bigKey.visibility_counter = 2
 
     def onLeftClick(self, elem):
         medkeyLabel = elem.svg.label+'med'
-        self.face.get(medkeyLabel).onDraw = self.doDraw
-        self.canvas.animate(self.FRAMERATE,3)
+        medKey = self.face.get(medkeyLabel)
+        medKey.onDraw = self.doDraw
+        medKey.unhide()
+        medKey.visibility_counter = 2
 
 App().main()

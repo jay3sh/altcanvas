@@ -38,10 +38,8 @@ class App:
         self.height = int(float(self.face.svg.height))
         self.canvas = PygameCanvas((self.width,self.height),framerate=self.FRAMERATE)
         # Calculate some constants
-        self.base_x = self.face.twt0.x
-        self.base_y = self.face.twt0.y
-        self.base_img_x = self.face.imgFrame0.x
-        self.base_img_y = self.face.imgFrame0.y
+        self.base_x,self.base_y = self.face.twt0.get_position()
+        self.base_img_x,self.base_img_y = self.face.imgFrame0.get_position()
         self.base_w = self.face.twt0.svg.w
         self.base_h = self.face.twt0.svg.h
         self.base_img_w = self.face.imgFrame0.svg.w
@@ -66,17 +64,15 @@ class App:
 
         # Make all the twits and imageFrames invisible to start with
         for i in range(self.MAX_TWT_NUM + 1):
-            self.face.get('twt'+str(i)).onDraw = self.doNotDraw
-            self.face.get('imgFrame'+str(i)).onDraw = self.doNotDraw
-        self.face.nextButton.onDraw = self.doNotDraw
+            self.face.get('twt'+str(i)).hide()
+            self.face.get('imgFrame'+str(i)).hide()
+        self.face.nextButton.hide()
 
         # Set the waitIcon to rotating effect
-        self.face.waitIcon.onDraw = self.showWaitIcon
+        self.face.waitIcon.unhide()
 
         # Show the face on canvas
         self.canvas.add(self.face)
-
-        self.canvas.paint()
 
         for i in range(self.MAX_TWT_NUM + 1):
             elem = self.face.get('twt'+str(i))
@@ -99,18 +95,15 @@ class App:
 
             self.roll.append((elem,eimg))
 
-            self.canvas.paint()
-
         self.roll[self.index][0].onDraw = self.processOffline
         self.roll[self.index][1].onDraw = self.processOffline
         
         self.face.nextButton.onLeftClick = self.rollToNext
 
-        self.face.nextButton.onDraw = None
+        self.face.nextButton.unhide()
 
         # waitIcon can disappear now
-        self.face.waitIcon.onDraw = self.doNotDraw
-        self.canvas.paint()
+        self.face.waitIcon.hide()
 
         print 'step decrement = %f'%(self.moveStep/self.FRAMERATE)
         print 'rollOver adj. = %f'%(self.base_y + self.MAX_TWT_NUM*self.moveStep)
@@ -122,8 +115,11 @@ class App:
             self.stopflag = True
 
     def drawTwt(self, elem):
+        elem.unhide()
         if self.moveflag:
-            elem.y -= self.moveStep/self.FRAMERATE
+            elem_x, elem_y = elem.get_position()
+            elem_y -= self.moveStep/self.FRAMERATE
+            elem.set_position((elem_x, elem_y))
             self.twtAnimCounter += 1
 
             if self.twtAnimCounter >= 2*self.MAX_TWT_NUM:
@@ -132,17 +128,11 @@ class App:
                 if self.moveAmount < int(self.moveStep/self.FRAMERATE):
                     self.moveflag = False
 
-        self.canvas.draw(elem)
-
-    def showWaitIcon(self, elem):
-        self.canvas.draw(elem)
-
-    def doNotDraw(self, elem):
-        pass
-
     def processOffline(self, elem):
         if self.moveflag:
-            elem.y -= self.moveStep/self.FRAMERATE
+            elem_x, elem_y = elem.get_position()
+            elem_y -= self.moveStep/self.FRAMERATE
+            elem.set_position((elem_x,elem_y))
 
     def load_image(self,twt):
         import urllib
@@ -158,14 +148,22 @@ class App:
         
     def rollToNext(self, elem):
 
-        self.face.waitIcon.onDraw = self.showWaitIcon
+        self.face.waitIcon.unhide()
 
         # incoming twit (invisible to visible)
         incoming,incoming_img = self.roll[self.index]
         incoming.onDraw = self.drawTwt
         incoming_img.onDraw = self.drawTwt
-        incoming.y = self.base_y + self.MAX_TWT_NUM*self.moveStep
-        incoming_img.y = self.base_img_y + self.MAX_TWT_NUM*self.moveStep
+        incoming.unhide()
+        incoming_img.unhide()
+
+        incoming_x, incoming_y = incoming.get_position()
+        incoming_y = self.base_y + self.MAX_TWT_NUM*self.moveStep
+        incoming.set_position((incoming_x, incoming_y))
+
+        incoming_img_x, incoming_img_y = incoming_img.get_position()
+        incoming_img_y = self.base_img_y + self.MAX_TWT_NUM*self.moveStep
+        incoming_img.set_position((incoming_img_x,incoming_img_y))
 
         twt = self.get_twt()
         incoming.svg.text = twt.text
@@ -181,6 +179,8 @@ class App:
         self.index = (self.index + 1)%(self.MAX_TWT_NUM + 1)
 
         # outgoing twit (visible to invisible)
+        self.roll[self.index][0].hide()
+        self.roll[self.index][1].hide()
 
         self.roll[self.index][0].onDraw = self.processOffline
         self.roll[self.index][1].onDraw = self.processOffline
@@ -188,9 +188,7 @@ class App:
         self.moveAmount = self.moveStep
         self.moveflag = True
         self.twtAnimCounter = 0
-        self.face.waitIcon.onDraw = self.doNotDraw
-
-        self.canvas.animate(self.FRAMERATE,self.FRAMERATE)
+        self.face.waitIcon.hide()
 
 App().main()
 
