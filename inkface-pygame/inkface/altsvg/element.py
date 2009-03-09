@@ -24,19 +24,21 @@ class Element:
         if self.__dict__.has_key(key):
             return self.__dict__[key]
         else:
+            node = None
             if self.__dict__.has_key('node'):
                 node = self.__dict__['node']
-            else:
-                raise AttributeError('Unknown attribute: '+key)
 
-            if node != None and key == 'label' and \
+            if node == None:
+                raise AttributeError('Unknown attribute: '+key)
+                
+            if key == 'label' and \
                 node.attrib.has_key(TAG_INKSCAPE_LABEL):
                 return node.attrib.get(TAG_INKSCAPE_LABEL)
-            elif node != None and key == 'text':
+            elif key == 'text':
                 tspan = node.find('.//'+TAG_TSPAN)
                 if tspan != None: 
                     return tspan.text
-            elif node != None and self.node.attrib.has_key(key):
+            elif self.node.attrib.has_key(key):
                 return node.attrib.get(key)
 
         raise AttributeError('Unknown attribute: '+key)
