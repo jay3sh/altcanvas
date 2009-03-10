@@ -2,11 +2,14 @@
 
 import os
 import sys
+import pickle
 
 from inkface.canvas import PygameFace, PygameCanvas
 from twtinklib.textbox import TextBox
 from twtinklib.twt import Twt
+from twtinklib.utils import encrypt,decrypt
 
+TWITINK_RC      = os.environ['HOME']+os.sep+'.twitinkrc'
 PREFIX      = '..'
 SVG_DIR     = os.path.join(PREFIX,'svg')
 THEME_NAME  = 'default'
@@ -38,6 +41,12 @@ class App:
 
             self.entry.loginButton.onLeftClick = self.doLogin
 
+            username, password = self.load_config()
+
+            if username and password:
+                self.uname.set_text(username)
+                self.passwd.set_text(password)
+
             self.canvas.add(self.entry)
 
             self.canvas.eventloop()
@@ -48,6 +57,25 @@ class App:
             self.canvas.stop()
             sys.exit(0)
 
+    def load_config(self):
+        config = None
+        try:
+            pfile = open(TWITINK_RC,'r')
+            config = pickle.load(pfile)
+        except IOError,ioe:
+            print '.twitinkrc file not found'
+
+        if config:
+            print config
+            return(config['username'],decrypt(config['password']))
+
+    def save_config(self, username, password):
+        pfile = open(TWITINK_RC,'w')
+        m = {}
+        m['username'] = username
+        m['password'] = encrypt(password)
+        pickle.dump(m,pfile)
+
     def doLogin(self, elem):
         username = self.uname.get_text()
         password = self.passwd.get_text()
@@ -56,6 +84,9 @@ class App:
             os.path.join(SVG_DIR, THEME_NAME, 'twits.svg'))
 
         twt = Twt(username, password, self.twits, self.canvas)
+
+        # Login was successful, let's save credentials.
+        self.save_config(username, password)
 
         self.canvas.remove(self.entry)
 
