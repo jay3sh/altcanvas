@@ -66,7 +66,6 @@ class App:
             print '.twitinkrc file not found'
 
         if config:
-            print config
             return(config['username'],decrypt(config['password']))
 
     def save_config(self, username, password):
