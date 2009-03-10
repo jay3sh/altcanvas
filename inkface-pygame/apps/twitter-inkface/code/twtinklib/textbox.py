@@ -102,6 +102,15 @@ class TextBox:
 
         elem.flcounter += self.counter_dir
  
+    def set_text(self, text):
+        self.txt_elem.text = text
+        if self.mask == None:
+            self.txt_elem.svg.text = text
+        else:
+            self.txt_elem.svg.text = self.mask * len(text)
+
+        self.txt_elem.refresh(svg_reload=True)
+
     def get_text(self):
         return self.txt_elem.text
         
