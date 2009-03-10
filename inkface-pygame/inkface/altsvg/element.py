@@ -115,8 +115,19 @@ class Element:
             raise Exception('Invalid surface dim for %s: %f,%f'%\
                 (self.node.get('id'),(ex2-ex1),(ey2-ey1)))
 
+        # This handles cases for empty text elements
+        if (ex2-ex1) == 0:
+            elem_surface_width = 1
+        else:
+            elem_surface_width = int(ex2-ex1)
+
+        if (ey2-ey1) == 0:
+            elem_surface_height = 1
+        else:
+            elem_surface_height = int(ey2-ey1)
+ 
         self.surface = cairo.ImageSurface(
-            cairo.FORMAT_ARGB32, int(ex2-ex1), int(ey2-ey1))
+            cairo.FORMAT_ARGB32, elem_surface_width, elem_surface_height)
         elem_ctx = cairo.Context(self.surface)
         elem_ctx.translate(-ex1,-ey1)
 
