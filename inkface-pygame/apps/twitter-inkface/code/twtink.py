@@ -33,7 +33,8 @@ class App:
                     txt_elem    = self.entry.passwd_txt,
                     cursor_elem = self.entry.passwd_cursor,
                     focus_elem  = self.entry.passwd_borderfocus,
-                    framerate   = self.FRAMERATE)
+                    framerate   = self.FRAMERATE,
+                    mask        = '*')
 
             self.entry.loginButton.onLeftClick = self.doLogin
 

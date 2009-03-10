@@ -6,14 +6,16 @@ class TextBox:
     counter_dir = 1
     inFocus = False
     _untouched = True
+    mask = None
     def __init__(self, 
         border_elem, txt_elem, cursor_elem, focus_elem, 
-        framerate=20):
+        framerate=20, mask=None):
 
         self.border_elem = border_elem
         self.txt_elem = txt_elem
         self.cursor_elem = cursor_elem
         self.focus_elem = focus_elem
+        self.mask = mask
         self.flash_count = framerate/3
 
         self.cursor_elem.onDraw = self._onCursorDraw
@@ -54,8 +56,12 @@ class TextBox:
 
     def _onKeyPress(self, elem, event):
         if event.key >= pygame.K_SPACE and event.key <= pygame.K_DELETE:
+            if self.mask != None:
+                elem.svg.text += self.mask
+            else:
+                elem.svg.text += event.unicode
+
             elem.text += event.unicode
-            elem.svg.text += event.unicode
             elem.refresh(svg_reload=True)
     
             # If the text exceeds width of widget, trim it
@@ -97,6 +103,6 @@ class TextBox:
         elem.flcounter += self.counter_dir
  
     def get_text(self):
-        return self.txt_elem.svg.text
+        return self.txt_elem.text
         
 
