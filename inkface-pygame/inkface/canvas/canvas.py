@@ -104,10 +104,13 @@ class Canvas:
  
 
     def add(self, face):
-        pass
+        for elem in face.elements:  
+            self.elementQ.append(elem)
+        self.recalculate_clouds()
 
     def remove(self, face):
-        pass
+        for elem in face.elements:
+            self.elementQ.remove(elem)
 
 
       

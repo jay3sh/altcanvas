@@ -7,23 +7,33 @@ from inkface.canvas import Face
 from inkface.canvas import CanvasElement
 
 class PygameFace(Face):
-    elements = []
 
     def __init__(self,svgname):
         Face.__init__(self,svgname)
 
+        self.elements = []
+        self._elements_dict = {}
+
         for svge in self.svgelements:
             pElement = PygameCanvasElement(svge)
             try:
-                self.__dict__[svge.label] = pElement 
+                self._elements_dict[svge.label] = pElement 
             except AttributeError, ae:
                 pass
 
             self.elements.append(pElement)
 
+    def __getattr__(self, key):
+        if self.__dict__.has_key(key):
+            return self.__dict__[key]
+        elif self._elements_dict.has_key(key):
+            return self._elements_dict[key]
+        else:
+            raise AttributeError('Unknown Attribute %s'%str(key))
+            
     def get(self,key):
         try:
-            return self.__dict__[key] 
+            return self._elements_dict[key] 
         except AttributeError,ae:
             pass
 
@@ -31,13 +41,13 @@ class PygameFace(Face):
 
     def clone(self, curNodeName, newNodeName, new_x=-1, new_y=-1):
 
-        if not self.__dict__.has_key(curNodeName):
+        if not self._elements_dict.has_key(curNodeName):
             raise Exception(curNodeName+' does not exist for cloning')
 
         if curNodeName == newNodeName:
             raise Exception('New node should have different name')
 
-        curNode = self.__dict__[curNodeName]
+        curNode = self._elements_dict[curNodeName]
 
         newNode = curNode.dup(newNodeName)
 
@@ -48,7 +58,7 @@ class PygameFace(Face):
 
         curNodePos = self.elements.index(curNode)
         self.elements.insert(curNodePos+1,newNode)
-        self.__dict__[newNodeName] = newNode
+        self._elements_dict[newNodeName] = newNode
 
 class PygameCanvasElement(CanvasElement):
 
@@ -182,11 +192,14 @@ class PygameCanvas(Canvas):
         pygame.display.flip()
 
     def add(self,face):
-        Canvas.add(self,face)
-        for elem in face.elements:  
-            self.elementQ.append(elem)
+        Canvas.add(self, face)
+        for elem in self.elementQ:
             self.elem_group.add(elem.sprite)
-        self.recalculate_clouds()
+
+    def remove(self, face):
+        Canvas.remove(self, face)
+        for elem in self.elementQ:
+            self.elem_group.add(elem.sprite)
 
     def update(self):
         self.elem_group.update()
