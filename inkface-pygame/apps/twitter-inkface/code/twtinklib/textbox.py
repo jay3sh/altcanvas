@@ -97,6 +97,6 @@ class TextBox:
         elem.flcounter += self.counter_dir
  
     def get_text(self):
-        return self.txt.svg.text
+        return self.txt_elem.svg.text
         
 

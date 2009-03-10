@@ -5,6 +5,7 @@ import sys
 
 from inkface.canvas import PygameFace, PygameCanvas
 from twtinklib.textbox import TextBox
+from twtinklib.twt import Twt
 
 PREFIX      = '..'
 SVG_DIR     = os.path.join(PREFIX,'svg')
@@ -20,14 +21,14 @@ class App:
             self.entry = PygameFace(
                 os.path.join(SVG_DIR,THEME_NAME,'entry.svg'))
 
-            uname = TextBox(
+            self.uname = TextBox(
                     border_elem = self.entry.uname_border,
                     txt_elem    = self.entry.uname_txt,
                     cursor_elem = self.entry.uname_cursor,
                     focus_elem  = self.entry.uname_borderfocus,
                     framerate   = self.FRAMERATE)
 
-            passwd = TextBox(
+            self.passwd = TextBox(
                     border_elem = self.entry.passwd_border,
                     txt_elem    = self.entry.passwd_txt,
                     cursor_elem = self.entry.passwd_cursor,
@@ -47,6 +48,16 @@ class App:
             sys.exit(0)
 
     def doLogin(self, elem):
-        pass
+        username = self.uname.get_text()
+        password = self.passwd.get_text()
+
+        self.twits = PygameFace(
+            os.path.join(SVG_DIR, THEME_NAME, 'twits.svg'))
+
+        twt = Twt(username, password, self.twits, self.canvas)
+
+        self.canvas.remove(self.entry)
+
+        twt.load()
 
 App().main()
