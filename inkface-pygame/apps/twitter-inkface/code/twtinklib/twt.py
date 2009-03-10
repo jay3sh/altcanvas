@@ -3,33 +3,34 @@ import pygame
 from twtinklib import twitter
 
 class Twt:
+    (TWT_FRIENDS, TWT_PUBLIC, TWT_REPLIES) = range(3)
     def __init__(self, username, password, face, canvas):
         self.face = face
         self.canvas = canvas
         self.twtApi = twitter.Api(username, password)
-        self.twtlist = self.twtApi.GetFriendsTimeline()
 
-        self.twtcnt = 0
+        self.friends_page_num = 1
+        self.replies_page_num = 1
+
+        self.friends_twtlist = \
+            self.twtApi.GetFriendsTimeline(page=self.friends_page_num)
+        self.public_twtlist = None
+        self.replies_twtlist = None
+
+        self.friends_page_num += 1
+
+        self.friends_twtcnt = 0
+        self.public_twtcnt = 0
+        self.replies_twtcnt = 0
         self.GAP = 10
         self.FRAMERATE = 12 
         self.roll = []
         self.moveflag = False
         self.stopflag = False
-        self.twtcnt = 0
         self.rotation = 0.0
         self.width = int(float(self.face.svg.width))
         self.height = int(float(self.face.svg.height))
 
-
-    def get_twt(self):
-        if self.twtcnt >= len(self.twtlist):
-            self.twtlist = self.twtApi.GetFriendsTimeline()
-            self.twtcnt = 0
-        twt = self.twtlist[self.twtcnt]
-        self.twtcnt += 1
-        return twt
-
-    def load(self):
         self.base_x,self.base_y = self.face.twt0.get_position()
         self.base_img_x,self.base_img_y = self.face.imgFrame0.get_position()
         self.base_w = self.face.twt0.svg.w
@@ -40,41 +41,68 @@ class Twt:
         self.moveStep = self.base_h + self.GAP
         
         self.MAX_TWT_NUM = (self.height / self.moveStep) + 1
-        self.index = self.MAX_TWT_NUM 
+ 
+    def get_public_twt(self):
+        if self.public_twtlist == None or \
+            self.public_twtcnt >= len(self.public_twtlist):
+            
+            self.public_twtlist = \
+                self.twtApi.GetPublicTimeline()
+            self.public_twtcnt = 0
+        twt = self.public_twtlist[self.public_twtcnt]
+        self.public_twtcnt += 1
+        return twt
 
-        # Clone elements
-        for i in range(self.MAX_TWT_NUM):
-            self.face.clone('twt0','twt'+str(i+1),
-                            new_x = self.base_x,
-                            new_y = self.base_y+\
-                                ((i+1)*(self.base_h + self.GAP)))
-            self.face.clone('imgFrame0','imgFrame'+str(i+1),
-                            new_x = self.base_img_x,
-                            new_y = self.base_img_y+\
-                                ((i+1)*(self.base_h + self.GAP)))
+    def get_replies(self):
+        if self.replies_twtlist == None or \
+            self.replies_twtcnt >= len(self.replies_twtlist):
+            
+            self.replies_twtlist = \
+                    self.twtApi.GetReplies(page=self.replies_page_num)
+            self.replies_page_num += 1
+            self.replies_twtcnt = 0
+        twt = self.replies_twtlist[self.replies_twtcnt]
+        self.replies_twtcnt += 1
+        return twt
 
+    def get_friends_twt(self):
+        if self.friends_twtcnt >= len(self.friends_twtlist):
+            self.friends_twtlist = \
+                self.twtApi.GetFriendsTimeline(page=self.friends_page_num)
+            self.friends_page_num += 1
+            self.friends_twtcnt = 0
+        twt = self.friends_twtlist[self.friends_twtcnt]
+        self.friends_twtcnt += 1
+        return twt
+
+    def reset_twt_roll(self):
         # Make all the twits and imageFrames invisible to start with
         for i in range(self.MAX_TWT_NUM + 1):
             self.face.get('twt'+str(i)).hide()
             self.face.get('imgFrame'+str(i)).hide()
         self.face.nextButton.hide()
+        self.canvas.update()
 
-        # Set the waitIcon to rotating effect
-        self.face.waitIcon.unhide()
-
-        # Show the face on canvas
-        self.canvas.add(self.face)
+    def load_twts(self, twt_type=TWT_FRIENDS):
+        self.get_twt = {
+            self.TWT_FRIENDS    : self.get_friends_twt,
+            self.TWT_PUBLIC     : self.get_public_twt,
+            self.TWT_REPLIES    : self.get_replies
+        }[twt_type]
 
         for i in range(self.MAX_TWT_NUM + 1):
             elem = self.face.get('twt'+str(i))
+
             twt = self.get_twt()
 
+            print twt.text
             elem.svg.text = twt.text
             elem.refresh(svg_reload=True)
 
             # render profile image
             eimg = self.face.get('imgFrame'+str(i))
             img = self.load_image(twt)
+            if img == None: continue
             iw = img.get_width()
             ih = img.get_height()
             eimg.sprite.image.blit(img,
@@ -88,7 +116,40 @@ class Twt:
 
         self.roll[self.index][0].onDraw = self.processOffline
         self.roll[self.index][1].onDraw = self.processOffline
-        
+ 
+    def load(self):
+        self.index = self.MAX_TWT_NUM 
+
+
+        # Clone elements
+        for i in range(self.MAX_TWT_NUM):
+            self.face.clone('twt0','twt'+str(i+1),
+                            new_x = self.base_x,
+                            new_y = self.base_y+\
+                                ((i+1)*(self.base_h + self.GAP)))
+            self.face.clone('imgFrame0','imgFrame'+str(i+1),
+                            new_x = self.base_img_x,
+                            new_y = self.base_img_y+\
+                                ((i+1)*(self.base_h + self.GAP)))
+
+        self.reset_twt_roll()
+
+        # Set visibility of button borders
+        self.face.friendsBorder.unhide()
+        self.face.everyoneBorder.hide()
+        self.face.repliesBorder.hide()
+        self.face.twitBorder.hide()
+
+        self.face.everyoneButton.onLeftClick = self.onEveryoneClicked
+
+        # Set the waitIcon to rotating effect
+        self.face.waitIcon.unhide()
+
+        # Show the face on canvas
+        self.canvas.add(self.face)
+
+        self.load_twts()
+       
         self.face.nextButton.onLeftClick = self.rollToNext
 
         self.face.nextButton.unhide()
@@ -128,6 +189,26 @@ class Twt:
         image = pygame.image.load(localfile)
         return image
         
+    def onEveryoneClicked(self, elem):
+        print 'loading public timeline'
+        self.reset_twt_roll()
+
+        # Set the waitIcon to rotating effect
+        self.face.waitIcon.unhide()
+
+        self.load_twts(twt_type=self.TWT_PUBLIC)
+
+        self.face.nextButton.unhide()
+
+    def onRepliesClick(self, elem):
+        pass
+
+    def onFriendsClick(self, elem):
+        pass
+
+    def onTwitClick(self, elem):
+        pass
+
     def rollToNext(self, elem):
 
         self.face.waitIcon.unhide()
