@@ -34,3 +34,5 @@ python magnify.py
 python keyboard.py data/gui-11.svg
 python keyboard.py data/gui-12.svg
 python keyboard.py data/gui-13.svg
+
+python textbox.py
