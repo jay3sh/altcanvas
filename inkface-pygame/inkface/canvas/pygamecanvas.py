@@ -79,6 +79,11 @@ class PygameCanvasElement(CanvasElement):
             self.sprite.dirty = 1
         
     def hide(self):
+        '''
+            Marks the element sprite invisible and dirty.
+            Warning: You may still see the element after calling hide() if
+            you have overridden the onDraw callback and calling unhide() there 
+        '''
         if self.sprite.visible == 1:   
             self.sprite.visible = 0
             self.sprite.dirty = 1
