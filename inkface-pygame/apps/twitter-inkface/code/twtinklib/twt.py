@@ -108,7 +108,9 @@ class Twt:
                 ((self.base_img_w - iw)/2,(self.base_img_h - ih)/2))
 
             # Now the twit and image are ready to show
+            elem.unhide()
             elem.onDraw = self.drawTwt
+            eimg.unhide()
             eimg.onDraw = self.drawTwt
 
             self.roll.append((elem,eimg))
@@ -148,7 +150,6 @@ class Twt:
         self.face.repliesButton.onLeftClick = self.onRepliesClicked
         self.face.friendsButton.onLeftClick = self.onFriendsClicked
 
-        # Set the waitIcon to rotating effect
         self.face.waitIcon.unhide()
 
         # Show the face on canvas
@@ -171,7 +172,6 @@ class Twt:
                 border.hide()
  
     def drawTwt(self, elem):
-        elem.unhide()
         if self.moveflag:
             elem_x, elem_y = elem.get_position()
             elem_y -= self.moveStep/self.FRAMERATE
