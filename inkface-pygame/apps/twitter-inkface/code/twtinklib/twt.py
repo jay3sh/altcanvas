@@ -1,6 +1,7 @@
 
 import pygame
 from twtinklib import twitter
+from twtinklib.textbox import TextBox
 
 class Twt:
     (TWT_FRIENDS, TWT_PUBLIC, TWT_REPLIES, TWT_TWIT) = range(4)
@@ -118,6 +119,27 @@ class Twt:
         self.roll[self.index][0].onDraw = self.processOffline
         self.roll[self.index][1].onDraw = self.processOffline
  
+    def hide_twt_box(self):
+        for elem in (self.face.update_border,
+                    self.face.update_txt,
+                    self.face.update_cursor,
+                    self.face.update_background,
+                    self.face.postButton,
+                    self.face.cancelButton,
+                    self.face.update_counter):
+            elem.hide()
+
+    def unhide_twt_box(self):
+        for elem in (self.face.update_border,
+                    self.face.update_txt,
+                    self.face.update_cursor,
+                    self.face.update_background,
+                    self.face.postButton,
+                    self.face.cancelButton,
+                    self.face.update_counter):
+            elem.unhide()
+
+
     def load(self):
         self.index = self.MAX_TWT_NUM 
 
@@ -132,6 +154,17 @@ class Twt:
                             new_x = self.base_img_x,
                             new_y = self.base_img_y+\
                                 ((i+1)*(self.base_h + self.GAP)))
+
+        self.twtbox = TextBox(
+                            border_elem = self.face.update_border,
+                            txt_elem    = self.face.update_txt,
+                            cursor_elem = self.face.update_cursor,
+                            framerate   = self.canvas.framerate)
+
+        self.face.postButton.onLeftClick = self.onTwitPost
+        self.face.cancelButton.onLeftClick = self.onTwitCancel
+        self.hide_twt_box()
+
 
         self.reset_twt_roll()
 
@@ -149,6 +182,7 @@ class Twt:
         self.face.everyoneButton.onLeftClick = self.onEveryoneClicked
         self.face.repliesButton.onLeftClick = self.onRepliesClicked
         self.face.friendsButton.onLeftClick = self.onFriendsClicked
+        self.face.twitButton.onLeftClick = self.onTwitClicked
 
         self.face.waitIcon.unhide()
 
@@ -249,8 +283,21 @@ class Twt:
 
         self.current_twt_type = self.TWT_FRIENDS
 
-    def onTwitClick(self, elem):
+    def onTwitClicked(self, elem):
+        if self.current_twt_type == self.TWT_TWIT:
+            return
+
+        self.change_borders(self.TWT_TWIT)
+
+        self.unhide_twt_box()
+
+        self.current_twt_type = self.TWT_TWIT
+
+    def onTwitPost(self, elem):
         pass
+
+    def onTwitCancel(self,elem):
+        self.hide_twt_box()
 
     def rollToNext(self, elem):
 
