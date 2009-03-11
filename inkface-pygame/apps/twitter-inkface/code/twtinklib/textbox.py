@@ -109,6 +109,7 @@ class TextBox:
             self.txt_elem.svg.text = self.mask * len(text)
 
         self.txt_elem.refresh(svg_reload=True)
+        self._untouched = False
 
     def get_text(self):
         return self.txt_elem.text
