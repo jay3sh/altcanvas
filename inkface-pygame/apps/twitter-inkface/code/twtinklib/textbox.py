@@ -8,7 +8,7 @@ class TextBox:
     _untouched = True
     mask = None
     def __init__(self, 
-        border_elem, txt_elem, cursor_elem, focus_elem, 
+        border_elem, txt_elem, cursor_elem, focus_elem=None, 
         framerate=20, mask=None, multiline=False):
 
         self.border_elem = border_elem
@@ -22,7 +22,8 @@ class TextBox:
         self.cursor_elem.onDraw = self._onCursorDraw
         self.cursor_elem.flcounter = 0
 
-        self.focus_elem.hide()
+        if self.focus_elem:
+            self.focus_elem.hide()
 
         self.txt_elem.onKeyPress = self._onKeyPress
         self.border_elem.onKeyPress = self._onKeyPress_proxy
@@ -42,7 +43,8 @@ class TextBox:
         self._onKeyPress(self.txt_elem, event)
 
     def _onGainFocus(self, elem):
-        self.focus_elem.unhide()
+        if self.focus_elem:
+            self.focus_elem.unhide()
         self.inFocus = True
         if self._untouched:
             self.txt_elem.svg.text = ''
@@ -51,7 +53,8 @@ class TextBox:
             self._untouched = False
 
     def _onLoseFocus(self, elem):
-        self.focus_elem.hide()
+        if self.focus_elem:
+            self.focus_elem.hide()
         self.inFocus = False
 
     def _onKeyPress(self, elem, event):
@@ -59,21 +62,43 @@ class TextBox:
             if self.mask != None:
                 elem.svg.text += self.mask
             else:
-                elem.svg.text += event.unicode
+                elem.svg.text += str(event.unicode)
 
-            elem.text += event.unicode
+            elem.text += str(event.unicode)
             elem.refresh(svg_reload=True)
     
-            # If the text exceeds width of widget, trim it
-            elem_x, elem_y = elem.get_position()
-            textbox_x, textbox_y = self.border_elem.get_position()
-            elem_x_offset = elem_x - textbox_x
+            if not self.multiline:
+                # If the text exceeds width of widget, trim it
+                elem_x, elem_y = elem.get_position()
+                textbox_x, textbox_y = self.border_elem.get_position()
+                elem_x_offset = elem_x - textbox_x
+    
+                text_width = self.border_elem.svg.w - \
+                        self.cursor_elem.svg.w - elem_x_offset
+                while (elem_x_offset + elem.svg.w) > text_width:
+                    elem.svg.text = elem.svg.text[1:]
+                    elem.refresh(svg_reload=True)
+            else:
+                # If the text exceeds width of widget, wrap it to next line
+                # Postponed for now.
+                '''
+                elem_x, elem_y = elem.get_position()
+                textbox_x, textbox_y = self.border_elem.get_position()
+                elem_x_offset = elem_x - textbox_x
+ 
+                text_width = self.border_elem.svg.w - \
+                        self.cursor_elem.svg.w - elem_x_offset
 
-            textbox_width = self.border_elem.svg.w - \
-                    self.cursor_elem.svg.w - elem_x_offset
-            while (elem_x_offset + elem.svg.w) > textbox_width:
-                elem.svg.text = elem.svg.text[1:]
-                elem.refresh(svg_reload=True)
+                while (elem_x_offset + elem.svg.w) > text_width:
+                    space_char = ' '
+                    parts = elem.svg.text.rpartition(space_char)
+                    if space_char in parts: 
+                        elem.svg.text = parts[0]+parts[1]+'\n'+parts[2]
+                        elem.refresh(svg_reload=True)
+                '''
+                pass
+
+
 
         elif event.key == pygame.K_BACKSPACE:
             elem.text = elem.text[:-1]
