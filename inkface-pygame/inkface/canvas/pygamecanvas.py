@@ -82,7 +82,6 @@ class PygameCanvasElement(CanvasElement):
         if self.sprite.visible == 1:   
             self.sprite.visible = 0
             self.sprite.dirty = 1
-            self.onDraw = None
 
     def unhide(self):
         if self.sprite.visible == 0:
