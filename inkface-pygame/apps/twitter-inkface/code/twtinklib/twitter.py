@@ -1067,12 +1067,13 @@ class Api(object):
     Returns:
       A sequence of twitter.Status instances, one for each reply to the user.
     '''
+    parameters = {}
     url = 'http://twitter.com/statuses/replies.json'
     if not self._username:
       raise TwitterError("The twitter.Api instance must be authenticated.")
     if page:
       parameters['page'] = page
-    json = self._FetchUrl(url)
+    json = self._FetchUrl(url,parameters=parameters)
     data = simplejson.loads(json)
     return [Status.NewFromJsonDict(x) for x in data]
 
