@@ -34,7 +34,6 @@ class TextBox:
         self.cursor_elem.onGainFocus = self._onGainFocus
         self.cursor_elem.onLoseFocus = self._onLoseFocus
 
-        #self.txt_elem.svg.text = "_"
         self.txt_elem.text = self.txt_elem.svg.text
         self.txt_elem.refresh(svg_reload=True)
 
@@ -88,9 +87,12 @@ class TextBox:
         if not self.inFocus:
             elem.hide()
             return
+        border_x, border_y = self.border_elem.get_position()
+        y_gap = (self.border_elem.svg.h - elem.svg.h)/2
+
         txt_x, txt_y = self.txt_elem.get_position()
         elem_x = txt_x + self.txt_elem.svg.w + 2
-        elem_y = txt_y
+        elem_y = border_y + y_gap
         elem.set_position((elem_x,elem_y))
 
         if abs(elem.flcounter) >= self.flash_count:
