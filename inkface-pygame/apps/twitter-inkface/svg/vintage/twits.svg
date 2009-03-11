@@ -20,6 +20,18 @@
   <defs
      id="defs4">
     <linearGradient
+       inkscape:collect="always"
+       id="linearGradient4020">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop4022" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop4024" />
+    </linearGradient>
+    <linearGradient
        id="linearGradient3831">
       <stop
          style="stop-color:#f3e5c4;stop-opacity:1;"
@@ -118,6 +130,15 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 526.18109 : 1"
        sodipodi:type="inkscape:persp3d" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4020"
+       id="linearGradient4026"
+       x1="230.13608"
+       y1="407.52263"
+       x2="414.78255"
+       y2="407.52263"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -133,7 +154,7 @@
      inkscape:cx="400"
      inkscape:cy="242.70253"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g3898"
      showgrid="false"
      inkscape:window-width="1280"
      inkscape:window-height="778"
@@ -197,7 +218,7 @@
            sodipodi:role="line">twt</tspan></text>
     </g>
     <rect
-       style="opacity:1;fill:#ab9664;fill-opacity:1;stroke:#000000;stroke-width:1.50000000000000000;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="opacity:1;fill:#211e17;fill-opacity:1;stroke:#000000;stroke-width:1.50000000000000000;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect3349"
        width="51.211575"
        height="50.343582"
@@ -206,17 +227,30 @@
        rx="10"
        ry="10"
        inkscape:label="imgFrame0" />
-    <text
-       id="text3470"
-       y="415.76852"
-       x="247.37791"
-       style="font-size:36px;font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Chancery L;-inkscape-font-specification:URW Chancery L Bold Italic"
-       xml:space="preserve"
-       inkscape:label="waitIcon"><tspan
-         y="415.76852"
+    <g
+       id="g3898"
+       inkscape:label="waitIcon">
+      <rect
+         ry="15"
+         rx="15"
+         y="381.91684"
+         x="230.88608"
+         height="51.211582"
+         width="183.14647"
+         id="rect3896"
+         style="opacity:1;fill:#baa77c;fill-opacity:0.89534884999999986;stroke:url(#linearGradient4026);stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         inkscape:label=""
+         xml:space="preserve"
+         style="font-size:36px;font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Chancery L;-inkscape-font-specification:URW Chancery L Italic"
          x="247.37791"
-         id="tspan3472"
-         sodipodi:role="line">Loading...</tspan></text>
+         y="415.76852"
+         id="text3470"><tspan
+           sodipodi:role="line"
+           id="tspan3472"
+           x="247.37791"
+           y="415.76852">Loading...</tspan></text>
+    </g>
     <text
        xml:space="preserve"
        style="font-size:28px;font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#f3e5c4;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Chancery L;-inkscape-font-specification:URW Chancery L Italic"
