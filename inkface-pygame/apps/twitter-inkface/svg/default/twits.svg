@@ -236,8 +236,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.1520833"
-     inkscape:cx="527.48644"
-     inkscape:cy="238.24351"
+     inkscape:cx="383.96747"
+     inkscape:cy="238.2435"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -352,7 +352,8 @@
        inkscape:label="nextButton" />
     <g
        id="g4230"
-       inkscape:label="waitIcon">
+       inkscape:label="waitIcon"
+       transform="translate(45,5)">
       <rect
          ry="10"
          rx="10"
@@ -361,7 +362,7 @@
          height="50"
          width="210"
          id="rect4224"
-         style="opacity:1;fill:#ff0000;fill-opacity:0.58139533;stroke:#000000;stroke-width:1.50000000000000000;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="opacity:1;fill:#ff0000;fill-opacity:0.58139535;stroke:#000000;stroke-width:1.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
       <text
          id="text4226"
          y="239.96582"
@@ -467,6 +468,106 @@
            x="85.391983"
            id="tspan4301"
            sodipodi:role="line">Twit</tspan></text>
+    </g>
+    <rect
+       style="opacity:1;fill:#000000;fill-opacity:0.55038763;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4367"
+       width="650"
+       height="105"
+       x="75"
+       y="187.5"
+       rx="20"
+       ry="20"
+       inkscape:label="update_background" />
+    <rect
+       style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4369"
+       width="630"
+       height="40"
+       x="86"
+       y="200"
+       rx="15"
+       ry="15"
+       inkscape:label="update_border" />
+    <text
+       xml:space="preserve"
+       style="font-size:18px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans Bold"
+       x="380"
+       y="270"
+       id="text4371"
+       inkscape:label="update_counter"><tspan
+         sodipodi:role="line"
+         id="tspan4373"
+         x="380"
+         y="270">140</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="96"
+       y="226"
+       id="text4375"
+       inkscape:label="update_txt"><tspan
+         sodipodi:role="line"
+         id="tspan4377"
+         x="96"
+         y="226">update</tspan></text>
+    <rect
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4379"
+       width="10"
+       height="20"
+       x="170"
+       y="210"
+       rx="3"
+       ry="3"
+       inkscape:label="update_cursor" />
+    <g
+       id="g4387"
+       inkscape:label="postButton"
+       transform="translate(-107.14844,-69.447266)">
+      <rect
+         ry="10"
+         rx="10"
+         y="320"
+         x="200"
+         height="30"
+         width="100"
+         id="rect4381"
+         style="opacity:1;fill:#333333;fill-opacity:1;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         id="text4383"
+         y="339.44727"
+         x="227.14844"
+         style="font-size:18px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans Bold"
+         xml:space="preserve"><tspan
+           y="339.44727"
+           x="227.14844"
+           id="tspan4385"
+           sodipodi:role="line">post</tspan></text>
+    </g>
+    <g
+       id="g4392"
+       inkscape:label="cancelButton"
+       transform="translate(410,-70)">
+      <rect
+         ry="10"
+         rx="10"
+         y="320"
+         x="200"
+         height="30"
+         width="100"
+         id="rect4394"
+         style="opacity:1;fill:#333333;fill-opacity:1;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         id="text4396"
+         y="339.44727"
+         x="221.14844"
+         style="font-size:18px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans Bold"
+         xml:space="preserve"><tspan
+           y="339.44727"
+           x="221.14844"
+           id="tspan4398"
+           sodipodi:role="line">cancel</tspan></text>
     </g>
   </g>
 </svg>
