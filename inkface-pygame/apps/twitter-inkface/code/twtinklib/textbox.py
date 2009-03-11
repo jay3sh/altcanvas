@@ -87,12 +87,9 @@ class TextBox:
         if not self.inFocus:
             elem.hide()
             return
-        border_x, border_y = self.border_elem.get_position()
-        y_gap = (self.border_elem.svg.h - elem.svg.h)/2
-
         txt_x, txt_y = self.txt_elem.get_position()
         elem_x = txt_x + self.txt_elem.svg.w + 2
-        elem_y = border_y + y_gap
+        elem_y = txt_y
         elem.set_position((elem_x,elem_y))
 
         if abs(elem.flcounter) >= self.flash_count:
