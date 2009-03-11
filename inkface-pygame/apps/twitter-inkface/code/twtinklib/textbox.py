@@ -9,13 +9,14 @@ class TextBox:
     mask = None
     def __init__(self, 
         border_elem, txt_elem, cursor_elem, focus_elem, 
-        framerate=20, mask=None):
+        framerate=20, mask=None, multiline=False):
 
         self.border_elem = border_elem
         self.txt_elem = txt_elem
         self.cursor_elem = cursor_elem
         self.focus_elem = focus_elem
         self.mask = mask
+        self.multiline = multiline
         self.flash_count = framerate/3
 
         self.cursor_elem.onDraw = self._onCursorDraw
@@ -54,7 +55,7 @@ class TextBox:
         self.inFocus = False
 
     def _onKeyPress(self, elem, event):
-        if event.key >= pygame.K_SPACE and event.key <= pygame.K_DELETE:
+        if event.key >= pygame.K_SPACE and event.key < pygame.K_DELETE:
             if self.mask != None:
                 elem.svg.text += self.mask
             else:
