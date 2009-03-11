@@ -18,6 +18,7 @@ class Twt:
         self.replies_twtlist = None
 
         self.friends_page_num += 1
+        self.current_twt_type = self.TWT_FRIENDS
 
         self.friends_twtcnt = 0
         self.public_twtcnt = 0
@@ -145,6 +146,7 @@ class Twt:
 
         self.face.everyoneButton.onLeftClick = self.onEveryoneClicked
         self.face.repliesButton.onLeftClick = self.onRepliesClicked
+        self.face.friendsButton.onLeftClick = self.onFriendsClicked
 
         # Set the waitIcon to rotating effect
         self.face.waitIcon.unhide()
@@ -201,6 +203,9 @@ class Twt:
         return image
         
     def onEveryoneClicked(self, elem):
+        if self.current_twt_type == self.TWT_PUBLIC:
+            return
+
         self.reset_twt_roll()
 
         self.change_borders(self.TWT_PUBLIC)
@@ -211,7 +216,12 @@ class Twt:
         self.face.waitIcon.hide()
         self.face.nextButton.unhide()
 
+        self.current_twt_type = self.TWT_PUBLIC
+
     def onRepliesClicked(self, elem):
+        if self.current_twt_type == self.TWT_REPLIES:
+            return
+
         self.reset_twt_roll()
 
         self.change_borders(self.TWT_REPLIES)
@@ -222,8 +232,22 @@ class Twt:
         self.face.waitIcon.hide()
         self.face.nextButton.unhide()
 
-    def onFriendsClick(self, elem):
-        pass
+        self.current_twt_type = self.TWT_REPLIES
+
+    def onFriendsClicked(self, elem):
+        if self.current_twt_type == self.TWT_FRIENDS:
+            return
+        self.reset_twt_roll()
+
+        self.change_borders(self.TWT_FRIENDS)
+        self.face.waitIcon.unhide()
+
+        self.load_twts(twt_type=self.TWT_FRIENDS)
+
+        self.face.waitIcon.hide()
+        self.face.nextButton.unhide()
+
+        self.current_twt_type = self.TWT_FRIENDS
 
     def onTwitClick(self, elem):
         pass
