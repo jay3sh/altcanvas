@@ -20,14 +20,17 @@
   <defs
      id="defs4">
     <linearGradient
-       inkscape:collect="always"
        id="linearGradient3464">
       <stop
          style="stop-color:#ff0000;stop-opacity:1;"
          offset="0"
          id="stop3466" />
       <stop
-         style="stop-color:#ff0000;stop-opacity:0;"
+         id="stop4343"
+         offset="0.2857143"
+         style="stop-color:#ff7f7f;stop-opacity:1;" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
          offset="1"
          id="stop3468" />
     </linearGradient>
@@ -144,8 +147,8 @@
        id="linearGradient3470"
        x1="770"
        y1="370"
-       x2="530"
-       y2="370"
+       x2="500"
+       y2="373.16132"
        gradientUnits="userSpaceOnUse"
        gradientTransform="matrix(0.6325696,0,0,0.5491317,291.14099,224.45844)" />
   </defs>
@@ -160,7 +163,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.1520833"
-     inkscape:cx="400"
+     inkscape:cx="471.09791"
      inkscape:cy="240"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
