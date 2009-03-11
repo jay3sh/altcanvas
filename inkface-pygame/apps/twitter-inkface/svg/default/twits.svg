@@ -271,6 +271,46 @@
        height="480"
        x="0"
        y="0" />
+    <rect
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:6.04990292;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4341"
+       width="169.9501"
+       height="50.850098"
+       x="614.73566"
+       y="4.9944801"
+       rx="15"
+       ry="15"
+       inkscape:label="twitBorder" />
+    <rect
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:6.04990292;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4339"
+       width="169.9501"
+       height="50.850098"
+       x="414.9126"
+       y="6.466454"
+       rx="15"
+       ry="15"
+       inkscape:label="repliesBorder" />
+    <rect
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:6.04990292;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4335"
+       width="169.9501"
+       height="50.850098"
+       x="15.232904"
+       y="6.5209756"
+       rx="15"
+       ry="15"
+       inkscape:label="friendsBorder" />
+    <rect
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:6.04990292;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4337"
+       width="169.9501"
+       height="50.850098"
+       x="215.16238"
+       y="6.4664536"
+       rx="15"
+       ry="15"
+       inkscape:label="everyoneBorder" />
     <g
        id="g4130"
        inkscape:label="twt0"
@@ -428,45 +468,5 @@
            id="tspan4301"
            sodipodi:role="line">Twit</tspan></text>
     </g>
-    <rect
-       style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:6.04990292;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect4335"
-       width="169.9501"
-       height="50.850098"
-       x="15.232904"
-       y="6.5209756"
-       rx="15"
-       ry="15"
-       inkscape:label="friendsBorder" />
-    <rect
-       style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:6.04990292;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect4337"
-       width="169.9501"
-       height="50.850098"
-       x="215.16238"
-       y="6.4664536"
-       rx="15"
-       ry="15"
-       inkscape:label="everyoneBorder" />
-    <rect
-       style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:6.04990292;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect4339"
-       width="169.9501"
-       height="50.850098"
-       x="414.9126"
-       y="6.466454"
-       rx="15"
-       ry="15"
-       inkscape:label="repliesBorder" />
-    <rect
-       style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:6.04990292;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect4341"
-       width="169.9501"
-       height="50.850098"
-       x="615.60364"
-       y="4.9944801"
-       rx="15"
-       ry="15"
-       inkscape:label="twitBorder" />
   </g>
 </svg>
