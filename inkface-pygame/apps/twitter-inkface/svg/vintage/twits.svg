@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="800"
+   height="480"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.46"
+   sodipodi:docname="twits.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   version="1.0">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient3831">
+      <stop
+         style="stop-color:#f3e5c4;stop-opacity:1;"
+         offset="0"
+         id="stop3833" />
+      <stop
+         id="stop3839"
+         offset="0.17460318"
+         style="stop-color:#f3e5c4;stop-opacity:0.49803922;" />
+      <stop
+         style="stop-color:#f3e5c4;stop-opacity:0;"
+         offset="1"
+         id="stop3835" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3809">
+      <stop
+         style="stop-color:#f3e5c4;stop-opacity:0.76428574;"
+         offset="0"
+         id="stop3811" />
+      <stop
+         id="stop3817"
+         offset="0.19047619"
+         style="stop-color:#f3e5c4;stop-opacity:0.49803922;" />
+      <stop
+         style="stop-color:#f3e5c4;stop-opacity:0;"
+         offset="1"
+         id="stop3813" />
+    </linearGradient>
+    <linearGradient
+       id="G3">
+      <stop
+         id="s5"
+         style="stop-color:#fff"
+         offset="0" />
+      <stop
+         id="s6"
+         style="stop-color:#fff;stop-opacity:0"
+         offset="1" />
+    </linearGradient>
+    <linearGradient
+       x1="37.521717"
+       y1="36.008625"
+       x2="18.094919"
+       y2="-4.0458355"
+       id="G5"
+       xlink:href="#G3"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1,0,0,1.0032625,14.187001,7.3450684)" />
+    <linearGradient
+       id="G1">
+      <stop
+         id="s1"
+         style="stop-color:#f5a108;stop-opacity:0"
+         offset="0" />
+      <stop
+         id="s2"
+         style="stop-color:#fefdc3;stop-opacity:0.74"
+         offset="1" />
+    </linearGradient>
+    <linearGradient
+       x1="12.608996"
+       y1="34.377342"
+       x2="9.5879765"
+       y2="9.5726242"
+       id="G4"
+       xlink:href="#G1"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(2.012297,0,0,1.079974,12.757506,4.6902024)" />
+    <linearGradient
+       id="linearGradient3379">
+      <stop
+         style="stop-color:#c2b6a0;stop-opacity:1;"
+         offset="0"
+         id="stop3381" />
+      <stop
+         id="stop3387"
+         offset="0.68661845"
+         style="stop-color:#615b50;stop-opacity:1;" />
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="1"
+         id="stop3383" />
+    </linearGradient>
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective10" />
+    <inkscape:perspective
+       id="perspective2567"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       sodipodi:type="inkscape:persp3d" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     gridtolerance="10000"
+     guidetolerance="10"
+     objecttolerance="10"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.1520833"
+     inkscape:cx="400"
+     inkscape:cy="242.70253"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1280"
+     inkscape:window-height="778"
+     inkscape:window-x="-5"
+     inkscape:window-y="-3">
+    <inkscape:grid
+       type="xygrid"
+       id="grid3351" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#060503;fill-opacity:1"
+       id="rect2383"
+       width="800"
+       height="480"
+       x="0"
+       y="0" />
+    <image
+       y="-0.86799276"
+       x="69"
+       id="image2569"
+       height="480"
+       width="718"
+       sodipodi:absref="/home/jayesh/altcanvas/inkface-pygame/apps/twitter-inkface/svg/vintage/background.png"
+       xlink:href="background.png" />
+    <g
+       id="g3486"
+       inkscape:label="twt0">
+      <rect
+         ry="9.3076172"
+         rx="10.000774"
+         y="21.145388"
+         x="76.205063"
+         height="38.854614"
+         width="673.79492"
+         id="rect2573"
+         style="opacity:1;fill:#ab9664;fill-opacity:0.60465118;stroke:#000000;stroke-width:1.44719589;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         id="text3345"
+         y="45.211575"
+         x="85.779381"
+         style="font-size:22;font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Chancery L;-inkscape-font-specification:URW Chancery L Bold Italic"
+         xml:space="preserve"><tspan
+           y="45.211575"
+           x="85.779381"
+           id="tspan3347"
+           sodipodi:role="line">twt</tspan></text>
+    </g>
+    <rect
+       style="opacity:1;fill:#ab9664;fill-opacity:1;stroke:#000000;stroke-width:1.50000000000000000;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3349"
+       width="51.211575"
+       height="50.343582"
+       x="740"
+       y="10"
+       rx="10"
+       ry="10"
+       inkscape:label="imgFrame0" />
+    <text
+       id="text3470"
+       y="415.76852"
+       x="247.37791"
+       style="font-size:36px;font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Chancery L;-inkscape-font-specification:URW Chancery L Bold Italic"
+       xml:space="preserve"
+       inkscape:label="waitIcon"><tspan
+         y="415.76852"
+         x="247.37791"
+         id="tspan3472"
+         sodipodi:role="line">Loading...</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:28px;font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#f3e5c4;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Chancery L;-inkscape-font-specification:URW Chancery L Italic"
+       x="6.5508981"
+       y="385.25354"
+       id="text3440"
+       inkscape:label="everyoneButton"><tspan
+         sodipodi:role="line"
+         id="tspan3442"
+         x="6.5508981"
+         y="385.25354">Everyone</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:28px;font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#f3e5c4;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Chancery L;-inkscape-font-specification:URW Chancery L Italic"
+       x="8.7628975"
+       y="423.44791"
+       id="text3450"
+       inkscape:label="repliesButton"><tspan
+         sodipodi:role="line"
+         id="tspan3452"
+         x="8.7628975"
+         y="423.44791">Replies</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:28px;font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#f3e5c4;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Chancery L;-inkscape-font-specification:URW Chancery L Italic"
+       x="9.322897"
+       y="350.1272"
+       id="text3460"
+       inkscape:label="twitButton"><tspan
+         sodipodi:role="line"
+         id="tspan3462"
+         x="9.322897"
+         y="350.1272">Twit</tspan></text>
+    <rect
+       style="opacity:1;fill:#2a261a;fill-opacity:0.76356590000000002;stroke:none;stroke-width:1.50000000000000000;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3515"
+       width="597.17896"
+       height="111.97107"
+       x="137.14285"
+       y="121.51899"
+       rx="15"
+       ry="15"
+       inkscape:label="update_background" />
+    <rect
+       style="opacity:1;fill:#c2b6a0;fill-opacity:0.83720931;stroke:none;stroke-width:1.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3517"
+       width="569.4032"
+       height="40.795643"
+       x="150.16275"
+       y="133.67088"
+       rx="10"
+       ry="10"
+       inkscape:label="update_border" />
+    <text
+       xml:space="preserve"
+       style="font-size:32px;font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#f3e5c4;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Chancery L;-inkscape-font-specification:URW Chancery L Bold Italic"
+       x="408.82458"
+       y="213.52623"
+       id="text3525"
+       inkscape:label="update_counter"><tspan
+         sodipodi:role="line"
+         id="tspan3527"
+         x="408.82458"
+         y="213.52623">140</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24;font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Chancery L;-inkscape-font-specification:URW Chancery L Italic"
+       x="157.44666"
+       y="157.71066"
+       id="text3529"
+       inkscape:label="update_txt"><tspan
+         sodipodi:role="line"
+         id="tspan3531"
+         x="157.44666"
+         y="157.71066">update</tspan></text>
+    <g
+       id="g3546"
+       inkscape:label="postButton"
+       transform="translate(0,1.7359855)">
+      <rect
+         ry="10"
+         rx="10"
+         y="185.75046"
+         x="216.13019"
+         height="31.247742"
+         width="111.97106"
+         id="rect3521"
+         style="opacity:1;fill:#c2b6a0;fill-opacity:0.83720931;stroke:none;stroke-width:1.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         id="text3533"
+         y="203.9783"
+         x="255.18985"
+         style="font-size:24px;font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Chancery L;-inkscape-font-specification:URW Chancery L Bold Italic"
+         xml:space="preserve"><tspan
+           y="203.9783"
+           x="255.18985"
+           id="tspan3535"
+           sodipodi:role="line">post</tspan></text>
+    </g>
+    <g
+       id="g3541"
+       inkscape:label="cancelButton">
+      <rect
+         ry="10"
+         rx="10"
+         y="184.88245"
+         x="549.00549"
+         height="31.247742"
+         width="111.97106"
+         id="rect3523"
+         style="opacity:1;fill:#c2b6a0;fill-opacity:0.83720931;stroke:none;stroke-width:1.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         id="text3537"
+         y="204.91435"
+         x="577.58234"
+         style="font-size:24px;font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Chancery L;-inkscape-font-specification:URW Chancery L Bold Italic"
+         xml:space="preserve"><tspan
+           y="204.91435"
+           x="577.58234"
+           id="tspan3539"
+           sodipodi:role="line">cancel</tspan></text>
+    </g>
+    <rect
+       style="opacity:1;fill:#f3e5c4;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3551"
+       width="12.151899"
+       height="20.831833"
+       x="223.07414"
+       y="146.69078"
+       rx="3"
+       ry="3"
+       inkscape:label="update_cursor" />
+    <g
+       id="g3782"
+       inkscape:label="nextButton">
+      <path
+         sodipodi:nodetypes="cccc"
+         id="path3553"
+         d="M 622.35084,405.35263 C 593.1654,378.74068 599.47904,349.78109 597.25807,336.78121 C 599.94764,376.50843 624.2598,365.61344 647.44361,341.12117 C 625.28943,362.88026 624.36486,389.87188 622.35084,405.35263 z"
+         style="fill:#f3e5c4;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-miterlimit:4;stroke-opacity:1"
+         transform="translate(-587.6311,-193.56239)" />
+      <path
+         sodipodi:nodetypes="ccccc"
+         id="rect3779"
+         d="M 24.303798,37.323684 L 29.511753,115.44303 L 33.851717,138.87883 L 25.171791,173.59854 L 24.303798,37.323684 z"
+         style="fill:#f3e5c4;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-miterlimit:4;stroke-opacity:1" />
+    </g>
+    <text
+       inkscape:label="friendsButton"
+       xml:space="preserve"
+       style="font-size:28px;font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#f3e5c4;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Chancery L;-inkscape-font-specification:URW Chancery L Italic"
+       x="8.6799335"
+       y="462.62622"
+       id="text3375"><tspan
+         sodipodi:role="line"
+         id="tspan3377"
+         x="8.6799335"
+         y="462.62622">Friends</tspan></text>
+    <path
+       sodipodi:type="star"
+       style="opacity:1;fill:none;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path3882"
+       sodipodi:sides="3"
+       sodipodi:cx="26.039783"
+       sodipodi:cy="255.18987"
+       sodipodi:r1="37.565139"
+       sodipodi:r2="18.782569"
+       sodipodi:arg1="0.70361378"
+       sodipodi:arg2="1.7508113"
+       inkscape:flatsided="true"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="M 54.683546,279.49366 L -9.3298043,267.84419 L 32.765609,218.23174 L 54.683546,279.49366 z" />
+    <path
+       style="fill:#f3e5c4;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-miterlimit:4;stroke-opacity:1"
+       d="M 65.967451,362.82097 C 53.267681,357.34084 21.19803,357.20569 0.25762283,355.84587 L 76.125737,355.0402 C 66.143135,357.0745 69.006507,358.47216 65.967451,362.82097 z"
+       id="path3887"
+       sodipodi:nodetypes="cccc"
+       inkscape:label="twitBorder" />
+    <path
+       style="fill:#f3e5c4;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-miterlimit:4;stroke-opacity:1"
+       d="M 71.175409,440.49075 C 58.475639,435.01062 26.405988,434.87547 5.4655813,433.51565 L 81.333695,432.70998 C 71.351093,434.74428 74.214465,436.14194 71.175409,440.49075 z"
+       id="path3890"
+       sodipodi:nodetypes="cccc"
+       inkscape:label="repliesBorder" />
+    <path
+       style="fill:#f3e5c4;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-miterlimit:4;stroke-opacity:1"
+       d="M 70.307416,400.56308 C 57.607646,395.08295 25.537995,394.9478 4.5975885,393.58798 L 80.465702,392.78231 C 70.4831,394.81661 73.346472,396.21427 70.307416,400.56308 z"
+       id="path3892"
+       sodipodi:nodetypes="cccc"
+       inkscape:label="everyoneBorder" />
+    <path
+       style="fill:#f3e5c4;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-miterlimit:4;stroke-opacity:1"
+       d="M 71.175409,475.21046 C 58.475639,469.73033 26.405988,469.59518 5.4655811,468.23536 L 81.333695,467.42969 C 71.351093,469.46399 74.214465,470.86165 71.175409,475.21046 z"
+       id="path3894"
+       sodipodi:nodetypes="cccc"
+       inkscape:label="friendsBorder" />
+  </g>
+</svg>
