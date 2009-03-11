@@ -3,7 +3,7 @@ import pygame
 from twtinklib import twitter
 
 class Twt:
-    (TWT_FRIENDS, TWT_PUBLIC, TWT_REPLIES) = range(3)
+    (TWT_FRIENDS, TWT_PUBLIC, TWT_REPLIES, TWT_TWIT) = range(4)
     def __init__(self, username, password, face, canvas):
         self.face = face
         self.canvas = canvas
@@ -81,7 +81,6 @@ class Twt:
             self.face.get('twt'+str(i)).hide()
             self.face.get('imgFrame'+str(i)).hide()
         self.face.nextButton.hide()
-        self.canvas.update()
 
     def load_twts(self, twt_type=TWT_FRIENDS):
         self.get_twt = {
@@ -95,7 +94,6 @@ class Twt:
 
             twt = self.get_twt()
 
-            print twt.text
             elem.svg.text = twt.text
             elem.refresh(svg_reload=True)
 
@@ -134,13 +132,19 @@ class Twt:
 
         self.reset_twt_roll()
 
+        self.button_borders = \
+                {
+                    self.TWT_FRIENDS    : self.face.friendsBorder,
+                    self.TWT_PUBLIC     : self.face.everyoneBorder,
+                    self.TWT_REPLIES    : self.face.repliesBorder,
+                    self.TWT_TWIT       : self.face.twitBorder
+                }
+
         # Set visibility of button borders
-        self.face.friendsBorder.unhide()
-        self.face.everyoneBorder.hide()
-        self.face.repliesBorder.hide()
-        self.face.twitBorder.hide()
+        self.change_borders(self.TWT_FRIENDS)
 
         self.face.everyoneButton.onLeftClick = self.onEveryoneClicked
+        self.face.repliesButton.onLeftClick = self.onRepliesClicked
 
         # Set the waitIcon to rotating effect
         self.face.waitIcon.unhide()
@@ -157,6 +161,13 @@ class Twt:
         # waitIcon can disappear now
         self.face.waitIcon.hide()
 
+    def change_borders(self, type):
+        for t, border in self.button_borders.items():
+            if t == type:
+                border.unhide()
+            else:
+                border.hide()
+ 
     def drawTwt(self, elem):
         elem.unhide()
         if self.moveflag:
@@ -190,18 +201,26 @@ class Twt:
         return image
         
     def onEveryoneClicked(self, elem):
-        print 'loading public timeline'
         self.reset_twt_roll()
 
-        # Set the waitIcon to rotating effect
+        self.change_borders(self.TWT_PUBLIC)
         self.face.waitIcon.unhide()
 
         self.load_twts(twt_type=self.TWT_PUBLIC)
 
+        self.face.waitIcon.hide()
         self.face.nextButton.unhide()
 
-    def onRepliesClick(self, elem):
-        pass
+    def onRepliesClicked(self, elem):
+        self.reset_twt_roll()
+
+        self.change_borders(self.TWT_REPLIES)
+        self.face.waitIcon.unhide()
+
+        self.load_twts(twt_type=self.TWT_REPLIES)
+
+        self.face.waitIcon.hide()
+        self.face.nextButton.unhide()
 
     def onFriendsClick(self, elem):
         pass
