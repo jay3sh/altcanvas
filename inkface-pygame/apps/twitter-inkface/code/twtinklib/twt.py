@@ -92,7 +92,10 @@ class Twt:
         }[twt_type]
 
         for i in range(self.MAX_TWT_NUM + 1):
-            elem = self.face.get('twt'+str(i))
+
+            ii = (i + self.index + 1)%(self.MAX_TWT_NUM + 1) 
+
+            elem = self.face.get('twt'+str(ii))
 
             twt = self.get_twt()
 
@@ -100,7 +103,7 @@ class Twt:
             elem.refresh(svg_reload=True)
 
             # render profile image
-            eimg = self.face.get('imgFrame'+str(i))
+            eimg = self.face.get('imgFrame'+str(ii))
             img = self.load_image(twt)
             if img == None: continue
             iw = img.get_width()
@@ -117,6 +120,8 @@ class Twt:
 
             self.roll.append((elem,eimg))
 
+        self.roll[self.index][0].hide()
+        self.roll[self.index][1].hide()
         self.roll[self.index][0].onDraw = self.processOffline
         self.roll[self.index][1].onDraw = self.processOffline
  
@@ -342,7 +347,6 @@ class Twt:
         # outgoing twit (visible to invisible)
         self.roll[self.index][0].hide()
         self.roll[self.index][1].hide()
-
         self.roll[self.index][0].onDraw = self.processOffline
         self.roll[self.index][1].onDraw = self.processOffline
 
