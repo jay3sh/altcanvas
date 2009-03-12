@@ -139,6 +139,9 @@ class Twt:
                     self.face.update_counter):
             elem.unhide()
 
+    def onTwtboxChange(self, text):
+        self.face.update_counter.svg.text = str(len(text))
+        self.face.update_counter.refresh(svg_reload=True)
 
     def load(self):
         self.index = self.MAX_TWT_NUM 
@@ -160,6 +163,8 @@ class Twt:
                             txt_elem    = self.face.update_txt,
                             cursor_elem = self.face.update_cursor,
                             framerate   = self.canvas.framerate)
+
+        self.twtbox.register_change_listener(self.onTwtboxChange)
 
         self.face.postButton.onLeftClick = self.onTwitPost
         self.face.cancelButton.onLeftClick = self.onTwitCancel

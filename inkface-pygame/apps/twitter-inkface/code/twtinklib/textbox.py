@@ -7,6 +7,7 @@ class TextBox:
     inFocus = False
     _untouched = True
     mask = None
+    _onChange = []
     def __init__(self, 
         border_elem, txt_elem, cursor_elem, focus_elem=None, 
         framerate=20, mask=None, multiline=False):
@@ -38,6 +39,14 @@ class TextBox:
 
         self.txt_elem.text = self.txt_elem.svg.text
         self.txt_elem.refresh(svg_reload=True)
+
+    def register_change_listener(self, onChange):
+        # TODO make it return ID
+        self._onChange.append(onChange)
+
+    def unregister_change_listener(self, id):
+        # TODO
+        pass
 
     def _onKeyPress_proxy(self, elem, event):
         self._onKeyPress(self.txt_elem, event)
@@ -98,6 +107,9 @@ class TextBox:
                 '''
                 pass
 
+            # Broadcast change to changelisteners
+            for listener in self._onChange:
+                listener(elem.text)
 
 
         elif event.key == pygame.K_BACKSPACE:
