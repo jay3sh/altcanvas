@@ -42,7 +42,11 @@ class App:
 
             self.entry.loginButton.onLeftClick = self.doLogin
 
-            username, password = self.load_config()
+            try:
+                username, password = self.load_config()
+            except:
+                username = None
+                password = None
 
             if username and password:
                 self.uname.set_text(username)
