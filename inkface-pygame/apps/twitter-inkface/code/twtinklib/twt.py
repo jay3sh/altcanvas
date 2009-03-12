@@ -329,7 +329,9 @@ class Twt:
         self.current_twt_type = self.TWT_TWIT
 
     def onTwitPost(self, elem):
-        pass
+        self.twtApi.PostUpdate(self.twtbox.get_text())
+        #print self.twtbox.get_text()
+        self.hide_twt_box()
 
     def onTwitCancel(self,elem):
         self.hide_twt_box()
