@@ -95,16 +95,21 @@ class Twt:
 
             ii = (i + self.index + 1)%(self.MAX_TWT_NUM + 1) 
 
+            while True:
+                try:
+                    twt = self.get_twt()
+                    img = self.load_image(twt)
+                    if img == None: continue
+                    break
+                except:
+                    continue
+
             elem = self.face.get('twt'+str(ii))
-
-            twt = self.get_twt()
-
             elem.svg.text = twt.text
             elem.refresh(svg_reload=True)
 
             # render profile image
             eimg = self.face.get('imgFrame'+str(ii))
-            img = self.load_image(twt)
             if img == None: continue
             iw = img.get_width()
             ih = img.get_height()
@@ -244,6 +249,10 @@ class Twt:
         except UnicodeError, ue:
             print 'Error fetching img URL'+str(ue)
             return None 
+        except IOError, ioe:
+            print 'IOError fetching img: '+str(ioe)
+            return None
+ 
         image = pygame.image.load(localfile)
         image.set_alpha(127)
         return image
@@ -330,11 +339,18 @@ class Twt:
         incoming_img_y = self.base_img_y + self.MAX_TWT_NUM*self.moveStep
         incoming_img.set_position((incoming_img_x,incoming_img_y))
 
-        twt = self.get_twt()
+        while True:
+            try:
+                twt = self.get_twt()
+                img = self.load_image(twt)
+                if img == None: continue
+                break
+            except:
+                continue
+
         incoming.svg.text = twt.text
         incoming.refresh(svg_reload=True)
 
-        img = self.load_image(twt)
         iw = img.get_width()
         ih = img.get_height()
         incoming_img.refresh(svg_reload=False)
