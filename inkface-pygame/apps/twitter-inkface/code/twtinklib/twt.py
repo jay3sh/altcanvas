@@ -105,6 +105,7 @@ class Twt:
             if img == None: continue
             iw = img.get_width()
             ih = img.get_height()
+            eimg.refresh(svg_reload=False)
             eimg.sprite.image.blit(img,
                 ((self.base_img_w - iw)/2,(self.base_img_h - ih)/2))
 
@@ -239,6 +240,7 @@ class Twt:
             print 'Error fetching img URL'+str(ue)
             return None 
         image = pygame.image.load(localfile)
+        image.set_alpha(127)
         return image
         
     def onEveryoneClicked(self, elem):
@@ -330,6 +332,7 @@ class Twt:
         img = self.load_image(twt)
         iw = img.get_width()
         ih = img.get_height()
+        incoming_img.refresh(svg_reload=False)
         incoming_img.sprite.image.blit(img,
             ((self.base_img_w - iw)/2,(self.base_img_h - ih)/2))
 
