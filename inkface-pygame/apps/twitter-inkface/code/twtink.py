@@ -3,6 +3,7 @@
 import os
 import sys
 import pickle
+import getopt
 
 from inkface.canvas import PygameFace, PygameCanvas
 from twtinklib.textbox import TextBox
@@ -12,17 +13,17 @@ from twtinklib.utils import encrypt,decrypt
 TWITINK_RC      = os.environ['HOME']+os.sep+'.twitinkrc'
 PREFIX      = '..'
 SVG_DIR     = os.path.join(PREFIX,'svg')
-THEME_NAME  = 'default'
 
 class App:
     FRAMERATE = 25
-    def main(self):
+    def main(self, theme='default'):
         try:
             self.canvas = PygameCanvas(
                 (800,480),framerate = self.FRAMERATE)
 
+            self.theme = theme
             self.entry = PygameFace(
-                os.path.join(SVG_DIR,THEME_NAME,'entry.svg'))
+                os.path.join(SVG_DIR,self.theme,'entry.svg'))
 
             self.uname = TextBox(
                     border_elem = self.entry.uname_border,
@@ -80,7 +81,7 @@ class App:
         password = self.passwd.get_text()
 
         self.twits = PygameFace(
-            os.path.join(SVG_DIR, THEME_NAME, 'twits.svg'))
+            os.path.join(SVG_DIR, self.theme, 'twits.svg'))
 
         twt = Twt(username, password, self.twits, self.canvas)
 
@@ -91,4 +92,28 @@ class App:
 
         twt.load()
 
-App().main()
+def usage():
+    print 'Twitter Inkface client:'
+    print ' twitink.py [options]'
+    print ' '
+    print ' -t --theme  : Theme to use for the app'
+    print ' -h --help   : usage'
+
+
+if __name__ == '__main__':
+    try:
+        optlist, args = getopt.getopt(sys.argv[1:],'ht:',['help','theme='])
+    except getopt.GetoptError, err:
+        print str(err)
+        usage()
+        sys.exit(0)
+
+    theme = 'default'
+    for o,a in optlist:
+        if o in ('-h','--help'):
+            usage()
+            break
+        elif o in ('-t','--theme'):
+            theme = a
+ 
+    App().main(theme=theme)
