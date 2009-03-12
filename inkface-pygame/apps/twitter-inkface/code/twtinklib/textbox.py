@@ -126,8 +126,10 @@ class TextBox:
             elem.hide()
             return
         txt_x, txt_y = self.txt_elem.get_position()
+        border_x, border_y = self.border_elem.get_position()
+        y_gap = (self.border_elem.svg.h - elem.svg.h)/2
         elem_x = txt_x + self.txt_elem.svg.w + 2
-        elem_y = txt_y
+        elem_y = border_y + y_gap
         elem.set_position((elem_x,elem_y))
 
         if abs(elem.flcounter) >= self.flash_count:
