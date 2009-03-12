@@ -105,8 +105,7 @@ class Twt:
                     continue
 
             elem = self.face.get('twt'+str(ii))
-            elem.svg.text = twt.text
-            elem.refresh(svg_reload=True)
+            self.set_twt_txt(elem, twt.text)
 
             # render profile image
             eimg = self.face.get('imgFrame'+str(ii))
@@ -130,6 +129,12 @@ class Twt:
         self.roll[self.index][0].onDraw = self.processOffline
         self.roll[self.index][1].onDraw = self.processOffline
  
+    def set_twt_txt(self, elem, text):
+        orig_width = elem.svg.surface.get_width()
+        elem.text = text
+        elem.svg.text = text
+        elem.refresh(svg_reload=True)
+
     def hide_twt_box(self):
         for elem in (self.face.update_border,
                     self.face.update_txt,
@@ -157,7 +162,6 @@ class Twt:
     def load(self):
         self.index = self.MAX_TWT_NUM 
 
-
         # Clone elements
         for i in range(self.MAX_TWT_NUM):
             self.face.clone('twt0','twt'+str(i+1),
@@ -168,6 +172,9 @@ class Twt:
                             new_x = self.base_img_x,
                             new_y = self.base_img_y+\
                                 ((i+1)*(self.base_h + self.GAP)))
+            new_twt = self.face.get('twt'+str(i+1))
+            new_twt.onGainFocus = self.on_gain_focus
+            new_twt.onLoseFocus = self.on_lose_focus
 
         self.twtbox = TextBox(
                             border_elem = self.face.update_border,
@@ -213,6 +220,13 @@ class Twt:
 
         # waitIcon can disappear now
         self.face.waitIcon.hide()
+
+    def on_gain_focus(self, elem):
+        elem.inFocus = True
+
+    def on_lose_focus(self, elem):
+        elem.inFocus = False
+
 
     def change_borders(self, type):
         for t, border in self.button_borders.items():
@@ -348,8 +362,7 @@ class Twt:
             except:
                 continue
 
-        incoming.svg.text = twt.text
-        incoming.refresh(svg_reload=True)
+        self.set_twt_txt(incoming, twt.text)
 
         iw = img.get_width()
         ih = img.get_height()
