@@ -170,16 +170,6 @@
        gradientUnits="userSpaceOnUse" />
     <linearGradient
        inkscape:collect="always"
-       xlink:href="#linearGradient4202"
-       id="linearGradient4200"
-       x1="760"
-       y1="90"
-       x2="760"
-       y2="20"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(0,40)" />
-    <linearGradient
-       inkscape:collect="always"
        xlink:href="#linearGradient4216"
        id="linearGradient4222"
        x1="760"
@@ -241,10 +231,10 @@
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1280"
-     inkscape:window-height="778"
-     inkscape:window-x="-5"
-     inkscape:window-y="-3">
+     inkscape:window-width="1920"
+     inkscape:window-height="1027"
+     inkscape:window-x="0"
+     inkscape:window-y="25">
     <inkscape:grid
        type="xygrid"
        id="grid4022" />
@@ -336,7 +326,7 @@
            sodipodi:role="line">twt</tspan></text>
     </g>
     <rect
-       style="opacity:1;fill:url(#linearGradient4200);fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="opacity:1;fill:#ffeded;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect4030"
        width="50"
        height="50"
