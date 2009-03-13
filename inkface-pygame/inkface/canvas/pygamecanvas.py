@@ -6,6 +6,62 @@ from inkface.altsvg.element import Element
 from inkface.canvas import Face
 from inkface.canvas import CanvasElement
 
+num_module = None
+try:
+    import numpy
+    num_module = 'numpy'
+except ImportError, ie:
+    try:
+        import Numeric
+        num_module = 'Numeric'
+    except ImportError, ie:
+        pass
+        
+from copy import copy
+
+def ARGB2RGBA_numpy(surface):
+    buf = surface.get_data()
+    a = numpy.frombuffer(buf,numpy.uint8)
+    a.shape = (surface.get_width(),
+                surface.get_height(),4)
+    tmp = copy(a[:,:,0])
+    a[:,:,0] = a[:,:,2]
+    a[:,:,2] = tmp
+    return a
+
+def ARGB2RGBA_Numeric(surface):
+    buf = surface.get_data()
+    a = Numeric.fromstring(buf,Numeric.UInt8)
+    a.shape = (surface.get_width(),
+                surface.get_height(),4)
+    tmp = copy(a[:,:,0])
+    a[:,:,0] = a[:,:,2]
+    a[:,:,2] = tmp
+    return a
+
+
+def ARGB2RGBA_python(surface):
+    # cairo's ARGB is interpreted by pygame as BGRA due to 
+    # then endian-format difference this routine swaps B and R 
+    # (0th and 2nd) byte converting it to RGBA format.
+    buf = surface.get_data()
+    import array
+    byte_buf = array.array("c", buf)
+    num_quads = len(byte_buf)/4
+    for i in xrange(num_quads):
+        tmp = byte_buf[i*4 + 0]
+        byte_buf[i*4 + 0] = byte_buf[i*4 + 2]
+        byte_buf[i*4 + 2] = tmp
+    return byte_buf
+
+
+if num_module == 'numpy':
+    ARGB2RGBA = ARGB2RGBA_numpy
+elif num_module == 'Numeric':
+    ARGB2RGBA = ARGB2RGBA_Numeric
+else:
+    ARGB2RGBA = ARGB2RGBA_python
+    
 class PygameFace(Face):
 
     def __init__(self,svgname):
@@ -93,29 +149,22 @@ class PygameCanvasElement(CanvasElement):
             self.sprite.visible = 1
             self.sprite.dirty = 1
         
-    def _ARGBtoRGBA(self,str_buf):
-        # cairo's ARGB is interpreted by pygame as BGRA due to 
-        # then endian-format difference this routine swaps B and R 
-        # (0th and 2nd) byte converting it to RGBA format.
-        import array
-        byte_buf = array.array("c", str_buf)
-        num_quads = len(byte_buf)/4
-        for i in xrange(num_quads):
-            tmp = byte_buf[i*4 + 0]
-            byte_buf[i*4 + 0] = byte_buf[i*4 + 2]
-            byte_buf[i*4 + 2] = tmp
-        return byte_buf
-
     def __init__(self,svgelem):
         CanvasElement.__init__(self,svgelem)
         self.sprite = self.ElementSprite(self)
+        self.surface_converted = False
         self.refresh()
 
     def refresh(self,svg_reload=False):
         if svg_reload or self.svg.surface == None:
             self.svg.render()
-        buf = self._ARGBtoRGBA(self.svg.surface.get_data())
-        image = pygame.image.frombuffer(buf.tostring(),
+            self.surface_converted = False
+
+        if not self.surface_converted:
+            self.buf = ARGB2RGBA(self.svg.surface)
+            self.surface_converted = True
+
+        image = pygame.image.frombuffer(self.buf.tostring(),
                     (self.svg.surface.get_width(),
                     self.svg.surface.get_height()),"RGBA")
         self.sprite.image = image
