@@ -237,8 +237,8 @@
      showgrid="false"
      inkscape:window-width="1280"
      inkscape:window-height="778"
-     inkscape:window-x="-5"
-     inkscape:window-y="-3">
+     inkscape:window-x="0"
+     inkscape:window-y="25">
     <inkscape:grid
        type="xygrid"
        id="grid3457" />
@@ -351,5 +351,15 @@
        id="path4845"
        sodipodi:nodetypes="cccc"
        inkscape:label="exitButton" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Chancery L;-inkscape-font-specification:URW Chancery L Bold Italic"
+       x="355.00906"
+       y="124.12296"
+       id="text5205"><tspan
+         sodipodi:role="line"
+         id="tspan5207"
+         x="355.00906"
+         y="124.12296">Twitter</tspan></text>
   </g>
 </svg>
