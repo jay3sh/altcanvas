@@ -89,6 +89,14 @@ class Element:
 
     def render(self, scratch_surface=None):
 
+        # In case of background surface, node is None. For such elements
+        # add_node() should be called instead of render().
+        # However the high level app won't know what kind of element it
+        # is dealing with. So if it calls render() on a background node
+        # then we will silently return
+        if self.node == None:
+            return
+
         # If there was no old surface to scratch on, create one 
         if scratch_surface == None:
             scratch_surface = cairo.ImageSurface(
