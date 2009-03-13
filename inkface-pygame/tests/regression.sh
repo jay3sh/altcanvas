@@ -9,7 +9,7 @@ export PYTHONPATH=$HOME/altcanvas/inkface-pygame
 
 python basic.py data/gui-0.svg
 
-python events.py data/gui-1.svg
+python events.py data/gui-0.svg
 
 python change.py
 
