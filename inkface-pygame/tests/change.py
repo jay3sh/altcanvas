@@ -16,6 +16,10 @@ class App:
         self.face.changeText.svg.text = 'This is new text!'
         self.face.changeText.refresh(svg_reload=True)
         self.canvas.paint()
+        from time import sleep
+        sleep(1)
+        import sys
+        sys.exit(0)
 
 
 

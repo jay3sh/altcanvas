@@ -1,7 +1,7 @@
 from inkface.canvas import PygameFace, PygameCanvas
 
 class gbl:
-    FRAMERATE = 15
+    FRAMERATE = 12
 
 class App:
     plateCounter = 0
@@ -28,7 +28,11 @@ class App:
         self.canvas = PygameCanvas((800,480),framerate=gbl.FRAMERATE)
         self.canvas.add(face)
 
-        self.canvas.eventloop()
+        try:
+            self.canvas.eventloop()
+        except KeyboardInterrupt, ki:
+            import sys
+            sys.exit(0)
 
     def drawPlate(self, elem):
         if self.moveDir != 0:

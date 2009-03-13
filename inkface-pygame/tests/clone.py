@@ -18,7 +18,11 @@ class App:
 
         self.canvas.paint()
 
-        self.canvas.eventloop()
+        try:
+            self.canvas.eventloop()
+        except KeyboardInterrupt, ki:
+            import sys
+            sys.exit(0)
 
 
 

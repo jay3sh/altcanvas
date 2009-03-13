@@ -46,7 +46,10 @@ class App:
 
 
         self.canvas.add(self.face)
-        self.canvas.eventloop()
+        try:
+            self.canvas.eventloop()
+        except KeyboardInterrupt, ki:
+            sys.exit(0)
 
     def doDraw(self, elem):
         if elem.visibility_counter > 0:
