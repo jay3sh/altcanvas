@@ -6,6 +6,14 @@ from inkface.altsvg.element import Element
 from inkface.canvas import Face
 from inkface.canvas import CanvasElement
 
+
+v_major, v_minor, _ = pygame.version.vernum
+
+if v_major <= 1 and v_minor < 8:
+    USE_DIRTY = False
+else:
+    USE_DIRTY = True
+
 num_module = None
 try:
     import numpy
@@ -118,14 +126,25 @@ class PygameFace(Face):
 
 class PygameCanvasElement(CanvasElement):
 
-    class ElementSprite(pygame.sprite.DirtySprite):
-        def __init__(self,parent):
-            pygame.sprite.DirtySprite.__init__(self)
-            self.parent = parent
+    if USE_DIRTY:
+        class ElementSprite(pygame.sprite.DirtySprite):
+            def __init__(self,parent):
+                pygame.sprite.DirtySprite.__init__(self)
+                self.parent = parent
 
-        def update(self,*args):
-            if self.parent.onDraw != None:
-                self.parent.onDraw(self.parent)
+            def update(self,*args):
+                if self.parent.onDraw != None:
+                    self.parent.onDraw(self.parent)
+
+    else:
+        class ElementSprite(pygame.sprite.Sprite):
+            def __init__(self,parent):
+                pygame.sprite.Sprite.__init__(self)
+                self.parent = parent
+
+            def update(self,*args):
+                if self.parent.onDraw != None:
+                    self.parent.onDraw(self.parent)
 
     def set_position(self, (x, y)):
         CanvasElement.set_position(self, (x, y))
@@ -134,6 +153,30 @@ class PygameCanvasElement(CanvasElement):
         if self.sprite.visible == 1:
             self.sprite.dirty = 1
         
+
+    '''
+        Implementation of hide/unhide without using "Dirty" sprites and groups.
+
+        Pygame 1.8.0 introduced DirtySprites which have attributes like 
+        "visible" and "dirty", which are read by LayeredDirty group while
+        drawing the sprites. So we use them directly to hide or unhide sprites
+
+        For versions <1.8.0, we can't use this straightforward method. 
+        In older version, we set and use the "visible" attribute ourselves.
+        For hiding an element we simply remove it from the group sprite.kill()
+        For unhiding, we mark the visible flag to 1 and mark one more flag
+        "visibility_changed"
+
+        In canvas's paint() function, the canvas checks if any element's 
+        visibility has changed. If so, it clears the group and reforms it 
+        with elements that are visible at that point.
+
+        The reason for the asymmetry in logic is: sprite removal and addition
+        API for group is also asymmetric. Sprite doesn't need to know about
+        groups it belongs to to remove it from them. But to add it to group
+        it needs a reference to the group, which it doesn't have. So canvas has
+        to do that when indicated so by visibility_changed flag.
+    '''
     def hide(self):
         '''
             Marks the element sprite invisible and dirty.
@@ -144,14 +187,24 @@ class PygameCanvasElement(CanvasElement):
             self.sprite.visible = 0
             self.sprite.dirty = 1
 
+        if not USE_DIRTY:
+            self.sprite.kill()
+
     def unhide(self):
         if self.sprite.visible == 0:
             self.sprite.visible = 1
             self.sprite.dirty = 1
+
+        if not USE_DIRTY:
+            self.sprite.visibility_changed = True
         
     def __init__(self,svgelem):
         CanvasElement.__init__(self,svgelem)
         self.sprite = self.ElementSprite(self)
+        self.sprite.visible = 1
+        self.sprite.dirty = 1
+        if not USE_DIRTY:
+            self.sprite.visibility_changed = True
         self.surface_converted = False
         self.refresh()
 
@@ -206,9 +259,11 @@ class PygameCanvas(Canvas):
         self.dispsurf.convert()
         pygame.display.set_caption(caption)
 
-        self.elem_group = pygame.sprite.LayeredDirty(
-                            _use_update=True, _time_threshold=1000./framerate)
-        #self.passive_elem_group = pygame.sprite.LayeredDirty()
+        if USE_DIRTY:
+            self.elem_group = pygame.sprite.LayeredDirty(
+                _use_update=True, _time_threshold=1000./framerate)
+        else:
+            self.elem_group = pygame.sprite.OrderedUpdates()
 
         self.framerate = framerate
         if self.framerate > 0:
@@ -238,6 +293,21 @@ class PygameCanvas(Canvas):
             self.stopflag = True
 
     def paint(self):
+
+        if not USE_DIRTY:
+            needs_refresh = False
+            for elem in self.elementQ:
+                if elem.sprite.visibility_changed:
+                    needs_refresh = True
+                    break
+            if needs_refresh:
+                self.elem_group.empty()
+                for elem in self.elementQ:
+                    elem.sprite.visibility_changed = False
+                    if elem.sprite.visible == 1:
+                        self.elem_group.add(elem.sprite)
+
+
         self.elem_group.update()
 
         rectlist = self.elem_group.draw(self.dispsurf)
