@@ -72,6 +72,7 @@ else:
     
 class PygameFace(Face):
 
+    # TODO /face dup code
     def __init__(self,svgname):
         Face.__init__(self,svgname)
 
@@ -102,6 +103,7 @@ class PygameFace(Face):
             pass
 
         return None
+    # TODO /face dup code
 
     def clone(self, curNodeName, newNodeName, new_x=-1, new_y=-1):
 
