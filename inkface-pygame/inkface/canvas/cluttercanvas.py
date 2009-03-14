@@ -54,8 +54,8 @@ class ClutterCanvasElement(CanvasElement):
                             height = svgelem.h)
     
         self.actor.set_position(
-                            x = svgelem.x,
-                            y = svgelem.y)
+                            x = int(svgelem.x),
+                            y = int(svgelem.y))
 
         ctx = self.actor.cairo_create()
         ctx.set_source_surface(svgelem.surface)
@@ -83,13 +83,26 @@ class ClutterCanvas(Canvas):
         self.stage.connect('destroy', clutter.main_quit)
 
     def _on_key_press(self, stage, event):
-        print 'key pressed'
+        pass
 
     def _on_mouse_motion(self, stage, event):
-        print 'mouse moved'
+        pass
 
     def _on_button_press(self, stage, event):
-        print 'button pressed'
+        for elem in self.elementQ:
+            if elem.occupies((event.x, event.y)) and \
+                not elem.clouded((event.x, event.y)):
+
+                if event.button == 1 and \
+                    elem.onLeftClick is not None:
+
+                    elem.onLeftClick(elem)
+
+                elif event.button == 3 and \
+                    elem.onRightClick is not None:
+
+                    elem.onRightClick(elem)
+            
         
     def add(self, face):
         Canvas.add(self, face)
