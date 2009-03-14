@@ -237,10 +237,6 @@ class Gradient:
         
  
 class LinearGradient(Gradient):
-    x1 = 0
-    x2 = 0
-    y1 = 0
-    y2 = 0
     def __init__(self, defnode):
         Gradient.__init__(self, defnode)
         self.x1 = float(defnode.attrib.get('x1', 0))
@@ -249,11 +245,6 @@ class LinearGradient(Gradient):
         self.y2 = float(defnode.attrib.get('y2', 0))
 
 class RadialGradient(Gradient):
-    cx = 0
-    cy = 0
-    fx = 0
-    fy = 0
-    r = 0
     def __init__(self, defnode):
         Gradient.__init__(self, defnode)
         self.cx = float(defnode.attrib.get('cx', 0))
