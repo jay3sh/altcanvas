@@ -11,11 +11,11 @@ python basic.py data/gui-0.svg
 
 python events.py data/gui-0.svg
 
-python change.py
+python change.py data/gui-4.svg
 
-python clone.py
+python clone.py data/gui-5.svg
 
-python animation.py
+python animation.py data/gui-1.svg
 
 printf "Enter twitter credentials:\n"
 printf "Username: "
@@ -29,7 +29,7 @@ python twt.py data/gui-6.svg
 python twt.py data/gui-7.svg
 python twt.py data/gui-8.svg
 
-python magnify.py
+python magnify.py data/gui-10.svg
 
 python keyboard.py data/gui-11.svg
 python keyboard.py data/gui-12.svg

@@ -1,14 +1,23 @@
 
 import sys
+import os
+import pygame
 from inkface.canvas import PygameFace, PygameCanvas
 
 class App:
     def main(self):
-        self.canvas = PygameCanvas((800,480))
-        face = PygameFace(sys.argv[1])
-        face.okButton.onLeftClick = self.handleOk
-        face.cancelButton.onLeftClick = self.handleCancel
-        self.canvas.add(face)
+        self.face = PygameFace(sys.argv[1])
+        if os.environ.get('INKFACE_FULLSCREEN') is not None:
+            flags = pygame.FULLSCREEN
+        else:
+            flags = 0
+        self.canvas = PygameCanvas(
+            (int(self.face.svg.width),int(self.face.svg.height)),
+            flags = flags)
+
+        self.face.okButton.onLeftClick = self.handleOk
+        self.face.cancelButton.onLeftClick = self.handleCancel
+        self.canvas.add(self.face)
         self.canvas.paint()
         self.canvas.eventloop()
 
