@@ -247,16 +247,18 @@ import threading
 class PygameCanvas(Canvas):
     animateflag = False
     def __init__(self,
-                resolution = (640,480),
-                caption='Inkface App',
-                framerate=25):
+                resolution  = (640,480),
+                caption     = 'Inkface App',
+                framerate   = 25,
+                flags       = 0):
 
         Canvas.__init__(self)
 
         resolution = map(lambda x: int(x), resolution)
 
         pygame.init()
-        self.screen = pygame.display.set_mode(resolution,pygame.DOUBLEBUF)
+        self.screen = pygame.display.set_mode(
+                        resolution, pygame.DOUBLEBUF|flags)
         self.dispsurf = pygame.Surface(self.screen.get_size())
         self.dispsurf.convert()
         pygame.display.set_caption(caption)
