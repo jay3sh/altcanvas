@@ -73,7 +73,6 @@ class ClutterCanvasElement(CanvasElement):
         ctx = self.actor.cairo_create()
 
         ctx.set_operator(cairo.OPERATOR_CLEAR)
-        ctx.set_source_rgba(255,255,255,255)
         ctx.paint()
 
         ctx.set_operator(cairo.OPERATOR_OVER)
