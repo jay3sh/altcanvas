@@ -155,8 +155,10 @@ class Element:
         x0 = None
         y0 = None
         transform = e.attrib.get('transform')
+
+        # TODO: matrix-dup-code
         transform_type = None
-        if transform:
+        if transform is not None:
             pattern = '(\w+)\s*\(([0-9-.,]+)\)'
             m = re.search(pattern, transform)
             if m: 
@@ -182,6 +184,8 @@ class Element:
             transform_matrix = cairo.Matrix(1,0,0,1,x0,y0)
         elif transform_type == 'matrix':
             transform_matrix = cairo.Matrix(xx,xy,yx,yy,x0,y0)
+
+        # TODO: /matrix-dup-code
 
         if transform_matrix:
             ctx.transform(transform_matrix)

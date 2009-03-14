@@ -59,11 +59,15 @@ class Style:
 
             if isinstance(grad, LinearGradient):
                 cairo_grad = cairo.LinearGradient( \
-                    grad.x1,grad.y1,grad.x2,grad.y2)
+                    grad.x1, grad.y1, grad.x2, grad.y2)
             elif isinstance(grad,RadialGradient):
+                # TODO: handle when cx,cy is different than fx,fy
                 cairo_grad = cairo.RadialGradient( \
                     grad.fx, grad.fy, 0,
                     grad.fx, grad.fy, grad.r)
+                # TODO: handle transform matrix for radial gradient
+                #if grad.transform_matrix is not None:
+                #    cairo_grad.set_matrix(grad.transform_matrix)
                     
             for offset, style in grad.stops:
                 stop_style = Style(style, None)
@@ -231,6 +235,37 @@ class Gradient:
             lambda x: (x.attrib.get('offset'), x.attrib.get('style')),
             self.stops)
 
+        transform_str = defnode.get('gradientTransform')
+
+        # TODO: matrix-dup-code
+        transform_type = None
+        if transform_str is not None:
+            pattern = '(\w+)\s*\(([0-9-.,]+)\)'
+            m = re.search(pattern, transform_str)
+            if m: 
+                transform_type = m.group(1)
+                transform_values = m.group(2)
+
+                if transform_type == 'translate':
+                    x0, y0 = \
+                    map(lambda x: float(x), transform_values.split(','))
+                elif transform_type == 'matrix':
+                    xx, xy, yx, yy, x0, y0 = \
+                    map(lambda x: float(x), transform_values.split(','))
+            else:
+                raise Exception('Unable to match transform')
+
+        self.transform_matrix = None
+
+        if transform_type == 'translate':
+            self.transform_matrix = cairo.Matrix(1,0,0,1,x0,y0)
+        elif transform_type == 'matrix':
+            self.transform_matrix = cairo.Matrix(xx,xy,yx,yy,x0,y0)
+            print str((xx,xy,yx,yy,x0,y0))
+
+        # TODO: /matrix-dup-code
+
+
     def resolve_href(self, defs):
         if self.href:
             self.stops = defs[self.href].stops
@@ -243,6 +278,11 @@ class LinearGradient(Gradient):
         self.x2 = float(defnode.attrib.get('x2', 0))
         self.y1 = float(defnode.attrib.get('y1', 0))
         self.y2 = float(defnode.attrib.get('y2', 0))
+        if self.transform_matrix is not None:
+            self.x1,self.y1 = \
+                self.transform_matrix.transform_point(self.x1,self.y1)
+            self.x2,self.y2 = \
+                self.transform_matrix.transform_point(self.x2,self.y2)
 
 class RadialGradient(Gradient):
     def __init__(self, defnode):
@@ -252,6 +292,11 @@ class RadialGradient(Gradient):
         self.fx = float(defnode.attrib.get('fx', 0))
         self.fy = float(defnode.attrib.get('fy', 0))
         self.r = float(defnode.attrib.get('r', 0))
-    
+        # TODO: handle transform matrix for radial gradients
+        #if self.transform_matrix is not None:
+        #    self.cx,self.cy = \
+        #        self.transform_matrix.transform_point(self.cx,self.cy)
+        #    self.fx,self.fy = \
+        #        self.transform_matrix.transform_point(self.fx,self.fy)
         
 
