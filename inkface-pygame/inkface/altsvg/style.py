@@ -253,7 +253,8 @@ class Gradient:
                     xx, xy, yx, yy, x0, y0 = \
                     map(lambda x: float(x), transform_values.split(','))
             else:
-                raise Exception('Unable to match transform')
+                raise Exception(
+                    'Unable to match transform: %s'%transform_str)
 
         self.transform_matrix = None
 
