@@ -1,6 +1,16 @@
 '''Canvas Backend module of inkface'''
     
 from canvas import Face, Canvas, CanvasElement
-from pygamecanvas import PygameFace, PygameCanvas, PygameCanvasElement
+try:
+    from pygamecanvas import \
+        PygameFace, PygameCanvas, PygameCanvasElement
+except ImportError, ie:
+    print "Warning: Pygame backend won't be supported"
+    print ie
 
-from cluttercanvas import ClutterFace, ClutterCanvas, ClutterCanvasElement
+try:
+    from cluttercanvas import \
+        ClutterFace, ClutterCanvas, ClutterCanvasElement
+except ImportError, ie:
+    print "Warning: Clutter backend won't be supported"
+    print ie
