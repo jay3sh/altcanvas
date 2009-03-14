@@ -1,6 +1,8 @@
 
 
 import sys
+import os
+import pygame
 from inkface.canvas import PygameFace, PygameCanvas
 
 
@@ -8,9 +10,15 @@ class App:
     FRAMERATE = 5
 
     def main(self):
-        self.canvas = PygameCanvas((800,480))
         self.face = PygameFace(sys.argv[1])
-
+        if os.environ.get('INKFACE_FULLSCREEN') is not None:
+            flags = pygame.FULLSCREEN
+        else:
+            flags = 0
+ 
+        self.canvas = PygameCanvas(
+            (int(self.face.svg.width),int(self.face.svg.height)),
+            flags = flags)
 
         for i in range(26):
             keyChr = chr(ord('A')+i)

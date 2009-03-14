@@ -34,9 +34,16 @@ class App:
     def main(self):
         self.face = PygameFace(sys.argv[1])
 
+        if os.environ.get('INKFACE_FULLSCREEN') is not None:
+            flags = pygame.FULLSCREEN
+        else:
+            flags = 0
+ 
         self.width = int(float(self.face.svg.width))
         self.height = int(float(self.face.svg.height))
-        self.canvas = PygameCanvas((self.width,self.height),framerate=self.FRAMERATE)
+        self.canvas = PygameCanvas(
+            (self.width,self.height),
+            framerate=self.FRAMERATE, flags=flags)
         # Calculate some constants
         self.base_x,self.base_y = self.face.twt0.get_position()
         self.base_img_x,self.base_img_y = self.face.imgFrame0.get_position()

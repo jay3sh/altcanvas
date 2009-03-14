@@ -1,3 +1,8 @@
+
+
+import sys
+import os
+import pygame
 from inkface.canvas import PygameFace, PygameCanvas
 
 class gbl:
@@ -7,8 +12,13 @@ class App:
     plateCounter = 0
     moveOffset = 0
     def main(self):
-        face = PygameFace('data/gui-1.svg')
+        face = PygameFace(sys.argv[1])
 
+        if os.environ.get('INKFACE_FULLSCREEN') is not None:
+            flags = pygame.FULLSCREEN
+        else:
+            flags = 0
+ 
         self.plates = (face.onePlate, 
                     face.twoPlate, 
                     face.threePlate, 
@@ -25,13 +35,16 @@ class App:
         self.moveStep = self.plates[0].svg.h
         self.moveDir = 0
 
-        self.canvas = PygameCanvas((800,480),framerate=gbl.FRAMERATE)
+        self.canvas = PygameCanvas(
+            (int(face.svg.width),int(face.svg.height)),
+            framerate=gbl.FRAMERATE,
+            flags = flags)
+
         self.canvas.add(face)
 
         try:
             self.canvas.eventloop()
         except KeyboardInterrupt, ki:
-            import sys
             sys.exit(0)
 
     def drawPlate(self, elem):

@@ -1,10 +1,21 @@
 
+import sys
+import os
+import pygame
 from inkface.canvas import PygameFace, PygameCanvas
 
 class App:
     def main(self):
-        self.canvas = PygameCanvas((800,480))
-        self.face = PygameFace('data/gui-5.svg')
+        self.face = PygameFace(sys.argv[1])
+
+        if os.environ.get('INKFACE_FULLSCREEN') is not None:
+            flags = pygame.FULLSCREEN
+        else:
+            flags = 0
+
+        self.canvas = PygameCanvas(
+            (int(self.face.svg.width),int(self.face.svg.height)),
+            flags = flags)
 
         self.face.clone('newsFlash','newsFlash2',new_x=50,new_y=200)
 
@@ -21,11 +32,7 @@ class App:
         try:
             self.canvas.eventloop()
         except KeyboardInterrupt, ki:
-            import sys
             sys.exit(0)
-
-
-
 
 App().main()
 

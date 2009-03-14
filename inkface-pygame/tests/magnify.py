@@ -1,12 +1,23 @@
 #!/usr/bin/python
 
 
+import sys
+import os
+import pygame
 from inkface.canvas import PygameFace, PygameCanvas
 
 class App:
     def main(self):
-        self.canvas = PygameCanvas((800,480))
-        face = PygameFace('data/gui-10.svg')
+        face = PygameFace(sys.argv[1])
+
+        if os.environ.get('INKFACE_FULLSCREEN') is not None:
+            flags = pygame.FULLSCREEN
+        else:
+            flags = 0
+ 
+        self.canvas = PygameCanvas(
+            (int(face.svg.width),int(face.svg.height)),
+            flags = flags)
 
         face.xelem.svg.scale(2)
         face.xelem.refresh(svg_reload=True)
