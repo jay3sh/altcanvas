@@ -1,4 +1,5 @@
 
+import cairo
 import clutter
 import cluttercairo
 
@@ -57,9 +58,7 @@ class ClutterCanvasElement(CanvasElement):
                             x = int(svgelem.x),
                             y = int(svgelem.y))
 
-        ctx = self.actor.cairo_create()
-        ctx.set_source_surface(svgelem.surface)
-        ctx.paint()
+        self.refresh(svg_reload=False)
 
     def hide(self):
         pass
@@ -67,6 +66,21 @@ class ClutterCanvasElement(CanvasElement):
     def unhide(self):
         pass
 
+    def refresh(self, svg_reload=True):
+        if svg_reload or self.svg.surface is None:
+            self.svg.render()
+
+        ctx = self.actor.cairo_create()
+
+        ctx.set_operator(cairo.OPERATOR_CLEAR)
+        ctx.set_source_rgba(255,255,255,255)
+        ctx.paint()
+
+        ctx.set_operator(cairo.OPERATOR_OVER)
+        ctx.set_source_surface(self.svg.surface)
+        ctx.paint()
+        del(ctx)
+        
 class ClutterCanvas(Canvas):
     def __init__(self,
                 (width,height) = (640, 480),
