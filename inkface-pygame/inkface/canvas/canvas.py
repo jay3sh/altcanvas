@@ -38,6 +38,27 @@ class Face:
 
         return None
 
+    def clone(self, curNodeName, newNodeName, new_x=-1, new_y=-1):
+
+        if not self._elements_dict.has_key(curNodeName):
+            raise Exception(curNodeName+' does not exist for cloning')
+
+        if curNodeName == newNodeName:
+            raise Exception('New node should have different name')
+
+        curNode = self._elements_dict[curNodeName]
+
+        newNode = curNode.dup(newNodeName)
+
+        if new_x > 0: newNode._x = new_x
+        if new_y > 0: newNode._y = new_y
+
+        newNode.refresh()
+
+        curNodePos = self.elements.index(curNode)
+        self.elements.insert(curNodePos+1,newNode)
+        self._elements_dict[newNodeName] = newNode
+
 
 
 class CanvasElement:
@@ -79,6 +100,9 @@ class CanvasElement:
                 return True
 
         return False
+
+    def dup(self, newName):
+        raise Exception('This method should be overridden by subclass')
 
 class Canvas:
 

@@ -22,15 +22,23 @@ class ClutterCanvasElement(CanvasElement):
     def __init__(self, svgelem):
         CanvasElement.__init__(self, svgelem)
 
+        if self.svg.surface is None:
+            self.svg.render()
+
         self.actor = cluttercairo.CairoTexture(
                             width = svgelem.w,
                             height = svgelem.h)
     
         self.actor.set_position(
-                            x = int(svgelem.x),
-                            y = int(svgelem.y))
+                            x = int(self._x),
+                            y = int(self._y))
 
-        self.refresh(svg_reload=False)
+        ctx = self.actor.cairo_create()
+        ctx.set_operator(cairo.OPERATOR_OVER)
+        ctx.set_source_surface(self.svg.surface)
+        ctx.paint()
+        del(ctx)
+
 
     def hide(self):
         pass
@@ -41,6 +49,10 @@ class ClutterCanvasElement(CanvasElement):
     def refresh(self, svg_reload=True):
         if svg_reload or self.svg.surface is None:
             self.svg.render()
+            self.actor.set_position(
+                            x = int(self._x),
+                            y = int(self._y))
+
 
         ctx = self.actor.cairo_create()
 
@@ -51,7 +63,17 @@ class ClutterCanvasElement(CanvasElement):
         ctx.set_source_surface(self.svg.surface)
         ctx.paint()
         del(ctx)
-        
+
+    def dup(self, newName):
+        # Clone the svg element first, it has to be a new instance and not
+        # just a new reference to the same svg element
+        # The new instance's SVG attributes should be changeable without
+        # affecting the original svg element
+
+        new_svg = self.svg.dup(newName)
+        return ClutterCanvasElement(new_svg)
+
+       
 class ClutterCanvas(Canvas):
     def __init__(self,
                 (width,height) = (640, 480),

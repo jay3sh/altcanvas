@@ -79,6 +79,7 @@ class PygameFace(Face):
             Face._append(self, svge, pcElement)
 
 
+'''
     def clone(self, curNodeName, newNodeName, new_x=-1, new_y=-1):
 
         if not self._elements_dict.has_key(curNodeName):
@@ -99,6 +100,7 @@ class PygameFace(Face):
         curNodePos = self.elements.index(curNode)
         self.elements.insert(curNodePos+1,newNode)
         self._elements_dict[newNodeName] = newNode
+'''
 
 class PygameCanvasElement(CanvasElement):
 
@@ -208,11 +210,7 @@ class PygameCanvasElement(CanvasElement):
         # The new instance's SVG attributes should be changeable without
         # affecting the original svg element
 
-        import xml.etree.ElementTree
-        node_str = xml.etree.ElementTree.tostring(self.svg.node)
-        new_node = xml.etree.ElementTree.fromstring(node_str)
-        new_svg = Element(new_node,self.svg.vdoc)
-        new_svg.label = newName
+        new_svg = self.svg.dup(newName)
         return PygameCanvasElement(new_svg)
 
 from inkface.canvas.canvas import Canvas

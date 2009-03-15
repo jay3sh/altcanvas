@@ -1,8 +1,8 @@
 
 
 import re
-
 import cairo
+
 from inkface.altsvg import TAG_INKSCAPE_LABEL,TAG_G,TAG_TSPAN
 from inkface.altsvg.draw import NODE_DRAW_MAP
 
@@ -63,6 +63,15 @@ class Element:
         else:
             self.__dict__[key] = value
 
+    def dup(self, newName):
+        import xml.etree.ElementTree
+        node_str = xml.etree.ElementTree.tostring(self.node)
+        new_node = xml.etree.ElementTree.fromstring(node_str)
+        new_elem = Element(new_node, self.vdoc)
+        new_elem.label = newName
+        return new_elem
+
+        
     def scale(self, factor):
         self.scale_factor = factor
 

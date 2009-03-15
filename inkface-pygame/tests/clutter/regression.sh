@@ -15,7 +15,7 @@ python events.py $DATA_DIR/gui-0.svg
 
 python change.py $DATA_DIR/gui-4.svg
 
-#python clone.py $DATA_DIR/gui-5.svg
+python clone.py $DATA_DIR/gui-5.svg
 
 #python animation.py $DATA_DIR/gui-1.svg
 
