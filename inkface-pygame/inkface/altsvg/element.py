@@ -168,6 +168,7 @@ class Element:
         # TODO: matrix-dup-code
         transform_type = None
         if transform is not None:
+            transform = transform.replace(' ','')
             pattern = '(\w+)\s*\(([e0-9-.,]+)\)'
             m = re.search(pattern, transform)
             if m: 

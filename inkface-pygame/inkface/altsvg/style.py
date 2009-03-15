@@ -240,6 +240,7 @@ class Gradient:
         # TODO: matrix-dup-code
         transform_type = None
         if transform_str is not None:
+            transform = transform.replace(' ','')
             pattern = '(\w+)\s*\(([e0-9-.,]+)\)'
             m = re.search(pattern, transform_str)
             if m: 
