@@ -91,10 +91,11 @@ class App:
             # render profile image
             eimg = self.face.get('imgFrame'+str(i))
             img = self.load_image(twt)
-            iw = img.get_width()
-            ih = img.get_height()
-            eimg.sprite.image.blit(img,
-                ((self.base_img_w - iw)/2,(self.base_img_h - ih)/2))
+            if img is not None:
+                iw = img.get_width()
+                ih = img.get_height()
+                eimg.sprite.image.blit(img,
+                    ((self.base_img_w - iw)/2,(self.base_img_h - ih)/2))
 
             # Now the twit and image are ready to show
             elem.onDraw = self.drawTwt
@@ -150,7 +151,12 @@ class App:
         except UnicodeError, ue:
             print 'Error fetching img URL'+str(ue)
             return None 
-        image = pygame.image.load(localfile)
+        try:
+            image = pygame.image.load(localfile)
+        except Exception, e:
+            print 'Error loading '+localfile+': '+str(e)
+            return None
+
         return image
         
     def rollToNext(self, elem):
