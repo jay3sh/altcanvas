@@ -39,12 +39,11 @@ class ClutterCanvasElement(CanvasElement):
         ctx.paint()
         del(ctx)
 
-
     def hide(self):
-        pass
+        self.actor.hide()
 
     def unhide(self):
-        pass
+        self.actor.show()
 
     def refresh(self, svg_reload=True):
         if svg_reload or self.svg.surface is None:
