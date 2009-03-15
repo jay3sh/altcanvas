@@ -98,7 +98,7 @@ class App:
     def main(self):
         try:
             self.canvas = PygameCanvas((800,480),framerate = self.FRAMERATE)
-            self.face = PygameFace('data/gui-14.svg')
+            self.face = PygameFace(sys.argv[1])
 
             tb = TextBox(border_elem=self.face.border,
                         txt_elem=self.face.txt,
