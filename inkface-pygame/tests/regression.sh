@@ -36,3 +36,5 @@ python keyboard.py data/gui-12.svg
 python keyboard.py data/gui-13.svg
 
 python textbox.py
+
+python hide.py data/gui-15.svg
