@@ -39,4 +39,4 @@ python clone.py $DATA_DIR/gui-5.svg
 
 #python textbox.py $DATA_DIR/gui-14.svg
 
-#python hide.py $DATA_DIR/gui-15.svg
+python hide.py $DATA_DIR/gui-15.svg
