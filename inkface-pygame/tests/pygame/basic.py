@@ -5,7 +5,7 @@ from inkface.canvas import PygameFace, PygameCanvas
 try:
     face = PygameFace(sys.argv[1])
 
-    canvas = PygameCanvas((int(face.svg.width),int(face.svg.height)))
+    canvas = PygameCanvas((int(float(face.svg.width)),int(float(face.svg.height))))
 
     canvas.add(face)
 
