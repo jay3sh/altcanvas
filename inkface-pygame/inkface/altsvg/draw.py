@@ -226,15 +226,51 @@ def draw_text(ctx, node, defs, simulate=False):
 
     ctx.save()
 
-    tspan_node = node.find(TAG_TSPAN)
-    if tspan_node != None:
-        style.apply_font(ctx)
-        extents = draw_tspan(ctx,tspan_node,simulate)
+    tspan_node_list = node.findall(TAG_TSPAN)
+    
+    extents = (0,0,0,0)
+    for tspan_node in tspan_node_list:
+        if tspan_node != None:
+            style.apply_font(ctx)
+            new_extents = draw_tspan(ctx,tspan_node,simulate)
+            if simulate:
+                extents = _union(extents, new_extents)
 
     ctx.restore()
 
     if simulate:
         return extents
+
+# TODO: extent-union dup code
+def _union(extents,new_extents):
+        if not extents:
+            return new_extents
+
+        ox1,oy1,ox2,oy2 = extents
+        nx1,ny1,nx2,ny2 = new_extents
+
+        if nx1 < ox1:
+            x1 = nx1
+        else:
+            x1 = ox1
+
+        if ny1 < oy1:
+            y1 = ny1
+        else:
+            y1 = oy1
+
+        if nx2 > ox2:
+            x2 = nx2
+        else:
+            x2 = ox2
+
+        if ny2 > oy2:
+            y2 = ny2
+        else:
+            y2 = oy2
+
+        return (x1, y1, x2, y2)
+# TODO: /extent-union dup code
 
 def draw_path(ctx, node, defs, simulate=False):
     ''' Render 'path' SVG element '''

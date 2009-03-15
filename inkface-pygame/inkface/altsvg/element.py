@@ -241,6 +241,7 @@ class Element:
         if simulate:
             return extents
 
+    # TODO: extent-union dup code
     def __union(self, extents,new_extents):
         if not extents:
             return new_extents
@@ -269,3 +270,4 @@ class Element:
             y2 = oy2
 
         return (x1, y1, x2, y2)
+    # TODO: /extent-union dup code
