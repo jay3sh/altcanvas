@@ -3,13 +3,41 @@
 from inkface.altsvg.element import Element
 
 class Face:
-    svg = None
-    svgelements = []
 
     def __init__(self,svgname,autoload=True):
         from inkface.altsvg import VectorDoc
         self.svg = VectorDoc(svgname)
         self.svgelements = self.svg.get_elements()
+
+        self.elements = []
+        self._elements_dict = {}
+
+    def _append(self, svge, element):
+        try:
+            self._elements_dict[svge.label] = element
+        except AttributeError, ae:
+            # For non-labeled elements we get this error
+            pass
+
+        self.elements.append(element)
+ 
+
+    def __getattr__(self, key):
+        if self.__dict__.has_key(key):
+            return self.__dict__[key]
+        elif self._elements_dict.has_key(key):
+            return self._elements_dict[key]
+        else:
+            raise AttributeError('Unknown Attribute %s'%str(key))
+            
+    def get(self,key):
+        try:
+            return self._elements_dict[key] 
+        except AttributeError,ae:
+            pass
+
+        return None
+
 
 
 class CanvasElement:

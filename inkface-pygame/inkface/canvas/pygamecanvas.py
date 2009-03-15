@@ -71,39 +71,13 @@ else:
     ARGB2RGBA = ARGB2RGBA_python
     
 class PygameFace(Face):
-
-    # TODO /face dup code
     def __init__(self,svgname):
         Face.__init__(self,svgname)
 
-        self.elements = []
-        self._elements_dict = {}
-
         for svge in self.svgelements:
-            pElement = PygameCanvasElement(svge)
-            try:
-                self._elements_dict[svge.label] = pElement 
-            except AttributeError, ae:
-                pass
+            pcElement = PygameCanvasElement(svge)
+            Face._append(self, svge, pcElement)
 
-            self.elements.append(pElement)
-
-    def __getattr__(self, key):
-        if self.__dict__.has_key(key):
-            return self.__dict__[key]
-        elif self._elements_dict.has_key(key):
-            return self._elements_dict[key]
-        else:
-            raise AttributeError('Unknown Attribute %s'%str(key))
-            
-    def get(self,key):
-        try:
-            return self._elements_dict[key] 
-        except AttributeError,ae:
-            pass
-
-        return None
-    # TODO /face dup code
 
     def clone(self, curNodeName, newNodeName, new_x=-1, new_y=-1):
 
