@@ -159,7 +159,7 @@ class Element:
         # TODO: matrix-dup-code
         transform_type = None
         if transform is not None:
-            pattern = '(\w+)\s*\(([0-9-.,]+)\)'
+            pattern = '(\w+)\s*\(([e0-9-.,]+)\)'
             m = re.search(pattern, transform)
             if m: 
                 transform_type = m.group(1)

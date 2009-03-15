@@ -240,7 +240,7 @@ class Gradient:
         # TODO: matrix-dup-code
         transform_type = None
         if transform_str is not None:
-            pattern = '(\w+)\s*\(([0-9-.,]+)\)'
+            pattern = '(\w+)\s*\(([e0-9-.,]+)\)'
             m = re.search(pattern, transform_str)
             if m: 
                 transform_type = m.group(1)
@@ -262,7 +262,6 @@ class Gradient:
             self.transform_matrix = cairo.Matrix(1,0,0,1,x0,y0)
         elif transform_type == 'matrix':
             self.transform_matrix = cairo.Matrix(xx,xy,yx,yy,x0,y0)
-            print str((xx,xy,yx,yy,x0,y0))
 
         # TODO: /matrix-dup-code
 
