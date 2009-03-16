@@ -228,7 +228,7 @@ def draw_text(ctx, node, defs, simulate=False):
 
     tspan_node_list = node.findall(TAG_TSPAN)
     
-    extents = (0,0,0,0)
+    extents = None
     for tspan_node in tspan_node_list:
         if tspan_node != None:
             style.apply_font(ctx)
