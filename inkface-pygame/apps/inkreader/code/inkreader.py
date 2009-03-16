@@ -40,19 +40,25 @@ class App:
         self.line_elem.svg.text = line+' '+word
         self.line_elem.refresh(svg_reload=True)
         return (self.line_elem.svg.w < \
-            (self.pad_elem.svg.w - 3*self.margin))
+            (self.pad_elem.svg.w - 2*self.margin))
         
     
     def main(self):
         try:
             self.face = PygameFace(SVG_FILE)
         
-            canvas = PygameCanvas(
+            self.canvas = PygameCanvas(
                         (int(float(self.face.svg.width)),
                             int(float(self.face.svg.height))),
                         framerate = 0)
         
             bookname = sys.argv[1]
+
+            title = bookname.rpartition('/')[-1]
+            title = title.rpartition('.')[-3]
+
+            self.face.title.svg.text = title
+            self.face.title.refresh(svg_reload=True)
     
             bookf = open(bookname,'r')
     
@@ -62,24 +68,31 @@ class App:
             self.line_elem = self.face.roughpage
             self.pad_elem = self.face.pad
             self.margin = self.face.page.svg.x
-    
+
+            self.face.downArrow.onLeftClick = self.moveDown
+            self.face.upArrow.onLeftClick = self.moveUp
+
+            self.num_lines = \
+                (self.face.pad.svg.h-self.face.page.svg.y) \
+                /(1.3*self.face.page.svg.h)
+
             i = 0
-            page = ''
+            self.page_lines = []
             self.line_generator = self.get_line(bookf)
             while True:
                 line = self.line_generator.next()
-                print line
-                page += line+'\n'
+                self.page_lines.append(line)
                 i += 1
-                if i > 25:
+                if i > self.num_lines:
                     break
     
-            self.face.page.svg.text = page
+            print len(self.page_lines)
+            self.face.page.svg.text = '\n'.join(self.page_lines)
             self.face.page.refresh(svg_reload=True)
 
-            canvas.add(self.face)
-            canvas.paint()
-            canvas.eventloop()
+            self.canvas.add(self.face)
+            self.canvas.paint()
+            self.canvas.eventloop()
         
         except Exception, e:
             import traceback
@@ -87,6 +100,18 @@ class App:
             print 'Caught Exception: '+str(e)
             sys.exit(0)
         
+    def moveUp(self, elem):
+        pass
+
+    def moveDown(self, elem):
+        self.page_lines = self.page_lines[1:]
+        self.page_lines.append(self.line_generator.next())
+
+        self.face.page.svg.text = '\n'.join(self.page_lines)
+        self.face.page.refresh(svg_reload=True)
+
+        self.canvas.paint()
+
 if __name__ == '__main__':
     App().main()
     
