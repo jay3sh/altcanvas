@@ -65,9 +65,11 @@ class Style:
                 cairo_grad = cairo.RadialGradient( \
                     grad.fx, grad.fy, 0,
                     grad.fx, grad.fy, grad.r)
-                # TODO: handle transform matrix for radial gradient
-                #if grad.transform_matrix is not None:
-                #    cairo_grad.set_matrix(grad.transform_matrix)
+                # Note: I have no clue why inverting the matrix works below
+                # found that's how librsvg does it and it works.
+                if grad.transform_matrix is not None:
+                    grad.transform_matrix.invert()
+                    cairo_grad.set_matrix(grad.transform_matrix)
                     
             for offset, style in grad.stops:
                 stop_style = Style(style, None)
@@ -303,11 +305,5 @@ class RadialGradient(Gradient):
         self.fx = float(defnode.attrib.get('fx', 0))
         self.fy = float(defnode.attrib.get('fy', 0))
         self.r = float(defnode.attrib.get('r', 0))
-        # TODO: handle transform matrix for radial gradients
-        #if self.transform_matrix is not None:
-        #    self.cx,self.cy = \
-        #        self.transform_matrix.transform_point(self.cx,self.cy)
-        #    self.fx,self.fy = \
-        #        self.transform_matrix.transform_point(self.fx,self.fy)
         
 
