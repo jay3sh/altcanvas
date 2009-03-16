@@ -3,7 +3,8 @@
 import re
 import cairo
 
-from inkface.altsvg import TAG_INKSCAPE_LABEL,TAG_G,TAG_TSPAN
+from inkface.altsvg import \
+    TAG_INKSCAPE_LABEL, TAG_G, TAG_TSPAN, TAG_TEXT
 from inkface.altsvg.draw import NODE_DRAW_MAP
 
 class Element:
@@ -52,11 +53,44 @@ class Element:
                 raise Exception('node member is not set')
 
             if key == 'text':
-                tspan = node.find('.//'+TAG_TSPAN)
-                if tspan != None:
-                    tspan.text = value
+                if value.find('\n') >= 0:
+                    import xml.etree.ElementTree
+                    text_node = node
+
+                    tmp_surface = cairo.ImageSurface(
+                        cairo.FORMAT_ARGB32,1,1)
+                    tmp_ctx = cairo.Context(tmp_surface)
+
+                    ex1,ey1,ex2,ey2 = self.raw_render(tmp_ctx, text_node, simulate=True)
+                    height = ey2 - ey1
+                    # TODO: hardcode a gap betwn lines which is 30% of height
+                    height += 0.30 * height
+
+                    tchildren = text_node.getchildren()
+                    old_x, old_y = (0, 0)
+                    for tchild in tchildren:
+                        if tchild.tag == TAG_TSPAN:
+                            old_x = float(tchild.get('x'))
+                            old_y = float(tchild.get('y'))
+                            text_node.remove(tchild)
+
+                    txt_lines = value.split('\n')
+                    i = 0
+                    for txt_line in txt_lines:
+                        attr_dict = {'x':str(old_x),
+                                    'y':str(old_y+i*height)}
+                        tspan_elem = xml.etree.ElementTree.Element(
+                                        TAG_TSPAN, attr_dict)
+                        tspan_elem.text = txt_line
+                        text_node.insert(0,tspan_elem)
+                        i += 1
+
                 else:
-                    raise Exception('No text element found')
+                    tspan = node.find('.//'+TAG_TSPAN)
+                    if tspan != None:
+                        tspan.text = value
+                    else:
+                        raise Exception('No text element found')
             elif key == 'label':
                 node.set(TAG_INKSCAPE_LABEL,value)
             
