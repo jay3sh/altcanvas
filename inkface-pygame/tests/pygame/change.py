@@ -13,7 +13,8 @@ class App:
             flags = 0
         self.canvas = PygameCanvas(
             (int(self.face.svg.width),int(self.face.svg.height)),
-            flags = flags)
+            flags = flags,
+            framerate = 0)
 
         self.face.changeButton.onLeftClick = self.change
         

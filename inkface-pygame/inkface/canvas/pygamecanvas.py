@@ -236,8 +236,12 @@ class PygameCanvas(Canvas):
         pygame.display.set_caption(caption)
 
         if USE_DIRTY:
-            self.elem_group = pygame.sprite.LayeredDirty(
-                _use_update=True, _time_threshold=1000./framerate)
+            if framerate > 0:
+                self.elem_group = pygame.sprite.LayeredDirty(
+                    _use_update=True, _time_threshold=1000./framerate)
+            else:
+                self.elem_group = pygame.sprite.LayeredDirty(
+                    _use_update=True)
         else:
             self.elem_group = pygame.sprite.OrderedUpdates()
 
@@ -372,9 +376,13 @@ class PygameCanvas(Canvas):
     # TODO rename to cleanup
     def stop(self):
         self.stop_signal = True
-        if self.painter != None:
-            self.painter.stop()
-            self.painter.join()
+        try:
+            if self.painter != None:
+                self.painter.stop()
+                self.painter.join()
+        except AttributeError, ae:
+            # In case there is no painter thread
+            pass
 
     def eventloop(self):
         while True:

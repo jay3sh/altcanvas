@@ -17,7 +17,8 @@ class App:
  
         self.canvas = PygameCanvas(
             (int(face.svg.width),int(face.svg.height)),
-            flags = flags)
+            flags = flags,
+            framerate = 0)
 
         face.xelem.svg.scale(2)
         face.xelem.refresh(svg_reload=True)
