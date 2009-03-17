@@ -6,7 +6,7 @@ import pygame
 import sys
 from inkface.canvas import PygameFace, PygameCanvas
 
-SVG_FILE='/home/jayesh/altcanvas/inkface-pygame/apps/inkreader/svg/inkreader.svg'
+SVG_FILE='/home/jayesh/altcanvas/inkface-pygame/apps/inkreader/svg/inkreader-maemo.svg'
 
 class App:
     def get_word(self, fd):
@@ -73,7 +73,7 @@ class App:
             self.canvas = PygameCanvas(
                         (int(float(self.face.svg.width)),
                             int(float(self.face.svg.height))),
-                        framerate = 0,
+                        framerate = 1,
                         flags = flags)
         
             bookname = sys.argv[1]
@@ -101,6 +101,8 @@ class App:
             self.face.upArrow1.onLeftClick = self.moveUp
 
             self.face.contextBlock.hide()
+            self.face.contextBlock.onDraw = self.onContextBlockDraw
+            self.contextHighlightCounter = 0
 
             self.face.closeButton.onLeftClick = self.exit
 
@@ -168,8 +170,16 @@ class App:
             (ctxblock_x,page_y + num_old_lines*self.line_height))
 
         self.face.contextBlock.unhide()
+        self.contextHighlightCounter = 3
 
         self.canvas.paint()
+
+    def onContextBlockDraw(self, elem):
+        if self.contextHighlightCounter > 0:
+            elem.unhide()
+            self.contextHighlightCounter -= 1
+        else:
+            elem.hide()
 
 if __name__ == '__main__':
     App().main()
