@@ -1,6 +1,8 @@
 
 #!/usr/bin/env python
 
+import os
+import pygame
 import sys
 from inkface.canvas import PygameFace, PygameCanvas
 
@@ -47,10 +49,16 @@ class App:
         try:
             self.face = PygameFace(SVG_FILE)
         
+            if os.environ.get('INKFACE_FULLSCREEN') is not None:
+                flags = pygame.FULLSCREEN
+            else:
+                flags = 0
+
             self.canvas = PygameCanvas(
                         (int(float(self.face.svg.width)),
                             int(float(self.face.svg.height))),
-                        framerate = 0)
+                        framerate = 0,
+                        flags = flags)
         
             bookname = sys.argv[1]
 
