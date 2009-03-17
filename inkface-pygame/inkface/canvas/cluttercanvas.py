@@ -51,6 +51,7 @@ class ClutterCanvasElement(CanvasElement):
             self.actor.set_position(
                             x = int(self._x),
                             y = int(self._y))
+            self.actor.set_size(self.svg.w,self.svg.h)
 
 
         ctx = self.actor.cairo_create()
