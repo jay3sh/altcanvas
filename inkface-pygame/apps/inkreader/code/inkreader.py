@@ -77,8 +77,12 @@ class App:
             self.pad_elem = self.face.pad
             self.margin = self.face.page.svg.x
 
-            self.face.downArrow.onLeftClick = self.moveDown
-            self.face.upArrow.onLeftClick = self.moveUp
+            self.face.downArrow3.onLeftClick = self.moveDown
+            self.face.downArrow2.onLeftClick = self.moveDown
+            self.face.downArrow1.onLeftClick = self.moveDown
+            self.face.upArrow3.onLeftClick = self.moveUp
+            self.face.upArrow2.onLeftClick = self.moveUp
+            self.face.upArrow1.onLeftClick = self.moveUp
 
             self.num_lines = \
                 (self.face.pad.svg.h-self.face.page.svg.y) \
@@ -94,7 +98,6 @@ class App:
                 if i > self.num_lines:
                     break
     
-            print len(self.page_lines)
             self.face.page.svg.text = '\n'.join(self.page_lines)
             self.face.page.refresh(svg_reload=True)
 
@@ -112,8 +115,21 @@ class App:
         pass
 
     def moveDown(self, elem):
-        self.page_lines = self.page_lines[1:]
-        self.page_lines.append(self.line_generator.next())
+        if elem.svg.label.endswith('3'):
+            scroll_step = int(self.num_lines/2)
+        elif elem.svg.label.endswith('2'):
+            scroll_step = int(self.num_lines/4)
+        elif elem.svg.label.endswith('1'):
+            scroll_step = int(self.num_lines/8)
+        
+        if scroll_step < 1: scroll_step = 1
+
+        self.page_lines = self.page_lines[scroll_step:]
+        new_lines = []
+        for i in range(scroll_step):
+            new_lines.append(self.line_generator.next())
+
+        self.page_lines += new_lines
 
         self.face.page.svg.text = '\n'.join(self.page_lines)
         self.face.page.refresh(svg_reload=True)
