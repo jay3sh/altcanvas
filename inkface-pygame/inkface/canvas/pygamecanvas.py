@@ -251,6 +251,8 @@ class PygameCanvas(Canvas):
             self.painter = self._PainterThread(self)
             self.painter.start()
 
+        self.stop_signal = False
+
     class _PainterThread(threading.Thread):
         def __init__(self,canvas):
             threading.Thread.__init__(self)
@@ -386,7 +388,7 @@ class PygameCanvas(Canvas):
 
     def eventloop(self):
         while True:
-            self.stop_signal = self._handle_event(pygame.event.wait())
+            self._handle_event(pygame.event.wait())
 
             if self.stop_signal: 
                 return
