@@ -32,12 +32,28 @@ class App:
                 yield curline
                 curline = ''
             else:
-                if not self.length_check(curline, word):
-                    yield curline
-                    curline = word
-                else:
-                    curline += ' '+word
-            
+                try:
+                    if not self.length_check(curline, word):
+                        yield curline
+                        curline = word
+                    else:
+                        curline += ' '+word
+                except Exception, e:
+                    new_word = ''
+                    for c in word:
+                        if ord(c) > 128:
+                            continue
+                        else:
+                            new_word += c
+
+                    if not self.length_check(curline, new_word):
+                        yield curline
+                        curline = new_word
+                    else:
+                        curline += ' '+new_word
+
+
+           
     def length_check(self, line, word):
         self.line_elem.svg.text = line+' '+word
         self.line_elem.refresh(svg_reload=True)
