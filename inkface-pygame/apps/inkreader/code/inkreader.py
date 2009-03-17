@@ -155,7 +155,7 @@ class App:
         self.face.page.refresh(svg_reload=True)
 
         # Calculate the position of contextBlock
-        num_old_lines = self.num_lines - scroll_step
+        num_old_lines = self.num_lines - scroll_step - 1
         page_x, page_y = self.face.page.get_position()
         ctxblock_x, ctxblock_y = self.face.contextBlock.get_position()
         self.face.contextBlock.set_position(
