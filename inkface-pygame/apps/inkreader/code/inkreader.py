@@ -100,9 +100,13 @@ class App:
             self.face.upArrow2.onLeftClick = self.moveUp
             self.face.upArrow1.onLeftClick = self.moveUp
 
+            self.face.contextBlock.hide()
+
+            self.line_height = 1.3*self.face.page.svg.h
+
             self.num_lines = \
                 (self.face.pad.svg.h-self.face.page.svg.y) \
-                /(1.3*self.face.page.svg.h)
+                /self.line_height
 
             i = 0
             self.page_lines = []
@@ -149,6 +153,15 @@ class App:
 
         self.face.page.svg.text = '\n'.join(self.page_lines)
         self.face.page.refresh(svg_reload=True)
+
+        # Calculate the position of contextBlock
+        num_old_lines = self.num_lines - scroll_step
+        page_x, page_y = self.face.page.get_position()
+        ctxblock_x, ctxblock_y = self.face.contextBlock.get_position()
+        self.face.contextBlock.set_position(
+            (ctxblock_x,page_y + num_old_lines*self.line_height))
+
+        self.face.contextBlock.unhide()
 
         self.canvas.paint()
 

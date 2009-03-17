@@ -37,7 +37,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.2546875"
-     inkscape:cx="240"
+     inkscape:cx="84.582814"
      inkscape:cy="336.9029"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -75,6 +75,14 @@
        x="0.49916801"
        y="0.49915418"
        inkscape:label="pad" />
+    <rect
+       style="fill:#000000;fill-opacity:0.14503817;stroke:none;stroke-opacity:1"
+       id="rect3173"
+       width="450"
+       height="330"
+       x="20"
+       y="310"
+       inkscape:label="contextBlock" />
     <text
        xml:space="preserve"
        style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:KacstArt;-inkscape-font-specification:KacstArt"
