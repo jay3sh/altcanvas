@@ -7,7 +7,7 @@
 
 DATA_DIR=../data
 
-export PYTHONPATH=$HOME/altcanvas/inkface-pygame
+export PYTHONPATH=$HOME/altcanvas/inkface2
 
 python basic.py $DATA_DIR/gui-0.svg
 
