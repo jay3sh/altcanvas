@@ -102,6 +102,8 @@ class App:
 
             self.face.contextBlock.hide()
 
+            self.face.closeButton.onLeftClick = self.exit
+
             self.line_height = 1.3*self.face.page.svg.h
 
             self.num_lines = \
@@ -128,9 +130,13 @@ class App:
         except Exception, e:
             import traceback
             print traceback.format_exc()
-            print 'Caught Exception: '+str(e)
+            self.canvas.stop()
             sys.exit(0)
         
+    def exit(self, elem):
+        self.canvas.stop()
+        sys.exit(0)
+
     def moveUp(self, elem):
         pass
 
