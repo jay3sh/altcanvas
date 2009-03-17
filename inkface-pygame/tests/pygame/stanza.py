@@ -1,5 +1,5 @@
 import sys
-from inkface.canvas import PygameFace, PygameCanvas
+from inkface.canvas.pygamecanvas import PygameFace, PygameCanvas
 
 try:
     face = PygameFace(sys.argv[1])

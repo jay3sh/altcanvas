@@ -2,7 +2,7 @@
 import sys
 import os
 import pygame
-from inkface.canvas import ClutterFace, ClutterCanvas
+from inkface.canvas.cluttercanvas import ClutterFace, ClutterCanvas
 
 class App:
     def main(self):

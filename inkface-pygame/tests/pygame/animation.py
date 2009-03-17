@@ -3,7 +3,7 @@
 import sys
 import os
 import pygame
-from inkface.canvas import PygameFace, PygameCanvas
+from inkface.canvas.pygamecanvas import PygameFace, PygameCanvas
 
 class gbl:
     FRAMERATE = 12

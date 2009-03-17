@@ -1,5 +1,5 @@
 
-from inkface.canvas import PygameFace, PygameCanvas
+from inkface.canvas.pygamecanvas import PygameFace, PygameCanvas
 from twitter import twitter
 import os
 import sys

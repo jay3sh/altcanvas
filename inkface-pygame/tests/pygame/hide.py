@@ -2,7 +2,7 @@
 import os
 import sys
 import pygame
-from inkface.canvas import PygameFace, PygameCanvas
+from inkface.canvas.pygamecanvas import PygameFace, PygameCanvas
 
 class App:
     def main(self):
