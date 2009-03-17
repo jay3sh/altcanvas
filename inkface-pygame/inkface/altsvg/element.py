@@ -75,7 +75,7 @@ class Element:
                     # Keep copy of text node element, used in regenerating it
                     text_node_attribs = text_node.attrib.copy()
 
-                    # Clear the text_node element to get rid of childred tspans
+                    # Clear the text_node element to get rid of children tspans
                     text_node.clear()
 
                     # Insert saved attributes into text_node, which also got 
