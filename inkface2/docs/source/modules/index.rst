@@ -9,3 +9,4 @@ Inkface Modules
 
    inkface
    inkface_canvas_pygamecanvas
+   inkface_canvas_canvas

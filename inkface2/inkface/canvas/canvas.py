@@ -1,3 +1,10 @@
+'''
+
+module:: inkface.canvas.canvas -- Generic Canvas Backend
+=============================================================
+
+:synopsis: This module contains Class definitions used for Generic Canvas Backend
+'''
 
 
 from inkface.altsvg.element import Element
@@ -31,6 +38,12 @@ class Face:
             raise AttributeError('Unknown Attribute %s'%str(key))
             
     def get(self,key):
+        '''
+        :param key: Name of element you are looking for.
+
+        This method has same result as accessing the element as Face's \
+        attribute.
+        '''
         try:
             return self._elements_dict[key] 
         except AttributeError,ae:
@@ -39,7 +52,14 @@ class Face:
         return None
 
     def clone(self, curNodeName, newNodeName, new_x=-1, new_y=-1):
+        '''
+        Clones an existing element of the face to create a duplicate one.
 
+        :param curNodeName: name of existing element to be cloned
+        :param newNodeName: name the new element should have
+        :param new_x: [optional] x coord of new element
+        :param new_y: [optional] y coord of new element
+        '''
         if not self._elements_dict.has_key(curNodeName):
             raise Exception(curNodeName+' does not exist for cloning')
 
@@ -80,10 +100,16 @@ class CanvasElement:
         self._y = self.svg.y
 
     def set_position(self, (x, y)):
+        '''
+        :param (x,y): x,y coordinates to set this element's position to
+        '''
         self._x = x
         self._y = y
 
     def get_position(self):
+        '''
+        :rtype: A tuple giving (x,y) coordinates.
+        '''
         return (self._x, self._y)
 
     def occupies(self,(x,y)):
