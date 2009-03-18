@@ -1,1 +1,4 @@
-''' The parent inkface module '''
+''' 
+module:: inkface -- The top inkface module 
+==========================================
+'''
