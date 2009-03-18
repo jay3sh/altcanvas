@@ -1,4 +1,10 @@
+'''
 
+module:: inkface.canvas.pygamecanvas -- Pygame Canvas Backend
+=============================================================
+
+:synopsis: This module contains Class definitions used for Pygame Canvas Backend
+'''
 import pygame
 
 from inkface.altsvg.element import Element
@@ -71,6 +77,11 @@ else:
     ARGB2RGBA = ARGB2RGBA_python
     
 class PygameFace(Face):
+    '''
+    Loads SVG file and creates PygameCanvasElement object from it.
+    These objects can be accessed as members of this Face instance,
+    addressed by the *label* given to them in Image editor.
+    '''
     def __init__(self,svgname):
         Face.__init__(self,svgname)
 
@@ -134,9 +145,18 @@ class PygameCanvasElement(CanvasElement):
     '''
     def hide(self):
         '''
-            Marks the element sprite invisible and dirty.
-            Warning: You may still see the element after calling hide() if
-            you have overridden the onDraw callback and calling unhide() there 
+        Hides this element.
+        Warning: There is a difference in semantics of this call, depending on
+        the pygame version.
+
+        * For pygame version < 1.8.x - Calling hide() will disable the call to
+          onDraw handler of it too. The onDraw of this element won't be called
+          until unhide() is called. 
+        * For pygame version >= 1.8.x - Calling hide() won't disable the call 
+          onDraw handler of this element. The onDraw handler will still be
+          called during each refresh cycle. You can use it to unhide this
+          element.
+
         '''
         if self.sprite.visible == 1:   
             self.sprite.visible = 0
@@ -146,6 +166,9 @@ class PygameCanvasElement(CanvasElement):
             self.sprite.kill()
 
     def unhide(self):
+        '''
+        Unhides this element
+        '''
         if self.sprite.visible == 0:
             self.sprite.visible = 1
             self.sprite.dirty = 1
@@ -164,6 +187,12 @@ class PygameCanvasElement(CanvasElement):
         self.refresh()
 
     def refresh(self,svg_reload=False):
+        '''
+        Redraws the SVG element's cairo surface on PygameCanvasElement's
+        sprite.
+
+        :param svg_reload: If underlying SVG should be redrawn. 
+        '''
         if svg_reload or self.svg.surface == None:
             self.svg.render()
             self.surface_converted = False
@@ -194,7 +223,18 @@ from inkface.canvas.canvas import Canvas
 import threading
 
 class PygameCanvas(Canvas):
-    animateflag = False
+    '''
+    :param resolution: Dimensions of the canvas
+    :param caption: Caption of the application window (if supported by platform)
+    :param framerate: Rate at which to refresh the canvas \
+    (frames per second - fps). The canvas spawns an internal thread to do \
+    this periodic refresh. If you are not interested in animation in GUI, \
+    then you can mention framerate=0 and the extra thread won't be spawned. \
+    In such situation, you will have to manually call paint() method of \
+    canvas if you want the canvas to be refreshed.
+    :param flags: You can pass additional pygame flags that will be passed \
+    to pygame.display.set_mode() call.
+    '''
     def __init__(self,
                 resolution  = (640,480),
                 caption     = 'Inkface App',
@@ -252,7 +292,9 @@ class PygameCanvas(Canvas):
             self.stopflag = True
 
     def paint(self):
-
+        '''
+        Redraws the canvas
+        '''
         if not USE_DIRTY:
             needs_refresh = False
             for elem in self.elementQ:
@@ -275,11 +317,21 @@ class PygameCanvas(Canvas):
         pygame.display.flip()
 
     def add(self,face):
+        '''
+        :param face: PygameFace instance to add to this canvas. \
+        This actually leads to addition of Face's elements to canvas's \
+        current list of elements.
+        '''
         Canvas.add(self, face)
         for elem in self.elementQ:
             self.elem_group.add(elem.sprite)
 
     def remove(self, face):
+        '''
+        :param face: PygameFace instance to remove from this canvas. \
+        This actually leads to removal of Face's elements from canvas's \
+        current list of elements.
+        '''
         Canvas.remove(self, face)
         for elem in self.elementQ:
             self.elem_group.add(elem.sprite)
@@ -354,6 +406,9 @@ class PygameCanvas(Canvas):
 
     # TODO rename to cleanup
     def stop(self):
+        '''
+        Cleans up the canvas (and its internal thread, if applicable).
+        '''
         self.stop_signal = True
         try:
             if self.painter != None:
@@ -364,6 +419,10 @@ class PygameCanvas(Canvas):
             pass
 
     def eventloop(self):
+        '''
+        The loop that application should call after it has setup all GUI \
+        elements and is ready to handle events from user.
+        '''
         while True:
             self._handle_event(pygame.event.wait())
 
