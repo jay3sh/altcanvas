@@ -55,7 +55,13 @@ class Element:
             if key == 'text':
                 if value.find('\n') >= 0:
                     import xml.etree.ElementTree
-                    text_node = node
+                    # Be more forgiving, as in the case of single line text
+                    # If current node is not text node, see if any sub-node
+                    # is a text node.
+                    if node.tag == TAG_TEXT:
+                        text_node = node
+                    else:
+                        text_node = node.find('.//'+TAG_TEXT)
 
                     # A temp scratch surface to calculate height of a line
                     tmp_surface = cairo.ImageSurface(
