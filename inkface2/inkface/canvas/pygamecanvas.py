@@ -186,16 +186,28 @@ class PygameCanvasElement(CanvasElement):
         self.surface_converted = False
         self.refresh()
 
-    def refresh(self,svg_reload=False):
+    def refresh(self, svg_reload=False, sprite_reload=True):
         '''
         Redraws the SVG element's cairo surface on PygameCanvasElement's
         sprite.
 
-        :param svg_reload: If underlying SVG should be redrawn. 
+        :param svg_reload: If underlying SVG should be redrawn. \
+        This needs to be true if you have made changes to the SVG \
+        node and need the change to reflect on screen
+        :param sprite_reload: If sprite should be reloaded. \
+        There are cases when SVG is changed and reloaded, but only \
+        for purposes of getting estimate of final dimensions. \
+        In such case the change is not to be reflected on screen. \
+        By setting this param to True, one can save time spent in \
+        reloading the sprite. This is only for performance \
+        improvement purposes. Even if the sprite gets reloaded, the \
+        change won't get reflected until the canvas gets redrawn.
         '''
         if svg_reload or self.svg.surface == None:
             self.svg.render()
             self.surface_converted = False
+
+        if not sprite_reload: return
 
         if not self.surface_converted:
             self.buf = ARGB2RGBA(self.svg.surface)
