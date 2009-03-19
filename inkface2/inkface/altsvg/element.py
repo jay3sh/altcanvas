@@ -135,6 +135,12 @@ class Element:
         else:
             self.__dict__[key] = value
 
+    def set(self, key, value):
+        if self.node is not None:
+            self.node.set(key,value)
+        else:
+            raise Exception('No SVG node present')
+
     def dup(self, newName):
         import xml.etree.ElementTree
         node_str = xml.etree.ElementTree.tostring(self.node)

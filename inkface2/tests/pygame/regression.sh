@@ -41,3 +41,5 @@ python textbox.py $DATA_DIR/gui-14.svg
 
 python hide.py $DATA_DIR/gui-15.svg
 python stanza.py $DATA_DIR/gui-16.svg
+
+python modifier.py $DATA_DIR/gui-17.svg
