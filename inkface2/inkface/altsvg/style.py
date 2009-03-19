@@ -15,6 +15,25 @@ import re
 import cairo
 import inkface.altsvg
 
+style_map = {}
+
+def get_style_object(style_str, defs):
+    '''
+    This method creates a Style object and stores it in a dictionary
+    keyed on the style_str. That way next request for parsing same
+    string is fulfilled from the dictionary and time spent in parsing
+    is saved.
+    Repetitive parsing requests for same style string are very common
+    hence this strategy helps improve performance.
+    '''
+    if style_str in style_map:
+        return style_map[style_str]
+    else:
+        st = Style(style_str, defs)
+        style_map[style_str] = st
+        return st
+
+
 class Style:
     ''' Class to encapsulate style strings '''
     def __init__(self, style_str, defs):

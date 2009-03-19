@@ -13,7 +13,7 @@
 
 import cairo
 
-from inkface.altsvg.style import Style
+from inkface.altsvg.style import get_style_object
 from inkface.altsvg import TAG_RECT, TAG_PATH, \
     TAG_TEXT, TAG_TSPAN, TAG_IMAGE, TAG_HREF
 
@@ -72,7 +72,7 @@ def draw_rect(ctx, node, defs, simulate=False):
 
     style_str = node.attrib.get('style')
     if style_str:
-        style = Style(style_str, defs)
+        style = get_style_object(style_str, defs)
 
 
     x = float(node.attrib.get('x'))
@@ -222,7 +222,7 @@ def draw_text(ctx, node, defs, simulate=False):
     style = None
     style_str = node.attrib.get('style')
     if style_str:
-        style = Style(style_str, defs)
+        style = get_style_object(style_str, defs)
 
     ctx.save()
 
@@ -279,7 +279,7 @@ def draw_path(ctx, node, defs, simulate=False):
     style = None
     style_str = node.attrib.get('style')
     if style_str:
-        style = Style(style_str, defs)
+        style = get_style_object(style_str, defs)
 
     tokens = node.attrib.get('d').replace(',',' ').split()
     i = 0
