@@ -3,6 +3,7 @@ import os
 import pygame
 from twtinklib import twitter
 from twtinklib.textbox import TextBox
+from twtinklib.twitbox import TwitBox
 from inkface.canvas.pygamecanvas import PygameFace, PygameCanvas
 
 PREFIX      = '..'
@@ -29,6 +30,7 @@ class Twt:
         self.current_twt_type = self.TWT_FRIENDS
 
         self.friends_twtcnt = 0
+        '''
         self.public_twtcnt = 0
         self.replies_twtcnt = 0
         self.GAP = 10
@@ -50,6 +52,7 @@ class Twt:
         self.moveStep = self.base_h + self.GAP
         
         self.MAX_TWT_NUM = (self.height / self.moveStep) + 1
+        '''
  
     def get_public_twt(self):
         if self.public_twtlist == None or \
@@ -84,64 +87,6 @@ class Twt:
         self.friends_twtcnt += 1
         return twt
 
-    def reset_twt_roll(self):
-        # Make all the twits and imageFrames invisible to start with
-        for i in range(self.MAX_TWT_NUM + 1):
-            self.face.get('twt'+str(i)).hide()
-            self.face.get('imgFrame'+str(i)).hide()
-        self.face.nextButton.hide()
-
-    def load_twts(self, twt_type=TWT_FRIENDS):
-        self.get_twt = {
-            self.TWT_FRIENDS    : self.get_friends_twt,
-            self.TWT_PUBLIC     : self.get_public_twt,
-            self.TWT_REPLIES    : self.get_replies
-        }[twt_type]
-
-        for i in range(self.MAX_TWT_NUM + 1):
-
-            ii = (i + self.index + 1)%(self.MAX_TWT_NUM + 1) 
-
-            while True:
-                try:
-                    twt = self.get_twt()
-                    img = self.load_image(twt)
-                    if img == None: continue
-                    break
-                except:
-                    continue
-
-            elem = self.face.get('twt'+str(ii))
-            self.set_twt_txt(elem, twt.text)
-
-            # render profile image
-            eimg = self.face.get('imgFrame'+str(ii))
-            if img == None: continue
-            iw = img.get_width()
-            ih = img.get_height()
-            eimg.refresh(svg_reload=False)
-            eimg.sprite.image.blit(img,
-                ((self.base_img_w - iw)/2,(self.base_img_h - ih)/2))
-
-            # Now the twit and image are ready to show
-            elem.unhide()
-            elem.onDraw = self.drawTwt
-            eimg.unhide()
-            eimg.onDraw = self.drawTwt
-
-            self.roll.append((elem,eimg))
-
-        self.roll[self.index][0].hide()
-        self.roll[self.index][1].hide()
-        self.roll[self.index][0].onDraw = self.processOffline
-        self.roll[self.index][1].onDraw = self.processOffline
- 
-    def set_twt_txt(self, elem, text):
-        orig_width = elem.svg.surface.get_width()
-        elem.text = text
-        elem.svg.text = text
-        elem.refresh(svg_reload=True)
-
     def hide_twt_box(self):
         for elem in (self.face.update_border,
                     self.face.update_txt,
@@ -166,23 +111,7 @@ class Twt:
         self.face.update_counter.svg.text = str(len(text))
         self.face.update_counter.refresh(svg_reload=True)
 
-    def load(self):
-        self.index = self.MAX_TWT_NUM 
-
-        # Clone elements
-        for i in range(self.MAX_TWT_NUM):
-            self.face.clone('twt0','twt'+str(i+1),
-                            new_x = self.base_x,
-                            new_y = self.base_y+\
-                                ((i+1)*(self.base_h + self.GAP)))
-            self.face.clone('imgFrame0','imgFrame'+str(i+1),
-                            new_x = self.base_img_x,
-                            new_y = self.base_img_y+\
-                                ((i+1)*(self.base_h + self.GAP)))
-            new_twt = self.face.get('twt'+str(i+1))
-            new_twt.onGainFocus = self.on_gain_focus
-            new_twt.onLoseFocus = self.on_lose_focus
-
+    def prepare_twt_box(self):
         self.twtbox = TextBox(
                             border_elem = self.face.update_border,
                             txt_elem    = self.face.update_txt,
@@ -193,11 +122,15 @@ class Twt:
 
         self.face.postButton.onLeftClick = self.onTwitPost
         self.face.cancelButton.onLeftClick = self.onTwitCancel
+ 
+    def load(self):
+
+        self.prepare_twt_box()
+
         self.hide_twt_box()
 
 
-        self.reset_twt_roll()
-
+        # Setup top buttons and their borders
         self.button_borders = \
                 {
                     self.TWT_FRIENDS    : self.face.friendsBorder,
@@ -206,7 +139,6 @@ class Twt:
                     self.TWT_TWIT       : self.face.twitBorder
                 }
 
-        # Set visibility of button borders
         self.change_borders(self.TWT_FRIENDS)
 
         self.face.everyoneButton.onLeftClick = self.onEveryoneClicked
@@ -216,14 +148,66 @@ class Twt:
 
         self.face.waitIcon.unhide()
 
+
+
+        #self.face.twtbg.hide()
+        #self.face.twttxt.hide()
+        #self.face.twtimg.hide()
+
+        tboxlist = []
+
+        twt = self.get_friends_twt()
+
+        tbox = TwitBox(
+            self.face,
+            background_ename = 'twtbg',
+            text_ename       = 'twttxt',
+            image_ename      = 'twtimg')
+        
+        tbox.set_text(twt.text)
+
+        tboxlist.append(tbox)
+
+        lx,ly,lw,lh = tbox.get_bounding_box()
+
+        for i in range(5):
+
+            twt = self.get_friends_twt()
+
+            new_tbox = tbox.clone()
+
+            new_tbox.set_text(twt.text)
+
+            new_tbox.set_position((lx, ly+lh+2))
+
+            tboxlist.append(new_tbox)
+
+            lx,ly,lw,lh = new_tbox.get_bounding_box()
+
+            
+
+            #tbox = TwitBox(
+            #    background_elem = self.face.get('twtbg%d'%i),
+            #    text_elem       = self.face.get('twttxt%d'%i),
+            #    image_elem      = self.face.get('twtimg%d'%i))
+
+            tbox.set_text(twt.text)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         # Show the face on canvas
         self.canvas.add(self.face)
-
-        self.load_twts()
-       
-        self.face.nextButton.onLeftClick = self.rollToNext
-
-        self.face.nextButton.unhide()
 
         # waitIcon can disappear now
         self.face.waitIcon.hide()
@@ -242,25 +226,6 @@ class Twt:
             else:
                 border.hide()
  
-    def drawTwt(self, elem):
-        if self.moveflag:
-            elem_x, elem_y = elem.get_position()
-            elem_y -= self.moveStep/self.FRAMERATE
-            elem.set_position((elem_x, elem_y))
-            self.twtAnimCounter += 1
-
-            if self.twtAnimCounter >= 2*self.MAX_TWT_NUM:
-                self.twtAnimCounter = 0
-                self.moveAmount -= int(self.moveStep/self.FRAMERATE)
-                if self.moveAmount < int(self.moveStep/self.FRAMERATE):
-                    self.moveflag = False
-
-    def processOffline(self, elem):
-        if self.moveflag:
-            elem_x, elem_y = elem.get_position()
-            elem_y -= self.moveStep/self.FRAMERATE
-            elem.set_position((elem_x,elem_y))
-
     def load_image(self,twt):
         import urllib
         imgurl = twt.GetUser().profile_image_url
@@ -290,7 +255,6 @@ class Twt:
         self.load_twts(twt_type=self.TWT_PUBLIC)
 
         self.face.waitIcon.hide()
-        self.face.nextButton.unhide()
 
         self.current_twt_type = self.TWT_PUBLIC
 
@@ -306,7 +270,6 @@ class Twt:
         self.load_twts(twt_type=self.TWT_REPLIES)
 
         self.face.waitIcon.hide()
-        self.face.nextButton.unhide()
 
         self.current_twt_type = self.TWT_REPLIES
 
@@ -321,7 +284,6 @@ class Twt:
         self.load_twts(twt_type=self.TWT_FRIENDS)
 
         self.face.waitIcon.hide()
-        self.face.nextButton.unhide()
 
         self.current_twt_type = self.TWT_FRIENDS
 
@@ -342,61 +304,5 @@ class Twt:
 
     def onTwitCancel(self,elem):
         self.hide_twt_box()
-
-    def rollToNext(self, elem):
-
-        self.face.waitIcon.unhide()
-
-        # incoming twit (invisible to visible)
-        incoming,incoming_img = self.roll[self.index]
-        incoming.onDraw = self.drawTwt
-        incoming_img.onDraw = self.drawTwt
-        incoming.unhide()
-        incoming_img.unhide()
-
-        incoming_x, incoming_y = incoming.get_position()
-        incoming_y = self.base_y + self.MAX_TWT_NUM*self.moveStep
-        incoming.set_position((incoming_x, incoming_y))
-
-        incoming_img_x, incoming_img_y = incoming_img.get_position()
-        incoming_img_y = self.base_img_y + self.MAX_TWT_NUM*self.moveStep
-        incoming_img.set_position((incoming_img_x,incoming_img_y))
-
-        while True:
-            try:
-                twt = self.get_twt()
-                img = self.load_image(twt)
-                if img == None: continue
-                break
-            except:
-                continue
-
-        self.set_twt_txt(incoming, twt.text)
-
-        iw = img.get_width()
-        ih = img.get_height()
-        incoming_img.refresh(svg_reload=False)
-        incoming_img.sprite.image.blit(img,
-            ((self.base_img_w - iw)/2,(self.base_img_h - ih)/2))
-
-        # Increment Index
-        self.index = (self.index + 1)%(self.MAX_TWT_NUM + 1)
-
-        # outgoing twit (visible to invisible)
-        self.roll[self.index][0].hide()
-        self.roll[self.index][1].hide()
-        self.roll[self.index][0].onDraw = self.processOffline
-        self.roll[self.index][1].onDraw = self.processOffline
-
-        self.moveAmount = self.moveStep
-        self.moveflag = True
-        self.twtAnimCounter = 0
-        self.face.waitIcon.hide()
-
-
-
- 
-
-
 
 

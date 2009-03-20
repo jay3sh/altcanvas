@@ -218,6 +218,16 @@
        x2="100"
        y2="12"
        gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4186"
+       id="linearGradient4510"
+       gradientUnits="userSpaceOnUse"
+       x1="370"
+       y1="90"
+       x2="370"
+       y2="30"
+       gradientTransform="translate(-10,32)" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -307,30 +317,27 @@
        rx="8.6564331"
        ry="8.709631"
        inkscape:label="everyoneBorder" />
-    <g
-       id="g4130"
-       inkscape:label="twt0"
-       transform="translate(-10,32)">
-      <rect
-         ry="10"
-         rx="10"
-         y="30"
+    <rect
+       style="fill:url(#linearGradient4510);fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4012"
+       width="430"
+       height="40"
+       x="10"
+       y="62"
+       rx="10"
+       ry="10"
+       inkscape:label="twtbg" />
+    <text
+       xml:space="preserve"
+       style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="20"
+       y="89.396027"
+       id="text4026"
+       inkscape:label="twttxt"><tspan
+         sodipodi:role="line"
+         id="tspan4028"
          x="20"
-         height="40"
-         width="430"
-         id="rect4012"
-         style="opacity:1;fill:url(#linearGradient4192);fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-      <text
-         id="text4026"
-         y="57.396023"
-         x="30"
-         style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
-         xml:space="preserve"><tspan
-           y="57.396023"
-           x="30"
-           id="tspan4028"
-           sodipodi:role="line">twt</tspan></text>
-    </g>
+         y="89.396027">twt</tspan></text>
     <rect
        style="opacity:1;fill:#ffeded;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect4030"
@@ -340,7 +347,7 @@
        y="52"
        rx="10"
        ry="10"
-       inkscape:label="imgFrame0" />
+       inkscape:label="twtimg" />
     <path
        style="fill:url(#linearGradient4222);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="M 64.53995,587.53683 C 64.53995,587.53683 64.53995,587.53683 57.26997,594.30587 C 52.0975,599.12195 48.77746,600.50479 47.28512,600.90569 L 50,530 L 42.73002,540.15356 L 39.09504,540.15356 L 31.82506,530 C 42.73002,587.53683 35.46005,601.07491 35.46005,601.07491 C 35.46005,601.07491 31.82506,601.07491 24.55509,594.30587 C 17.28512,587.53683 17.28512,587.53683 17.28512,587.53683 C 17.28512,587.53683 20.9201,614.61299 35.46005,624.76655 C 35.46005,624.76655 39.09504,617.99751 46.36501,624.76655 C 60.90496,614.61299 64.53995,587.53683 64.53995,587.53683 z"
