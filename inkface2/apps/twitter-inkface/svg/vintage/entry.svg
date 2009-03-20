@@ -372,5 +372,16 @@
          id="tspan3918"
          x="347.19687"
          y="347.66516">authenticating...</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Chancery L;-inkscape-font-specification:URW Chancery L Bold Italic"
+       x="308.57224"
+       y="349.25262"
+       id="text4503"
+       inkscape:label="authfailIcon"><tspan
+         sodipodi:role="line"
+         id="tspan4505"
+         x="308.57224"
+         y="349.25262">Authentication failed</tspan></text>
   </g>
 </svg>

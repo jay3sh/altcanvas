@@ -10,6 +10,8 @@ from twtinklib.textbox import TextBox
 from twtinklib.twt import Twt
 from twtinklib.utils import encrypt,decrypt
 
+from urllib2 import HTTPError
+
 TWITINK_RC      = os.environ['HOME']+os.sep+'.twitinkrc'
 PREFIX      = '..'
 SVG_DIR     = os.path.join(PREFIX,'svg')
@@ -29,6 +31,7 @@ class App:
                             framerate = self.FRAMERATE)
 
             self.entry.waitIcon.hide()
+            self.entry.authfailIcon.hide()
 
             self.uname = TextBox(
                     border_elem = self.entry.uname_border,
@@ -89,11 +92,14 @@ class App:
         username = self.uname.get_text()
         password = self.passwd.get_text()
 
-        self.twits = PygameFace(
-            os.path.join(SVG_DIR, self.theme, 'twits.svg'))
-
-        self.entry.waitIcon.unhide()
-        twt = Twt(username, password, self.twits, self.canvas)
+        try:
+            self.entry.authfailIcon.hide()
+            self.entry.waitIcon.unhide()
+            twt = Twt(username, password, self.theme, self.canvas)
+        except HTTPError, hter:
+            self.entry.waitIcon.hide()
+            self.entry.authfailIcon.unhide()
+            return
 
         # Login was successful, let's save credentials.
         self.save_config(username, password)

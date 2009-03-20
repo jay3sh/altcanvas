@@ -202,7 +202,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.1520833"
-     inkscape:cx="183.47455"
+     inkscape:cx="170.45466"
      inkscape:cy="240"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -351,7 +351,7 @@
     <g
        id="g4230"
        inkscape:label="waitIcon"
-       transform="translate(77.26041,113.93308)">
+       transform="translate(45,113.93308)">
       <rect
          ry="10"
          rx="10"
@@ -371,6 +371,30 @@
            x="296.31253"
            id="tspan4228"
            sodipodi:role="line">authenticating</tspan></text>
+    </g>
+    <g
+       id="g3920"
+       inkscape:label="authfailIcon"
+       transform="translate(15.922241,112.76853)">
+      <rect
+         ry="10"
+         rx="10"
+         y="210"
+         x="250"
+         height="50.867992"
+         width="268.15552"
+         id="rect3922"
+         style="opacity:1;fill:#c06ff3;fill-opacity:0.2633588;stroke:#000000;stroke-width:1.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         id="text3924"
+         y="241.77278"
+         x="288.21545"
+         style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="241.77278"
+           x="288.21545"
+           id="tspan3926"
+           sodipodi:role="line">Authentication failed.</tspan></text>
     </g>
   </g>
 </svg>

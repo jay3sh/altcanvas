@@ -1,14 +1,21 @@
 
+import os
 import pygame
 from twtinklib import twitter
 from twtinklib.textbox import TextBox
+from inkface.canvas.pygamecanvas import PygameFace, PygameCanvas
+
+PREFIX      = '..'
+SVG_DIR     = os.path.join(PREFIX,'svg')
 
 class Twt:
     (TWT_FRIENDS, TWT_PUBLIC, TWT_REPLIES, TWT_TWIT) = range(4)
-    def __init__(self, username, password, face, canvas):
-        self.face = face
+    def __init__(self, username, password, theme, canvas):
         self.canvas = canvas
         self.twtApi = twitter.Api(username, password)
+
+        self.face = PygameFace(
+            os.path.join(SVG_DIR, theme, 'twits.svg'))
 
         self.friends_page_num = 1
         self.replies_page_num = 1
