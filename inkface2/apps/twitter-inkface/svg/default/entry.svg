@@ -209,8 +209,8 @@
      showgrid="false"
      inkscape:window-width="1280"
      inkscape:window-height="778"
-     inkscape:window-x="-5"
-     inkscape:window-y="-3">
+     inkscape:window-x="0"
+     inkscape:window-y="51">
     <inkscape:grid
        type="xygrid"
        id="grid3457" />
@@ -348,5 +348,29 @@
        d="M 69.713173,17.254004 C 69.713173,17.254004 69.713173,17.254004 62.08374,24.764664 C 56.65551,30.108388 55.096895,33.538344 54.645041,35.080088 L 134.56337,32.275323 L 123.11921,39.78599 L 123.11921,43.541316 L 134.56337,51.051981 C 69.713173,39.78599 54.454308,47.296649 54.454308,47.296649 C 54.454308,47.296649 54.454308,51.051981 62.08374,58.56264 C 69.713173,66.0733 69.713173,66.0733 69.713173,66.0733 C 69.713173,66.0733 39.195437,62.317974 27.751291,47.296649 C 27.751291,47.296649 35.380723,43.541316 27.751291,36.030656 C 39.195437,21.00933 69.713173,17.254004 69.713173,17.254004 z"
        id="path4345"
        inkscape:label="exitButton" />
+    <g
+       id="g4230"
+       inkscape:label="waitIcon"
+       transform="translate(77.26041,113.93308)">
+      <rect
+         ry="10"
+         rx="10"
+         y="210"
+         x="250"
+         height="50"
+         width="210"
+         id="rect4224"
+         style="opacity:1;fill:#8f00e9;fill-opacity:0.56370658;stroke:#000000;stroke-width:1.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         id="text4226"
+         y="239.16881"
+         x="296.31253"
+         style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="239.16881"
+           x="296.31253"
+           id="tspan4228"
+           sodipodi:role="line">authenticating</tspan></text>
+    </g>
   </g>
 </svg>

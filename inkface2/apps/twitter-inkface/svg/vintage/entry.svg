@@ -237,8 +237,8 @@
      showgrid="false"
      inkscape:window-width="1280"
      inkscape:window-height="778"
-     inkscape:window-x="0"
-     inkscape:window-y="25">
+     inkscape:window-x="6"
+     inkscape:window-y="74">
     <inkscape:grid
        type="xygrid"
        id="grid3457" />
@@ -361,5 +361,16 @@
          id="tspan5207"
          x="355.00906"
          y="124.12296">Twitter</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Chancery L;-inkscape-font-specification:URW Chancery L Bold Italic"
+       x="347.19687"
+       y="347.66516"
+       id="text3916"
+       inkscape:label="waitIcon"><tspan
+         sodipodi:role="line"
+         id="tspan3918"
+         x="347.19687"
+         y="347.66516">authenticating...</tspan></text>
   </g>
 </svg>

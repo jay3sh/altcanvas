@@ -5,7 +5,7 @@ import sys
 import pickle
 import getopt
 
-from inkface.canvas import PygameFace, PygameCanvas
+from inkface.canvas.pygamecanvas import PygameFace, PygameCanvas
 from twtinklib.textbox import TextBox
 from twtinklib.twt import Twt
 from twtinklib.utils import encrypt,decrypt
@@ -18,12 +18,17 @@ class App:
     FRAMERATE = 25
     def main(self, theme='default'):
         try:
-            self.canvas = PygameCanvas(
-                (800,480),framerate = self.FRAMERATE)
 
             self.theme = theme
             self.entry = PygameFace(
                 os.path.join(SVG_DIR,self.theme,'entry.svg'))
+
+            self.canvas = PygameCanvas(
+                            (int(float(self.entry.svg.width)),
+                            int(float(self.entry.svg.height))),
+                            framerate = self.FRAMERATE)
+
+            self.entry.waitIcon.hide()
 
             self.uname = TextBox(
                     border_elem = self.entry.uname_border,
@@ -87,10 +92,13 @@ class App:
         self.twits = PygameFace(
             os.path.join(SVG_DIR, self.theme, 'twits.svg'))
 
+        self.entry.waitIcon.unhide()
         twt = Twt(username, password, self.twits, self.canvas)
 
         # Login was successful, let's save credentials.
         self.save_config(username, password)
+
+        self.entry.waitIcon.hide()
 
         self.canvas.remove(self.entry)
 
