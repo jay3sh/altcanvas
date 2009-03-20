@@ -166,11 +166,11 @@ class Twt:
         
         tbox.set_text(twt.text)
 
-        tboxlist.append(tbox)
+        #tboxlist.append(tbox)
 
         lx,ly,lw,lh = tbox.get_bounding_box()
 
-        for i in range(5):
+        for i in range(3):
 
             twt = self.get_friends_twt()
 
@@ -180,7 +180,7 @@ class Twt:
 
             new_tbox.set_position((lx, ly+lh+2))
 
-            tboxlist.append(new_tbox)
+            #tboxlist.append(new_tbox)
 
             lx,ly,lw,lh = new_tbox.get_bounding_box()
 
