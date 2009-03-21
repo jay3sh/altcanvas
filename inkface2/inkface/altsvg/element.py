@@ -53,82 +53,75 @@ class Element:
                 raise Exception('node member is not set')
 
             if key == 'text':
-                if value.find('\n') >= 0:
-                    import xml.etree.ElementTree
-                    # Be more forgiving, as in the case of single line text
-                    # If current node is not text node, see if any sub-node
-                    # is a text node.
-                    if node.tag == TAG_TEXT:
-                        text_node = node
-                    else:
-                        text_node = node.find('.//'+TAG_TEXT)
-
-                    # A temp scratch surface to calculate height of a line
-                    tmp_surface = cairo.ImageSurface(
-                        cairo.FORMAT_ARGB32,1,1)
-                    tmp_ctx = cairo.Context(tmp_surface)
-
-                    tchildren = text_node.getchildren()
-
-                    # Save position of first tspan element to use later
-                    old_x, old_y = \
-                            (float(tchildren[0].get('x')),
-                            float(tchildren[0].get('y')))
-
-                    # Keep copy of first tspan element, used in regenerating it
-                    tchild_attribs = tchildren[0].attrib.copy()
-
-                    # Keep copy of text node element, used in regenerating it
-                    text_node_attribs = text_node.attrib.copy()
-
-                    # Clear the text_node element to get rid of children tspans
-                    text_node.clear()
-
-                    # Insert saved attributes into text_node, which also got 
-                    # cleared above
-                    for key,val in text_node_attribs.items():
-                        text_node.set(key,val)
-
-                    # Create a temporary tspan element to calculate height 
-                    # of single line
-                    tmp_tspan = xml.etree.ElementTree.Element(
-                                        TAG_TSPAN, tchild_attribs)
-                    tmp_tspan.text = 'text'
-
-                    text_node.insert(0,tmp_tspan)
-
-                    ex1,ey1,ex2,ey2 = self.raw_render(
-                        tmp_ctx, text_node, simulate=True)
-                    height = ey2 - ey1
-                    # TODO: hardcode a gap betwn lines which is 30% of height
-                    height += 0.30 * height
-                    
-                    # Again clear the text_node to remove the temp tspan
-                    text_node.clear()
-                    # Again insert its saved attributes
-                    for key,val in text_node_attribs.items():
-                        text_node.set(key,val)
-
-                    # Now create tspan elements for each line of new text
-                    txt_lines = value.split('\n')
-                    i = 0
-                    for txt_line in txt_lines:
-                        # Calculate position of each tspan element using
-                        # old_{x,y} and height calculated above
-                        attr_dict = {'x':str(old_x),
-                                    'y':str(old_y+i*height)}
-                        tspan_elem = xml.etree.ElementTree.Element(
-                                        TAG_TSPAN, attr_dict)
-                        tspan_elem.text = txt_line
-                        text_node.insert(0,tspan_elem)
-                        i += 1
-
+                import xml.etree.ElementTree
+                # Be more forgiving, as in the case of single line text
+                # If current node is not text node, see if any sub-node
+                # is a text node.
+                if node.tag == TAG_TEXT:
+                    text_node = node
                 else:
-                    tspan = node.find('.//'+TAG_TSPAN)
-                    if tspan != None:
-                        tspan.text = value
-                    else:
-                        raise Exception('No text element found')
+                    text_node = node.find('.//'+TAG_TEXT)
+
+                # A temp scratch surface to calculate height of a line
+                tmp_surface = cairo.ImageSurface(
+                    cairo.FORMAT_ARGB32,1,1)
+                tmp_ctx = cairo.Context(tmp_surface)
+
+                tchildren = text_node.getchildren()
+
+                # Save position of first tspan element to use later
+                old_x, old_y = \
+                        (float(tchildren[0].get('x')),
+                        float(tchildren[0].get('y')))
+
+                # Keep copy of first tspan element, used in regenerating it
+                tchild_attribs = tchildren[0].attrib.copy()
+
+                # Keep copy of text node element, used in regenerating it
+                text_node_attribs = text_node.attrib.copy()
+
+                # Clear the text_node element to get rid of children tspans
+                text_node.clear()
+
+                # Insert saved attributes into text_node, which also got 
+                # cleared above
+                for key,val in text_node_attribs.items():
+                    text_node.set(key,val)
+
+                # Create a temporary tspan element to calculate height 
+                # of single line
+                tmp_tspan = xml.etree.ElementTree.Element(
+                                    TAG_TSPAN, tchild_attribs)
+                tmp_tspan.text = 'text'
+
+                text_node.insert(0,tmp_tspan)
+
+                ex1,ey1,ex2,ey2 = self.raw_render(
+                    tmp_ctx, text_node, simulate=True)
+                height = ey2 - ey1
+                # TODO: hardcode a gap betwn lines which is 30% of height
+                height += 0.30 * height
+                
+                # Again clear the text_node to remove the temp tspan
+                text_node.clear()
+                # Again insert its saved attributes
+                for key,val in text_node_attribs.items():
+                    text_node.set(key,val)
+
+                # Now create tspan elements for each line of new text
+                txt_lines = value.split('\n')
+                i = 0
+                for txt_line in txt_lines:
+                    # Calculate position of each tspan element using
+                    # old_{x,y} and height calculated above
+                    attr_dict = {'x':str(old_x),
+                                'y':str(old_y+i*height)}
+                    tspan_elem = xml.etree.ElementTree.Element(
+                                    TAG_TSPAN, attr_dict)
+                    tspan_elem.text = txt_line
+                    text_node.insert(0,tspan_elem)
+                    i += 1
+
             elif key == 'label':
                 node.set(TAG_INKSCAPE_LABEL,value)
             
