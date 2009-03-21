@@ -20,9 +20,9 @@ class TwitBox:
         self.image_elem = self.face.get(self.image_ename)
 
         # Calculate relative distances that can be used further
-        self.txt_x_margin = self.text_elem.svg.x
+        self.txt_x_margin = self.text_elem.svg.x - self.background_elem.svg.x
         self.txt_y_margin = self.text_elem.svg.y - self.background_elem.svg.y
-        self.img_x_margin = self.image_elem.svg.x
+        self.img_x_margin = self.image_elem.svg.x - self.background_elem.svg.x
         self.img_y_margin = self.image_elem.svg.y - self.background_elem.svg.y
         self.clone_counter = 0
 
@@ -87,7 +87,13 @@ class TwitBox:
 
 
     def set_image(self, img):
-        pass
+        if img is None: return
+        img.set_alpha(127)
+        iw, ih = img.get_size()
+        self.image_elem.refresh(svg_reload=False)
+        self.image_elem.sprite.image.blit(img,
+            ((self.image_elem.svg.w - iw)/2,
+            (self.image_elem.svg.h - ih)/2))
 
     def _length_check(self, line, word):
         self.text_elem.svg.text = line+' '+word

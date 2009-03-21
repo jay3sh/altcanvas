@@ -92,7 +92,7 @@
     <linearGradient
        id="linearGradient4186">
       <stop
-         style="stop-color:#ff0000;stop-opacity:1;"
+         style="stop-color:#ff3a3a;stop-opacity:1;"
          offset="0"
          id="stop4188" />
       <stop
@@ -240,7 +240,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.1520833"
-     inkscape:cx="213.40689"
+     inkscape:cx="44.148296"
      inkscape:cy="342.40264"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -318,10 +318,10 @@
        ry="8.709631"
        inkscape:label="everyoneBorder" />
     <rect
-       style="fill:url(#linearGradient4510);fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:url(#linearGradient4510);fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect4012"
-       width="430"
-       height="40"
+       width="460"
+       height="38"
        x="10"
        y="62"
        rx="10"
@@ -329,22 +329,22 @@
        inkscape:label="twtbg" />
     <text
        xml:space="preserve"
-       style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
-       x="20"
-       y="89.396027"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="16"
+       y="83.396027"
        id="text4026"
        inkscape:label="twttxt"><tspan
          sodipodi:role="line"
          id="tspan4028"
-         x="20"
-         y="89.396027">twt</tspan></text>
+         x="16"
+         y="83.396027">twt</tspan></text>
     <rect
-       style="opacity:1;fill:#ffeded;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="opacity:1;fill:#ffeded;fill-opacity:0.49803922;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect4030"
        width="50"
        height="50"
        x="430"
-       y="52"
+       y="52.603977"
        rx="10"
        ry="10"
        inkscape:label="twtimg" />
