@@ -23,7 +23,9 @@ printf "Enter twitter credentials:\n"
 printf "Username: "
 read TWT_UNAME
 printf "Password: "
+stty -echo
 read TWT_PASSWD
+stty echo
 export TWT_USERNAME=$TWT_UNAME
 export TWT_PASSWORD=$TWT_PASSWD
 
