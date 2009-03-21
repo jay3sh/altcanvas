@@ -91,6 +91,14 @@ class PygameFace(Face):
             Face._append(self, svge, pcElement)
 
     def clone(self, curNodeName, newNodeName, new_x=-1, new_y=-1):
+        '''
+        Clones an existing element of the face to create a duplicate one.
+
+        :param curNodeName: name of existing element to be cloned
+        :param newNodeName: name the new element should have
+        :param new_x: [optional] x coord of new element
+        :param new_y: [optional] y coord of new element
+        '''
         Face.clone(self, curNodeName, newNodeName, new_x, new_y)
 
         if self.parent_canvas is not None:
