@@ -151,6 +151,8 @@ class Twt:
         self.face.waitIcon.unhide()
 
 
+        # Show the face on canvas
+        self.canvas.add(self.face)
 
         tboxlist = []
 
@@ -181,6 +183,8 @@ class Twt:
 
             lx,ly,lw,lh = new_tbox.get_bounding_box()
 
+            self.canvas.add(self.face)
+
             
 
 
@@ -198,8 +202,6 @@ class Twt:
 
 
 
-        # Show the face on canvas
-        self.canvas.add(self.face)
 
         # waitIcon can disappear now
         self.face.waitIcon.hide()

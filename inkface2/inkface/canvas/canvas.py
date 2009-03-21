@@ -10,7 +10,11 @@ module:: inkface.canvas.canvas -- Generic Canvas Backend
 from inkface.altsvg.element import Element
 
 class Face:
-
+    '''
+    .. attribute: svg
+       A reference to the SVG doc (inkface.altsvg.VectorDoc) from which this \
+       face is loaded
+    '''
     def __init__(self,svgname,autoload=True):
         from inkface.altsvg import VectorDoc
         self.svg = VectorDoc(svgname)
@@ -183,7 +187,8 @@ class Canvas:
 
     def add(self, face):
         for elem in face.elements:  
-            self.elementQ.append(elem)
+            if elem not in self.elementQ:
+                self.elementQ.append(elem)
         self.recalculate_clouds()
 
     def remove(self, face):
