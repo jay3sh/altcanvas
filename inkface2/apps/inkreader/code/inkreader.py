@@ -4,9 +4,9 @@
 import os
 import pygame
 import sys
-from inkface.canvas import PygameFace, PygameCanvas
+from inkface.canvas.pygamecanvas import PygameFace, PygameCanvas
 
-SVG_FILE='/home/jayesh/altcanvas/inkface-pygame/apps/inkreader/svg/inkreader-maemo.svg'
+SVG_FILE='/home/jayesh/altcanvas/inkface2/apps/inkreader/svg/inkreader-maemo.svg'
 
 class App:
     def get_word(self, fd):
@@ -56,7 +56,7 @@ class App:
            
     def length_check(self, line, word):
         self.line_elem.svg.text = line+' '+word
-        self.line_elem.refresh(svg_reload=True)
+        self.line_elem.refresh(svg_reload=True, sprite_reload=False)
         return (self.line_elem.svg.w < \
             (self.pad_elem.svg.w - 2*self.margin))
         
