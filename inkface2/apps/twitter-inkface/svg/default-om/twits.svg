@@ -20,6 +20,18 @@
   <defs
      id="defs4">
     <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3477">
+      <stop
+         style="stop-color:#b3b3b3;stop-opacity:1;"
+         offset="0"
+         id="stop3479" />
+      <stop
+         style="stop-color:#b3b3b3;stop-opacity:0;"
+         offset="1"
+         id="stop3481" />
+    </linearGradient>
+    <linearGradient
        id="linearGradient4327">
       <stop
          style="stop-color:#00ffff;stop-opacity:1;"
@@ -224,10 +236,20 @@
        id="linearGradient4510"
        gradientUnits="userSpaceOnUse"
        x1="370"
-       y1="90"
+       y1="168"
        x2="370"
        y2="30"
-       gradientTransform="translate(-10,32)" />
+       gradientTransform="matrix(1.0245302,0,0,1,-15.698562,32)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3477"
+       id="linearGradient3483"
+       x1="480"
+       y1="80"
+       x2="430"
+       y2="80"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(-11.320072,4.7920444)" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -248,7 +270,8 @@
      inkscape:window-width="1920"
      inkscape:window-height="1001"
      inkscape:window-x="0"
-     inkscape:window-y="28">
+     inkscape:window-y="28"
+     inkscape:snap-global="false">
     <inkscape:grid
        type="xygrid"
        id="grid4022"
@@ -320,31 +343,31 @@
     <rect
        style="fill:url(#linearGradient4510);fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect4012"
-       width="460"
+       width="471.28391"
        height="38"
-       x="10"
+       x="4.7920432"
        y="62"
-       rx="10"
+       rx="10.245302"
        ry="10"
        inkscape:label="twtbg" />
     <text
        xml:space="preserve"
        style="font-size:16px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
-       x="16"
-       y="83.396027"
+       x="10.792046"
+       y="82.52803"
        id="text4026"
        inkscape:label="twttxt"><tspan
          sodipodi:role="line"
          id="tspan4028"
-         x="16"
-         y="83.396027">twt</tspan></text>
+         x="10.792046"
+         y="82.52803">twt</tspan></text>
     <rect
-       style="opacity:1;fill:#ffeded;fill-opacity:0.49803922;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="opacity:1;fill:url(#linearGradient3483);fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect4030"
        width="50"
        height="50"
-       x="430"
-       y="52.603977"
+       x="418.67993"
+       y="57.396023"
        rx="10"
        ry="10"
        inkscape:label="twtimg" />
@@ -572,6 +595,25 @@
            x="221.14844"
            id="tspan4398"
            sodipodi:role="line">cancel</tspan></text>
+    </g>
+    <g
+       id="g3215"
+       transform="matrix(0.5,0,0,0.5,355,535)"
+       style="opacity:0.85"
+       inkscape:label="closeButton">
+      <path
+         d="M 230,150 A 30,30 0 1 1 170,150 A 30,30 0 1 1 230,150 z"
+         sodipodi:ry="30"
+         sodipodi:rx="30"
+         sodipodi:cy="150"
+         sodipodi:cx="200"
+         id="path3213"
+         style="fill:#000000;fill-opacity:0.85114501;stroke:#000000;stroke-opacity:1"
+         sodipodi:type="arc" />
+      <path
+         id="path3183"
+         d="M 180,140 L 190,150 L 180,160 L 190,170 L 200,160 L 210,170 L 220,160 L 210,150 L 220,140 L 210,130 L 200,140 L 190,130 L 180,140 z"
+         style="fill:#ffffff;fill-opacity:0.85114501;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     </g>
   </g>
 </svg>

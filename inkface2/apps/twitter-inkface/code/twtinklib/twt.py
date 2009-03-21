@@ -1,6 +1,7 @@
 
 import os
 import pygame
+import sys
 from twtinklib import twitter
 from twtinklib.textbox import TextBox
 from twtinklib.twitbox import TwitBox
@@ -131,6 +132,7 @@ class Twt:
 
         self.hide_twt_box()
 
+        self.face.closeButton.onLeftClick = self.exit
 
         # Setup top buttons and their borders
         self.button_borders = \
@@ -169,38 +171,17 @@ class Twt:
 
         lx,ly,lw,lh = tbox.get_bounding_box()
 
-        for i in range(5):
+        for i in range(8):
 
             twt = self.get_friends_twt()
 
-            new_tbox = tbox.clone()
+            new_tbox = tbox.clone((lx, ly+lh+4))
 
             new_tbox.set_text(twt.text)
 
             new_tbox.set_image(self.load_image(twt))
 
-            new_tbox.set_position((lx, ly+lh+2))
-
             lx,ly,lw,lh = new_tbox.get_bounding_box()
-
-            self.canvas.add(self.face)
-
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         # waitIcon can disappear now
@@ -303,3 +284,6 @@ class Twt:
         self.hide_twt_box()
 
 
+    def exit(self, elem):
+        self.canvas.stop()
+        sys.exit(0)
