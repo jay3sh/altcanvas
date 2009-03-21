@@ -9,6 +9,8 @@ from inkface.canvas.pygamecanvas import PygameFace, PygameCanvas
 PREFIX      = '..'
 SVG_DIR     = os.path.join(PREFIX,'svg')
 
+IMAGE_CACHE_DIR = os.path.join(os.path.sep+'tmp','.twitinkimg')
+
 class Twt:
     (TWT_FRIENDS, TWT_PUBLIC, TWT_REPLIES, TWT_TWIT) = range(4)
     def __init__(self, username, password, theme, canvas):
@@ -218,16 +220,20 @@ class Twt:
  
     def load_image(self,twt):
         import urllib
+        if not os.path.exists(IMAGE_CACHE_DIR):
+            os.makedirs(IMAGE_CACHE_DIR)
         imgurl = twt.GetUser().profile_image_url
-        localfile = '/tmp/'+imgurl.split('/')[-1]
-        try:
-            urllib.urlretrieve(imgurl,localfile)
-        except UnicodeError, ue:
-            print 'Error fetching img URL'+str(ue)
-            return None 
-        except IOError, ioe:
-            print 'IOError fetching img: '+str(ioe)
-            return None
+        localfile = os.path.join(IMAGE_CACHE_DIR,imgurl.split('/')[-1])
+
+        if not os.path.exists(localfile):
+            try:
+                urllib.urlretrieve(imgurl,localfile)
+            except UnicodeError, ue:
+                print 'Error fetching img URL'+str(ue)
+                return None 
+            except IOError, ioe:
+                print 'IOError fetching img: '+str(ioe)
+                return None
  
         image = pygame.image.load(localfile)
         return image
