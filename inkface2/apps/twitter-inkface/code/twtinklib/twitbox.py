@@ -56,19 +56,25 @@ class TwitBox:
         self.image_elem.set_position(
             (x+self.img_x_margin, y+self.img_y_margin))
         
-    def clone(self):
+    def clone(self, (new_x,new_y)=(-1,-1)):
         assert self.face is not None
 
         self.clone_counter += 1
 
         self.face.clone(self.background_ename,
-                        self.background_ename+str(self.clone_counter))
+                        self.background_ename+str(self.clone_counter),
+                        new_x,
+                        new_y)
 
         self.face.clone(self.text_ename,
-                        self.text_ename+str(self.clone_counter))
+                        self.text_ename+str(self.clone_counter),
+                        new_x+self.txt_x_margin,
+                        new_y+self.txt_y_margin)
 
         self.face.clone(self.image_ename,
-                        self.image_ename+str(self.clone_counter))
+                        self.image_ename+str(self.clone_counter),
+                        new_x+self.img_x_margin,
+                        new_y+self.img_y_margin)
 
 
         new_twtbox = TwitBox(self.face, 
@@ -86,9 +92,16 @@ class TwitBox:
         return new_twtbox
 
 
+    def hide(self):
+        for elem in (self.background_elem, self.text_elem, self.image_elem):
+            elem.hide()
+
+    def unhide(self):
+        for elem in (self.background_elem, self.text_elem, self.image_elem):
+            elem.unhide()
     def set_image(self, img):
         if img is None: return
-        img.set_alpha(127)
+        img.set_alpha(180)
         iw, ih = img.get_size()
         self.image_elem.refresh(svg_reload=False)
         self.image_elem.sprite.image.blit(img,
