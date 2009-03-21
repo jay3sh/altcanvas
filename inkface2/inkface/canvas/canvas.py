@@ -23,6 +23,8 @@ class Face:
         self.elements = []
         self._elements_dict = {}
 
+        self.parent_canvas = None
+
     def _append(self, svge, element):
         try:
             self._elements_dict[svge.label] = element
@@ -187,8 +189,16 @@ class Canvas:
 
     def add(self, face):
         for elem in face.elements:  
-            if elem not in self.elementQ:
-                self.elementQ.append(elem)
+            self.elementQ.append(elem)
+        self.recalculate_clouds()
+
+    def insert_after(self, existing_elem, new_elem):
+        i = 0
+        for elem in self.elementQ:
+            if elem is existing_elem:
+                self.elementQ.insert(i+1, new_elem)
+                break
+            i += 1
         self.recalculate_clouds()
 
     def remove(self, face):

@@ -5,6 +5,7 @@ module:: inkface.canvas.pygamecanvas -- Pygame Canvas Backend
 
 :synopsis: This module contains Class definitions used for Pygame Canvas Backend
 '''
+import os
 import pygame
 
 from inkface.altsvg.element import Element
@@ -88,6 +89,13 @@ class PygameFace(Face):
         for svge in self.svgelements:
             pcElement = PygameCanvasElement(svge)
             Face._append(self, svge, pcElement)
+
+    def clone(self, curNodeName, newNodeName, new_x=-1, new_y=-1):
+        Face.clone(self, curNodeName, newNodeName, new_x, new_y)
+
+        if self.parent_canvas is not None:
+            self.parent_canvas.insert_after(
+                self.get(curNodeName), self.get(newNodeName))
 
 
 class PygameCanvasElement(CanvasElement):
@@ -257,6 +265,10 @@ class PygameCanvas(Canvas):
 
         resolution = map(lambda x: int(x), resolution)
 
+        # Check for fullscreen hint from environment
+        if os.environ.get('INKFACE_FULLSCREEN') is not None:
+            flags = flags | pygame.FULLSCREEN
+
         pygame.init()
         self.screen = pygame.display.set_mode(
                         resolution, pygame.DOUBLEBUF|flags)
@@ -328,6 +340,12 @@ class PygameCanvas(Canvas):
                     
         pygame.display.flip()
 
+    def insert_after(self, existing_elem, new_elem):
+        Canvas.insert_after(self, existing_elem, new_elem)
+        self.elem_group.empty()
+        for elem in self.elementQ:
+            self.elem_group.add(elem.sprite)
+
     def add(self,face):
         '''
         :param face: PygameFace instance to add to this canvas. \
@@ -335,6 +353,7 @@ class PygameCanvas(Canvas):
         current list of elements.
         '''
         Canvas.add(self, face)
+        face.parent_canvas = self
         for elem in self.elementQ:
             self.elem_group.add(elem.sprite)
 
