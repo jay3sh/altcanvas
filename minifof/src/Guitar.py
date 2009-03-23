@@ -25,7 +25,6 @@ from Song import Note, Tempo
 from Mesh import Mesh
 import Theme
 
-from OpenGL.GL import *
 import math
 import numpy
 
@@ -58,11 +57,6 @@ class Guitar:
 
     engine.resource.load(self,  "noteMesh", lambda: Mesh(engine.resource.fileName("note.dae")))
     engine.resource.load(self,  "keyMesh",  lambda: Mesh(engine.resource.fileName("key.dae")))
-    engine.loadSvgDrawing(self, "glowDrawing", "glow.png")
-    engine.loadSvgDrawing(self, "neckDrawing", "neck.png")
-    engine.loadSvgDrawing(self, "stringDrawing", "string.png")
-    engine.loadSvgDrawing(self, "barDrawing", "bar.png")
-    engine.loadSvgDrawing(self, "noteDrawing", "note.png")
 
   def selectPreviousString(self):
     self.selectedString = (self.selectedString - 1) % self.strings
@@ -487,6 +481,7 @@ class Guitar:
     glDisable(GL_DEPTH_TEST)
 
   def render(self, visibility, song, pos, controls):
+    return
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     glEnable(GL_COLOR_MATERIAL)

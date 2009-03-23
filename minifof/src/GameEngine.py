@@ -20,7 +20,6 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-from OpenGL.GL import *
 import pygame
 import os
 import sys
@@ -34,7 +33,6 @@ from Resource import Resource
 from Data import Data
 from Server import Server
 from Session import ClientSession
-from Svg import SvgContext, SvgDrawing, LOW_QUALITY, NORMAL_QUALITY, HIGH_QUALITY
 from Debug import DebugLayer
 from Language import _
 import Network
@@ -159,17 +157,9 @@ class GameEngine(Engine):
       Log.debug("Enabling high priority timer.")
       self.timer.highPriority = True
 
-    viewport = glGetIntegerv(GL_VIEWPORT)
-    h = viewport[3] - viewport[1]
-    w = viewport[2] - viewport[0]
-    geometry = (0, 0, w, h)
-    self.svg = SvgContext(geometry)
-    self.svg.setRenderingQuality(self.config.get("opengl", "svgquality"))
-    glViewport(int(viewport[0]), int(viewport[1]), int(viewport[2]), int(viewport[3]))
 
     self.input     = Input()
-    self.view      = View(self, geometry)
-    self.resizeScreen(w, h)
+    self.view      = View(self)
 
     self.resource  = Resource(Version.dataPath())
     self.server    = None
@@ -189,7 +179,7 @@ class GameEngine(Engine):
     self.addTask(self.input, synchronized = False)
     self.addTask(self.view)
     self.addTask(self.resource, synchronized = False)
-    self.data = Data(self.resource, self.svg)
+    self.data = Data(self.resource, None)
     
     self.input.addKeyListener(FullScreenSwitcher(self), priority = True)
     self.input.addSystemEventListener(SystemEventHandler(self))
@@ -256,8 +246,9 @@ class GameEngine(Engine):
     @param width:   New width in pixels
     @param height:  New height in pixels
     """
-    self.view.setGeometry((0, 0, width, height))
-    self.svg.setGeometry((0, 0, width, height))
+    #self.view.setGeometry((0, 0, width, height))
+    #self.svg.setGeometry((0, 0, width, height))
+    pass
     
   def isServerRunning(self):
     return bool(self.server)
@@ -317,12 +308,12 @@ class GameEngine(Engine):
   def loading(self):
     """Loading state loop."""
     done = Engine.run(self)
-    self.clearScreen()
+    #self.clearScreen()
     
-    if self.data.essentialResourcesLoaded():
+    if True:
       if not self.loadingScreenShown:
         self.loadingScreenShown = True
-        Dialogs.showLoadingScreen(self, self.data.resourcesLoaded)
+        #Dialogs.showLoadingScreen(self, self.data.resourcesLoaded)
         if self.startupLayer:
           self.view.pushLayer(self.startupLayer)
         self.mainloop = self.main
@@ -331,7 +322,8 @@ class GameEngine(Engine):
     return done
 
   def clearScreen(self):
-    self.svg.clear(*Theme.backgroundColor)
+    #self.svg.clear(*Theme.backgroundColor)
+    pass
 
   def main(self):
     """Main state loop."""
@@ -375,8 +367,6 @@ class GameEngine(Engine):
       import traceback
       traceback.print_exc()
 
-      clearMatrixStack(GL_PROJECTION)
-      clearMatrixStack(GL_MODELVIEW)
       
       Dialogs.showMessage(self, unicode(e))
       self.handlingException = False

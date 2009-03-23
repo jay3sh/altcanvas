@@ -23,8 +23,6 @@
 """A bunch of dialog functions for interacting with the user."""
 
 import pygame
-from OpenGL.GL import *
-from OpenGL.GLU import *
 import math
 import os
 import fnmatch
@@ -35,7 +33,6 @@ from Camera import Camera
 from Mesh import Mesh
 from Menu import Menu
 from Language import _
-from Texture import Texture
 import Theme
 import Log
 import Song
@@ -235,36 +232,7 @@ class LoadingScreen(Layer, KeyListener):
       self.ready = True
   
   def render(self, visibility, topMost):
-    self.engine.view.setOrthogonalProjection(normalize = True)
-    font = self.engine.data.font
-
-    if not font:
-      return
-
-    if visibility > 0.9:
-      self.engine.boostBackgroundThreads(True)
-    else:
-      self.engine.boostBackgroundThreads(False)
-    
-    try:
-      v = (1 - visibility) ** 2
-      fadeScreen(v)
-
-      w, h = self.engine.view.geometry[2:4]
-      self.engine.data.loadingImage.transform.reset()
-      self.engine.data.loadingImage.transform.translate(w / 2, (1.0 - v * .25) * h / 2)
-      self.engine.data.loadingImage.transform.scale(1, -1)
-      self.engine.data.loadingImage.draw(color = (1, 1, 1, visibility))
-
-      Theme.setBaseColor(1 - v)
-      w, h = font.getStringSize(self.text)
-      x = .5 - w / 2
-      y = .6 - h / 2 + v * .5
-      
-      font.render(self.text, (x, y))
-      
-    finally:
-      self.engine.view.resetProjection()
+    pass
 
 class MessageScreen(Layer, KeyListener):
   """Message screen layer."""
@@ -290,30 +258,8 @@ class MessageScreen(Layer, KeyListener):
     self.time += ticks / 50.0
   
   def render(self, visibility, topMost):
-    self.engine.view.setOrthogonalProjection(normalize = True)
-    font = self.engine.data.font
-
-    if not font:
-      return
-    
-    try:
-      v = (1 - visibility) ** 2
-      fadeScreen(v)
-
-      x = .1
-      y = .3 + v * 2
-      Theme.setBaseColor(1 - v)
-      pos = wrapText(font, (x, y), self.text, visibility = v)
-
-      w, h = font.getStringSize(self.prompt, scale = 0.001)
-      x = .5 - w / 2
-      y = pos[1] + 3 * h + v * 2
-      Theme.setSelectedColor(1 - v)
-      font.render(self.prompt, (x, y), scale = 0.001)
-      
-    finally:
-      self.engine.view.resetProjection()
-      
+    pass
+     
 class SongChooser(Layer, KeyListener):
   """Song choosing layer."""
   def __init__(self, engine, prompt = "", selectedSong = None, selectedLibrary = None):

@@ -21,8 +21,6 @@
 #####################################################################
 
 from __future__ import division
-from OpenGL.GL import *
-from OpenGL.GLU import *
 
 import Log
 
@@ -56,12 +54,7 @@ class View(Task):
     self.outgoing = []
     self.visibility = {}
     self.transitionTime = 512.0
-    self.geometry = geometry or glGetIntegerv(GL_VIEWPORT)
-    self.savedGeometry = None
     self.engine = engine
-    w = self.geometry[2] - self.geometry[0]
-    h = self.geometry[3] - self.geometry[1]
-    self.aspectRatio = float(w) / float(h)
 
   def pushLayer(self, layer):
     Log.debug("View: Push: %s" % layer.__class__.__name__)

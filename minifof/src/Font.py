@@ -22,7 +22,6 @@
 
 import pygame
 import numpy
-from OpenGL.GL import *
 import sys
 
 from Texture import Texture, TextureAtlas, TextureAtlasFullException

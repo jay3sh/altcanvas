@@ -21,7 +21,6 @@
 #####################################################################
 
 import pygame
-from OpenGL.GL import *
 import math
 import colorsys
 

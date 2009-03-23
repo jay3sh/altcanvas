@@ -22,8 +22,6 @@
 
 import pygame
 import os
-from OpenGL.GL import *
-from OpenGL.GL.ARB.multisample import *
 import Log
 
 class Video:
@@ -33,7 +31,7 @@ class Video:
     self.fullscreen = False
     self.flags      = True
 
-  def setMode(self, resolution, fullscreen = False, flags = pygame.OPENGL | pygame.DOUBLEBUF,
+  def setMode(self, resolution, fullscreen = False, flags = pygame.DOUBLEBUF,
               multisamples = 0):
     if fullscreen:
       flags |= pygame.FULLSCREEN
@@ -48,14 +46,7 @@ class Video:
       
     pygame.display.init()
     
-    pygame.display.gl_set_attribute(pygame.GL_RED_SIZE,   8)
-    pygame.display.gl_set_attribute(pygame.GL_GREEN_SIZE, 8)
-    pygame.display.gl_set_attribute(pygame.GL_BLUE_SIZE,  8)
-    pygame.display.gl_set_attribute(pygame.GL_ALPHA_SIZE, 8)
       
-    if multisamples:
-      pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLEBUFFERS, 1);
-      pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLESAMPLES, multisamples);
 
     try:
       self.screen = pygame.display.set_mode(resolution, flags)
@@ -63,8 +54,6 @@ class Video:
       Log.error(str(e))
       if multisamples:
         Log.warn("Video setup failed. Trying without antialiasing.")
-        pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLEBUFFERS, 0);
-        pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLESAMPLES, 0);
         multisamples = 0
         self.screen = pygame.display.set_mode(resolution, flags)
       else:
@@ -74,11 +63,6 @@ class Video:
     pygame.display.set_caption(self.caption)
     pygame.mouse.set_visible(False)
 
-    if multisamples:
-      try:
-        glEnable(GL_MULTISAMPLE_ARB)
-      except:
-        pass
 
     return bool(self.screen)
     

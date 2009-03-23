@@ -20,10 +20,6 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-from Font import Font
-from Texture import Texture
-from Svg import SvgDrawing, SvgContext
-from Texture import Texture
 from Audio import Sound
 from Language import _
 import random
@@ -44,16 +40,7 @@ class Data(object):
     self.resource = resource
     self.svg      = svg
 
-    # load font customization images
-    self.loadSvgDrawing(self, "star1",   "star1.svg", textureSize = (128, 128))
-    self.loadSvgDrawing(self, "star2",   "star2.svg", textureSize = (128, 128))
-    self.loadSvgDrawing(self, "left",    "left.svg",  textureSize = (128, 128))
-    self.loadSvgDrawing(self, "right",   "right.svg", textureSize = (128, 128))
-    self.loadSvgDrawing(self, "ball1",   "ball1.svg", textureSize = (128, 128))
-    self.loadSvgDrawing(self, "ball2",   "ball2.svg", textureSize = (128, 128))
 
-    # load misc images
-    self.loadSvgDrawing(self, "loadingImage", "loading.svg", textureSize = (256, 256))
 
     # load all the data in parallel
     asciiOnly = not bool(Language.language)
@@ -71,8 +58,6 @@ class Data(object):
     # load fonts
     font1     = lambda: Font(font,    fontSize[0], scale = scale, reversed = reversed, systemFont = not asciiOnly)
     font2     = lambda: Font(bigFont, fontSize[1], scale = scale, reversed = reversed, systemFont = not asciiOnly)
-    resource.load(self, "font",         font1, onLoad = self.customizeFont)
-    resource.load(self, "bigFont",      font2, onLoad = self.customizeFont)
 
     # load sounds
     resource.load(self, "screwUpSounds", self.loadScrewUpSounds)
@@ -132,7 +117,7 @@ class Data(object):
 
   def essentialResourcesLoaded(self):
     """return: True if essential resources such as the font have been loaded."""
-    return bool(self.font and self.bigFont)
+    return True
 
   def resourcesLoaded(self):
     """return: True if all the resources have been loaded."""

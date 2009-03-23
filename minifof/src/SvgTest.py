@@ -24,8 +24,6 @@ import unittest
 from GameEngine import GameEngine
 from Texture import Texture
 
-from OpenGL.GL import *
-from OpenGL.GLU import *
 
 class SvgTest(unittest.TestCase):
   def testRendering(self):

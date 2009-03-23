@@ -20,7 +20,6 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-from OpenGL.GL import *
 import math
 import socket
 
@@ -29,7 +28,6 @@ from Menu import Menu
 from Editor import Editor, Importer, GHImporter
 from Credits import Credits
 from Lobby import Lobby
-from Svg import SvgDrawing
 from Language import _
 import Dialogs
 import Config
@@ -42,11 +40,8 @@ class MainMenu(BackgroundLayer):
     self.time                = 0.0
     self.nextLayer           = None
     self.visibility          = 0.0
-    self.songName            = songName
+    self.songName            = 'defy'
     
-    self.engine.loadSvgDrawing(self, "background", "keyboard.svg")
-    self.engine.loadSvgDrawing(self, "guy",        "pose.svg")
-    self.engine.loadSvgDrawing(self, "logo",       "logo.svg")
     self.song = Audio.Sound(self.engine.resource.fileName("menu.ogg"))
     self.song.setVolume(self.engine.config.get("audio", "songvol"))
     self.song.play(-1)
@@ -180,6 +175,7 @@ class MainMenu(BackgroundLayer):
     self.time += ticks / 50.0
     
   def render(self, visibility, topMost):
+    return
     self.visibility = visibility
     v = 1.0 - ((1 - visibility) ** 2)
       

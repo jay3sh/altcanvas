@@ -21,7 +21,6 @@
 #####################################################################
 
 import pygame
-from OpenGL.GL import *
 import math
 
 from View import Layer
@@ -158,6 +157,7 @@ class Menu(Layer, KeyListener):
     glEnd()
   
   def render(self, visibility, topMost):
+    return
     if not visibility:
       return
 

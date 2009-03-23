@@ -21,8 +21,6 @@
 #####################################################################
 
 import pygame
-from OpenGL.GL import *
-from OpenGL.GLU import *
 import math
 
 from View import Layer

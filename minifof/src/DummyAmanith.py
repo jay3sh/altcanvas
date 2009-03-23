@@ -22,7 +22,6 @@
 
 """Mock amanith implementation that does next to nothing."""
 
-from OpenGL.GL import *
 
 G_LOW_RENDERING_QUALITY    = 0
 G_NORMAL_RENDERING_QUALITY = 1

@@ -33,7 +33,6 @@ from Language import _
 import pygame
 import math
 import random
-from OpenGL.GL import *
 
 class GameResultsScene:
   pass

@@ -21,7 +21,6 @@
 #####################################################################
 
 from ConfigParser import ConfigParser
-from OpenGL.GL import *
 import math
 import Log
 import Theme
@@ -340,6 +339,6 @@ class Stage(object):
       self.triggerBeat(pos, beat)
 
   def render(self, visibility):
-    self._renderLayers(self.backgroundLayers, visibility)
+    #self._renderLayers(self.backgroundLayers, visibility)
     self.scene.renderGuitar()
-    self._renderLayers(self.foregroundLayers, visibility)
+    #self._renderLayers(self.foregroundLayers, visibility)

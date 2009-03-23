@@ -29,8 +29,6 @@ import Network
 import Player
 import Config
 
-from OpenGL.GL import *
-from OpenGL.GLU import *
 import math
 import colorsys
 import pygame
@@ -141,26 +139,9 @@ class SceneClient(Scene, KeyListener):
       actor.render()
 
   def render(self, visibility, topMost):
-    font = self.engine.data.font
 
     # render the scene
-    try:
-      glMatrixMode(GL_PROJECTION)
-      glPushMatrix()
-      glLoadIdentity()
-      gluPerspective(60, self.engine.view.aspectRatio, 0.1, 1000)
-      glMatrixMode(GL_MODELVIEW)
-      glLoadIdentity()
-      
-      glPushMatrix()
-      self.camera.apply()
-  
-      self.render3D()
-    finally:
-      glPopMatrix()
-      glMatrixMode(GL_PROJECTION)
-      glPopMatrix()
-      glMatrixMode(GL_MODELVIEW)
+    self.render3D()
 
 class SceneServer(Scene):
   def __init__(self, engine, owner, server, **args):

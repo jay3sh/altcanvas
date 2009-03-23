@@ -28,8 +28,6 @@ import Image
 import pygame
 import StringIO
 import PngImagePlugin
-from OpenGL.GL import *
-from OpenGL.GLU import *
 from Queue import Queue, Empty
 
 Config.define("opengl", "supportfbo", bool, False)
@@ -182,7 +180,7 @@ class Framebuffer:
 class Texture:
   """Represents an OpenGL texture, optionally loaded from disk in any format supported by PIL"""
 
-  def __init__(self, name = None, target = GL_TEXTURE_2D):
+  def __init__(self, name = None, target = None):
     # Delete all pending textures
     try:
       func, args = cleanupQueue.get_nowait()
@@ -317,7 +315,7 @@ class Texture:
     self.setFilter()
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
 
-  def setRepeat(self, u=GL_CLAMP, v=GL_CLAMP):
+  def setRepeat(self, u=None, v=None):
     Texture.bind(self)
     glTexParameteri(self.glTarget, GL_TEXTURE_WRAP_S, u)
     glTexParameteri(self.glTarget, GL_TEXTURE_WRAP_T, v)

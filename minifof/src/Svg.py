@@ -23,7 +23,6 @@
 import re
 import os
 from xml import sax
-from OpenGL.GL import *
 from numpy import reshape, dot, transpose, identity, zeros, float32
 from math import sin, cos
 

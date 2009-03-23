@@ -38,7 +38,6 @@ import math
 import pygame
 import random
 import os
-from OpenGL.GL import *
 
 class GuitarScene:
   pass
@@ -72,11 +71,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.loadSettings()
     self.engine.resource.load(self, "song",          lambda: loadSong(self.engine, songName, library = libraryName), onLoad = self.songLoaded)
     
-    self.stage            = Stage.Stage(self, self.engine.resource.fileName("stage.ini"))
     
-    self.engine.loadSvgDrawing(self, "fx2x",   "2x.svg", textureSize = (256, 256))
-    self.engine.loadSvgDrawing(self, "fx3x",   "3x.svg", textureSize = (256, 256))
-    self.engine.loadSvgDrawing(self, "fx4x",   "4x.svg", textureSize = (256, 256))
 
     Dialogs.showLoadingScreen(self.engine, lambda: self.song, text = _("Tuning Guitar..."))
 
@@ -141,10 +136,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.session.world.createScene("SongChoosingScene")
 
   def restartSong(self):
-    self.engine.data.startSound.play()
+    #self.engine.data.startSound.play()
     self.engine.view.popLayer(self.menu)
     self.player.reset()
-    self.stage.reset()
+    #self.stage.reset()
     self.enteredCode     = []
     self.autoPlay        = False
     self.engine.collectGarbage()
@@ -163,7 +158,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     # update song
     if self.song:
       # update stage
-      self.stage.run(pos, self.guitar.currentPeriod)
+      #self.stage.run(pos, self.guitar.currentPeriod)
 
       if self.countdown <= 0 and not self.song.isPlaying() and not self.done:
         self.goToResults()
@@ -222,7 +217,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.player.addScore(score)
 
   def render3D(self):
-    self.stage.render(self.visibility)
+    #self.stage.render(self.visibility)
+    self.renderGuitar()
     
   def renderGuitar(self):
     self.guitar.render(self.visibility, self.song, self.getSongPosition(), self.controls)
@@ -259,13 +255,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.player.streak += 1
       self.player.notesHit += len(self.guitar.playedNotes)
       self.player.addScore(len(self.guitar.playedNotes) * 50)
-      self.stage.triggerPick(pos, [n[1].number for n in self.guitar.playedNotes])
+      #self.stage.triggerPick(pos, [n[1].number for n in self.guitar.playedNotes])
       if self.player.streak % 10 == 0:
         self.lastMultTime = pos
     else:
       self.song.setGuitarVolume(0.0)
       self.player.streak = 0
-      self.stage.triggerMiss(pos)
+      #self.stage.triggerMiss(pos)
       self.sfxChannel.play(self.engine.data.screwUpSound)
       self.sfxChannel.setVolume(self.screwUpVolume)
         
@@ -351,7 +347,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.endPick()
   def render(self, visibility, topMost):
     SceneClient.render(self, visibility, topMost)
-    
+    return
+
     font    = self.engine.data.font
     bigFont = self.engine.data.bigFont
       
