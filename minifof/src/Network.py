@@ -176,7 +176,7 @@ class Server(asyncore.dispatcher):
     asyncore.dispatcher.__init__(self)
     self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
     self.set_reuse_addr()
-    self.bind((localOnly and "localhost" or "", port))
+    self.bind((localOnly and "127.0.0.1" or "", port))
     self.listen(5)
     self.clients = {}
     self.__idCounter = 0
