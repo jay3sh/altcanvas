@@ -33,6 +33,27 @@ try:
 except ImportError, ie:
   import Numeric
   USE_NUMPY = False
+  
+MAX_Z = 12
+MIN_Z = -3
+RANGE_Z = MAX_Z - MIN_Z
+
+SCREEN_WIDTH    = 800
+SCREEN_HEIGHT   = 480
+
+TRACK_LENGTH    = SCREEN_WIDTH # In case of horizontal n810 screen
+TRACK_WIDTH     = 0.70 * SCREEN_HEIGHT # In case of horizontal n810 screen
+TRACK_MARGIN    = (SCREEN_HEIGHT - TRACK_WIDTH)/2.
+
+NUM_STRINGS     = 5
+STRING_BREAK    = 4
+STRING_GAP      = TRACK_WIDTH/(NUM_STRINGS - 1)
+STRING_WIDTH    = 7
+
+Z_UNIT = TRACK_LENGTH/(1.*RANGE_Z)
+BASE_Z = Z_UNIT*(-1*MIN_Z)
+
+FRET_LINE = ((BASE_Z, TRACK_MARGIN-3),(BASE_Z, TRACK_MARGIN+TRACK_WIDTH+3))
 
 import pygame
 
@@ -69,7 +90,8 @@ class Guitar:
 
     engine.resource.load(self,  "noteMesh", lambda: Mesh(engine.resource.fileName("note.dae")))
     engine.resource.load(self,  "keyMesh",  lambda: Mesh(engine.resource.fileName("key.dae")))
-
+    self.hwatermark = 0
+    self.lwatermark = 0
   def selectPreviousString(self):
     self.selectedString = (self.selectedString - 1) % self.strings
 
@@ -237,12 +259,27 @@ class Guitar:
 
     glDisable(GL_TEXTURE_2D)
 
-  def renderSimpleNote(self, event_num, y, length):
+  
+  def renderSimpleNote(self, event_num, z, length):
+
+    color = [(34,255,34),(255,34,34),(255,255,34),(51,51,255),(255,34,255)][event_num]
+
+    '''
+    # Verticle 
     nx = 200 + event_num * 50
     ny = 25*y
-    color = [(34,255,34),(255,34,34),(255,255,34),(51,51,255),(255,34,255)][event_num]
     pygame.draw.rect(self.engine.video.screen,
         color,pygame.Rect(nx,400-ny-25*length,7,25*length-3),0)
+    '''
+
+    # Horizontal for n810
+    ny = TRACK_MARGIN + event_num * STRING_GAP
+    nx = BASE_Z + Z_UNIT * z
+    pygame.draw.rect(
+        self.engine.video.screen,
+        color,
+        pygame.Rect(nx+STRING_BREAK, ny, Z_UNIT*length, STRING_WIDTH),
+        0)
  
   def renderNote(self, length, color, flat = False, tailOnly = False, isTappable = False):
     if not self.noteMesh:
@@ -301,7 +338,8 @@ class Guitar:
     track = song.track
 
     self.engine.video.screen.fill((0,0,0))
-    pygame.draw.line(self.engine.video.screen, (255,255,255), (0,400),(640,400),3)
+    pygame.draw.line(self.engine.video.screen, (255,255,255), FRET_LINE[0], FRET_LINE[1],3)
+
     for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard):
       if isinstance(event, Tempo):
         if (pos - time > self.currentPeriod or self.lastBpmChange < 0) and time > self.lastBpmChange:
