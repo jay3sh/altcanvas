@@ -79,16 +79,16 @@ class Input(Task):
     self.disableKeyRepeat()
 
     # Initialize joysticks
-    pygame.joystick.init()
-    self.joystickAxes = {}
-    self.joystickHats = {}
+    #pygame.joystick.init()
+    #self.joystickAxes = {}
+    #self.joystickHats = {}
 
-    self.joysticks = [pygame.joystick.Joystick(id) for id in range(pygame.joystick.get_count())]
-    for j in self.joysticks:
-      j.init()
-      self.joystickAxes[j.get_id()] = [0] * j.get_numaxes() 
-      self.joystickHats[j.get_id()] = [(0, 0)] * j.get_numhats() 
-    Log.debug("%d joysticks found." % (len(self.joysticks)))
+    #self.joysticks = [pygame.joystick.Joystick(id) for id in range(pygame.joystick.get_count())]
+    #for j in self.joysticks:
+    #  j.init()
+    #  self.joystickAxes[j.get_id()] = [0] * j.get_numaxes() 
+    #  self.joystickHats[j.get_id()] = [(0, 0)] * j.get_numhats() 
+    #Log.debug("%d joysticks found." % (len(self.joysticks)))
 
     # Enable music events
     Audio.Music.setEndEvent(MusicFinished)
