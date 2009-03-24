@@ -28,6 +28,8 @@ import Theme
 import math
 import numpy
 
+import pygame
+
 KEYS = [Player.KEY1, Player.KEY2, Player.KEY3, Player.KEY4, Player.KEY5]
 
 class Guitar:
@@ -225,6 +227,13 @@ class Guitar:
 
     glDisable(GL_TEXTURE_2D)
 
+  def renderSimpleNote(self, event_num, y, length):
+    nx = 200 + event_num * 50
+    ny = 25*y
+    color = [(34,255,34),(255,34,34),(255,255,34),(51,51,255),(255,34,255)][event_num]
+    pygame.draw.rect(self.engine.video.screen,
+        color,pygame.Rect(nx,400-ny-25*length,7,25*length-3),0)
+ 
   def renderNote(self, length, color, flat = False, tailOnly = False, isTappable = False):
     if not self.noteMesh:
       return
@@ -281,6 +290,8 @@ class Guitar:
     w = self.boardWidth / self.strings
     track = song.track
 
+    self.engine.video.screen.fill((0,0,0))
+    pygame.draw.line(self.engine.video.screen, (255,255,255), (0,400),(640,400),3)
     for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard):
       if isinstance(event, Tempo):
         if (pos - time > self.currentPeriod or self.lastBpmChange < 0) and time > self.lastBpmChange:
@@ -323,10 +334,9 @@ class Guitar:
           color = (.2 + .4, .2 + .4, .2 + .4, .5 * visibility * f)
           flat  = True
 
-      glPushMatrix()
-      glTranslatef(x, (1.0 - visibility) ** (event.number + 1), z)
-      self.renderNote(length, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable)
-      glPopMatrix()
+      #self.renderNote(length, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable)
+      self.renderSimpleNote(event.number, z, length)
+    return
 
     # Draw a waveform shape over the currently playing notes
     vertices = self.vertexCache
@@ -481,20 +491,12 @@ class Guitar:
     glDisable(GL_DEPTH_TEST)
 
   def render(self, visibility, song, pos, controls):
-    return
-    glEnable(GL_BLEND)
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-    glEnable(GL_COLOR_MATERIAL)
-    if self.leftyMode:
-      glScalef(-1, 1, 1)
 
-    self.renderNeck(visibility, song, pos)
-    self.renderTracks(visibility)
-    self.renderBars(visibility, song, pos)
+    #self.renderNeck(visibility, song, pos)
+    #self.renderTracks(visibility)
+    #self.renderBars(visibility, song, pos)
     self.renderNotes(visibility, song, pos)
-    self.renderFrets(visibility, song, controls)
-    if self.leftyMode:
-      glScalef(-1, 1, 1)
+    #self.renderFrets(visibility, song, controls)
 
   def getMissedNotes(self, song, pos):
     if not song:
