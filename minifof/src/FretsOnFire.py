@@ -53,25 +53,28 @@ usage = """%(prog)s [options]
 Options:
   --verbose, -v         Verbose messages
   --play, -p [songName] Start playing the given song
+  --mode, -m            Mode (possible values - desktop, n810[default])
 """ % {"prog": sys.argv[0] }
 
 if __name__ == "__main__":
   try:
-    opts, args = getopt.getopt(sys.argv[1:], "vp:", ["verbose", "play="])
+    opts, args = getopt.getopt(sys.argv[1:], "vp:m:", ["verbose", "play=", "mode="])
   except getopt.GetoptError:
     print usage
     sys.exit(1)
 
-  songName = None
+  songName = 'defy' 
   for opt, arg in opts:
     if opt in ["--verbose", "-v"]:
       Log.quiet = False
     elif opt in ["--play", "-p"]:
       songName = arg
+    elif opt in ["--mode", "-m"]:
+      mode = arg
 
   while True:
     config = Config.load(Version.appName() + ".ini", setAsDefault = True)
-    engine = GameEngine(config)
+    engine = GameEngine(config, mode=mode)
     menu   = MainMenu(engine, songName = songName)
     engine.setStartupLayer(menu)
 

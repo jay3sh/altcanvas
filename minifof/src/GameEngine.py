@@ -112,7 +112,7 @@ class SystemEventHandler(SystemEventListener):
 
 class GameEngine(Engine):
   """The main game engine."""
-  def __init__(self, config = None):
+  def __init__(self, config = None, mode = 'n810'):
     """
     Constructor.
 
@@ -124,13 +124,22 @@ class GameEngine(Engine):
       
     self.config  = config
 
-    # For Maemo n810 these keys will replace the F1-F5 keys
-    Config.set("player", "key_1", pygame.K_QUOTE)
-    Config.set("player", "key_2", pygame.K_k)
-    Config.set("player", "key_3", pygame.K_h)
-    Config.set("player", "key_4", pygame.K_f)
-    Config.set("player", "key_5", pygame.K_s)
-    Config.set("player", "key_action1", pygame.K_q)
+    self.mode = mode
+    if self.mode == 'n810':
+      # For Maemo n810 these keys will replace the F1-F5 keys
+      Config.set("player", "key_1", pygame.K_QUOTE)
+      Config.set("player", "key_2", pygame.K_k)
+      Config.set("player", "key_3", pygame.K_h)
+      Config.set("player", "key_4", pygame.K_f)
+      Config.set("player", "key_5", pygame.K_s)
+      Config.set("player", "key_action1", pygame.K_q)
+    elif self.mode == 'desktop':
+      Config.set("player", "key_1", pygame.K_F1)
+      Config.set("player", "key_2", pygame.K_F2)
+      Config.set("player", "key_3", pygame.K_F3)
+      Config.set("player", "key_4", pygame.K_F4)
+      Config.set("player", "key_5", pygame.K_F5)
+      Config.set("player", "key_action1", pygame.K_RETURN)
     
     fps          = self.config.get("video", "fps")
     tickrate     = self.config.get("engine", "tickrate")

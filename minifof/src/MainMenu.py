@@ -42,7 +42,7 @@ class MainMenu(BackgroundLayer):
     self.time                = 0.0
     self.nextLayer           = None
     self.visibility          = 0.0
-    self.songName            = 'defy'
+    self.songName            = songName
     
     self.song = Audio.Sound(self.engine.resource.fileName("menu."+AUDIO_FORMAT))
     self.song.setVolume(self.engine.config.get("audio", "songvol"))
