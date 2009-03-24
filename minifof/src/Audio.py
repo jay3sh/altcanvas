@@ -278,7 +278,13 @@ else: # pygame
 
 if "ogg.vorbis" in sys.modules:
   import struct
-  import numpy
+  USE_NUMPY = True
+  try:
+    import numpy
+    USE_NUMPY = True
+  except ImportError, ie:
+    import Numeric
+    USE_NUMPY = False
 
   class OggStream(object):
     def __init__(self, inputFileName):
@@ -298,13 +304,19 @@ if "ogg.vorbis" in sys.modules:
       self.bufferSize   = 1024 * 64
       self.bufferCount  = 8
       self.volume       = 1.0
-      self.buffer       = numpy.zeros((2 * self.bufferSize, 2), dtype = numpy.int16)
+      if USE_NUMPY:
+        self.buffer       = numpy.zeros((2 * self.bufferSize, 2), dtype = numpy.int16)
+      else:
+        self.buffer       = Numeric.zeros((2 * self.bufferSize, 2), dtype = Numeric.Int16)
       self.decodingRate = 4
       self._reset()
 
     def _reset(self):
       self.stream        = OggStream(self.fileName)
-      self.buffersIn     = [pygame.sndarray.make_sound(numpy.zeros((self.bufferSize, 2), dtype = numpy.int16)) for i in range(self.bufferCount + 1)]
+      if USE_NUMPY:
+        self.buffersIn     = [pygame.sndarray.make_sound(numpy.zeros((self.bufferSize, 2), dtype = numpy.int16)) for i in range(self.bufferCount + 1)]
+      else:
+        self.buffersIn     = [pygame.sndarray.make_sound(Numeric.zeros((self.bufferSize, 2), dtype = Numeric.Int16)) for i in range(self.bufferCount + 1)]
       self.buffersOut    = []
       self.buffersBusy   = []
       self.bufferPos     = 0

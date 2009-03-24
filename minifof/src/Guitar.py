@@ -26,7 +26,13 @@ from Mesh import Mesh
 import Theme
 
 import math
-import numpy
+USE_NUMPY = True
+try:
+  import numpy
+  USE_NUMPY = True
+except ImportError, ie:
+  import Numeric
+  USE_NUMPY = False
 
 import pygame
 
@@ -54,8 +60,12 @@ class Guitar:
     self.lastBpmChange  = -1.0
     self.baseBeat       = 0.0
     self.setBPM(self.currentBpm)
-    self.vertexCache    = numpy.empty((8 * 4096, 3), numpy.float32)
-    self.colorCache     = numpy.empty((8 * 4096, 4), numpy.float32)
+    if USE_NUMPY:
+        self.vertexCache    = numpy.empty((8 * 4096, 3), numpy.float32)
+        self.colorCache     = numpy.empty((8 * 4096, 4), numpy.float32)
+    else:
+        self.vertexCache    = Numeric.empty((8 * 4096, 3), Numeric.Float32)
+        self.colorCache     = Numeric.empty((8 * 4096, 4), Numeric.Float32)
 
     engine.resource.load(self,  "noteMesh", lambda: Mesh(engine.resource.fileName("note.dae")))
     engine.resource.load(self,  "keyMesh",  lambda: Mesh(engine.resource.fileName("key.dae")))
