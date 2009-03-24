@@ -36,6 +36,8 @@ import Version
 import Theme
 from Language import _
 
+from Config import AUDIO_FORMAT
+
 DEFAULT_LIBRARY         = "songs"
 
 AMAZING_DIFFICULTY      = 0
@@ -772,9 +774,9 @@ class MidiInfoReader(midi.MidiOutStream):
       pass
 
 def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playbackOnly = False, notesOnly = False):
-  guitarFile = engine.resource.fileName(library, name, "guitar.ogg")
-  songFile   = engine.resource.fileName(library, name, "song.ogg")
-  rhythmFile = engine.resource.fileName(library, name, "rhythm.ogg")
+  guitarFile = engine.resource.fileName(library, name, "guitar."+AUDIO_FORMAT)
+  songFile   = engine.resource.fileName(library, name, "song."+AUDIO_FORMAT)
+  rhythmFile = engine.resource.fileName(library, name, "rhythm."+AUDIO_FORMAT)
   noteFile   = engine.resource.fileName(library, name, "notes.mid", writable = True)
   infoFile   = engine.resource.fileName(library, name, "song.ini", writable = True)
   scriptFile = engine.resource.fileName(library, name, "script.txt")
@@ -809,8 +811,8 @@ def createSong(engine, name, guitarTrackName, backgroundTrackName, rhythmTrackNa
   path = os.path.abspath(engine.resource.fileName(library, name, writable = True))
   os.makedirs(path)
   
-  guitarFile = engine.resource.fileName(library, name, "guitar.ogg", writable = True)
-  songFile   = engine.resource.fileName(library, name, "song.ogg",   writable = True)
+  guitarFile = engine.resource.fileName(library, name, "guitar."+AUDIO_FORMAT, writable = True)
+  songFile   = engine.resource.fileName(library, name, "song."+AUDIO_FORMAT,   writable = True)
   noteFile   = engine.resource.fileName(library, name, "notes.mid",  writable = True)
   infoFile   = engine.resource.fileName(library, name, "song.ini",   writable = True)
   
@@ -823,7 +825,7 @@ def createSong(engine, name, guitarTrackName, backgroundTrackName, rhythmTrackNa
     guitarFile = None
 
   if rhythmTrackName:
-    rhythmFile = engine.resource.fileName(library, name, "rhythm.ogg", writable = True)
+    rhythmFile = engine.resource.fileName(library, name, "rhythm."+AUDIO_FORMAT, writable = True)
     shutil.copy(rhythmTrackName, rhythmFile)
   else:
     rhythmFile = None

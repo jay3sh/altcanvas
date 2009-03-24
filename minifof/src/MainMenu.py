@@ -34,6 +34,8 @@ import Config
 import Audio
 import Settings
 
+from Config import AUDIO_FORMAT
+
 class MainMenu(BackgroundLayer):
   def __init__(self, engine, songName = None):
     self.engine              = engine
@@ -42,7 +44,7 @@ class MainMenu(BackgroundLayer):
     self.visibility          = 0.0
     self.songName            = 'defy'
     
-    self.song = Audio.Sound(self.engine.resource.fileName("menu.ogg"))
+    self.song = Audio.Sound(self.engine.resource.fileName("menu."+AUDIO_FORMAT))
     self.song.setVolume(self.engine.config.get("audio", "songvol"))
     self.song.play(-1)
 

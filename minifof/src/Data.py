@@ -26,6 +26,8 @@ import random
 import Language
 import Config
 
+from Config import AUDIO_FORMAT
+
 # these constants define a few customized letters in the default font
 STAR1 = unicode('\x10')
 STAR2 = unicode('\x11')
@@ -61,12 +63,12 @@ class Data(object):
 
     # load sounds
     resource.load(self, "screwUpSounds", self.loadScrewUpSounds)
-    self.loadSoundEffect(self, "acceptSound",  "in.ogg")
-    self.loadSoundEffect(self, "cancelSound",  "out.ogg")
-    self.loadSoundEffect(self, "selectSound1", "crunch1.ogg")
-    self.loadSoundEffect(self, "selectSound2", "crunch2.ogg")
-    self.loadSoundEffect(self, "selectSound3", "crunch3.ogg")
-    self.loadSoundEffect(self, "startSound",   "start.ogg")
+    self.loadSoundEffect(self, "acceptSound",  "in."+AUDIO_FORMAT)
+    self.loadSoundEffect(self, "cancelSound",  "out."+AUDIO_FORMAT)
+    self.loadSoundEffect(self, "selectSound1", "crunch1."+AUDIO_FORMAT)
+    self.loadSoundEffect(self, "selectSound2", "crunch2."+AUDIO_FORMAT)
+    self.loadSoundEffect(self, "selectSound3", "crunch3."+AUDIO_FORMAT)
+    self.loadSoundEffect(self, "startSound",   "start."+AUDIO_FORMAT)
 
   def loadSoundEffect(self, target, name, fileName):
     volume   = Config.get("audio", "guitarvol")
@@ -74,7 +76,7 @@ class Data(object):
     self.resource.load(target, name, lambda: Sound(fileName), onLoad = lambda s: s.setVolume(volume))
 
   def loadScrewUpSounds(self):
-    return [Sound(self.resource.fileName("fiba%d.ogg" % i)) for i in range(1, 7)]
+    return [Sound(self.resource.fileName("fiba%d.%s"%(i,AUDIO_FORMAT))) for i in range(1, 7)]
     
   def loadSvgDrawing(self, target, name, fileName, textureSize = None):
     """

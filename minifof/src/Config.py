@@ -29,6 +29,8 @@ encoding  = "iso-8859-1"
 config    = None
 prototype = {}
 
+AUDIO_FORMAT    = "wav"
+
 class Option:
   """A prototype configuration key."""
   def __init__(self, **args):
