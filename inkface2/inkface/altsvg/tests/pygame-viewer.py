@@ -37,12 +37,18 @@ def draw(surface):
     print cr.stroke_extents()
     cr.stroke()
 
-    midx,midy = ((ex1+(ex2-ex1)/2),(ey1+(ey2-ey1)/2))
-    orig_vector = (ex1,ey1,midx,midy)
-    orig_vector_mag = math.sqrt((midx-ex1)*(midx-ex1)+(midy-ey1)*(midy-ey1))
-    orig_vector_ang = math.acos((midx-ex1)/orig_vector_mag)
+    #midx,midy = ((ex1+(ex2-ex1)/2),(ey1+(ey2-ey1)/2))
+    #orig_vector = (ex1,ey1,midx,midy)
+    #orig_vector_mag = math.sqrt((midx-ex1)*(midx-ex1)+(midy-ey1)*(midy-ey1))
+    #orig_vector_ang = math.acos((midx-ex1)/orig_vector_mag)
 
-    print (orig_vector_mag,orig_vector_ang)
+    #print (orig_vector_mag,orig_vector_ang)
+    midx,midy = ((ex1+(ex2-ex1)/2),(ey1+(ey2-ey1)/2))
+    orig_vector = (ax,ay,midx,midy)
+    orig_vector_mag = math.sqrt((midx-ax)*(midx-ax)+(midy-ay)*(midy-ay))
+    orig_vector_ang = math.acos((midx-ax)/orig_vector_mag)
+
+    #print (orig_vector_mag,orig_vector_ang)
 
 
     mat = cairo.Matrix(0.7071068,-0.7071068,0.7071068,0.7071068,0,0)
@@ -62,6 +68,7 @@ def draw(surface):
     
     cr.set_source_rgb(1,1,1)
 
+
     # --------------------------------
     #cr.move_to(cx,cy)
     #cr.line_to(cx+200,cy)
@@ -76,6 +83,18 @@ def draw(surface):
     #cr.rectangle(cx,cy,100,100)
 
     # --------------------------------
+    nex1,ney1,nex2,ney2 = cr.stroke_extents()
+    print (cx-nex1, cy-ney1)
+    print cr.stroke_extents()
+
+    
+    cx = cx - nex1
+    cy = cy - ney1
+
+    cr.move_to(cx,cy)
+    cr.curve_to(cx+30,cy+30,cx+60,cy+30,cx+90,cy)
+    cr.curve_to(cx+60,cy-30,cx+30,cy-30,cx,cy)
+
     cr.stroke()
     
 
