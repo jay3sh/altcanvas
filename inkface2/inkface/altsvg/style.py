@@ -33,6 +33,13 @@ def get_style_object(style_str, defs):
         style_map[style_str] = st
         return st
 
+def parse_length(value_str):
+    if value_str.endswith('px'):
+        value_str = value_str.replace('px','')
+
+    return float(value_str)
+
+
 
 class Style:
     ''' Class to encapsulate style strings '''
@@ -58,7 +65,7 @@ class Style:
         if self.__style__.has_key(modkey): 
             val = self.__style__[modkey]
             if self._is_type_length(modkey):
-                return self.__parse_length(val)
+                return parse_length(val)
             else:
                 return self.__style__[modkey]
  
@@ -123,12 +130,6 @@ class Style:
         ''' simple check '''
         return colorstr.startswith('url')
 
-    def __parse_length(self, value_str):
-        if value_str.endswith('px'):
-            value_str = value_str.replace('px','')
-
-        return float(value_str)
-
     def apply_font(self, ctx):
 
         font_family = None
@@ -136,7 +137,7 @@ class Style:
         font_slant = None
 
         if self.__style__.has_key('font-size'):
-            ctx.set_font_size(self.__parse_length(
+            ctx.set_font_size(parse_length(
                                 self.__style__['font-size']))
 
         if self.__style__.has_key('font-family'):
@@ -186,7 +187,7 @@ class Style:
                     False if stroke is not specified 
         '''
         if self.__style__.has_key('stroke-width'):
-            ctx.set_line_width(self.__parse_length(
+            ctx.set_line_width(parse_length(
                                     self.__style__['stroke-width']))
         if self.__style__.has_key('stroke-miterlimit'):
             ctx.set_miter_limit(float(self.__style__['stroke-miterlimit']))

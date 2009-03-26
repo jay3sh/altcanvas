@@ -19,7 +19,9 @@ from inkface.altsvg import TAG_RECT, TAG_PATH, \
 
 def draw(ctx, style):
     ''' Generic draw routine '''
-    if style.has('opacity') and float(style.opacity) < 1.0:
+    if style is not None and style.has('opacity') \
+        and float(style.opacity) < 1.0:
+
         # We need to draw on temporary surface
         ex1, ey1, ex2, ey2 = ctx.stroke_extents()
 

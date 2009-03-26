@@ -46,6 +46,7 @@ TAG_HREF            = XLINK_NS+'href'
 import inkface.altsvg.draw
 from inkface.altsvg.element import Element
 from inkface.altsvg.style import LinearGradient, RadialGradient
+from inkface.altsvg.style import parse_length
 from inkface.altsvg.draw import NODE_DRAW_MAP
 
 
@@ -86,10 +87,14 @@ class VectorDoc:
             root = self.tree.getroot()
             val = root.attrib.get(key)
             if val:
-                return val
+                if key is 'width' or key is 'height':
+                    return parse_length(val)
+                else:
+                    return val
             else:
                 raise AttributeError('Unknown attribute '+key)
                 
+        raise AttributeError('Unknown attribute '+key)
  
     def get_elements(self):
         '''
