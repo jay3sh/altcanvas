@@ -72,13 +72,14 @@ class VectorDoc:
         # Each stop is a tuple with first element offset and 
         # second being the style string
         #
-        for e in defs_node.getchildren():
-            if e.tag == TAG_LINEARGRAD:
-                self.defs[e.attrib.get('id')] = \
-                    LinearGradient(e)
-            elif e.tag == TAG_RADIALGRAD:
-                self.defs[e.attrib.get('id')] = \
-                    RadialGradient(e)
+        if defs_node is not None:
+            for e in defs_node.getchildren():
+                if e.tag == TAG_LINEARGRAD:
+                    self.defs[e.attrib.get('id')] = \
+                        LinearGradient(e)
+                elif e.tag == TAG_RADIALGRAD:
+                    self.defs[e.attrib.get('id')] = \
+                        RadialGradient(e)
 
         self._implemented_node_types = \
             (TAG_G, TAG_RECT, TAG_PATH, TAG_TEXT, TAG_IMAGE)
