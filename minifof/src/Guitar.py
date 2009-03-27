@@ -25,6 +25,8 @@ from Song import Note, Tempo
 from Mesh import Mesh
 import Theme
 
+from inkface.canvas.pygamecanvas import PygameFace
+
 import math
 USE_NUMPY = True
 try:
@@ -42,7 +44,7 @@ SCREEN_WIDTH    = 800
 SCREEN_HEIGHT   = 480
 
 TRACK_LENGTH    = SCREEN_WIDTH # In case of horizontal n810 screen
-TRACK_WIDTH     = 0.70 * SCREEN_HEIGHT # In case of horizontal n810 screen
+TRACK_WIDTH     = 0.25 * SCREEN_HEIGHT # In case of horizontal n810 screen
 TRACK_MARGIN    = (SCREEN_HEIGHT - TRACK_WIDTH)/2.
 
 NUM_STRINGS     = 5
@@ -329,6 +331,9 @@ class Guitar:
     if not song:
       return
 
+    #face = PygameFace('guitar.svg')
+    #self.engine.video.screen.blit(face.guitar.sprite.image,face.guitar.get_position())
+
     # Update dynamic period
     self.currentPeriod = 60000.0 / self.currentBpm
     self.targetPeriod  = 60000.0 / self.targetBpm
@@ -337,7 +342,9 @@ class Guitar:
     w = self.boardWidth / self.strings
     track = song.track
 
-    self.engine.video.screen.fill((0,0,0))
+    #self.engine.video.screen.fill((0,0,0))
+    pygame.draw.rect(self.engine.video.screen, (0,0,0), 
+            (0,TRACK_MARGIN-4, TRACK_LENGTH, TRACK_WIDTH+8))
     pygame.draw.line(self.engine.video.screen, (255,255,255), FRET_LINE[0], FRET_LINE[1],3)
 
     for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard):

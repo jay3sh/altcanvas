@@ -24,6 +24,8 @@ import pygame
 import os
 import Log
 
+from inkface.canvas.pygamecanvas import PygameFace
+
 class Video:
   def __init__(self, caption = "Game"):
     self.screen     = None
@@ -63,6 +65,9 @@ class Video:
     pygame.display.set_caption(self.caption)
     pygame.mouse.set_visible(False)
 
+    face = PygameFace('guitar.svg')
+    self.screen.blit(face.background.sprite.image,face.background.get_position())
+    self.screen.blit(face.guitar.sprite.image,face.guitar.get_position())
 
     return bool(self.screen)
     
