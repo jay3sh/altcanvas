@@ -31,6 +31,7 @@ INKSCAPE_NS = "{http://www.inkscape.org/namespaces/inkscape}"
 XLINK_NS    = "{http://www.w3.org/1999/xlink}"
 
 TAG_DEFS            = SVG_NS+'defs'
+TAG_METADATA        = SVG_NS+'metadata'
 TAG_LINEARGRAD      = SVG_NS+'linearGradient'
 TAG_RADIALGRAD      = SVG_NS+'radialGradient'
 TAG_STOP            = SVG_NS+'stop'
@@ -79,6 +80,9 @@ class VectorDoc:
                 self.defs[e.attrib.get('id')] = \
                     RadialGradient(e)
 
+        self._implemented_node_types = \
+            (TAG_G, TAG_RECT, TAG_PATH, TAG_TEXT, TAG_IMAGE)
+
     def __getattr__(self,key):
         if self.__dict__.has_key(key):
             return self.__dict__[key]
@@ -96,6 +100,22 @@ class VectorDoc:
                 
         raise AttributeError('Unknown attribute '+key)
  
+    def _get_element_nodes(self):
+        for node in self.tree.getroot().getchildren():
+            if node.tag == TAG_DEFS: continue
+
+            if node.tag == TAG_METADATA: continue
+
+            if node.tag not in self._implemented_node_types: continue
+
+            if node.tag == TAG_G:
+                for cnode in node.getchildren():
+                    yield cnode
+                continue
+
+            yield node
+
+        
     def get_elements(self):
         '''
             Algorithm to create Element objects from SVG doc:
@@ -118,10 +138,9 @@ class VectorDoc:
         '''
 
         element = Element(None,self)
-        root_g = self.tree.find(TAG_G)
         in_backdrop = True
         elements = []
-        for e in root_g.getchildren():
+        for e in self._get_element_nodes():
             if in_backdrop and e.attrib.has_key(TAG_INKSCAPE_LABEL):
                 in_backdrop = False
 
@@ -150,9 +169,8 @@ class VectorDoc:
         
     def render_full(self, ctx):
         ''' render the full SVG tree '''
-        root_g = self.tree.find(TAG_G)
         ctx.move_to(0, 0)
-        for e in root_g.getchildren():
+        for e in self._get_element_nodes():
             elem = Element(e,self)
             elem.raw_render(ctx, e)
             
