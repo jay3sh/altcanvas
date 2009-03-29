@@ -46,6 +46,7 @@ TAG_HREF            = XLINK_NS+'href'
 
 import inkface.altsvg.draw
 from inkface.altsvg.element import Element
+from inkface.altsvg.qtelement import QtElement
 from inkface.altsvg.style import LinearGradient, RadialGradient
 from inkface.altsvg.style import parse_length
 from inkface.altsvg.draw import NODE_DRAW_MAP
@@ -168,6 +169,34 @@ class VectorDoc:
             
         return elements
         
+    def get_qt_elements(self):
+        element = QtElement(None, self)
+        in_backdrop = True
+        elements = []
+
+        for e in self._get_element_nodes():
+            if in_backdrop and e.attrib.has_key(TAG_INKSCAPE_LABEL):
+                in_backdrop = False
+
+                if element.pixmap is not None:
+                    elements.append(element)
+
+                # Keep a reference to the backdrop surface, we will use
+                # it as a scratch surface later
+                backdrop_pixmap = element.pixmap
+
+            if in_backdrop:
+                element.add_node(e)
+            else:
+                element = QtElement(e, self)
+                element.render()
+                elements.append(element)
+
+        if len(elements) == 0:
+            elements.append(element)
+
+        return elements
+
     def render_full(self, ctx):
         ''' render the full SVG tree '''
         ctx.move_to(0, 0)
