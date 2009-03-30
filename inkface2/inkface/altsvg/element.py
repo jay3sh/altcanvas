@@ -8,18 +8,15 @@ from inkface.altsvg import \
 from inkface.altsvg.draw import NODE_DRAW_MAP
 
 class Element:
-    surface = None
-    x = 0
-    y = 0
-    w = 0
-    h = 0
-    scale_factor = -1
-
     def __init__(self,node,vdoc):
         self.node = node
         self.vdoc = vdoc
-
         self.defs = vdoc.defs
+
+        self.surface = None
+        self.x, self.y, self.w, self.h = (0, 0, 0, 0)
+        self.scale_factor = -1
+
 
     def __getattr__(self,key):
         if self.__dict__.has_key(key):
@@ -306,7 +303,10 @@ class Element:
                     # /TODO
                     extents = self.__union(extents,new_extents)
             else:
-                raise Exception("Shape not implemented: "+e.tag)
+                #raise Exception("Shape not implemented: "+e.tag)
+                print 'Shape not implemented: '+e.tag
+                extents = [0, 0, 0, 0]
+
 
         ctx.restore()
 
