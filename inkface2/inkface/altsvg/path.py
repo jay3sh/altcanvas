@@ -39,7 +39,7 @@ def parse_path(path_data):
                 else:
                     val = (val * 10) + (ord(c) - ord('0'))
             else:
-                in_num = False
+                in_num = True 
                 in_frac = False
                 in_exp = False
                 exp = 0
@@ -139,14 +139,14 @@ def parse_path(path_data):
 def do_cmd(ctx, final):
     if ctx.cmd is 'm':
         if ctx.param == 2 or final:
-            print 'moveto %d %d'%(ctx.params[0], ctx.params[1])
+            print 'moveto %f %f'%(ctx.params[0], ctx.params[1])
             ctx.cpx = ctx.rpx = ctx.params[0]
             ctx.cpy = ctx.rpy = ctx.params[1]
             ctx.param = 0
 
     elif ctx.cmd is 'l':
         if ctx.param == 2 or final:
-            print 'lineto %d %d'%(ctx.params[0], ctx.params[1])
+            print 'lineto %f %f'%(ctx.params[0], ctx.params[1])
             ctx.cpx = ctx.rpx = ctx.params[0]
             ctx.cpy = ctx.rpy = ctx.params[1]
             ctx.param = 0
@@ -154,14 +154,26 @@ def do_cmd(ctx, final):
     elif ctx.cmd is 'c':
         if ctx.param == 6 or final:
             x1, y1, x2, y2, x3, y3 = ctx.params[0:6]
-            print 'curve to %d %d %d %d %d %d'%(x1, y1, x2, y2, x3, y3)
+            print 'curve to %f %f %f %f %f %f'%(x1, y1, x2, y2, x3, y3)
             ctx.rpx = x2
             ctx.rpy = y2
             ctx.cpx = x3
             ctx.cpy = y3
             ctx.param = 0
     elif ctx.cmd is 's':
-        print 'Not implemented '+ctx.cmd
+        if ctx.param == 4 or final:
+            x1 = 2 * ctx.cpx - ctx.rpx;
+            y1 = 2 * ctx.cpy - ctx.rpy;
+            x2 = ctx.params[0];
+            y2 = ctx.params[1];
+            x3 = ctx.params[2];
+            y3 = ctx.params[3];
+            print 'curve to %f %f %f %f %f %f'%(x1, y1, x2, y2, x3, y3)
+            ctx.rpx = x2
+            ctx.rpy = y2
+            ctx.cpx = x3
+            ctx.cpy = y3
+            ctx.param = 0
     elif ctx.cmd is 'h':
         print 'Not implemented '+ctx.cmd
     elif ctx.cmd is 'v':
@@ -171,7 +183,8 @@ def do_cmd(ctx, final):
     elif ctx.cmd is 't':
         print 'Not implemented '+ctx.cmd
     elif ctx.cmd is 'a':
-        print 'Not implemented '+ctx.cmd
+        if ctx.param == 7 or final:
+            print 'arc %f %f %f %f %f %f %f'%ctx.params[0:7]
     else:
         print 'default'
         ctx.param = 0
@@ -180,6 +193,7 @@ def do_cmd(ctx, final):
 
 if __name__ == '__main__':
     path='M205.65,98.19c0,0-1.429,3.75-3.215,5.894     c-1.786,2.143-6.429,3.572-11.608,3.215c-5.18-0.357-9.645-6.43-10.717-9.645C191.004,99.976,199.22,99.976,205.65,98.19z      M179.039,91.403l-4.644,3.394c0,0,0,4.108,3.572,9.108c3.572,5.001,9.287,8.751,14.824,8.395     c5.536-0.357,12.859-4.287,14.466-6.787c1.608-2.5,4.822-10.716,4.822-10.716l-3.929-3.214c-5.715,2.679-12.859,2.5-16.431,2.5     S182.789,93.725,179.039,91.403z'
+    #path='M 489.00638,122.79131 C 489.00638,122.79131 553.67347,48.886064 576.46092,86.454564 C 599.24837,124.02306 599.24837,124.02306 599.24837,124.02306 C 599.24837,124.02306 604.79126,247.19847 547.5147,184.99489 C 490.23813,122.79131 489.62226,122.17543 489.00638,122.79131 z'
     parse_path(path)
         
 
