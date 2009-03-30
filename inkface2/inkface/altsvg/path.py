@@ -121,11 +121,6 @@ def parse_path(path_data):
                     commands.append(command)
 
             commands.append(('Z', []))
-            # TODO check if not doing this causes any trouble
-            '''
-            ctx.cpx = ctx.rpx 
-            ctx.cpy = ctx.rpy
-            '''
 
         elif (c >= 'A' and c <= 'Z' and c is not 'E'):
             if ctx.param > 0:
@@ -143,6 +138,15 @@ def parse_path(path_data):
             ctx.cmd = c
             ctx.rel = True
         # else c should be whitespace or , 
+
+
+    # In case of absent 'z'
+    ctx.params[ctx.param] = val
+    ctx.param += 1
+
+    command = do_cmd(ctx, False)
+    if command is not None:
+        commands.append(command)
 
     return commands
 

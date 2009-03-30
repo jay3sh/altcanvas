@@ -15,7 +15,7 @@ import cairo
 
 from inkface.altsvg.style import get_style_object
 from inkface.altsvg import TAG_RECT, TAG_PATH, \
-    TAG_TEXT, TAG_TSPAN, TAG_IMAGE, TAG_HREF
+    TAG_TEXT, TAG_TSPAN, TAG_IMAGE, TAG_HREF, TAG_LINE
 
 def draw(ctx, style):
     ''' Generic draw routine '''
@@ -70,11 +70,12 @@ def draw_rect(ctx, node, defs, simulate=False):
     ''' Render 'rect' SVG element '''
     ctx.save()
 
-    style = None
+    #style = None
 
-    style_str = node.attrib.get('style')
-    if style_str:
-        style = get_style_object(style_str, defs)
+    #style_str = node.attrib.get('style')
+    #if style_str:
+    #    style = get_style_object(style_str, defs)
+    style = get_style_object(node.attrib, defs)
 
 
     x = float(node.attrib.get('x'))
@@ -221,10 +222,11 @@ def draw_tspan(ctx, node, simulate):
         ctx.show_text(node.text)
     
 def draw_text(ctx, node, defs, simulate=False):
-    style = None
-    style_str = node.attrib.get('style')
-    if style_str:
-        style = get_style_object(style_str, defs)
+    #style = None
+    #style_str = node.attrib.get('style')
+    #if style_str:
+    #    style = get_style_object(style_str, defs)
+    style = get_style_object(node.attrib, defs)
 
     ctx.save()
 
@@ -274,61 +276,41 @@ def _union(extents,new_extents):
         return (x1, y1, x2, y2)
 # TODO: /extent-union dup code
 
+def draw_line(ctx, node, defs, simulate=False):
+    ctx.save()
+
+    ctx.restore()
+
 def draw_path(ctx, node, defs, simulate=False):
     ''' Render 'path' SVG element '''
     ctx.save()
 
-    style = None
-    style_str = node.attrib.get('style')
-    if style_str:
-        style = get_style_object(style_str, defs)
+    style = get_style_object(node.attrib, defs)
+    
+    from inkface.altsvg.path import parse_path
+    
+    path_cmds = parse_path(node.get('d'))
 
-    tokens = node.attrib.get('d').replace(',',' ').split()
-    i = 0
-    while i < len(tokens):
-        if tokens[i].isalpha():
-            if tokens[i] == 'L':
-                x = int(float(tokens[i+1]))
-                y = int(float(tokens[i+2]))
-                i += 3
-                ctx.line_to(x, y)
-                continue
-            elif tokens[i] == 'M':
-                x = int(float(tokens[i+1]))
-                y = int(float(tokens[i+2]))
-                i += 3
-                ctx.move_to(x, y)
-                continue
-            elif tokens[i] == 'C':
-                x1 = int(float(tokens[i+1]))
-                y1 = int(float(tokens[i+2]))
-                x2 = int(float(tokens[i+3]))
-                y2 = int(float(tokens[i+4]))
-                x = int(float(tokens[i+5]))
-                y = int(float(tokens[i+6]))
-                i += 7
-                ctx.curve_to(x1, y1, x2, y2, x, y)
-                continue
-            elif tokens[i] == 'A':
-                rx = float(tokens[i+1]) 
-                ry = float(tokens[i+2]) 
-                xrot = float(tokens[i+3])
-                laflag = int(tokens[i+4])
-                swflag = int(tokens[i+5])
-                x = float(tokens[i+6])
-                y = float(tokens[i+7])
-                i += 8
-                draw_arc(ctx,rx,ry,xrot,laflag,swflag,x,y)
-                continue
-            elif tokens[i] == 'z':
-                ctx.close_path()
-                break
-
-        # This should never be reached; 
-        # but if the path data is malformed this will help from 
-        # getting stuck in an infinite loop
-        i += 1
-
+    for cmd,param in path_cmds:
+        if cmd is 'M':
+            x, y = param
+            ctx.move_to(x, y)
+            continue
+        elif cmd is 'L':
+            x, y = param
+            ctx.line_to(x, y)
+            continue
+        elif cmd is 'C':
+            x1, y1, x2, y2, x3, y3 = param
+            ctx.curve_to(x1, y1, x2, y2, x3, y3)
+            continue
+        elif cmd is 'A':
+            rx, ry, xrot, laflag, swflag, x, y = param
+            draw_arc(ctx, rx, ry, xrot, laflag, swflag, x, y)
+            continue
+        elif cmd is 'Z':
+            ctx.close_path()
+        
     if simulate:
         ex1, ey1, ex2, ey2 = ctx.stroke_extents()
         try:
@@ -388,6 +370,7 @@ def draw_image(ctx, node, defs, simulate=False):
         
 NODE_DRAW_MAP = \
     {
+        TAG_LINE:draw_line,
         TAG_RECT:draw_rect,
         TAG_PATH:draw_path,
         TAG_TEXT:draw_text,
