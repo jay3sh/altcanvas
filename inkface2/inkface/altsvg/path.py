@@ -1,4 +1,6 @@
-
+'''
+Path parsing functions
+'''
 
 class PathContext:
     cpx = 0.0
@@ -9,7 +11,6 @@ class PathContext:
     param = 0 
     rel = None
     params = [0,0,0,0,0,0,0]
-
 
 
 def parse_path(path_data):
@@ -25,6 +26,8 @@ def parse_path(path_data):
     exp = 0
     exp_sign = 0
     frac = 0.0
+
+    commands = []
 
     for c in path_data:
         if c >= '0' and c <= '9':
@@ -88,7 +91,9 @@ def parse_path(path_data):
             ctx.params[ctx.param] = val
             ctx.param += 1
 
-            do_cmd(ctx, False)
+            command = do_cmd(ctx, False)
+            if command is not None:
+                commands.append(command)
 
             in_num = False
 
@@ -110,56 +115,62 @@ def parse_path(path_data):
             exp_wait_sign = False
 
         elif c == 'z' or c == 'Z':
-            if ctx.param > 0:  # TODO check
-                do_cmd(ctx, True)
-                pass
+            if ctx.param > 0:  
+                command = do_cmd(ctx, True)
+                if command is not None:
+                    commands.append(command)
 
-            #TODO close_path
-
-            #TODO
+            commands.append(('Z', []))
+            # TODO check if not doing this causes any trouble
+            '''
             ctx.cpx = ctx.rpx 
             ctx.cpy = ctx.rpy
+            '''
+
         elif (c >= 'A' and c <= 'Z' and c is not 'E'):
             if ctx.param > 0:
-                do_cmd(ctx, True)
-                pass
+                command = do_cmd(ctx, True)
+                if command is not None:
+                    commands.append(command)
 
             ctx.cmd = chr(ord(c) + ord('a') - ord('A'))
             ctx.rel = False
         elif (c >= 'a' and c <= 'z' and c is not 'e'):
             if ctx.param > 0:
-                do_cmd(ctx, True)
-                pass
+                command = do_cmd(ctx, True)
+                if command is not None:
+                    commands.append(command)
             ctx.cmd = c
             ctx.rel = True
         # else c should be whitespace or , 
 
+    return commands
 
 
 def do_cmd(ctx, final):
     if ctx.cmd is 'm':
         if ctx.param == 2 or final:
-            print 'moveto %f %f'%(ctx.params[0], ctx.params[1])
             ctx.cpx = ctx.rpx = ctx.params[0]
             ctx.cpy = ctx.rpy = ctx.params[1]
             ctx.param = 0
+            return ('M',ctx.params[0:2])
 
     elif ctx.cmd is 'l':
         if ctx.param == 2 or final:
-            print 'lineto %f %f'%(ctx.params[0], ctx.params[1])
             ctx.cpx = ctx.rpx = ctx.params[0]
             ctx.cpy = ctx.rpy = ctx.params[1]
             ctx.param = 0
+            return ('L',ctx.params[0:2])
 
     elif ctx.cmd is 'c':
         if ctx.param == 6 or final:
             x1, y1, x2, y2, x3, y3 = ctx.params[0:6]
-            print 'curve to %f %f %f %f %f %f'%(x1, y1, x2, y2, x3, y3)
             ctx.rpx = x2
             ctx.rpy = y2
             ctx.cpx = x3
             ctx.cpy = y3
             ctx.param = 0
+            return ('C',ctx.params[0:6])
     elif ctx.cmd is 's':
         if ctx.param == 4 or final:
             x1 = 2 * ctx.cpx - ctx.rpx;
@@ -168,12 +179,12 @@ def do_cmd(ctx, final):
             y2 = ctx.params[1];
             x3 = ctx.params[2];
             y3 = ctx.params[3];
-            print 'curve to %f %f %f %f %f %f'%(x1, y1, x2, y2, x3, y3)
             ctx.rpx = x2
             ctx.rpy = y2
             ctx.cpx = x3
             ctx.cpy = y3
             ctx.param = 0
+            return ('C',(x1, y1, x2, y2, x3, y3))
     elif ctx.cmd is 'h':
         print 'Not implemented '+ctx.cmd
     elif ctx.cmd is 'v':
@@ -184,9 +195,9 @@ def do_cmd(ctx, final):
         print 'Not implemented '+ctx.cmd
     elif ctx.cmd is 'a':
         if ctx.param == 7 or final:
-            print 'arc %f %f %f %f %f %f %f'%ctx.params[0:7]
+            ctx.param = 0
+            return ('A',ctx.params[0:7])
     else:
-        print 'default'
         ctx.param = 0
                 
             
