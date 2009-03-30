@@ -20,8 +20,15 @@ class App:
 
         self.vDoc = VectorDoc(sys.argv[1])
 
-        self.window = pygame.display.set_mode(
-            (int(float(self.vDoc.width)),int(float(self.vDoc.height))),pygame.DOUBLEBUF )
+        try:
+            self.window = pygame.display.set_mode(
+                (int(self.vDoc.width), int(self.vDoc.height)),
+                pygame.DOUBLEBUF )
+        except AttributeError, ae:
+            print ae
+            print 'Creating default size window'
+            self.window = pygame.display.set_mode((640, 480),
+                            pygame.DOUBLEBUF )
 
         self.screen = pygame.display.get_surface()
 
