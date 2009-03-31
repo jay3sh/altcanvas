@@ -59,7 +59,6 @@ def parse_length(value_str):
     return float(value_str)
 
 
-
 class Style:
     ''' Class to encapsulate style strings '''
     def __init__(self, style_str, defs):

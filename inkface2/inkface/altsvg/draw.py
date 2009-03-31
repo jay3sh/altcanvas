@@ -17,6 +17,9 @@ from inkface.altsvg.style import get_style_object
 from inkface.altsvg import TAG_RECT, TAG_PATH, \
     TAG_TEXT, TAG_TSPAN, TAG_IMAGE, TAG_HREF, TAG_LINE
 
+from inkface.altsvg.path import parse_path
+from inkface.altsvg.style import parse_length
+
 def draw(ctx, style):
     ''' Generic draw routine '''
     if style is not None and style.has('opacity') \
@@ -70,13 +73,7 @@ def draw_rect(ctx, node, defs, simulate=False):
     ''' Render 'rect' SVG element '''
     ctx.save()
 
-    #style = None
-
-    #style_str = node.attrib.get('style')
-    #if style_str:
-    #    style = get_style_object(style_str, defs)
     style = get_style_object(node.attrib, defs)
-
 
     x = float(node.attrib.get('x'))
     y = float(node.attrib.get('y'))
@@ -279,6 +276,26 @@ def _union(extents,new_extents):
 def draw_line(ctx, node, defs, simulate=False):
     ctx.save()
 
+    style = get_style_object(node.attrib, defs)
+
+    x1 = parse_length(node.get('x1'))
+    y1 = parse_length(node.get('y1'))
+    x2 = parse_length(node.get('x2'))
+    y2 = parse_length(node.get('y2'))
+
+    ctx.move_to(x1, y1)
+
+    ctx.line_to(x2, y2)
+
+    ctx.close_path()
+
+    if simulate:
+        extents = ctx.stroke_extents()
+        # TODO: factor in stroke width and capstyle
+        return extents
+    else:
+        draw(ctx, style)
+
     ctx.restore()
 
 def draw_path(ctx, node, defs, simulate=False):
@@ -286,8 +303,6 @@ def draw_path(ctx, node, defs, simulate=False):
     ctx.save()
 
     style = get_style_object(node.attrib, defs)
-    
-    from inkface.altsvg.path import parse_path
     
     path_cmds = parse_path(node.get('d'))
 
