@@ -18,8 +18,7 @@ from PyQt4.QtGui import QColor, QPen, QBrush
 from PyQt4.QtCore import Qt
 
 style_map = {}
-
-def get_style_object(style_str, defs):
+def get_style_object(attrib, defs):
     '''
     This method creates a Style object and stores it in a dictionary
     keyed on the style_str. That way next request for parsing same
@@ -27,7 +26,24 @@ def get_style_object(style_str, defs):
     is saved.
     Repetitive parsing requests for same style string are very common
     hence this strategy helps improve performance.
+
+
+    As per SVG specs, style attributes can also be direct attributes of 
+    a node. Adobe Illustrator seems to follow that. So, if we do not get
+    a 'style' attribute in a node, we will search for individual style
+    attributes and serialize them into string. Serializing them is important
+    because that will caching commonly used styles.
     '''
+
+    if attrib.has_key('style'):
+        style_str = attrib.get('style')
+    else:
+        style_list = []
+        for att in STYLE_ATTRIBUTES:
+            if attrib.has_key(att):
+                style_list.append(att+':'+attrib[att])
+        style_str = ';'.join(style_list)
+
     if style_str in style_map:
         return style_map[style_str]
     else:
@@ -79,7 +95,7 @@ class Style:
     def __html2rgb(self, html_color):
         ''' Converts HTML color code to normalized RGB values '''
         try:
-            html_color = html_color.replace(' ','')
+            html_color = html_color.lower().replace(' ','')
             if html_color.startswith('rgb'):
                 pattern = 'rgb\(([0-9,]+)\)'
                 m = re.search(pattern, html_color)
@@ -100,10 +116,10 @@ class Style:
 
 
     def get_brush(self):
-        r = g = b = 0
-        a = 255
+        r = g = b = 0.
+        a = 255.
         if self.__style__.has_key('fill'):
-            if self.__style__['fill'] is 'none':
+            if self.__style__['fill'] == 'none':
                 return None
             elif self.__is_url(self.__style__['fill']):
                 raise Exception('Not implemented')
@@ -111,7 +127,7 @@ class Style:
                 r, g, b = self.__html2rgb(self.__style__['fill'])
 
         if self.__style__.has_key('fill-opacity'):
-            a = 255 * float(self.__style__['fill-opacity'])
+            a = 255. * float(self.__style__['fill-opacity'])
 
         brush = QBrush()
         brush.setColor(QColor(r, g, b, a))
@@ -120,9 +136,8 @@ class Style:
         return brush
             
     def get_pen(self):
-           
-        r = g = b = 0
-        a = 255
+        r = g = b = 0.
+        a = 255.
         if self.__style__.has_key('stroke'):
             if self.__style__['stroke'] == 'none':
                 return None
@@ -131,10 +146,9 @@ class Style:
             else:
                 r, g, b = self.__html2rgb(self.__style__['stroke'])
         if self.__style__.has_key('stroke-opacity'):
-            a = 255 * float(self.__style__['stroke-opacity'])
+            a = 255. * float(self.__style__['stroke-opacity'])
  
         pen = QPen()
-        print 'setting pen to '+str((r,g,b,a))
         pen.setColor(QColor(r, g, b, a))
 
         if self.__style__.has_key('stroke-width'):
