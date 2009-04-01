@@ -20,6 +20,17 @@
   <defs
      id="defs4">
     <linearGradient
+       id="linearGradient3827">
+      <stop
+         id="stop3829"
+         offset="0"
+         style="stop-color:#ff007a;stop-opacity:1;" />
+      <stop
+         id="stop3831"
+         offset="1"
+         style="stop-color:#0000ff;stop-opacity:0;" />
+    </linearGradient>
+    <linearGradient
        inkscape:collect="always"
        id="linearGradient3181">
       <stop
@@ -47,6 +58,16 @@
        x2="344.7963"
        y2="352.28769"
        gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3827"
+       id="linearGradient3825"
+       gradientUnits="userSpaceOnUse"
+       x1="135.39026"
+       y1="133.20299"
+       x2="344.7963"
+       y2="352.28769"
+       gradientTransform="translate(245.53635,119.32872)" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -94,5 +115,9 @@
        style="fill:url(#linearGradient3187);fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1"
        d="M 160,254.22222 C 160,254.22222 243.55556,115.55556 273.18519,135.7037 C 302.81481,155.85185 287.40741,293.92593 300.44444,289.18519 C 313.48148,284.44444 400,132.14815 444.44444,167.11111 C 488.88889,202.07407 533.33333,321.18519 533.33333,321.18519 C 533.33333,321.18519 458.07407,350.81481 452.14815,295.7037 C 446.22222,240.59259 432.59259,301.62963 370.37037,341.92593 C 308.14815,382.22222 274.96296,285.03704 235.25926,299.85185 C 195.55556,314.66667 88.296296,365.62963 160,254.22222 z"
        id="path2393" />
+    <path
+       style="fill:url(#linearGradient3825);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 405.53635,373.55094 C 405.53635,373.55094 489.09191,234.88429 518.72154,255.03243 C 548.35116,275.18058 532.94376,413.25465 545.98079,408.51391 C 559.01783,403.77316 645.53635,251.47688 689.98079,286.43984 C 734.42524,321.40279 778.86968,440.51391 778.86968,440.51391 C 778.86968,440.51391 703.61042,470.14353 697.6845,415.03242 C 691.75857,359.92131 678.12894,420.95835 615.90672,461.25465 C 553.6845,501.55094 520.49931,404.36576 480.79561,419.18057 C 441.09191,433.99539 333.83265,484.95835 405.53635,373.55094 z"
+       id="path3823" />
   </g>
 </svg>

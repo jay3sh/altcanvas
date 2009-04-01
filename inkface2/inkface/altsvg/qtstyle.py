@@ -14,8 +14,8 @@
 
 import re
 
-from PyQt4.QtGui import QColor, QPen, QBrush, QLinearGradient, QRadialGradient
-from PyQt4.QtCore import Qt
+from PyQt4.QtGui import QColor, QPen, QBrush, QLinearGradient, QRadialGradient, QMatrix
+from PyQt4.QtCore import Qt, QPointF
 
 style_map = {}
 def get_style_object(attrib, defs):
@@ -123,20 +123,31 @@ class Style:
             grad.resolve_href(self.defs)
 
             if isinstance(grad, LinearGradient):
-                qgrad = QLinearGradient( \
-                    grad.x1, grad.y1, grad.x2, grad.y2)
+                if grad.transform_matrix is not None:
+                    grad.transform_matrix = QMatrix(*(grad.transform_matrix))
+                    pt1 = grad.transform_matrix.map(QPointF(grad.x1, grad.y1))
+                    pt2 = grad.transform_matrix.map(QPointF(grad.x2, grad.y2))
+                    qgrad = QLinearGradient(pt1.x(), pt1.y(), pt2.x(), pt2.y())
+                else:
+                    qgrad = QLinearGradient( \
+                        grad.x1, grad.y1, grad.x2, grad.y2)
             elif isinstance(grad,RadialGradient):
                 # TODO: handle when cx,cy is different than fx,fy
+
+                # Note: I have no clue why inverting the matrix works below
+                # found that's how librsvg does it and it works.
+                if grad.transform_matrix is not None:
+                    print 'Transformed radial gradient not implemented for Qt' 
+                    #grad.transform_matrix = QMatrix(*(grad.transform_matrix))
+                    #grad.transform_matrix,_ = grad.transform_matrix.inverted()
+                    #center = grad.transform_matrix.map(QPointF(grad.fx, grad.fy))
+                    #qgrad = QRadialGradient(center.x(), center.y(), grad.r,
+                    #                        center.x(), center.y())
+
                 qgrad = QRadialGradient( \
                             grad.fx, grad.fy, grad.r,
                             grad.fx, grad.fy)
                 
-                # Note: I have no clue why inverting the matrix works below
-                # found that's how librsvg does it and it works.
-                if grad.transform_matrix is not None:
-                    grad.transform_matrix.invert()
-                    cairo_grad.set_matrix(grad.transform_matrix)
-                    
             stops = []
             for offset, style in grad.stops:
                 stop_style = Style(style, None)
