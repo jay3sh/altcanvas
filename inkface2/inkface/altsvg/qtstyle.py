@@ -14,7 +14,7 @@
 
 import re
 
-from PyQt4.QtGui import QColor, QPen, QBrush, QLinearGradient
+from PyQt4.QtGui import QColor, QPen, QBrush, QLinearGradient, QRadialGradient
 from PyQt4.QtCore import Qt
 
 style_map = {}
@@ -127,9 +127,10 @@ class Style:
                     grad.x1, grad.y1, grad.x2, grad.y2)
             elif isinstance(grad,RadialGradient):
                 # TODO: handle when cx,cy is different than fx,fy
-                cairo_grad = cairo.RadialGradient( \
-                    grad.fx, grad.fy, 0,
-                    grad.fx, grad.fy, grad.r)
+                qgrad = QRadialGradient( \
+                            grad.fx, grad.fy, grad.r,
+                            grad.fx, grad.fy)
+                
                 # Note: I have no clue why inverting the matrix works below
                 # found that's how librsvg does it and it works.
                 if grad.transform_matrix is not None:
