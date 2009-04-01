@@ -102,8 +102,17 @@ class Style:
             grad.resolve_href(self.defs)
 
             if isinstance(grad, LinearGradient):
+                if grad.transform_matrix is not None:
+                    grad.transform_matrix = cairo.Matrix(*(grad.transform_matrix))
+                    grad.x1,grad.y1 = \
+                        grad.transform_matrix.transform_point(grad.x1,grad.y1)
+                    grad.x2,grad.y2 = \
+                        grad.transform_matrix.transform_point(grad.x2,grad.y2)
+
                 cairo_grad = cairo.LinearGradient( \
                     grad.x1, grad.y1, grad.x2, grad.y2)
+
+
             elif isinstance(grad,RadialGradient):
                 # TODO: handle when cx,cy is different than fx,fy
                 cairo_grad = cairo.RadialGradient( \
@@ -112,6 +121,7 @@ class Style:
                 # Note: I have no clue why inverting the matrix works below
                 # found that's how librsvg does it and it works.
                 if grad.transform_matrix is not None:
+                    grad.transform_matrix = cairo.Matrix(*(grad.transform_matrix))
                     grad.transform_matrix.invert()
                     cairo_grad.set_matrix(grad.transform_matrix)
                     
@@ -310,9 +320,9 @@ class Gradient:
         self.transform_matrix = None
 
         if transform_type == 'translate':
-            self.transform_matrix = cairo.Matrix(1,0,0,1,x0,y0)
+            self.transform_matrix = (1,0,0,1,x0,y0)
         elif transform_type == 'matrix':
-            self.transform_matrix = cairo.Matrix(xx,xy,yx,yy,x0,y0)
+            self.transform_matrix = (xx,xy,yx,yy,x0,y0)
 
         # TODO: /matrix-dup-code
 
@@ -329,11 +339,6 @@ class LinearGradient(Gradient):
         self.x2 = float(defnode.attrib.get('x2', 0))
         self.y1 = float(defnode.attrib.get('y1', 0))
         self.y2 = float(defnode.attrib.get('y2', 0))
-        if self.transform_matrix is not None:
-            self.x1,self.y1 = \
-                self.transform_matrix.transform_point(self.x1,self.y1)
-            self.x2,self.y2 = \
-                self.transform_matrix.transform_point(self.x2,self.y2)
 
 class RadialGradient(Gradient):
     def __init__(self, defnode):
