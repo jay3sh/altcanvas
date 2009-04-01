@@ -21,12 +21,12 @@ from inkface.altsvg.path import parse_path
 from inkface.altsvg.style import parse_length
 
 def draw(painter, path, style):
-    pen = style.get_pen()
-    if pen is not None:
-        painter.strokePath(path, pen)
     brush = style.get_brush()
     if brush is not None:
         painter.fillPath(path, brush)
+    pen = style.get_pen()
+    if pen is not None:
+        painter.strokePath(path, pen)
 
 def draw_path(painter, node, defs, simulate=False):
     painter.save()
