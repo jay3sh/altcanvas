@@ -199,7 +199,6 @@ class Style:
 
 
         if self.__style__.has_key('stroke-width'):
-            print 'stroke-width = %f'%(parse_length(self.__style__['stroke-width']))
             pen.setWidthF(parse_length(self.__style__['stroke-width']))
         if self.__style__.has_key('stroke-miterlimit'):
             pen.setMiterLimit(
