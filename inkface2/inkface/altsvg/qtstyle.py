@@ -14,7 +14,7 @@
 
 import re
 
-from PyQt4.QtGui import QColor, QPen, QBrush
+from PyQt4.QtGui import QColor, QPen, QBrush, QLinearGradient
 from PyQt4.QtCore import Qt
 
 style_map = {}
@@ -114,6 +114,40 @@ class Style:
             print 'Error parsing color code [%s]: %s'% (html_color, str(e))
             return (0, 0, 0)
 
+    def _apply_pattern(self, pattern_url):
+        from inkface.altsvg.style import LinearGradient, RadialGradient
+        m = re.search("url\((\S+)\)", pattern_url)
+        if m:
+            grad_id = m.group(1).replace('#','')
+            grad = self.defs[grad_id]
+            grad.resolve_href(self.defs)
+
+            if isinstance(grad, LinearGradient):
+                qgrad = QLinearGradient( \
+                    grad.x1, grad.y1, grad.x2, grad.y2)
+            elif isinstance(grad,RadialGradient):
+                # TODO: handle when cx,cy is different than fx,fy
+                cairo_grad = cairo.RadialGradient( \
+                    grad.fx, grad.fy, 0,
+                    grad.fx, grad.fy, grad.r)
+                # Note: I have no clue why inverting the matrix works below
+                # found that's how librsvg does it and it works.
+                if grad.transform_matrix is not None:
+                    grad.transform_matrix.invert()
+                    cairo_grad.set_matrix(grad.transform_matrix)
+                    
+            stops = []
+            for offset, style in grad.stops:
+                stop_style = Style(style, None)
+                r, g, b = self.__html2rgb(stop_style.stop_color)
+                a = 255. * float(stop_style.stop_opacity)
+                stops.append((float(offset), QColor(r, g, b, a)))
+
+            qgrad.setStops(stops)
+
+            return QBrush(qgrad)
+
+        
 
     def get_brush(self):
         r = g = b = 0.
@@ -122,7 +156,8 @@ class Style:
             if self.__style__['fill'] == 'none':
                 return None
             elif self.__is_url(self.__style__['fill']):
-                raise Exception('Not implemented')
+                brush = self._apply_pattern(self.__style__['fill'])
+                return brush
             else:
                 r, g, b = self.__html2rgb(self.__style__['fill'])
 
@@ -158,3 +193,87 @@ class Style:
                 parse_length(self.__style__['stroke-miterlimit']))
  
         return pen
+
+#
+# There are two kinds of Gradient def nodes
+# 1. that define stops as their children
+# 2. that define position of gradient and have link to first kind
+#
+# I like to think of later as the instance of former.
+#
+'''
+from inkface.altsvg import TAG_HREF, TAG_STOP
+
+class Gradient:
+    #'' Class to encapsulate definition of Gradients ''
+    stops = ()
+    href = None
+    def __init__(self, defnode):
+        self.href = defnode.attrib.get(TAG_HREF)
+        if self.href: self.href = self.href.replace('#','')
+        self.stops = filter( \
+            lambda x: x.tag == TAG_STOP, defnode.getchildren())
+        self.stops = map ( \
+            lambda x: (x.attrib.get('offset'), x.attrib.get('style')),
+            self.stops)
+
+        transform_str = defnode.get('gradientTransform')
+
+        # TODO: matrix-dup-code
+        transform_type = None
+        if transform_str is not None:
+            transform_str = transform_str.replace(' ','')
+            pattern = '(\w+)\s*\(([e0-9-.,]+)\)'
+            m = re.search(pattern, transform_str)
+            if m: 
+                transform_type = m.group(1)
+                transform_values = m.group(2)
+
+                if transform_type == 'translate':
+                    x0, y0 = \
+                    map(lambda x: float(x), transform_values.split(','))
+                elif transform_type == 'matrix':
+                    xx, xy, yx, yy, x0, y0 = \
+                    map(lambda x: float(x), transform_values.split(','))
+            else:
+                raise Exception(
+                    'Unable to match transform: %s'%transform_str)
+
+        self.transform_matrix = None
+
+        if transform_type == 'translate':
+            self.transform_matrix = cairo.Matrix(1,0,0,1,x0,y0)
+        elif transform_type == 'matrix':
+            self.transform_matrix = cairo.Matrix(xx,xy,yx,yy,x0,y0)
+
+        # TODO: /matrix-dup-code
+
+
+    def resolve_href(self, defs):
+        if self.href:
+            self.stops = defs[self.href].stops
+        
+ 
+class LinearGradient(Gradient):
+    def __init__(self, defnode):
+        Gradient.__init__(self, defnode)
+        self.x1 = float(defnode.attrib.get('x1', 0))
+        self.x2 = float(defnode.attrib.get('x2', 0))
+        self.y1 = float(defnode.attrib.get('y1', 0))
+        self.y2 = float(defnode.attrib.get('y2', 0))
+        if self.transform_matrix is not None:
+            self.x1,self.y1 = \
+                self.transform_matrix.transform_point(self.x1,self.y1)
+            self.x2,self.y2 = \
+                self.transform_matrix.transform_point(self.x2,self.y2)
+
+class RadialGradient(Gradient):
+    def __init__(self, defnode):
+        Gradient.__init__(self, defnode)
+        self.cx = float(defnode.attrib.get('cx', 0))
+        self.cy = float(defnode.attrib.get('cy', 0))
+        self.fx = float(defnode.attrib.get('fx', 0))
+        self.fy = float(defnode.attrib.get('fy', 0))
+        self.r = float(defnode.attrib.get('r', 0))
+        
+'''
