@@ -6,7 +6,7 @@ from inkface.altsvg import \
     TAG_INKSCAPE_LABEL, TAG_G, TAG_TSPAN, TAG_TEXT
 from inkface.altsvg.qtdraw import NODE_DRAW_MAP
 
-from PyQt4.QtGui import QPixmap, QPainter
+from PyQt4.QtGui import QPixmap, QPainter, QMatrix, QTransform
 from PyQt4.QtCore import Qt
 
 class QtElement:
@@ -148,6 +148,7 @@ class QtElement:
         self.pixmap.fill(Qt.transparent)
         elem_painter = QPainter()
         elem_painter.begin(self.pixmap)
+
         elem_painter.translate(-ex1, -ey1)
 
         if self.scale_factor > 0:
@@ -189,9 +190,16 @@ class QtElement:
 
         extents = None
 
-        # TODO transform
+        transform_matrix = None
+        if transform_type == 'translate':
+            transform_matrix = QMatrix(1, 0, 0, 1, x0, y0)
+        elif transform_type == 'matrix':
+            transform_matrix = QMatrix(xx, xy, yx, yy, x0, y0)
 
-        if e.tag is TAG_G:
+        if transform_matrix is not None:
+            painter.setTransform(QTransform(transform_matrix), True)
+
+        if e.tag == TAG_G:
             for sub_e in e.getchildren():
                 new_extents = self.raw_render(painter, sub_e, simulate)
 
@@ -201,7 +209,13 @@ class QtElement:
                     else:
                         ex1, ey1, ex2, ey2 = new_extents
 
-                # TODO transform
+                    # TODO transform
+                    if transform_matrix is not None:
+                        new_extents = \
+                            transform_matrix.map(ex1,ey1) + \
+                            transform_matrix.map(ex2,ey2)
+
+                    extents = self.__union(extents, new_extents) 
 
         else:
             draw = NODE_DRAW_MAP.get(e.tag, None)
@@ -210,6 +224,10 @@ class QtElement:
                 if simulate:
                     ex1, ey1, ex2, ey2 = new_extents
                     # TODO transform
+                    if transform_matrix is not None:
+                        new_extents = \
+                            transform_matrix.map(ex1,ey1) + \
+                            transform_matrix.map(ex2,ey2)
  
                     extents = self.__union(extents,new_extents)
             else:
