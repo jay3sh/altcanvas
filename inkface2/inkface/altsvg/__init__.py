@@ -47,7 +47,6 @@ TAG_HREF            = XLINK_NS+'href'
 
 import inkface.altsvg.draw
 from inkface.altsvg.element import Element
-from inkface.altsvg.qtelement import QtElement
 from inkface.altsvg.style import LinearGradient, RadialGradient
 from inkface.altsvg.style import parse_length
 from inkface.altsvg.draw import NODE_DRAW_MAP
@@ -171,6 +170,7 @@ class VectorDoc:
         return elements
         
     def get_qt_elements(self):
+        from inkface.altsvg.qtelement import QtElement
         element = QtElement(None, self)
         in_backdrop = True
         elements = []
