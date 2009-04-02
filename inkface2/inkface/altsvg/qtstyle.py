@@ -114,7 +114,7 @@ class Style:
             print 'Error parsing color code [%s]: %s'% (html_color, str(e))
             return (0, 0, 0)
 
-    def _apply_pattern(self, pattern_url):
+    def _get_pattern_brush(self, pattern_url):
         from inkface.altsvg.style import LinearGradient, RadialGradient
         m = re.search("url\((\S+)\)", pattern_url)
         if m:
@@ -167,7 +167,7 @@ class Style:
             if self.__style__['fill'] == 'none':
                 return None
             elif self.__is_url(self.__style__['fill']):
-                brush = self._apply_pattern(self.__style__['fill'])
+                brush = self._get_pattern_brush(self.__style__['fill'])
                 return brush
             else:
                 r, g, b = self.__html2rgb(self.__style__['fill'])
@@ -184,19 +184,20 @@ class Style:
     def get_pen(self):
         r = g = b = 0.
         a = 255.
+        pen = QPen()
         if self.__style__.has_key('stroke'):
             if self.__style__['stroke'] == 'none':
                 return None
             if self.__is_url(self.__style__['stroke']):
-                raise Exception('Not implemented')
+                brush = self._get_pattern_brush(self.__style__['stroke'])
+                pen.setBrush(brush)
             else:
                 r, g, b = self.__html2rgb(self.__style__['stroke'])
-        if self.__style__.has_key('stroke-opacity'):
-            a = 255. * float(self.__style__['stroke-opacity'])
- 
-        pen = QPen()
-        pen.setColor(QColor(r, g, b, a))
 
+                if self.__style__.has_key('stroke-opacity'):
+                    a = 255. * float(self.__style__['stroke-opacity'])
+ 
+                pen.setColor(QColor(r, g, b, a))
 
         if self.__style__.has_key('stroke-width'):
             pen.setWidthF(parse_length(self.__style__['stroke-width']))
