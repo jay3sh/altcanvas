@@ -1,26 +1,100 @@
 
 #!/usr/bin/env python
 
+import os
 import sys
+import getopt
 from inkface.evas import EFace, ECanvas
+from etwtlib.textbox import TextBox
 
-def main():
-    try:
-        face = EFace(sys.argv[1])
-    
-        canvas = ECanvas(
-                    (int(float(face.svg.width)),
-                        int(float(face.svg.height))),
-                    framerate = 60.0)
-    
-        face.load_elements(canvas)
+TWITINK_RC      = os.environ['HOME']+os.sep+'.twitinkrc'
+PREFIX      = '..'
+SVG_DIR     = os.path.join(PREFIX,'svg')
 
-        canvas.eventloop()
-    
-    except Exception, e:
-        print 'Caught Exception: '+str(e)
-        sys.exit(0)
-    
+class App:
+    FRAMERATE=60
+    def main(self, theme='default'):
+        try:
+            self.theme = theme
+            self.entry = EFace(
+                os.path.join(SVG_DIR,self.theme,'entry.svg'))
+        
+            canvas = ECanvas(
+                        (int(float(self.entry.svg.width)),
+                            int(float(self.entry.svg.height))),
+                        framerate = 60.0)
+        
+            self.entry.load_elements(canvas)
+
+            self.entry.waitIcon.hide()
+            self.entry.authfailIcon.hide()
+
+            self.uname = TextBox(
+                    border_elem = self.entry.uname_border,
+                    txt_elem    = self.entry.uname_txt,
+                    cursor_elem = self.entry.uname_cursor,
+                    focus_elem  = self.entry.uname_borderfocus,
+                    framerate   = self.FRAMERATE)
+
+            self.passwd = TextBox(
+                    border_elem = self.entry.passwd_border,
+                    txt_elem    = self.entry.passwd_txt,
+                    cursor_elem = self.entry.passwd_cursor,
+                    focus_elem  = self.entry.passwd_borderfocus,
+                    framerate   = self.FRAMERATE,
+                    mask        = '*')
+   
+            self.entry.loginButton.image.on_mouse_down_add(self.on_mouse_down)
+            canvas.eventloop()
+        
+        except Exception, e:
+            print 'Caught Exception: '+str(e)
+            sys.exit(0)
+
+    def on_mouse_down(self, img, event):
+        print 'on mouse down'
+
+    def load_config(self):
+        config = None
+        try:
+            pfile = open(TWITINK_RC,'r')
+            config = pickle.load(pfile)
+        except IOError,ioe:
+            print '.twitinkrc file not found'
+
+        if config:
+            return(config['username'],decrypt(config['password']))
+
+    def save_config(self, username, password):
+        pfile = open(TWITINK_RC,'w')
+        m = {}
+        m['username'] = username
+        m['password'] = encrypt(password)
+        pickle.dump(m,pfile)
+
+
+def usage():
+    print 'Twitter Inkface client:'
+    print ' twitink.py [options]'
+    print ' '
+    print ' -t --theme  : Theme to use for the app'
+    print ' -h --help   : usage'
+   
 if __name__ == '__main__':
-    main()
+    try:
+        optlist, args = getopt.getopt(sys.argv[1:],'ht:',['help','theme='])
+    except getopt.GetoptError, err:
+        print str(err)
+        usage()
+        sys.exit(0)
+
+    theme = 'default'
+    for o,a in optlist:
+        if o in ('-h','--help'):
+            usage()
+            break
+        elif o in ('-t','--theme'):
+            theme = a
+ 
+    App().main(theme=theme)
 
