@@ -38,18 +38,11 @@ class EFace(Face):
         Face._append(self, svge, ecElement)
 
 
-
 class ECanvasElement(CanvasElement):
     def __init__(self, svgelem, canvas):
         CanvasElement.__init__(self, svgelem)
 
         self.canvas = canvas
-
-        self.onLeftClick = None
-        self.onMiddleClick = None
-        self.onRightClick = None
-        self.onGainFocus = None
-        self.onLoseFocus = None
 
         if self.svg.surface is None:
             self.refresh(svg_reload = True)
@@ -84,6 +77,14 @@ class ECanvasElement(CanvasElement):
     def hide(self):
         self.image.hide()
 
+    def __setattr__(self, key, value):
+        if key == 'onDraw':
+            if value is not None:
+                ecore.animator_add(value, self)
+        else:
+            self.__dict__[key] = value
+
+
     def handle_mouse_down(self, image, event, *args):
         mouse_button_handlers = \
             {   
@@ -114,9 +115,11 @@ class ECanvas(Canvas):
     def __init__(self,
                 (width,height) = (640, 480),
                 caption = 'Evas Inkface App',
-                framerate = 60.0):
+                framerate = 0):
 
         Canvas.__init__(self)
+
+        self.framerate = framerate
 
         self.ee = ecore.evas.SoftwareX11(w=width, h=height)
         self.ee.title = caption
@@ -131,4 +134,6 @@ class ECanvas(Canvas):
 
     def eventloop(self):
         self.ee.show()
+        if self.framerate != 0:
+            ecore.animator_frametime_set(1.0/float(self.framerate))
         ecore.main_loop_begin()
