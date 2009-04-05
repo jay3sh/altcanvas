@@ -44,15 +44,16 @@ class App:
                     framerate   = self.FRAMERATE,
                     mask        = '*')
    
-            self.entry.loginButton.image.on_mouse_down_add(self.on_mouse_down)
+            self.entry.loginButton.onLeftClick = self.onLogin
+
             canvas.eventloop()
         
         except Exception, e:
             print 'Caught Exception: '+str(e)
             sys.exit(0)
 
-    def on_mouse_down(self, img, event):
-        print 'on mouse down'
+    def onLogin(self, image, event):
+        print 'onLogin'
 
     def load_config(self):
         config = None
@@ -72,6 +73,8 @@ class App:
         m['password'] = encrypt(password)
         pickle.dump(m,pfile)
 
+    def doLogin(self, elem):
+        pass
 
 def usage():
     print 'Twitter Inkface client:'
