@@ -72,6 +72,11 @@ class ECanvasElement(CanvasElement):
         self.image.resize(w, h)
         self.image.show()
 
+    def hide(self):
+        self.image.hide()
+
+    def unhide(self):
+        self.image.show()
 
     def dup(self, newName):
         new_svg = self.svg.dup(newName)
