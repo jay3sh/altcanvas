@@ -1,6 +1,6 @@
 import sys
 import pygame
-from inkface.canvas.pygamecanvas import PygameFace, PygameCanvas
+from inkface.pygame import PygameFace, PygameCanvas
 
 class TextBox:
     counter_dir = 1

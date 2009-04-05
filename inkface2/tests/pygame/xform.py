@@ -1,5 +1,5 @@
 
-from inkface.canvas import PygameFace, PygameCanvas
+from inkface.pygame import PygameFace, PygameCanvas
 
 class App:
     def main(self):

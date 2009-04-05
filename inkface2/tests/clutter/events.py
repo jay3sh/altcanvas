@@ -1,6 +1,6 @@
 
 import sys
-from inkface.canvas.cluttercanvas import ClutterFace, ClutterCanvas
+from inkface.clutter import ClutterFace, ClutterCanvas
 
 class App:
     def main(self):
