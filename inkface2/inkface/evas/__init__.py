@@ -48,6 +48,8 @@ class ECanvasElement(CanvasElement):
         self.onLeftClick = None
         self.onMiddleClick = None
         self.onRightClick = None
+        self.onGainFocus = None
+        self.onLoseFocus = None
 
         if self.svg.surface is None:
             self.refresh(svg_reload = True)
@@ -74,6 +76,10 @@ class ECanvasElement(CanvasElement):
         # wire the new image with event handlers
         self.image.event_callback_add(
             evas.EVAS_CALLBACK_MOUSE_DOWN, self.handle_mouse_down)
+        self.image.event_callback_add(
+            evas.EVAS_CALLBACK_MOUSE_IN, self.handle_mouse_entry)
+        self.image.event_callback_add(
+            evas.EVAS_CALLBACK_MOUSE_OUT, self.handle_mouse_entry)
 
     def hide(self):
         self.image.hide()
@@ -87,7 +93,15 @@ class ECanvasElement(CanvasElement):
             }
         handler = mouse_button_handlers[event.button]
         if handler is not None:
-            handler(image, event, *args)
+            handler(self)
+
+    def handle_mouse_entry(self, image, event, *args):
+        if type(event) == evas.c_evas.EventMouseIn:
+            if self.onGainFocus is not None:
+                self.onGainFocus(self)
+        elif type(event) == evas.c_evas.EventMouseOut:
+            if self.onLoseFocus is not None:
+                self.onLoseFocus(self)
 
     def unhide(self):
         self.image.show()

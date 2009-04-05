@@ -1,4 +1,5 @@
 
+import evas
 
 class TextBox:
     def __init__(self,
@@ -18,7 +19,13 @@ class TextBox:
         if self.focus_elem:
             self.focus_elem.hide()
 
-        self.txt_elem.image.on_key_down_add(self.on_key_down)
+        self.border_elem.onGainFocus = self._onGainFocus
+        self.border_elem.onLoseFocus = self._onLoseFocus
 
-    def on_key_down(self, img, event):
-        print 'key down'
+    def _onGainFocus(self, elem):
+        if self.focus_elem is not None:
+            self.focus_elem.unhide()
+
+    def _onLoseFocus(self, elem):
+        if self.focus_elem is not None:
+            self.focus_elem.hide()
