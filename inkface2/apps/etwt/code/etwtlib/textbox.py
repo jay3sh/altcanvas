@@ -1,10 +1,11 @@
 
+from keyboard import Keyboard
 import evas
 
 class TextBox:
     def __init__(self,
         border_elem, txt_elem, cursor_elem, focus_elem=None,
-        framerate=20, mask=None, multiline=False):
+        framerate=20, mask=None, multiline=False, kbd=None):
 
         self.border_elem = border_elem
         self.txt_elem = txt_elem
@@ -16,14 +17,16 @@ class TextBox:
         self.framerate = framerate
         self.cursor_elem.flcounter = 0
 
+        self.kbd = kbd
+
         self.counter_dir = 1
         self.inFocus = False
 
         if self.focus_elem:
             self.focus_elem.hide()
 
-        self.border_elem.onGainFocus = self._onGainFocus
-        self.border_elem.onLoseFocus = self._onLoseFocus
+        self.border_elem.onMouseGainFocus = self._onMouseGainFocus
+        self.border_elem.onMouseLoseFocus = self._onMouseLoseFocus
 
         self.cursor_elem.onDraw = self._onCursorDraw
 
@@ -42,12 +45,22 @@ class TextBox:
 
         return True
  
-    def _onGainFocus(self, elem):
+    def _onMouseGainFocus(self, elem):
         self.inFocus = True
         if self.focus_elem is not None:
             self.focus_elem.unhide()
+        self.kbd.unhide()
+        self.kbd.connect('done',self._onKeyboardDone)
 
-    def _onLoseFocus(self, elem):
+    def _onKeyboardDone(self):
         self.inFocus = False
         if self.focus_elem is not None:
             self.focus_elem.hide()
+        self.kbd.hide()
+
+    def _onMouseLoseFocus(self, elem):
+        return
+        self.inFocus = False
+        if self.focus_elem is not None:
+            self.focus_elem.hide()
+        self.kbd.hide()
