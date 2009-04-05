@@ -10,8 +10,7 @@ import pygame
 
 from inkface.altsvg.element import Element
 
-from inkface.canvas import Face
-from inkface.canvas import CanvasElement
+from inkface.canvas import Face, Canvas, CanvasElement
 
 
 v_major, v_minor, _ = pygame.version.vernum
@@ -247,7 +246,6 @@ class PygameCanvasElement(CanvasElement):
         new_svg = self.svg.dup(newName)
         return PygameCanvasElement(new_svg)
 
-from inkface.canvas.canvas import Canvas
 import threading
 
 class PygameCanvas(Canvas):
