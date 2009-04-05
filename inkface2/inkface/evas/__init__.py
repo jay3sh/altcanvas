@@ -45,23 +45,17 @@ class ECanvasElement(CanvasElement):
         self.canvas = canvas
 
         if self.svg.surface is None:
-            self.svg.render()
+            self.refresh(svg_reload = True)
+        else:
+            self.refresh(svg_reload = False)
 
-        surface = self.svg.surface
-
-        w, h = surface.get_width(), surface.get_height()
-        self.image = self.canvas.canvas.Image()
-        self.image.alpha_set(True)
-        self.image.image_size_set(w, h)
-        self.image.fill_set(0, 0, w, h)
-        self.image.image_data_set(surface.get_data())
-        self.image.resize(w, h)
         x, y = self.get_position()
         self.image.move(x, y)
         self.image.show()
 
-    def refresh(self):
-        self.svg.render()
+    def refresh(self, svg_reload=True):
+        if svg_reload:
+            self.svg.render()
         surface = self.svg.surface
         w, h = surface.get_width(), surface.get_height()
         self.image = self.canvas.canvas.Image()
@@ -74,6 +68,11 @@ class ECanvasElement(CanvasElement):
 
     def hide(self):
         self.image.hide()
+
+    def handle_mouse_down(self, image, event, *args):
+        if event.button == 1:
+            if self.onLeftClick is not None:
+                self.onLeftClick(image, event, *args)
 
     def unhide(self):
         self.image.show()
