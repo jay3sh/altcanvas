@@ -3,6 +3,7 @@ import os
 import cairo
 
 import ecore.evas
+import evas
 
 from inkface.altsvg.element import Element
 from inkface.canvas import Canvas, Face, CanvasElement
@@ -44,6 +45,10 @@ class ECanvasElement(CanvasElement):
 
         self.canvas = canvas
 
+        self.onLeftClick = None
+        self.onMiddleClick = None
+        self.onRightClick = None
+
         if self.svg.surface is None:
             self.refresh(svg_reload = True)
         else:
@@ -66,13 +71,23 @@ class ECanvasElement(CanvasElement):
         self.image.resize(w, h)
         self.image.show()
 
+        # wire the new image with event handlers
+        self.image.event_callback_add(
+            evas.EVAS_CALLBACK_MOUSE_DOWN, self.handle_mouse_down)
+
     def hide(self):
         self.image.hide()
 
     def handle_mouse_down(self, image, event, *args):
-        if event.button == 1:
-            if self.onLeftClick is not None:
-                self.onLeftClick(image, event, *args)
+        mouse_button_handlers = \
+            {   
+                1:self.onLeftClick,
+                2:self.onMiddleClick,
+                3:self.onRightClick
+            }
+        handler = mouse_button_handlers[event.button]
+        if handler is not None:
+            handler(image, event, *args)
 
     def unhide(self):
         self.image.show()
