@@ -6,11 +6,23 @@ import sys
 import getopt
 from inkface.evas import EFace, ECanvas
 from etwtlib.textbox import TextBox
+from etwtlib.keyboard import Keyboard
 
 TWITINK_RC      = os.environ['HOME']+os.sep+'.twitinkrc'
 PREFIX      = '..'
 SVG_DIR     = os.path.join(PREFIX,'svg')
 
+class KeyFocus:
+    loseFocus = None
+    def get(self, callback):
+        if self.loseFocus is not None:
+            self.loseFocus()
+        self.loseFocus = callback
+        return True
+
+    def put(self):
+        self.loseFocus = None
+        
 class App:
     FRAMERATE=60
     def main(self, theme='default'):
@@ -22,38 +34,70 @@ class App:
             canvas = ECanvas(
                         (int(float(self.entry.svg.width)),
                             int(float(self.entry.svg.height))),
-                        framerate = 60.0)
+                        framerate = self.FRAMERATE)
         
             self.entry.load_elements(canvas)
 
             self.entry.waitIcon.hide()
             self.entry.authfailIcon.hide()
 
+            self.kbd = Keyboard(
+                os.path.join(SVG_DIR, self.theme, 'keyboard.svg'), canvas)
+            self.kbd.hide()
+
             self.uname = TextBox(
+                    parentApp   = self,
                     border_elem = self.entry.uname_border,
                     txt_elem    = self.entry.uname_txt,
                     cursor_elem = self.entry.uname_cursor,
                     focus_elem  = self.entry.uname_borderfocus,
-                    framerate   = self.FRAMERATE)
+                    framerate   = self.FRAMERATE,
+                    kbd         = self.kbd)
 
             self.passwd = TextBox(
+                    parentApp   = self,
                     border_elem = self.entry.passwd_border,
                     txt_elem    = self.entry.passwd_txt,
                     cursor_elem = self.entry.passwd_cursor,
                     focus_elem  = self.entry.passwd_borderfocus,
                     framerate   = self.FRAMERATE,
-                    mask        = '*')
+                    mask        = '*',
+                    kbd         = self.kbd)
    
-            self.entry.loginButton.onLeftClick = self.onLogin
+            self.entry.loginButton.onLeftClick = self.doLogin
+
+            self.keyfocus = KeyFocus()
 
             canvas.eventloop()
         
         except Exception, e:
             print 'Caught Exception: '+str(e)
+            import traceback
+            print traceback.format_exc()
             sys.exit(0)
 
-    def onLogin(self, image, event):
-        print 'onLogin'
+    def doLogin(self, elem):
+        username = self.uname.get_text()
+        password = self.passwd.get_text()
+
+        try:
+            self.entry.authfailIcon.hide()
+            self.entry.waitIcon.unhide()
+            twt = Twt(username, password, self.theme, self.canvas)
+        except HTTPError, hter:
+            self.entry.waitIcon.hide()
+            self.entry.authfailIcon.unhide()
+            return
+
+        # Login was successful, let's save credentials.
+        self.save_config(username, password)
+
+        self.entry.waitIcon.hide()
+
+        self.canvas.remove(self.entry)
+
+        twt.load()
+
 
     def load_config(self):
         config = None
@@ -73,8 +117,8 @@ class App:
         m['password'] = encrypt(password)
         pickle.dump(m,pfile)
 
-    def doLogin(self, elem):
-        pass
+
+    
 
 def usage():
     print 'Twitter Inkface client:'

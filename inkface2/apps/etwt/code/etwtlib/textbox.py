@@ -3,10 +3,11 @@ from keyboard import Keyboard
 import evas
 
 class TextBox:
-    def __init__(self,
+    def __init__(self, parentApp,
         border_elem, txt_elem, cursor_elem, focus_elem=None,
         framerate=20, mask=None, multiline=False, kbd=None):
 
+        self.parentApp = parentApp
         self.border_elem = border_elem
         self.txt_elem = txt_elem
         self.cursor_elem = cursor_elem
@@ -26,7 +27,6 @@ class TextBox:
             self.focus_elem.hide()
 
         self.border_elem.onMouseGainFocus = self._onMouseGainFocus
-        self.border_elem.onMouseLoseFocus = self._onMouseLoseFocus
 
         self.cursor_elem.onDraw = self._onCursorDraw
 
@@ -46,21 +46,29 @@ class TextBox:
         return True
  
     def _onMouseGainFocus(self, elem):
+        if self.inFocus:
+            # avoid multiple focus gain calls
+            return
+
+        # Claim the keyfocus first
+        self.parentApp.keyfocus.get(self._onKeyLoseFocus)
+
         self.inFocus = True
         if self.focus_elem is not None:
             self.focus_elem.unhide()
+
+        # Display the keyboard
         self.kbd.unhide()
         self.kbd.connect('done',self._onKeyboardDone)
 
     def _onKeyboardDone(self):
+        self.parentApp.keyfocus.put()
+        self._onKeyLoseFocus()
+
+    def _onKeyLoseFocus(self):
         self.inFocus = False
         if self.focus_elem is not None:
             self.focus_elem.hide()
         self.kbd.hide()
 
-    def _onMouseLoseFocus(self, elem):
-        return
-        self.inFocus = False
-        if self.focus_elem is not None:
-            self.focus_elem.hide()
-        self.kbd.hide()
+
