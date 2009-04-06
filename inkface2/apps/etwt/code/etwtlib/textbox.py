@@ -7,6 +7,7 @@ class TextBox:
         border_elem, txt_elem, cursor_elem, focus_elem=None,
         framerate=20, mask=None, multiline=False, kbd=None):
 
+
         self.parentApp = parentApp
         self.border_elem = border_elem
         self.txt_elem = txt_elem
@@ -20,6 +21,8 @@ class TextBox:
         self.cursor_elem.flcounter = 0
 
         self.kbd = kbd
+
+        self._untouched = True
 
         self.counter_dir = 1
         self.inFocus = False
@@ -63,7 +66,15 @@ class TextBox:
         self.kbd.connect('keypress',self._onKeyPress)
         self.kbd.connect('done',self._onKeyboardDone)
 
+        if self._untouched:
+            self.border_elem.refresh(svg_reload=False)
+            self.txt_elem.svg.text = ''
+            self.txt_elem.text = self.txt_elem.svg.text
+            self.txt_elem.refresh()
+            self._untouched = False
+
     def _onKeyPress(self, keyVal):
+        self.border_elem.refresh(svg_reload=False)
         elem = self.txt_elem
         if self.mask != None:
             elem.svg.text += self.mask
@@ -71,6 +82,7 @@ class TextBox:
             elem.svg.text += keyVal
         elem.text += keyVal
         elem.refresh()
+
 
         if not self.multiline:
             elem_x, elem_y = elem.get_position()
