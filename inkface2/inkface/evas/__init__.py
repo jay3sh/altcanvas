@@ -49,9 +49,6 @@ class ECanvasElement(CanvasElement):
         else:
             self.refresh(svg_reload = False)
 
-        x, y = self.get_position()
-        self.image.move(x, y)
-        self.image.show()
 
     def refresh(self, svg_reload=True):
         if svg_reload:
@@ -73,6 +70,11 @@ class ECanvasElement(CanvasElement):
             evas.EVAS_CALLBACK_MOUSE_IN, self.handle_mouse_entry)
         self.image.event_callback_add(
             evas.EVAS_CALLBACK_MOUSE_OUT, self.handle_mouse_entry)
+
+        x, y = self.get_position()
+        self.image.move(x, y)
+        self.image.show()
+
 
     def hide(self):
         self.image.hide()
