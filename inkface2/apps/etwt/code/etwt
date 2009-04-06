@@ -4,9 +4,15 @@
 import os
 import sys
 import getopt
+import pickle
+
 from inkface.evas import EFace, ECanvas
 from etwtlib.textbox import TextBox
 from etwtlib.keyboard import Keyboard
+from etwtlib.twt import Twt
+from etwtlib.utils import encrypt,decrypt
+
+from urllib2 import HTTPError
 
 TWITINK_RC      = os.environ['HOME']+os.sep+'.twitinkrc'
 PREFIX      = '..'
@@ -69,6 +75,17 @@ class App:
         self.entry.exitButton.onLeftClick = self.Exit
 
         self.keyfocus = KeyFocus()
+
+        try:
+            username, password = self.load_config()
+        except:
+            username = None
+            password = None
+
+        if username and password:
+            self.uname.set_text(username)
+            self.passwd.set_text(password)
+
 
         canvas.eventloop()
         
