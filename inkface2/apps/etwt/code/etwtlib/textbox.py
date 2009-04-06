@@ -76,13 +76,18 @@ class TextBox:
     def _onKeyPress(self, keyVal):
         self.border_elem.refresh(svg_reload=False)
         elem = self.txt_elem
-        if self.mask != None:
-            elem.svg.text += self.mask
-        else:
-            elem.svg.text += keyVal
-        elem.text += keyVal
-        elem.refresh()
 
+        if keyVal == Keyboard.K_BACKSPACE:
+            elem.text = elem.text[:-1]
+            elem.svg.text = elem.svg.text[:-1]
+        else:
+            if self.mask != None:
+                elem.svg.text += self.mask
+            else:
+                elem.svg.text += keyVal
+            elem.text += keyVal
+
+        elem.refresh()
 
         if not self.multiline:
             elem_x, elem_y = elem.get_position()

@@ -26,55 +26,58 @@ class KeyFocus:
 class App:
     FRAMERATE=60
     def main(self, theme='default'):
-        try:
-            self.theme = theme
-            self.entry = EFace(
-                os.path.join(SVG_DIR,self.theme,'entry.svg'))
+        #try:
+        self.theme = theme
+        self.entry = EFace(
+            os.path.join(SVG_DIR,self.theme,'entry.svg'))
+    
+        canvas = ECanvas(
+                    (int(float(self.entry.svg.width)),
+                        int(float(self.entry.svg.height))),
+                    framerate = self.FRAMERATE)
+    
+        self.entry.load_elements(canvas)
+
+        self.entry.waitIcon.hide()
+        self.entry.authfailIcon.hide()
+
+        self.kbd = Keyboard(
+            os.path.join(SVG_DIR, self.theme, 'keyboard.svg'), canvas)
+        self.kbd.hide()
+
+        self.uname = TextBox(
+                parentApp   = self,
+                border_elem = self.entry.uname_border,
+                txt_elem    = self.entry.uname_txt,
+                cursor_elem = self.entry.uname_cursor,
+                focus_elem  = self.entry.uname_borderfocus,
+                framerate   = self.FRAMERATE,
+                kbd         = self.kbd)
+
+        self.passwd = TextBox(
+                parentApp   = self,
+                border_elem = self.entry.passwd_border,
+                txt_elem    = self.entry.passwd_txt,
+                cursor_elem = self.entry.passwd_cursor,
+                focus_elem  = self.entry.passwd_borderfocus,
+                framerate   = self.FRAMERATE,
+                mask        = '*',
+                kbd         = self.kbd)
+
+        self.entry.loginButton.onLeftClick = self.doLogin
+
+        self.entry.exitButton.onLeftClick = self.Exit
+
+        self.keyfocus = KeyFocus()
+
+        canvas.eventloop()
         
-            canvas = ECanvas(
-                        (int(float(self.entry.svg.width)),
-                            int(float(self.entry.svg.height))),
-                        framerate = self.FRAMERATE)
-        
-            self.entry.load_elements(canvas)
-
-            self.entry.waitIcon.hide()
-            self.entry.authfailIcon.hide()
-
-            self.kbd = Keyboard(
-                os.path.join(SVG_DIR, self.theme, 'keyboard.svg'), canvas)
-            self.kbd.hide()
-
-            self.uname = TextBox(
-                    parentApp   = self,
-                    border_elem = self.entry.uname_border,
-                    txt_elem    = self.entry.uname_txt,
-                    cursor_elem = self.entry.uname_cursor,
-                    focus_elem  = self.entry.uname_borderfocus,
-                    framerate   = self.FRAMERATE,
-                    kbd         = self.kbd)
-
-            self.passwd = TextBox(
-                    parentApp   = self,
-                    border_elem = self.entry.passwd_border,
-                    txt_elem    = self.entry.passwd_txt,
-                    cursor_elem = self.entry.passwd_cursor,
-                    focus_elem  = self.entry.passwd_borderfocus,
-                    framerate   = self.FRAMERATE,
-                    mask        = '*',
-                    kbd         = self.kbd)
-   
-            self.entry.loginButton.onLeftClick = self.doLogin
-
-            self.keyfocus = KeyFocus()
-
-            canvas.eventloop()
-        
-        except Exception, e:
-            print 'Caught Exception: '+str(e)
-            import traceback
-            print traceback.format_exc()
-            sys.exit(0)
+        #except Exception, e:
+        #print 'Caught Exception: '+str(e)
+        #import traceback
+        #print traceback.format_exc()
+        #sys.exit(0)
+        #raise e
 
     def doLogin(self, elem):
         username = self.uname.get_text()
@@ -98,6 +101,8 @@ class App:
 
         twt.load()
 
+    def Exit(self, elem):
+        sys.exit(0)
 
     def load_config(self):
         config = None
