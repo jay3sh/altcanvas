@@ -98,11 +98,11 @@ class ECanvasElement(CanvasElement):
 
     def handle_mouse_entry(self, image, event, *args):
         if type(event) == evas.c_evas.EventMouseIn:
-            if self.onGainFocus is not None:
-                self.onGainFocus(self)
+            if self.onMouseGainFocus is not None:
+                self.onMouseGainFocus(self)
         elif type(event) == evas.c_evas.EventMouseOut:
-            if self.onLoseFocus is not None:
-                self.onLoseFocus(self)
+            if self.onMouseLoseFocus is not None:
+                self.onMouseLoseFocus(self)
 
     def unhide(self):
         self.image.show()

@@ -85,12 +85,15 @@ class CanvasElement:
         self.clouds = []
 
         self.onLeftClick = None
+        self.onMiddleClick = None
         self.onRightClick = None
         self.onTap = None
         self.onMouseOver = None
         self.onKeyPress = None
         self.onGainFocus = None
         self.onLoseFocus = None
+        self.onMouseGainFocus = None
+        self.onMouseLoseFocus = None
 
         self.onDraw = None
 
