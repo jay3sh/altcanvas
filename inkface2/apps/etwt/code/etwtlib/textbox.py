@@ -10,6 +10,7 @@ class TextBox:
         self.parentApp = parentApp
         self.border_elem = border_elem
         self.txt_elem = txt_elem
+        self.txt_elem.text = ''
         self.cursor_elem = cursor_elem
         self.focus_elem = focus_elem
         self.mask = mask
@@ -63,7 +64,26 @@ class TextBox:
         self.kbd.connect('done',self._onKeyboardDone)
 
     def _onKeyPress(self, keyVal):
-        print 'reading '+keyVal
+        elem = self.txt_elem
+        if self.mask != None:
+            elem.svg.text += self.mask
+        else:
+            elem.svg.text += keyVal
+        elem.text += keyVal
+        elem.refresh()
+
+        if not self.multiline:
+            elem_x, elem_y = elem.get_position()
+            textbox_x, textbox_y = self.border_elem.get_position()
+            elem_x_offset = elem_x - textbox_x
+
+            text_width = self.border_elem.svg.w - \
+                    self.cursor_elem.svg.w - elem_x_offset
+            while (elem_x_offset + elem.svg.w) > text_width:
+                elem.svg.text = elem.svg.text[1:]
+                elem.refresh()
+        else:
+            pass
 
     def _onKeyboardDone(self):
         self.parentApp.keyfocus.put()
