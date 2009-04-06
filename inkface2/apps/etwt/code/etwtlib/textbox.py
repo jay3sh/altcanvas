@@ -59,7 +59,11 @@ class TextBox:
 
         # Display the keyboard
         self.kbd.unhide()
+        self.kbd.connect('keypress',self._onKeyPress)
         self.kbd.connect('done',self._onKeyboardDone)
+
+    def _onKeyPress(self, keyVal):
+        print 'reading '+keyVal
 
     def _onKeyboardDone(self):
         self.parentApp.keyfocus.put()
@@ -67,6 +71,8 @@ class TextBox:
 
     def _onKeyLoseFocus(self):
         self.inFocus = False
+        self.kbd.disconnect('keypress',self._onKeyPress)
+        self.kbd.disconnect('done', self._onKeyboardDone)
         if self.focus_elem is not None:
             self.focus_elem.hide()
         self.kbd.hide()

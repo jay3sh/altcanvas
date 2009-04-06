@@ -13,6 +13,10 @@ class Keyboard:
 
         self.face.key_Enter.onLeftClick = self.onEnter
 
+        for e in self.face.elements:
+            if e.svg.label[3] != '_':
+                e.onLeftClick = self.onKeyClick
+
 
     def connect(self, event_str, callback):
         if not self.event_map.has_key(event_str):
@@ -20,13 +24,24 @@ class Keyboard:
 
         self.event_map[event_str].append(callback)
 
-    def emit(self, event_str):
-        if not self.event_map.has_key(event_str):
+    def disconnect(self, event_str, callback):
+        if not self.event_map.has_key(event_str) or \
+            self.event_map[event_str] is None:
+            return
+        self.event_map[event_str].remove(callback)
+
+    def emit(self, event_str, *args):
+        if not self.event_map.has_key(event_str) or \
+            self.event_map[event_str] is None:
             return
 
         for handler in self.event_map[event_str]:
-            handler()
-        
+            handler(*args)
+
+    def onKeyClick(self, elem):
+        assert elem.svg is not None and elem.svg.label is not None
+        keyVal = elem.svg.label[3]
+        self.emit('keypress',keyVal)
 
     def onEnter(self, elem):
         self.emit('done')
