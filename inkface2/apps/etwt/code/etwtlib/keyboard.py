@@ -63,12 +63,11 @@ class Keyboard:
 
         self._capsLockOff()
 
-        #self.face.key_Caps.onLeftClick = self.onCapsLock
-
-        #self.face.key_Enter.onLeftClick = self.onEnter
+        self.face.closeButton.onLeftClick = self.onClose
 
         for e in self.face.elements:
-            e.onLeftClick = self.onKeyClick
+            if e.svg.label not in ('closeButton','kbdBackground'):
+                e.onLeftClick = self.onKeyClick
 
 
     def connect(self, event_str, callback):
@@ -112,6 +111,9 @@ class Keyboard:
     def onEnter(self, elem):
         self.emit('done')
 
+    def onClose(self, elem):
+        self.hide()
+
     def hide(self):
         for e in self.face.elements:
             e.hide()
@@ -137,7 +139,8 @@ class Keyboard:
             else:
                 e.unhide()
 
-        #self.face.key_Caps.hide()
+        self.face.kbdBackground.unhide()
+        self.face.closeButton.unhide()
         self._capsLock = True
 
     def _capsLockOff(self):
@@ -151,5 +154,7 @@ class Keyboard:
                 e.hide()
             else:
                 e.unhide()
-        self.face.key_Caps.unhide()
+
+        self.face.kbdBackground.unhide()
+        self.face.closeButton.unhide()
         self._capsLock = False

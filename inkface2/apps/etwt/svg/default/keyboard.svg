@@ -62,16 +62,16 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.541165"
-     inkscape:cx="262.12458"
-     inkscape:cy="153.71865"
+     inkscape:zoom="1.2705825"
+     inkscape:cx="177.22676"
+     inkscape:cy="113.85343"
      inkscape:document-units="px"
-     inkscape:current-layer="g4750"
+     inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1920"
-     inkscape:window-height="1001"
-     inkscape:window-x="0"
-     inkscape:window-y="28">
+     inkscape:window-width="1280"
+     inkscape:window-height="778"
+     inkscape:window-x="-5"
+     inkscape:window-y="-3">
     <inkscape:grid
        type="xygrid"
        id="grid3895" />
@@ -91,9 +91,19 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
+    <rect
+       style="opacity:1;fill:#1a1a1a;fill-opacity:0.5736434;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4048"
+       width="460"
+       height="240"
+       x="10"
+       y="390"
+       rx="15"
+       ry="15"
+       inkscape:label="kbdBackground" />
     <g
        id="g45892"
-       transform="translate(-38.670807,58.534157)"
+       transform="translate(-38.670807,62.534157)"
        inkscape:label="keyQ">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -117,7 +127,7 @@
     </g>
     <g
        id="g45897"
-       transform="translate(4.702553,58.534157)"
+       transform="translate(4.702553,62.534157)"
        inkscape:label="keyW">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -141,7 +151,7 @@
     </g>
     <g
        id="g45905"
-       transform="translate(48.075927,58.534157)"
+       transform="translate(48.075927,62.534157)"
        inkscape:label="keyE">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -165,7 +175,7 @@
     </g>
     <g
        id="g45913"
-       transform="translate(91.44927,58.534157)"
+       transform="translate(91.44927,62.534157)"
        inkscape:label="keyR">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -189,7 +199,7 @@
     </g>
     <g
        id="g45921"
-       transform="translate(134.82265,58.534157)"
+       transform="translate(134.82265,62.534157)"
        inkscape:label="keyT">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -213,7 +223,7 @@
     </g>
     <g
        id="g45929"
-       transform="translate(178.19601,58.534157)"
+       transform="translate(178.19601,62.534157)"
        inkscape:label="keyY">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -237,7 +247,7 @@
     </g>
     <g
        id="g45937"
-       transform="translate(221.56935,58.534157)"
+       transform="translate(221.56935,62.534157)"
        inkscape:label="keyU">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -261,7 +271,7 @@
     </g>
     <g
        id="g45945"
-       transform="translate(264.94275,58.534157)"
+       transform="translate(264.94275,62.534157)"
        inkscape:label="keyI">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -285,7 +295,7 @@
     </g>
     <g
        id="g45953"
-       transform="translate(308.3161,58.534157)"
+       transform="translate(308.3161,62.534157)"
        inkscape:label="keyO">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -309,7 +319,7 @@
     </g>
     <g
        id="g45961"
-       transform="translate(351.68944,58.534157)"
+       transform="translate(351.68944,62.534157)"
        inkscape:label="keyP">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -717,7 +727,7 @@
     </g>
     <g
        id="g3564"
-       transform="translate(-37.006212,15.04347)"
+       transform="translate(-37.006212,21.04347)"
        inkscape:label="key1">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -741,7 +751,7 @@
     </g>
     <g
        id="g3572"
-       transform="translate(9.282259,15.04347)"
+       transform="translate(9.282259,21.04347)"
        inkscape:label="key2">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -765,7 +775,7 @@
     </g>
     <g
        id="g3580"
-       transform="translate(55.570728,15.04347)"
+       transform="translate(55.570728,21.04347)"
        inkscape:label="key3">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -789,7 +799,7 @@
     </g>
     <g
        id="g3588"
-       transform="translate(101.85921,15.04347)"
+       transform="translate(101.85921,21.04347)"
        inkscape:label="key4">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -813,7 +823,7 @@
     </g>
     <g
        id="g3596"
-       transform="translate(148.14769,15.04347)"
+       transform="translate(148.14769,21.04347)"
        inkscape:label="key5">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -837,7 +847,7 @@
     </g>
     <g
        id="g3604"
-       transform="translate(194.43615,15.04347)"
+       transform="translate(194.43615,21.04347)"
        inkscape:label="key6">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -861,7 +871,7 @@
     </g>
     <g
        id="g3612"
-       transform="translate(240.72462,15.04347)"
+       transform="translate(240.72462,21.04347)"
        inkscape:label="key7">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -885,7 +895,7 @@
     </g>
     <g
        id="g3620"
-       transform="translate(287.01307,15.04347)"
+       transform="translate(287.01307,21.04347)"
        inkscape:label="key8">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -909,7 +919,7 @@
     </g>
     <g
        id="g3628"
-       transform="translate(333.30157,15.04347)"
+       transform="translate(333.30157,21.04347)"
        inkscape:label="key9">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -933,7 +943,7 @@
     </g>
     <g
        id="g3636"
-       transform="translate(379.59006,15.04347)"
+       transform="translate(379.59006,21.04347)"
        inkscape:label="key0">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -958,17 +968,17 @@
     <rect
        style="opacity:1;fill:#8cff00;fill-opacity:0.7;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect5980"
-       width="200"
-       height="20"
-       x="140"
-       y="610"
+       width="282"
+       height="16"
+       x="98"
+       y="604"
        inkscape:label="key_Space"
        rx="4"
        ry="4" />
     <g
        id="g6519"
        inkscape:label="key_Caps"
-       transform="translate(0,18)">
+       transform="translate(12,16)">
       <rect
          ry="4"
          rx="4"
@@ -989,7 +999,8 @@
     </g>
     <g
        id="g4767"
-       inkscape:label="key_Enter">
+       inkscape:label="key_Enter"
+       transform="translate(-6,0)">
       <rect
          ry="4"
          rx="4"
@@ -998,7 +1009,7 @@
          height="35"
          width="40"
          id="rect4765"
-         style="opacity:1;fill:#8cff00;fill-opacity:0.69803923;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="opacity:1;fill:#8cff00;fill-opacity:0.69803922;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
       <path
          sodipodi:nodetypes="cccccccccc"
          id="path6524"
@@ -1007,7 +1018,7 @@
     </g>
     <g
        id="g6531"
-       transform="translate(-38.248583,58.526461)"
+       transform="translate(-38.248583,62.526461)"
        inkscape:label="keyq">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -1031,7 +1042,7 @@
     </g>
     <g
        id="g6539"
-       transform="translate(5.1247787,58.526461)"
+       transform="translate(5.1247787,62.526461)"
        inkscape:label="keyw">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -1055,7 +1066,7 @@
     </g>
     <g
        id="g6547"
-       transform="translate(48.498153,58.526461)"
+       transform="translate(48.498153,62.526461)"
        inkscape:label="keye">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -1079,7 +1090,7 @@
     </g>
     <g
        id="g6555"
-       transform="translate(91.871496,58.526461)"
+       transform="translate(91.871496,62.526461)"
        inkscape:label="keyr">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -1103,7 +1114,7 @@
     </g>
     <g
        id="g6563"
-       transform="translate(135.24487,58.526461)"
+       transform="translate(135.24487,62.526461)"
        inkscape:label="keyt">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -1127,7 +1138,7 @@
     </g>
     <g
        id="g6571"
-       transform="translate(178.61823,58.526461)"
+       transform="translate(178.61823,62.526461)"
        inkscape:label="keyy">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -1151,7 +1162,7 @@
     </g>
     <g
        id="g6579"
-       transform="translate(221.99157,58.526461)"
+       transform="translate(221.99157,62.526461)"
        inkscape:label="keyu">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -1175,7 +1186,7 @@
     </g>
     <g
        id="g6587"
-       transform="translate(265.36497,58.526461)"
+       transform="translate(265.36497,62.526461)"
        inkscape:label="keyi">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -1199,7 +1210,7 @@
     </g>
     <g
        id="g6595"
-       transform="translate(308.73832,58.526461)"
+       transform="translate(308.73832,62.526461)"
        inkscape:label="keyo">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -1223,7 +1234,7 @@
     </g>
     <g
        id="g6603"
-       transform="translate(352.11166,58.526461)"
+       transform="translate(352.11166,62.526461)"
        inkscape:label="keyp">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -1631,7 +1642,7 @@
     </g>
     <g
        id="g4489"
-       transform="translate(-37.122134,15.190547)"
+       transform="translate(-37.122134,21.190547)"
        inkscape:label="key_Exclaim">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -1655,7 +1666,7 @@
     </g>
     <g
        id="g4497"
-       transform="translate(9.166336,15.190547)"
+       transform="translate(9.166336,21.190547)"
        inkscape:label="key_At">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -1679,7 +1690,7 @@
     </g>
     <g
        id="g4505"
-       transform="translate(55.454806,15.190547)"
+       transform="translate(55.454806,21.190547)"
        inkscape:label="key_Pound">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -1703,7 +1714,7 @@
     </g>
     <g
        id="g4513"
-       transform="translate(101.74329,15.190547)"
+       transform="translate(101.74329,21.190547)"
        inkscape:label="key_Dollar">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -1727,7 +1738,7 @@
     </g>
     <g
        id="g4521"
-       transform="translate(148.03177,15.190547)"
+       transform="translate(148.03177,21.190547)"
        inkscape:label="key_Percent">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -1751,7 +1762,7 @@
     </g>
     <g
        id="g4529"
-       transform="translate(194.32023,15.190547)"
+       transform="translate(194.32023,21.190547)"
        inkscape:label="key_Caret">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -1775,7 +1786,7 @@
     </g>
     <g
        id="g4537"
-       transform="translate(240.6087,15.190547)"
+       transform="translate(240.6087,21.190547)"
        inkscape:label="key_Amp">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -1799,7 +1810,7 @@
     </g>
     <g
        id="g4545"
-       transform="translate(286.89715,15.190547)"
+       transform="translate(286.89715,21.190547)"
        inkscape:label="key_Asterisk">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -1823,7 +1834,7 @@
     </g>
     <g
        id="g4553"
-       transform="translate(333.18565,15.190547)"
+       transform="translate(333.18565,21.190547)"
        inkscape:label="key_LeftParen">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -1847,7 +1858,7 @@
     </g>
     <g
        id="g4561"
-       transform="translate(379.47414,15.190547)"
+       transform="translate(379.47414,21.190547)"
        inkscape:label="key_RightParen">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -1871,7 +1882,7 @@
     </g>
     <g
        id="g4573"
-       transform="translate(-37.418458,187.32091)"
+       transform="translate(-33.418458,187.32091)"
        inkscape:label="key_Dash">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -2087,7 +2098,7 @@
     </g>
     <g
        id="g4645"
-       transform="translate(379.17781,187.32091)"
+       transform="translate(377.17781,187.32091)"
        inkscape:label="key_FrontSlash">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -2111,7 +2122,7 @@
     </g>
     <g
        id="g4657"
-       transform="translate(-37.418457,187.09886)"
+       transform="translate(-33.418457,187.09886)"
        inkscape:label="key_UnderScore">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -2327,7 +2338,7 @@
     </g>
     <g
        id="g4730"
-       transform="translate(379.17781,187.09886)"
+       transform="translate(377.17781,187.09886)"
        inkscape:label="key_QMark">
       <path
          d="M 83.478261,393.9379 A 14.310559,14.708075 0 1 1 54.857142,393.9379 A 14.310559,14.708075 0 1 1 83.478261,393.9379 z"
@@ -2351,7 +2362,7 @@
     </g>
     <g
        id="g4750"
-       transform="translate(-6,14)"
+       transform="translate(-14,16)"
        inkscape:label="key_Backspace">
       <rect
          ry="4"
@@ -2361,11 +2372,16 @@
          height="30"
          width="35"
          id="rect4748"
-         style="opacity:1;fill:#8cff00;fill-opacity:0.69803923;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="opacity:1;fill:#8cff00;fill-opacity:0.69803922;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
       <path
          id="path4746"
          d="M 455,470 L 455,465 L 445,475 L 455,485 L 455,480 L 470,480 L 470,470 L 455,470 z"
          style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     </g>
+    <path
+       style="fill:#ffffff;fill-opacity:0.8759689;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 24,613 L 19,608 L 24,603 L 29,608 L 34,603 L 39,608 L 34,613 L 39,618 L 34,623 L 29,618 L 24,623 L 19,618 L 24,613 z"
+       id="path4050"
+       inkscape:label="closeButton" />
   </g>
 </svg>
