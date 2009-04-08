@@ -13,6 +13,9 @@ class BoundingBox:
         
     def __add__(self, other):
 
+        if other is None:
+            return self
+
         ox1, oy1, ox2, oy2 = \
             self.x, self.y, self.x+self.w, self.y+self.h
         nx1, ny1, nx2, ny2 = \
@@ -39,8 +42,10 @@ class Container(InkObject):
         
         InkObject.__init__(self)
 
-        self.cur_bbox = BoundingBox()
+        self.cur_bbox = None
         self.widgets = []
+        self.index = 0
+        self.anim_period = 10
 
         self.bbox = BoundingBox(bbox)
         self.upArrow_elem = upArrow_elem
@@ -53,7 +58,7 @@ class Container(InkObject):
 
         wbbox = BoundingBox(widget.get_bounding_box())
         
-        self.cur_bbox = self.cur_bbox + wbbox
+        self.cur_bbox = wbbox + self.cur_bbox
 
         return not (self.cur_bbox <= self.bbox)
             
@@ -61,9 +66,49 @@ class Container(InkObject):
     def remove(self, widget):
         self.widgets.remove(widget)
 
+    def upAnimate(self, elem):
+        x,y = elem.get_position()
+
+        if elem.anim_length < self.anim_step:
+            elem.set_position((x, y-elem.anim_length))
+            elem.refresh(svg_reload=False)
+            elem.anim_length = 0
+            elem.onDraw = None
+            return False
+        else:
+            elem.set_position((x, y-self.anim_step))
+            elem.refresh(svg_reload=False)
+            elem.anim_length -= self.anim_step
+            return True
+
     def onUpArrow(self, elem):
-        print 'going up'
+
+        _,_,_,wh = self.widgets[self.index].get_bounding_box()
+        self.anim_step = wh / self.anim_period
+        self.widgets[self.index].hide()
+
+        self.anim_length = wh
+
+        self.index += 1
+
+        visible_widgets = self.widgets[self.index:]
+
+        bb = None
+        for w in visible_widgets:
+            bb = BoundingBox(w.get_bounding_box()) + bb
+        
+        # TODO make it while
+        if bb <= self.bbox:
+            self.emit('request')
                             
+        for vw in self.widgets[self.index:]:
+            vw.text_elem.anim_length = self.anim_length
+            vw.text_elem.onDraw = self.upAnimate
+            vw.background_elem.anim_length = self.anim_length
+            vw.background_elem.onDraw = self.upAnimate
+            vw.image_elem.anim_length = self.anim_length
+            vw.image_elem.onDraw = self.upAnimate
+
 
     def onDownArrow(self, elem):
         print 'going down'

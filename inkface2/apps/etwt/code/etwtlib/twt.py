@@ -140,10 +140,12 @@ class Twt:
                             self.face.svg.width,
                             self.face.svg.height-self.face.twtbg.svg.y+3)
 
-        twtContainer = Container(
+        self.twtContainer = Container(
                         bbox            = container_bbox,
                         upArrow_elem    = self.face.upArrow,
                         downArrow_elem  = self.face.downArrow)
+
+        self.twtContainer.connect('request',self.on_container_request)
 
         tboxlist = []
 
@@ -158,7 +160,7 @@ class Twt:
         tbox.set_text(twt.text)
         #tbox.set_image(self.load_image(twt))
 
-        containerFull = twtContainer.add(tbox)
+        containerFull = self.twtContainer.add(tbox)
         
         lx,ly,lw,lh = tbox.get_bounding_box()
 
@@ -174,11 +176,20 @@ class Twt:
 
             lx,ly,lw,lh = new_tbox.get_bounding_box()
 
-            containerFull = twtContainer.add(new_tbox)
+            containerFull = self.twtContainer.add(new_tbox)
 
+            self.face.waitIcon.refresh(svg_reload=False)
+
+
+        self.face.upArrow.refresh(svg_reload=False)
+        self.face.downArrow.refresh(svg_reload=False)
 
         # waitIcon can disappear now
         self.face.waitIcon.hide()
+
+    def on_container_request(self):
+        self.twtContainer.add()
+
 
     def on_gain_focus(self, elem):
         elem.inFocus = True
