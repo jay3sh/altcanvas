@@ -5,6 +5,8 @@ import sys
 from etwtlib import twitter
 from etwtlib.textbox import TextBox
 from etwtlib.twitbox import TwitBox
+from etwtlib.container import Container
+
 from inkface.evas import EFace, ECanvas
 
 PREFIX      = '..'
@@ -132,6 +134,17 @@ class Twt:
         # Show the face on canvas
         self.canvas.add(self.face)
 
+
+        container_bbox = (self.face.twtbg.svg.x-3, 
+                            self.face.twtbg.svg.y-3,
+                            self.face.svg.width,
+                            self.face.svg.height-self.face.twtbg.svg.y+3)
+
+        twtContainer = Container(
+                        bbox            = container_bbox,
+                        upArrow_elem    = self.face.upArrow,
+                        downArrow_elem  = self.face.downArrow)
+
         tboxlist = []
 
         twt = self.get_friends_twt()
@@ -141,14 +154,15 @@ class Twt:
             background_ename = 'twtbg',
             text_ename       = 'twttxt',
             image_ename      = 'twtimg')
-        
 
         tbox.set_text(twt.text)
         #tbox.set_image(self.load_image(twt))
 
+        containerFull = twtContainer.add(tbox)
+        
         lx,ly,lw,lh = tbox.get_bounding_box()
 
-        for i in range(4):
+        while not containerFull:
 
             twt = self.get_friends_twt()
 
@@ -159,6 +173,9 @@ class Twt:
             #new_tbox.set_image(self.load_image(twt))
 
             lx,ly,lw,lh = new_tbox.get_bounding_box()
+
+            containerFull = twtContainer.add(new_tbox)
+
 
         # waitIcon can disappear now
         self.face.waitIcon.hide()
