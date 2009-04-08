@@ -37,8 +37,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.1520833"
-     inkscape:cx="400"
-     inkscape:cy="240"
+     inkscape:cx="399.99999"
+     inkscape:cy="239.99999"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -81,7 +81,8 @@
        width="738.66187"
        height="417.50452"
        x="36.455696"
-       y="34.719711" />
+       y="34.719711"
+       inkscape:label="yellowbg" />
     <g
        id="g3171"
        inkscape:label="cancelButton"
