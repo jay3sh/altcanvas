@@ -4,7 +4,7 @@ import pygame
 import sys
 from etwtlib import twitter
 from etwtlib.textbox import TextBox
-#from etwtlib.twitbox import TwitBox
+from etwtlib.twitbox import TwitBox
 from inkface.evas import EFace, ECanvas
 
 PREFIX      = '..'
@@ -18,8 +18,8 @@ class Twt:
         self.canvas = canvas
         self.twtApi = twitter.Api(username, password)
 
-        self.face = PygameFace(
-            os.path.join(SVG_DIR, theme, 'twits.svg'))
+        self.face = EFace(
+            os.path.join(SVG_DIR, theme, 'twits.svg'), self.canvas)
 
         self.friends_page_num = 1
         self.replies_page_num = 1
@@ -33,29 +33,6 @@ class Twt:
         self.current_twt_type = self.TWT_FRIENDS
 
         self.friends_twtcnt = 0
-        '''
-        self.public_twtcnt = 0
-        self.replies_twtcnt = 0
-        self.GAP = 10
-        self.FRAMERATE = 12 
-        self.roll = []
-        self.moveflag = False
-        self.stopflag = False
-        self.rotation = 0.0
-        self.width = int(float(self.face.svg.width))
-        self.height = int(float(self.face.svg.height))
-
-        self.base_x,self.base_y = self.face.twt0.get_position()
-        self.base_img_x,self.base_img_y = self.face.imgFrame0.get_position()
-        self.base_w = self.face.twt0.svg.w
-        self.base_h = self.face.twt0.svg.h
-        self.base_img_w = self.face.imgFrame0.svg.w
-        self.base_img_h = self.face.imgFrame0.svg.h
-
-        self.moveStep = self.base_h + self.GAP
-        
-        self.MAX_TWT_NUM = (self.height / self.moveStep) + 1
-        '''
  
     def get_public_twt(self):
         if self.public_twtlist == None or \
@@ -90,7 +67,7 @@ class Twt:
         self.friends_twtcnt += 1
         return twt
 
-    def hide_twt_box(self):
+    def hide_twt_entry(self):
         for elem in (self.face.update_border,
                     self.face.update_txt,
                     self.face.update_cursor,
@@ -100,7 +77,7 @@ class Twt:
                     self.face.update_counter):
             elem.hide()
 
-    def unhide_twt_box(self):
+    def unhide_twt_entry(self):
         for elem in (self.face.update_border,
                     self.face.update_txt,
                     self.face.update_cursor,
@@ -114,23 +91,23 @@ class Twt:
         self.face.update_counter.svg.text = str(len(text))
         self.face.update_counter.refresh(svg_reload=True)
 
-    def prepare_twt_box(self):
-        self.twtbox = TextBox(
+    def prepare_twt_entry(self):
+        self.twtentry = TextBox(
                             border_elem = self.face.update_border,
                             txt_elem    = self.face.update_txt,
                             cursor_elem = self.face.update_cursor,
                             framerate   = self.canvas.framerate)
 
-        self.twtbox.register_change_listener(self.onTwtboxChange)
+        self.twtentry.connect('changed', self.onTwtboxChange)
 
         self.face.postButton.onLeftClick = self.onTwitPost
         self.face.cancelButton.onLeftClick = self.onTwitCancel
  
     def load(self):
 
-        self.prepare_twt_box()
+        self.prepare_twt_entry()
 
-        self.hide_twt_box()
+        self.hide_twt_entry()
 
         self.face.closeButton.onLeftClick = self.exit
 
@@ -152,7 +129,6 @@ class Twt:
 
         self.face.waitIcon.unhide()
 
-
         # Show the face on canvas
         self.canvas.add(self.face)
 
@@ -166,12 +142,13 @@ class Twt:
             text_ename       = 'twttxt',
             image_ename      = 'twtimg')
         
+
         tbox.set_text(twt.text)
-        tbox.set_image(self.load_image(twt))
+        #tbox.set_image(self.load_image(twt))
 
         lx,ly,lw,lh = tbox.get_bounding_box()
 
-        for i in range(8):
+        for i in range(4):
 
             twt = self.get_friends_twt()
 
@@ -179,10 +156,9 @@ class Twt:
 
             new_tbox.set_text(twt.text)
 
-            new_tbox.set_image(self.load_image(twt))
+            #new_tbox.set_image(self.load_image(twt))
 
             lx,ly,lw,lh = new_tbox.get_bounding_box()
-
 
         # waitIcon can disappear now
         self.face.waitIcon.hide()
@@ -271,17 +247,17 @@ class Twt:
 
         self.change_borders(self.TWT_TWIT)
 
-        self.unhide_twt_box()
+        self.unhide_twt_entry()
 
         self.current_twt_type = self.TWT_TWIT
 
     def onTwitPost(self, elem):
-        self.twtApi.PostUpdate(self.twtbox.get_text())
-        #print self.twtbox.get_text()
-        self.hide_twt_box()
+        #self.twtApi.PostUpdate(self.twtentry.get_text())
+        print self.twtentry.get_text()
+        self.hide_twt_entry()
 
     def onTwitCancel(self,elem):
-        self.hide_twt_box()
+        self.hide_twt_entry()
 
 
     def exit(self, elem):
