@@ -102,10 +102,10 @@ class Container(InkObject):
             self.emit('request')
                             
         for vw in self.widgets[self.index:]:
-            vw.text_elem.anim_length = self.anim_length
-            vw.text_elem.onDraw = self.upAnimate
             vw.background_elem.anim_length = self.anim_length
             vw.background_elem.onDraw = self.upAnimate
+            vw.text_elem.anim_length = self.anim_length
+            vw.text_elem.onDraw = self.upAnimate
             vw.image_elem.anim_length = self.anim_length
             vw.image_elem.onDraw = self.upAnimate
 
