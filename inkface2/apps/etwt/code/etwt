@@ -37,22 +37,24 @@ class App:
         self.entry = EFace(
             os.path.join(SVG_DIR,self.theme,'entry.svg'))
     
-        canvas = ECanvas(
+        self.canvas = ECanvas(
                     (int(float(self.entry.svg.width)),
                         int(float(self.entry.svg.height))),
                     framerate = self.FRAMERATE)
     
-        self.entry.load_elements(canvas)
+        self.entry.load_elements(self.canvas)
 
         self.entry.waitIcon.hide()
         self.entry.authfailIcon.hide()
 
         self.kbd = Keyboard(
-            os.path.join(SVG_DIR, self.theme, 'keyboard.svg'), canvas)
+            os.path.join(SVG_DIR, self.theme, 'keyboard.svg'), self.canvas)
         self.kbd.hide()
 
+        self.keyfocus = KeyFocus()
+
         self.uname = TextBox(
-                parentApp   = self,
+                keyfocus    = self.keyfocus,
                 border_elem = self.entry.uname_border,
                 txt_elem    = self.entry.uname_txt,
                 cursor_elem = self.entry.uname_cursor,
@@ -61,7 +63,7 @@ class App:
                 kbd         = self.kbd)
 
         self.passwd = TextBox(
-                parentApp   = self,
+                keyfocus    = self.keyfocus,
                 border_elem = self.entry.passwd_border,
                 txt_elem    = self.entry.passwd_txt,
                 cursor_elem = self.entry.passwd_cursor,
@@ -74,8 +76,6 @@ class App:
 
         self.entry.exitButton.onLeftClick = self.Exit
 
-        self.keyfocus = KeyFocus()
-
         try:
             username, password = self.load_config()
         except:
@@ -86,8 +86,7 @@ class App:
             self.uname.set_text(username)
             self.passwd.set_text(password)
 
-
-        canvas.eventloop()
+        self.canvas.eventloop()
         
         #except Exception, e:
         #print 'Caught Exception: '+str(e)
