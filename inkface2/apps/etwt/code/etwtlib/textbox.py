@@ -1,14 +1,17 @@
 
 from keyboard import Keyboard
 import evas
+from etwtlib.inkobject import InkObject
 
-class TextBox:
-    def __init__(self, parentApp,
-        border_elem, txt_elem, cursor_elem, focus_elem=None,
+class TextBox(InkObject):
+    def __init__(self, 
+        border_elem, txt_elem, cursor_elem, 
+        keyfocus=None, focus_elem=None,
         framerate=20, mask=None, multiline=False, kbd=None):
 
+        InkObject.__init__(self)
 
-        self.parentApp = parentApp
+        self.keyfocus = keyfocus 
         self.border_elem = border_elem
         self.txt_elem = txt_elem
         self.txt_elem.text = ''
@@ -55,7 +58,8 @@ class TextBox:
             return
 
         # Claim the keyfocus first
-        self.parentApp.keyfocus.get(self._onKeyLoseFocus)
+        if self.keyfocus is not None:
+            self.keyfocus.get(self._onKeyLoseFocus)
 
         self.inFocus = True
         if self.focus_elem is not None:
@@ -102,8 +106,11 @@ class TextBox:
         else:
             pass
 
+        self.emit('changed', elem.text)
+
     def _onKeyboardDone(self):
-        self.parentApp.keyfocus.put()
+        if self.keyfocus is not None:
+            self.keyfocus.put()
         self._onKeyLoseFocus()
 
     def _onKeyLoseFocus(self):
