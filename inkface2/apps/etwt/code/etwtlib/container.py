@@ -44,7 +44,7 @@ class Container(InkObject):
 
         self.cur_bbox = None
         self.widgets = []
-        self.index = 0
+        self.top_index = 0
         self.anim_period = 10
 
         self.bbox = BoundingBox(bbox)
@@ -60,6 +60,8 @@ class Container(InkObject):
         
         self.cur_bbox = wbbox + self.cur_bbox
 
+        self.btm_index = len(self.widgets) - 1
+
         return not (self.cur_bbox <= self.bbox)
             
 
@@ -70,39 +72,41 @@ class Container(InkObject):
         x,y = elem.get_position()
 
         if elem.anim_length < self.anim_step:
-            elem.set_position((x, y-elem.anim_length))
-            #elem.refresh(svg_reload=False)
+            elem.set_position((x, y + (self.direction * elem.anim_length)))
             elem.anim_length = 0
             elem.onDraw = None
             return False
         else:
-            elem.set_position((x, y-self.anim_step))
-            #elem.refresh(svg_reload=False)
+            elem.set_position((x, y + (self.direction * self.anim_step)))
             elem.anim_length -= self.anim_step
             return True
 
     def onDownArrow(self, elem):
-
-        _,_,_,wh = self.widgets[self.index].get_bounding_box()
+        _,_,_,wh = self.widgets[self.top_index].get_bounding_box()
         self.anim_step = wh / self.anim_period
-        self.widgets[self.index].hide()
+        self.widgets[self.top_index].hide()
 
         self.anim_length = wh
 
-        self.index += 1
+        self.top_index += 1
 
-        visible_widgets = self.widgets[self.index:]
+        visible_widgets = self.widgets[self.top_index:self.btm_index+1]
+
+        print '%d/%d'%(len(visible_widgets),len(self.widgets))
 
         bb = None
         for w in visible_widgets:
             bb = BoundingBox(w.get_bounding_box()) + bb
         
-        # TODO make it while
         if bb <= self.bbox:
             new_position = (bb.x, bb.y+bb.h+4)
             self.emit('request', new_position)
+            self.btm_index += 1
                             
-        for vw in self.widgets[self.index:]:
+        visible_widgets = self.widgets[self.top_index:self.btm_index+1]
+
+        self.direction = -1
+        for vw in visible_widgets:
             vw.background_elem.anim_length = self.anim_length
             vw.background_elem.onDraw = self.upAnimate
             vw.text_elem.anim_length = self.anim_length
@@ -112,7 +116,32 @@ class Container(InkObject):
 
 
     def onUpArrow(self, elem):
-        print 'going down'
+        if self.top_index == 0:
+            return
+
+        _,_,_,wh = self.widgets[self.btm_index - 1].get_bounding_box()
+        self.anim_step = wh / self.anim_period
+        self.widgets[self.btm_index - 1].hide()
+
+        self.btm_index -= 1
+
+        self.top_index -= 1
+
+        self.widgets[self.top_index].unhide()
+
+        visible_widgets = self.widgets[self.top_index:self.btm_index+1]
+
+        self.direction = 1
+        for vw in visible_widgets:
+            vw.background_elem.anim_length = self.anim_length
+            vw.background_elem.onDraw = self.upAnimate
+            vw.text_elem.anim_length = self.anim_length
+            vw.text_elem.onDraw = self.upAnimate
+            vw.image_elem.anim_length = self.anim_length
+            vw.image_elem.onDraw = self.upAnimate
+
+       
+
 
 
 if __name__ == '__main__':
