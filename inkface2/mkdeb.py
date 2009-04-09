@@ -1,23 +1,59 @@
 import glob
 from py2deb import Py2deb
 
-version="0.2.2"
+AUTHOR  = "Jayesh Salvi"
+MAIL    = "jayeshsalvi@gmail.com"
+VERSION = "0.2.5"
+URL     = "http://code.google.com/p/altcanvas"
+LICENSE = "gpl"
+SECTION = "utils"
+ARCH    = "all"
 
-p = Py2deb("inkface")
-
-p.author = "Jayesh Salvi"
-p.mail =  "jayeshsalvi@gmail.com"
-p.description = "SVG based GUI framework library"
-p.url = "http://code.google.com/p/altcanvas"
-p.depends = "python2.5-cairo, python2.5-pygame, python2.5-xml"
-p.license="gpl"
-p.section="utils"
-p.arch="all"
+def fill_common_details(p):
+    p.author        = AUTHOR
+    p.mail          = MAIL
+    p.url           = URL
+    p.license       = LICENSE
+    p.section       = SECTION
+    p.arch          = ARCH
 
 
+# Inkface core
+p = Py2deb("inkface-core")
+
+fill_common_details(p)
+
+p.description   = "SVG based GUI framework library"
 lib_files = glob.glob('inkface/*.py')
 lib_files += glob.glob('inkface/altsvg/*.py')
-lib_files += glob.glob('inkface/canvas/*.py')
 p["/usr/lib/python2.5/site-packages"] = lib_files
-
 p.generate(version,src=True)
+
+
+# Inkface pygame
+
+p = Py2deb("inkface-pygame")
+
+fill_common_details(p)
+
+p.depends       = "python2.5-cairo, python2.5-pygame, python2.5-xml"
+p.description   = "Pygame backend for Inkface"
+
+lib_files = glob.glob('inkface/pygame/*.py')
+p["/usr/lib/python2.5/site-packages"] = lib_files
+p.generate(version,src=True)
+
+
+# Inkface evas
+
+p = Py2deb("inkface-evas")
+
+fill_common_details(p)
+
+p.depends       = "python2.5-evas, python2.5-ecore"
+p.description   = "Evas backend for Inkface"
+
+lib_files = glob.glob('inkface/evas/*.py')
+p["/usr/lib/python2.5/site-packages"] = lib_files
+p.generate(version,src=True)
+
