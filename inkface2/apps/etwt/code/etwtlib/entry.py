@@ -119,7 +119,7 @@ class Entry(InkObject):
         pickle.dump(m,pfile)
 
     def Exit(self, elem):
-        self.canvas.ee.shutdown()
+        self.canvas.stop()
 
 
      

@@ -51,7 +51,6 @@ class ECanvasElement(CanvasElement):
         x, y = self.get_position()
         self.image.move(x, y)
 
-
     def refresh(self, svg_reload=True):
         if svg_reload:
             self.svg.render()
@@ -65,7 +64,6 @@ class ECanvasElement(CanvasElement):
         self.image.fill_set(0, 0, w, h)
         self.image.image_data_set(surface.get_data())
         self.image.resize(w, h)
-        #self.image.show()
 
         # wire the new image with event handlers
         self.image.event_callback_add(
@@ -78,7 +76,6 @@ class ECanvasElement(CanvasElement):
         x, y = self.get_position()
         self.image.move(x, y)
         self.image.show()
-
 
     def hide(self):
         self.image.hide()
@@ -142,6 +139,9 @@ class ECanvas(Canvas):
         for elem in face.elements:
             elem.hide()
         
+    def stop(self):
+        ecore.main_loop_quit()
+        ecore.shutdown()
 
     def eventloop(self):
         self.ee.show()
