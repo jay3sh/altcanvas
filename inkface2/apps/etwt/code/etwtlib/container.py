@@ -99,7 +99,8 @@ class Container(InkObject):
         
         # TODO make it while
         if bb <= self.bbox:
-            self.emit('request')
+            new_position = (bb.x, bb.y+bb.h+4)
+            self.emit('request', new_position)
                             
         for vw in self.widgets[self.index:]:
             vw.background_elem.anim_length = self.anim_length

@@ -1,6 +1,5 @@
 
 import os
-import pygame
 import sys
 from etwtlib import twitter
 from etwtlib.textbox import TextBox
@@ -151,24 +150,24 @@ class Twt:
 
         twt = self.get_friends_twt()
 
-        tbox = TwitBox(
+        self.tbox = TwitBox(
             self.face,
             background_ename = 'twtbg',
             text_ename       = 'twttxt',
             image_ename      = 'twtimg')
 
-        tbox.set_text(twt.text)
+        self.tbox.set_text(twt.text)
         #tbox.set_image(self.load_image(twt))
 
-        containerFull = self.twtContainer.add(tbox)
+        containerFull = self.twtContainer.add(self.tbox)
         
-        lx,ly,lw,lh = tbox.get_bounding_box()
+        lx,ly,lw,lh = self.tbox.get_bounding_box()
 
         while not containerFull:
 
             twt = self.get_friends_twt()
 
-            new_tbox = tbox.clone((lx, ly+lh+4))
+            new_tbox = self.tbox.clone((lx, ly+lh+4))
 
             new_tbox.set_text(twt.text)
 
@@ -187,9 +186,14 @@ class Twt:
         # waitIcon can disappear now
         self.face.waitIcon.hide()
 
-    def on_container_request(self):
-        self.twtContainer.add()
-
+    def on_container_request(self, position):
+        containerFull = False
+        while not containerFull:
+            twt = self.get_friends_twt()
+            new_tbox = self.tbox.clone(position)
+            new_tbox.set_text(twt.text)
+            #new_tbox.set_image(self.load_image(twt))
+            containerFull = self.twtContainer.add(new_tbox)
 
     def on_gain_focus(self, elem):
         elem.inFocus = True
