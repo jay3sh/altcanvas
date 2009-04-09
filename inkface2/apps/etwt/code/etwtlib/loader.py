@@ -27,9 +27,12 @@ class Loader(InkObject):
         self.X_MIN = self.face.svg.width/7
         self.X_MAX = 6*self.face.svg.width/7 - self.face.meterBullet.svg.w
 
+    def eventloop(self):
+        self.canvas.eventloop()
+
     def drawMeter(self, elem):
         if self.first_draw:
-            self.emit('started')
+            self.emit('started', self.canvas)
             self.first_draw = False
 
         x, y = elem.get_position()
