@@ -32,11 +32,6 @@ class EFace(Face):
         '''
         Face.clone(self, curNodeName, newNodeName, new_x, new_y)
 
-        svge = self.get(newNodeName).svg
-        ecElement = ECanvasElement(svge, self.canvas)
-
-        Face._append(self, svge, ecElement)
-
 
 class ECanvasElement(CanvasElement):
     def __init__(self, svgelem, canvas):
@@ -44,10 +39,17 @@ class ECanvasElement(CanvasElement):
 
         self.canvas = canvas
 
+        self.image = None
+
         if self.svg.surface is None:
             self.refresh(svg_reload = True)
         else:
             self.refresh(svg_reload = False)
+
+    def set_position(self, (x, y)):
+        CanvasElement.set_position(self, (x, y))
+        x, y = self.get_position()
+        self.image.move(x, y)
 
 
     def refresh(self, svg_reload=True):
@@ -55,13 +57,15 @@ class ECanvasElement(CanvasElement):
             self.svg.render()
         surface = self.svg.surface
         w, h = surface.get_width(), surface.get_height()
+        if self.image is not None:
+            self.image.delete()
         self.image = self.canvas.canvas.Image()
         self.image.alpha_set(True)
         self.image.image_size_set(w, h)
         self.image.fill_set(0, 0, w, h)
         self.image.image_data_set(surface.get_data())
         self.image.resize(w, h)
-        self.image.show()
+        #self.image.show()
 
         # wire the new image with event handlers
         self.image.event_callback_add(
@@ -132,7 +136,12 @@ class ECanvas(Canvas):
 
     def add(self, face):
         #Canvas.add(self, face)
-        print 'ECanvas::add not needed'
+        pass
+
+    def remove(self, face):
+        for elem in face.elements:
+            elem.hide()
+        
 
     def eventloop(self):
         self.ee.show()

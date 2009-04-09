@@ -71,13 +71,13 @@ class Container(InkObject):
 
         if elem.anim_length < self.anim_step:
             elem.set_position((x, y-elem.anim_length))
-            elem.refresh(svg_reload=False)
+            #elem.refresh(svg_reload=False)
             elem.anim_length = 0
             elem.onDraw = None
             return False
         else:
             elem.set_position((x, y-self.anim_step))
-            elem.refresh(svg_reload=False)
+            #elem.refresh(svg_reload=False)
             elem.anim_length -= self.anim_step
             return True
 
