@@ -81,7 +81,7 @@ class Container(InkObject):
             elem.anim_length -= self.anim_step
             return True
 
-    def onUpArrow(self, elem):
+    def onDownArrow(self, elem):
 
         _,_,_,wh = self.widgets[self.index].get_bounding_box()
         self.anim_step = wh / self.anim_period
@@ -111,7 +111,7 @@ class Container(InkObject):
             vw.image_elem.onDraw = self.upAnimate
 
 
-    def onDownArrow(self, elem):
+    def onUpArrow(self, elem):
         print 'going down'
 
 
