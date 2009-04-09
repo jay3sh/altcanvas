@@ -11,6 +11,8 @@ import math
 class Loader(InkObject):
     def __init__(self):
         InkObject.__init__(self)
+
+    def load(self):
         self.face = EFace(os.path.join(SVG_DIR,'default','loader.svg'))
 
         self.canvas = ECanvas(
@@ -27,14 +29,9 @@ class Loader(InkObject):
         self.X_MIN = self.face.svg.width/7
         self.X_MAX = 6*self.face.svg.width/7 - self.face.meterBullet.svg.w
 
-    def eventloop(self):
-        self.canvas.eventloop()
+        return self.canvas
 
     def drawMeter(self, elem):
-        if self.first_draw:
-            self.emit('started', self.canvas)
-            self.first_draw = False
-
         x, y = elem.get_position()
 
         x += 5

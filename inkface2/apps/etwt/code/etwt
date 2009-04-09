@@ -18,12 +18,14 @@ class App:
 
         loader = Loader()
 
-        loader.connect('started',self.start)
+        self.canvas = loader.load()
 
-        loader.eventloop()
+        self.canvas.ee.callback_show_set(self.onShow)
+
+        self.canvas.eventloop()
         
-    def start(self, canvas):
-        self.entry = Entry(canvas, theme)
+    def onShow(self, arg):
+        self.entry = Entry(self.canvas, self.theme)
         self.entry.load()
 
 def usage():
