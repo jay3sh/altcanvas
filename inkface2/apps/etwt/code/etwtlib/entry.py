@@ -83,20 +83,20 @@ class Entry(InkObject):
         password = self.passwd.get_text()
 
         try:
-            self.entry.authfailIcon.hide()
-            self.entry.waitIcon.unhide()
+            self.face.authfailIcon.hide()
+            self.face.waitIcon.unhide()
             twt = Twt(username, password, self.theme, self.canvas)
         except HTTPError, hter:
-            self.entry.waitIcon.hide()
-            self.entry.authfailIcon.unhide()
+            self.face.waitIcon.hide()
+            self.face.authfailIcon.unhide()
             return
 
         # Login was successful, let's save credentials.
         self.save_config(username, password)
 
-        self.entry.waitIcon.hide()
+        self.face.waitIcon.hide()
 
-        self.canvas.remove(self.entry)
+        self.canvas.remove(self.face)
 
         twt.load()
 
@@ -119,7 +119,7 @@ class Entry(InkObject):
         pickle.dump(m,pfile)
 
     def Exit(self, elem):
-        sys.exit(0)
+        self.canvas.ee.shutdown()
 
 
      
