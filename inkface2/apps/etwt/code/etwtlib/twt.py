@@ -162,7 +162,6 @@ class Twt:
             image_ename      = 'twtimg')
 
         self.tbox.set_text(twt.text)
-        #tbox.set_image(self.load_image(twt))
         self.image_thread.add_work(
             (twt.GetUser().profile_image_url,self.tbox.image_elem))
 
@@ -178,7 +177,6 @@ class Twt:
 
             new_tbox.set_text(twt.text)
 
-            #new_tbox.set_image(self.load_image(twt))
             self.image_thread.add_work(
                 (twt.GetUser().profile_image_url,new_tbox.image_elem))
 
@@ -201,7 +199,6 @@ class Twt:
             twt = self.get_friends_twt()
             new_tbox = self.tbox.clone(position)
             new_tbox.set_text(twt.text)
-            #new_tbox.set_image(self.load_image(twt))
             containerFull = self.twtContainer.add(new_tbox)
             break # TODO
 
