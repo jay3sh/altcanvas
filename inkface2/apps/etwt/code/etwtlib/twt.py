@@ -5,8 +5,10 @@ from etwtlib import twitter
 from etwtlib.textbox import TextBox
 from etwtlib.twitbox import TwitBox
 from etwtlib.container import Container
+from etwtlib.imgthread import ImageThread
 
 from inkface.evas import EFace, ECanvas
+
 
 PREFIX      = '..'
 SVG_DIR     = os.path.join(PREFIX,'svg')
@@ -34,6 +36,9 @@ class Twt:
         self.current_twt_type = self.TWT_FRIENDS
 
         self.friends_twtcnt = 0
+
+        self.image_thread = ImageThread()
+        self.image_thread.start()
  
     def get_public_twt(self):
         if self.public_twtlist == None or \
@@ -158,6 +163,8 @@ class Twt:
 
         self.tbox.set_text(twt.text)
         #tbox.set_image(self.load_image(twt))
+        self.image_thread.add_work(
+            (twt.GetUser().profile_image_url,self.tbox.image_elem))
 
         containerFull = self.twtContainer.add(self.tbox)
         
@@ -172,6 +179,8 @@ class Twt:
             new_tbox.set_text(twt.text)
 
             #new_tbox.set_image(self.load_image(twt))
+            self.image_thread.add_work(
+                (twt.GetUser().profile_image_url,self.tbox.image_elem))
 
             lx,ly,lw,lh = new_tbox.get_bounding_box()
 
@@ -194,13 +203,13 @@ class Twt:
             new_tbox.set_text(twt.text)
             #new_tbox.set_image(self.load_image(twt))
             containerFull = self.twtContainer.add(new_tbox)
+            break # TODO
 
     def on_gain_focus(self, elem):
         elem.inFocus = True
 
     def on_lose_focus(self, elem):
         elem.inFocus = False
-
 
     def change_borders(self, type):
         for t, border in self.button_borders.items():
@@ -291,7 +300,7 @@ class Twt:
     def onTwitCancel(self,elem):
         self.hide_twt_entry()
 
-
     def exit(self, elem):
+        self.image_thread.stop()
+        self.image_thread.join()
         self.canvas.stop()
-        sys.exit(0)
