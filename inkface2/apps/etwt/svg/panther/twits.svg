@@ -71,8 +71,8 @@
     <rect
        style="opacity:1;fill:#b3b3b3;fill-opacity:0.91603052;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect3170"
-       width="417.63385"
-       height="51.805733"
+       width="373.79822"
+       height="94.844337"
        x="12.752181"
        y="80.498131"
        rx="15"
@@ -80,22 +80,22 @@
        inkscape:label="twtbg" />
     <text
        xml:space="preserve"
-       style="font-size:14px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
-       x="23.113325"
-       y="99.626411"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="23.910336"
+       y="106.79951"
        id="text3174"
        inkscape:label="twttxt"><tspan
          sodipodi:role="line"
          id="tspan3176"
-         x="23.113325"
-         y="99.626411">twt</tspan></text>
+         x="23.910336"
+         y="106.79951">twt</tspan></text>
     <rect
        style="opacity:1;fill:#333333;fill-opacity:1;stroke:none;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect3178"
-       width="51.008717"
-       height="51.008717"
-       x="423.198"
-       y="77.73101"
+       width="77.310112"
+       height="72.528023"
+       x="399.28766"
+       y="78.528023"
        rx="5"
        ry="5"
        inkscape:label="twtimg" />
