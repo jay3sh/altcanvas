@@ -67,14 +67,10 @@ class ECanvasElement(CanvasElement):
             self.image.image_data_set(surface.get_data())
             self.image.resize(w, h)
         else:
-            print 'loading '+imgpath
-            try:
-                self.image = self.canvas.canvas.Image(file=imgpath)
-                self.image.alpha_set(True)
-                self.image.image_size_set(w, h)
-                self.image.fill_set(0, 0, w, h)
-            except Exception, e:
-                print e
+            x, y = self.get_position()
+            self.image = self.canvas.canvas.Image(file=imgpath)
+            self.image.size = (w, h)
+            self.image.fill = (0, 0, w, h)
 
         # wire the new image with event handlers
         self.image.event_callback_add(

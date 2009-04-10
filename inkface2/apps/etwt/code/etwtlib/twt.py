@@ -180,7 +180,7 @@ class Twt:
 
             #new_tbox.set_image(self.load_image(twt))
             self.image_thread.add_work(
-                (twt.GetUser().profile_image_url,self.tbox.image_elem))
+                (twt.GetUser().profile_image_url,new_tbox.image_elem))
 
             lx,ly,lw,lh = new_tbox.get_bounding_box()
 
