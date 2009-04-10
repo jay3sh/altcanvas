@@ -51,19 +51,30 @@ class ECanvasElement(CanvasElement):
         x, y = self.get_position()
         self.image.move(x, y)
 
-    def refresh(self, svg_reload=True):
+    def refresh(self, svg_reload=True, imgpath=None):
         if svg_reload:
             self.svg.render()
         surface = self.svg.surface
         w, h = surface.get_width(), surface.get_height()
         if self.image is not None:
             self.image.delete()
-        self.image = self.canvas.canvas.Image()
-        self.image.alpha_set(True)
-        self.image.image_size_set(w, h)
-        self.image.fill_set(0, 0, w, h)
-        self.image.image_data_set(surface.get_data())
-        self.image.resize(w, h)
+
+        if imgpath is None:
+            self.image = self.canvas.canvas.Image()
+            self.image.alpha_set(True)
+            self.image.image_size_set(w, h)
+            self.image.fill_set(0, 0, w, h)
+            self.image.image_data_set(surface.get_data())
+            self.image.resize(w, h)
+        else:
+            print 'loading '+imgpath
+            try:
+                self.image = self.canvas.canvas.Image(file=imgpath)
+                self.image.alpha_set(True)
+                self.image.image_size_set(w, h)
+                self.image.fill_set(0, 0, w, h)
+            except Exception, e:
+                print e
 
         # wire the new image with event handlers
         self.image.event_callback_add(
@@ -83,7 +94,11 @@ class ECanvasElement(CanvasElement):
     def __setattr__(self, key, value):
         if key == 'onDraw':
             if value is not None:
-                ecore.animator_add(value, self)
+                if self.__dict__.has_key('onDrawAnimator'):
+                    self.__dict__['onDrawAnimator'].stop()
+                    self.__dict__['onDrawAnimator'].delete()
+                animator = ecore.animator_add(value, self)
+                self.__dict__['onDrawAnimator'] = animator
         else:
             self.__dict__[key] = value
 
@@ -114,6 +129,17 @@ class ECanvasElement(CanvasElement):
         new_svg = self.svg.dup(newName)
         return ECanvasElement(new_svg, self.canvas)
 
+    def destroy(self):
+        try:
+            if self.onDrawAnimator is not None:
+                self.onDrawAnimator.stop()
+                self.onDrawAnimator.delete()
+        except AttributeError, ae:
+            pass
+
+        self.image.delete()
+        del self.image
+
 class ECanvas(Canvas):
     def __init__(self,
                 (width,height) = (640, 480),
@@ -137,7 +163,7 @@ class ECanvas(Canvas):
 
     def remove(self, face):
         for elem in face.elements:
-            elem.hide()
+            elem.destroy()
         
     def stop(self):
         ecore.main_loop_quit()
