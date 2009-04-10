@@ -5,7 +5,7 @@ import sys
 import pickle
 import getopt
 
-from inkface.canvas.pygamecanvas import PygameFace, PygameCanvas
+from inkface.pygame import PygameFace, PygameCanvas
 from twtinklib.textbox import TextBox
 from twtinklib.twt import Twt
 from twtinklib.utils import encrypt,decrypt

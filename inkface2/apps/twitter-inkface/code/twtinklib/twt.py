@@ -5,7 +5,7 @@ import sys
 from twtinklib import twitter
 from twtinklib.textbox import TextBox
 from twtinklib.twitbox import TwitBox
-from inkface.canvas.pygamecanvas import PygameFace, PygameCanvas
+from inkface.pygame import PygameFace, PygameCanvas
 
 PREFIX      = '..'
 SVG_DIR     = os.path.join(PREFIX,'svg')
