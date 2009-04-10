@@ -62,7 +62,12 @@ class Container(InkObject):
 
         self.btm_index = len(self.widgets) - 1
 
-        return not (self.cur_bbox <= self.bbox)
+        if self.cur_bbox.y+self.cur_bbox.h > self.bbox.y+self.bbox.h:
+            containerFull = True
+        else:
+            containerFull = False
+
+        return containerFull
             
 
     def remove(self, widget):
@@ -92,13 +97,11 @@ class Container(InkObject):
 
         visible_widgets = self.widgets[self.top_index:self.btm_index+1]
 
-        print '%d/%d'%(len(visible_widgets),len(self.widgets))
-
         bb = None
         for w in visible_widgets:
             bb = BoundingBox(w.get_bounding_box()) + bb
         
-        if bb <= self.bbox:
+        if bb.y+bb.h <= bb.y+bb.h:
             new_position = (bb.x, bb.y+bb.h+4)
             self.emit('request', new_position)
             self.btm_index += 1
