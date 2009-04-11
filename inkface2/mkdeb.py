@@ -4,9 +4,10 @@ from py2deb import Py2deb
 AUTHOR  = "Jayesh Salvi"
 MAIL    = "jayeshsalvi@gmail.com"
 VERSION = "0.2.5"
+BLDVERSION  = "0"
 URL     = "http://code.google.com/p/altcanvas"
 LICENSE = "gpl"
-SECTION = "utils"
+SECTION = "user/system"
 ARCH    = "all"
 
 def fill_common_details(p):
@@ -27,7 +28,7 @@ p.description   = "SVG based GUI framework library"
 lib_files = glob.glob('inkface/*.py')
 lib_files += glob.glob('inkface/altsvg/*.py')
 p["/usr/lib/python2.5/site-packages"] = lib_files
-p.generate(version,src=True)
+p.generate(VERSION,BLDVERSION,tar=True,dsc=True,changes=True,build=True,src=True)
 
 
 # Inkface pygame
@@ -41,7 +42,7 @@ p.description   = "Pygame backend for Inkface"
 
 lib_files = glob.glob('inkface/pygame/*.py')
 p["/usr/lib/python2.5/site-packages"] = lib_files
-p.generate(version,src=True)
+p.generate(VERSION,BLDVERSION,tar=True,dsc=True,changes=True,build=True,src=True)
 
 
 # Inkface evas
@@ -55,5 +56,5 @@ p.description   = "Evas backend for Inkface"
 
 lib_files = glob.glob('inkface/evas/*.py')
 p["/usr/lib/python2.5/site-packages"] = lib_files
-p.generate(version,src=True)
+p.generate(VERSION,BLDVERSION,tar=True,dsc=True,changes=True,build=True,src=True)
 
