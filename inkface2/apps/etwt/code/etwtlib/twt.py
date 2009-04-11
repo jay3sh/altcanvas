@@ -138,7 +138,7 @@ class Twt:
         # Show the face on canvas
         self.canvas.add(self.face)
 
-
+        # Create a container box
         container_bbox = (self.face.twtbg.svg.x-3, 
                             self.face.twtbg.svg.y-3,
                             self.face.svg.width,
@@ -149,43 +149,10 @@ class Twt:
                         upArrow_elem    = self.face.upArrow,
                         downArrow_elem  = self.face.downArrow)
 
-        self.twtContainer.connect('request',self.on_container_request)
+        self.twtContainer.connect('request',self.add_new_tbox)
 
-        tboxlist = []
 
-        twt = self.get_friends_twt()
-
-        self.tbox = TwitBox(
-            self.face,
-            background_ename = 'twtbg',
-            text_ename       = 'twttxt',
-            image_ename      = 'twtimg')
-
-        self.tbox.set_text(twt.text)
-        self.image_thread.add_work(
-            (twt.GetUser().profile_image_url,self.tbox.image_elem))
-
-        containerFull = self.twtContainer.add(self.tbox)
-        
-        lx,ly,lw,lh = self.tbox.get_bounding_box()
-
-        while not containerFull:
-
-            twt = self.get_friends_twt()
-
-            new_tbox = self.tbox.clone((lx, ly+lh+4))
-
-            new_tbox.set_text(twt.text)
-
-            self.image_thread.add_work(
-                (twt.GetUser().profile_image_url,new_tbox.image_elem))
-
-            lx,ly,lw,lh = new_tbox.get_bounding_box()
-
-            containerFull = self.twtContainer.add(new_tbox)
-
-            self.face.waitIcon.refresh(svg_reload=False)
-
+        self.load_twts(self.TWT_FRIENDS)
 
         self.face.upArrow.refresh(svg_reload=False)
         self.face.downArrow.refresh(svg_reload=False)
@@ -193,16 +160,44 @@ class Twt:
         # waitIcon can disappear now
         self.face.waitIcon.hide()
 
-    def on_container_request(self, position):
+    def load_twts(self, twt_type):
+        get_twt = \
+                {
+                    self.TWT_FRIENDS    : self.get_friends_twt,
+                    self.TWT_PUBLIC     : self.get_public_twt,
+                    self.TWT_REPLIES    : self.get_replies
+                }[twt_type]
+
+
+        tboxes = self.twtContainer.get_widgets()
+
+            
+
+        twt = get_twt()
+
+        self.tbox = TwitBox(
+            self.face,
+            background_ename = 'twtbg',
+            text_ename       = 'twttxt',
+            image_ename      = 'twtimg')
+
+        self.add_new_tbox(None, self.tbox)
+
+    def add_new_tbox(self, position, tbox=None):
         containerFull = False
         while not containerFull:
             twt = self.get_friends_twt()
-            new_tbox = self.tbox.clone(position)
-            new_tbox.set_text(twt.text)
+            if tbox is None:
+                tbox = self.tbox.clone(position)
+            tbox.set_text(twt.text)
             self.image_thread.add_work(
-                (twt.GetUser().profile_image_url,new_tbox.image_elem))
-            containerFull = self.twtContainer.add(new_tbox)
-            break # TODO
+                (twt.GetUser().profile_image_url,tbox.image_elem))
+
+            lx,ly,lw,lh = tbox.get_bounding_box()
+            position = (lx, ly+lh+4)
+
+            containerFull = self.twtContainer.add(tbox)
+            tbox = None
 
     def on_gain_focus(self, elem):
         elem.inFocus = True
@@ -241,7 +236,7 @@ class Twt:
         if self.current_twt_type == self.TWT_PUBLIC:
             return
 
-        self.reset_twt_roll()
+        #self.reset_twt_roll()
 
         self.change_borders(self.TWT_PUBLIC)
         self.face.waitIcon.unhide()
@@ -256,7 +251,7 @@ class Twt:
         if self.current_twt_type == self.TWT_REPLIES:
             return
 
-        self.reset_twt_roll()
+        #self.reset_twt_roll()
 
         self.change_borders(self.TWT_REPLIES)
         self.face.waitIcon.unhide()
