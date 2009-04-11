@@ -75,7 +75,7 @@
        x2="135.40688"
        y2="416.05786"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(65.379752,-6.0180743)" />
+       gradientTransform="translate(65.379752,-66.018074)" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient3564"
@@ -108,15 +108,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.8640625"
-     inkscape:cx="240"
+     inkscape:cx="86.075949"
      inkscape:cy="320"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1280"
-     inkscape:window-height="778"
-     inkscape:window-x="-5"
-     inkscape:window-y="-3">
+     inkscape:window-width="1920"
+     inkscape:window-height="1001"
+     inkscape:window-x="0"
+     inkscape:window-y="28">
     <inkscape:grid
        type="xygrid"
        id="grid3321"
@@ -147,7 +147,7 @@
        y="0" />
     <g
        id="g2528"
-       transform="translate(10.84991,65.388791)"
+       transform="translate(10.84991,5.388791)"
        inkscape:label="">
       <image
          y="155.18988"
@@ -158,15 +158,15 @@
          sodipodi:absref="/home/jayesh/altcanvas/inkface2/apps/etwt/svg/default/logo-blur.png"
          xlink:href="logo-blur.png" />
     </g>
-    <rect
-       style="opacity:1;fill:url(#linearGradient3554);fill-opacity:1;stroke:none;stroke-width:9;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect3546"
-       width="79.855331"
-       height="12.73056"
-       x="200.78662"
-       y="403.6745"
-       inkscape:label="meterBullet"
-       rx="5"
-       ry="5" />
+    <text
+       xml:space="preserve"
+       style="font-size:36px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="168.3074"
+       y="388.19891"
+       id="text2549"><tspan
+         sodipodi:role="line"
+         id="tspan2551"
+         x="168.3074"
+         y="388.19891">loading...</tspan></text>
   </g>
 </svg>
