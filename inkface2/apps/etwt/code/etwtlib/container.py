@@ -63,8 +63,6 @@ class Container(InkObject):
         
         self.cur_bbox = wbbox + self.cur_bbox
 
-        self.btm_index = len(self.widgets) - 1
-
         if self.cur_bbox.y+self.cur_bbox.h > self.bbox.y+self.bbox.h:
             containerFull = True
         else:
@@ -96,24 +94,10 @@ class Container(InkObject):
     def onDownArrow(self, elem):
         _,_,_,wh = self.widgets[self.top_index].get_bounding_box()
         self.anim_step = wh / self.anim_period
-        #self.widgets[self.top_index].hide()
 
         self.anim_length = wh
 
         self.top_index += 1
-
-        #visible_widgets = self.widgets[self.top_index:self.btm_index+1]
-
-        #bb = None
-        #for w in visible_widgets:
-        #    bb = BoundingBox(w.get_bounding_box()) + bb
-        
-        #if bb.y+bb.h <= bb.y+bb.h:
-        #    new_position = (bb.x, bb.y+bb.h+4)
-        #    self.emit('request', new_position)
-        #    self.btm_index += 1
-                            
-        #visible_widgets = self.widgets[self.top_index:self.btm_index+1]
 
         btm_x,btm_y,_,btm_h = self.widgets[-1].get_bounding_box()
 
@@ -140,8 +124,6 @@ class Container(InkObject):
 
         #self.widgets[self.btm_index - 1].hide()
 
-        self.btm_index -= 1
-
         self.top_index -= 1
 
         wx,wy,ww,wh = self.widgets[self.top_index].get_bounding_box()
@@ -149,8 +131,6 @@ class Container(InkObject):
         self.anim_length = wh
 
         #self.widgets[self.top_index].unhide()
-
-        visible_widgets = self.widgets[self.top_index:self.btm_index+1]
 
         self.direction = 1
         for vw in self.widgets:
@@ -160,9 +140,6 @@ class Container(InkObject):
             vw.text_elem.onDraw = self.animate
             vw.image_elem.anim_length = self.anim_length
             vw.image_elem.onDraw = self.animate
-
-       
-
 
 
 if __name__ == '__main__':
