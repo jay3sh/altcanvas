@@ -152,6 +152,8 @@ class ECanvas(Canvas):
         if os.environ.get('INKFACE_FULLSCREEN') is not None:
             self.ee.fullscreen = True
 
+    def refresh(self):
+        ecore.main_loop_iterate()
 
     def add(self, face):
         #Canvas.add(self, face)
