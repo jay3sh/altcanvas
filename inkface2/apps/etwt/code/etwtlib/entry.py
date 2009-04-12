@@ -26,15 +26,21 @@ class KeyFocus:
  
 
 class Entry(InkObject):
-    def __init__(self, canvas, theme):
+    def __init__(self, theme):
         InkObject.__init__(self)
 
-        self.canvas = canvas
         self.theme = theme
+        self.face = EFace(
+            os.path.join(SVG_DIR,self.theme,'entry.svg'))
+
+        self.canvas = ECanvas(
+                            (int(float(self.face.svg.width)),
+                            int(float(self.face.svg.height))),
+                            framerate = FRAMERATE)
+
 
     def load(self):
-        self.face = EFace(
-            os.path.join(SVG_DIR,self.theme,'entry.svg'), self.canvas)
+        self.face.load_elements(self.canvas)
 
         self.face.waitIcon.hide()
         self.face.authfailIcon.hide()
@@ -79,6 +85,7 @@ class Entry(InkObject):
         if username and password:
             self.uname.set_text(username)
             self.passwd.set_text(password)
+
 
     def doFriendsLogin(self, elem):
         self.doLogin(Twt.TWT_FRIENDS)

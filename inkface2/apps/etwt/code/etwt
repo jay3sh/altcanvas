@@ -14,18 +14,13 @@ from etwtlib.entry import Entry
 class App:
     def main(self, theme='default'):
 
-        self.theme = theme
+        self.entry = Entry(theme)
 
-        loader = Loader()
+        self.entry.canvas.ee.callback_show_set(self.onShow)
 
-        self.canvas = loader.load()
-
-        self.canvas.ee.callback_show_set(self.onShow)
-
-        self.canvas.eventloop()
+        self.entry.canvas.eventloop()
         
     def onShow(self, arg):
-        self.entry = Entry(self.canvas, self.theme)
         self.entry.load()
 
 def usage():
