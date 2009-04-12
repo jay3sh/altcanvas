@@ -38,7 +38,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="1.2546875"
      inkscape:cx="240"
-     inkscape:cy="381.9198"
+     inkscape:cy="286.27846"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -71,169 +71,34 @@
     <rect
        style="opacity:1;fill:#b3b3b3;fill-opacity:0.91603052;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect3170"
-       width="373.79822"
-       height="94.844337"
-       x="12.752181"
-       y="80.498131"
+       width="391.33243"
+       height="68.542961"
+       x="8.7671251"
+       y="7.9701109"
        rx="15"
        ry="15"
        inkscape:label="twtbg" />
     <text
        xml:space="preserve"
        style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
-       x="23.910336"
-       y="106.79951"
+       x="19.92528"
+       y="32.677464"
        id="text3174"
        inkscape:label="twttxt"><tspan
          sodipodi:role="line"
          id="tspan3176"
-         x="23.910336"
-         y="106.79951">twt</tspan></text>
+         x="19.92528"
+         y="32.677464">twt</tspan></text>
     <rect
        style="opacity:1;fill:#333333;fill-opacity:1;stroke:none;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect3178"
-       width="77.310112"
-       height="72.528023"
-       x="399.28766"
-       y="78.528023"
+       width="62.166908"
+       height="58.978828"
+       x="409.6488"
+       y="11.579082"
        rx="5"
        ry="5"
        inkscape:label="twtimg" />
-    <rect
-       style="fill:#999999;fill-opacity:1;stroke:none;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect3535"
-       width="82.889168"
-       height="30.286427"
-       x="24.271482"
-       y="22.70735"
-       rx="5"
-       ry="5"
-       inkscape:label="friendsBorder" />
-    <g
-       id="g3537"
-       inkscape:label="friendsButton">
-      <rect
-         ry="5"
-         rx="5"
-         y="19.92528"
-         x="21.519302"
-         height="30.286427"
-         width="82.889168"
-         id="rect3180"
-         style="fill:#333333;fill-opacity:1;stroke:none;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-      <text
-         id="text3521"
-         y="37.068493"
-         x="41.39975"
-         style="font-size:13px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
-         xml:space="preserve"><tspan
-           y="37.068493"
-           x="41.39975"
-           id="tspan3523"
-           sodipodi:role="line">Friends</tspan></text>
-    </g>
-    <rect
-       style="fill:#999999;fill-opacity:1;stroke:none;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect3542"
-       width="82.889168"
-       height="30.286427"
-       x="148.02615"
-       y="22.910337"
-       rx="5"
-       ry="5"
-       inkscape:label="everyoneBorder" />
-    <g
-       id="g3544"
-       transform="translate(123.75467,0.2029876)"
-       inkscape:label="everyoneButton">
-      <rect
-         ry="5"
-         rx="5"
-         y="19.92528"
-         x="21.519302"
-         height="30.286427"
-         width="82.889168"
-         id="rect3546"
-         style="fill:#333333;fill-opacity:1;stroke:none;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-      <text
-         id="text3548"
-         y="37.068493"
-         x="55.39975"
-         style="font-size:13px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
-         xml:space="preserve"><tspan
-           y="37.068493"
-           x="55.39975"
-           id="tspan3550"
-           sodipodi:role="line">All</tspan></text>
-    </g>
-    <rect
-       style="fill:#999999;fill-opacity:1;stroke:none;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect3552"
-       width="82.889168"
-       height="30.286427"
-       x="260.05853"
-       y="21.707348"
-       rx="5"
-       ry="5"
-       inkscape:label="repliesBorder" />
-    <g
-       id="g3554"
-       transform="translate(235.78705,-1.0000012)"
-       inkscape:label="repliesButton">
-      <rect
-         ry="5"
-         rx="5"
-         y="19.92528"
-         x="21.519302"
-         height="30.286427"
-         width="82.889168"
-         id="rect3556"
-         style="fill:#333333;fill-opacity:1;stroke:none;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-      <text
-         id="text3558"
-         y="37.068493"
-         x="41.39975"
-         style="font-size:13px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
-         xml:space="preserve"><tspan
-           y="37.068493"
-           x="41.39975"
-           id="tspan3560"
-           sodipodi:role="line">Replies</tspan></text>
-    </g>
-    <rect
-       style="fill:#999999;fill-opacity:1;stroke:none;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect3562"
-       width="82.889168"
-       height="30.286427"
-       x="375.26401"
-       y="22.489416"
-       rx="5"
-       ry="5"
-       inkscape:label="twitBorder" />
-    <g
-       id="g3564"
-       transform="translate(350.99253,-0.2179339)"
-       inkscape:label="twitButton">
-      <rect
-         ry="5"
-         rx="5"
-         y="19.92528"
-         x="21.519302"
-         height="30.286427"
-         width="82.889168"
-         id="rect3566"
-         style="fill:#333333;fill-opacity:1;stroke:none;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-      <text
-         id="text3568"
-         y="37.068493"
-         x="49.39975"
-         style="font-size:13px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
-         xml:space="preserve"><tspan
-           y="37.068493"
-           x="49.39975"
-           id="tspan3570"
-           sodipodi:role="line">Twit</tspan></text>
-    </g>
     <g
        id="g3580"
        inkscape:label="upArrow"
@@ -273,7 +138,8 @@
     </g>
     <g
        id="g3594"
-       inkscape:label="waitIcon">
+       inkscape:label="waitIcon"
+       transform="translate(-11.158157,-93.250311)">
       <rect
          ry="10"
          rx="10"
@@ -282,7 +148,7 @@
          height="66.948944"
          width="170.56039"
          id="rect3588"
-         style="opacity:1;fill:#f2f2f2;fill-opacity:0.67938939;stroke:none;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="opacity:1;fill:#f2f2f2;fill-opacity:0.67938944;stroke:none;stroke-width:4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
       <text
          id="text3590"
          y="378.02832"
@@ -293,106 +159,6 @@
            x="214.39601"
            id="tspan3592"
            sodipodi:role="line">Loading</tspan></text>
-    </g>
-    <rect
-       style="opacity:1;fill:#f2f2f2;fill-opacity:0.44656488;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect4367"
-       width="450"
-       height="100"
-       x="19.682434"
-       y="194.68243"
-       rx="20"
-       ry="20"
-       inkscape:label="update_background" />
-    <rect
-       style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect4369"
-       width="433"
-       height="35"
-       x="28.182442"
-       y="209.68243"
-       rx="15"
-       ry="12.5"
-       inkscape:label="update_border" />
-    <text
-       xml:space="preserve"
-       style="font-size:18px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans Bold"
-       x="225.32014"
-       y="274.68243"
-       id="text4371"
-       inkscape:label="update_counter"><tspan
-         sodipodi:role="line"
-         id="tspan4373"
-         x="225.32014"
-         y="274.68243">140</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
-       x="39.154411"
-       y="231.68243"
-       id="text4375"
-       inkscape:label="update_txt"><tspan
-         sodipodi:role="line"
-         id="tspan4377"
-         x="39.154411"
-         y="231.68243">update</tspan></text>
-    <rect
-       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect4379"
-       width="10"
-       height="20"
-       x="104.68244"
-       y="214.68243"
-       rx="3"
-       ry="3"
-       inkscape:label="update_cursor" />
-    <g
-       id="g4387"
-       inkscape:label="postButton"
-       transform="translate(-166.99404,-64.764825)">
-      <rect
-         ry="10"
-         rx="10"
-         y="320"
-         x="200"
-         height="30"
-         width="100"
-         id="rect4381"
-         style="opacity:1;fill:#333333;fill-opacity:1;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-      <text
-         id="text4383"
-         y="339.44727"
-         x="227.14844"
-         style="font-size:18px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans Bold"
-         xml:space="preserve"><tspan
-           y="339.44727"
-           x="227.14844"
-           id="tspan4385"
-           sodipodi:role="line">post</tspan></text>
-    </g>
-    <g
-       id="g4392"
-       inkscape:label="cancelButton"
-       transform="translate(160.1544,-65.317559)">
-      <rect
-         ry="10"
-         rx="10"
-         y="320"
-         x="200"
-         height="30"
-         width="100"
-         id="rect4394"
-         style="opacity:1;fill:#333333;fill-opacity:1;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-      <text
-         id="text4396"
-         y="339.44727"
-         x="221.14844"
-         style="font-size:18px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans Bold"
-         xml:space="preserve"><tspan
-           y="339.44727"
-           x="221.14844"
-           id="tspan4398"
-           sodipodi:role="line">cancel</tspan></text>
     </g>
     <g
        id="g3215"
