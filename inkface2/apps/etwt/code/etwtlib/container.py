@@ -117,7 +117,7 @@ class Container(InkObject):
 
         btm_x,btm_y,_,btm_h = self.widgets[-1].get_bounding_box()
 
-        while btm_y+btm_h < self.bbox.y+self.bbox.h:
+        while btm_y < self.bbox.y+self.bbox.h:
             # We need more twits
             new_position = (btm_x, btm_y+btm_h+4)
             self.emit('request', new_position)
