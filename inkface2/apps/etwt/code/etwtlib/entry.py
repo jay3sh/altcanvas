@@ -91,14 +91,12 @@ class Entry(InkObject):
 
     def doLogin(self, twt_type):
         self.face.waitIcon.unhide()
-        self.face.waitIcon.refresh()
-        self.face.waitIcon.image.raise_()
+        self.face.authfailIcon.hide()
 
         username = self.uname.get_text()
         password = self.passwd.get_text()
 
         try:
-            self.face.authfailIcon.hide()
             twt = Twt(username, password, self.theme, 
                         self.canvas, twt_type=twt_type)
         except HTTPError, hter:
@@ -114,7 +112,7 @@ class Entry(InkObject):
         self.canvas.remove(self.face)
 
         twt.load()
-
+ 
     def load_config(self):
         config = None
         try:

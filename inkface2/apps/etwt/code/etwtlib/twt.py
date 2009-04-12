@@ -23,19 +23,24 @@ class Twt:
 
         self.current_twt_type = twt_type
 
-        self.face = EFace(
-            os.path.join(SVG_DIR, theme, 'twits.svg'), self.canvas)
-
         self.friends_page_num = 1
         self.replies_page_num = 1
 
-        self.friends_twtlist = None
-        self.public_twtlist = None
-        self.replies_twtlist = None
+        if twt_type == self.TWT_FRIENDS:
+            self.friends_twtlist = self.twtApi.GetFriendsTimeline()
+            self.friends_page_num += 1
+            self.friends_twtcnt = 0
+        elif twt_type == self.TWT_PUBLIC:
+            self.public_twtlist = self.twtApi.GetPublicTimeline()
+            self.public_twtcnt = 0
+        elif twt_type == self.TWT_REPLIES:
+            self.replies_twtlist = \
+                self.twtApi.GetReplies(page=self.replies_page_num)
+            self.replies_twtcnt = 0
+            self.replies_page_num += 1
 
-        self.friends_twtcnt = 0
-        self.public_twtcnt = 0
-        self.replies_twtcnt = 0
+        self.face = EFace(
+            os.path.join(SVG_DIR, theme, 'twits.svg'), self.canvas)
 
         self.image_thread = ImageThread()
         self.image_thread.start()
