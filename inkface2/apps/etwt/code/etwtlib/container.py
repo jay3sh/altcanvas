@@ -76,7 +76,7 @@ class Container(InkObject):
     def remove(self, widget):
         self.widgets.remove(widget)
 
-    def upAnimate(self, elem):
+    def animate(self, elem):
         x,y = elem.get_position()
 
         if elem.anim_length < self.anim_step:
@@ -116,39 +116,41 @@ class Container(InkObject):
         visible_widgets = self.widgets[self.top_index:self.btm_index+1]
 
         self.direction = -1
-        for vw in visible_widgets:
+        for vw in self.widgets:
             vw.background_elem.anim_length = self.anim_length
-            vw.background_elem.onDraw = self.upAnimate
+            vw.background_elem.onDraw = self.animate
             vw.text_elem.anim_length = self.anim_length
-            vw.text_elem.onDraw = self.upAnimate
+            vw.text_elem.onDraw = self.animate
             vw.image_elem.anim_length = self.anim_length
-            vw.image_elem.onDraw = self.upAnimate
+            vw.image_elem.onDraw = self.animate
 
 
     def onUpArrow(self, elem):
         if self.top_index == 0:
             return
 
-        _,_,_,wh = self.widgets[self.btm_index - 1].get_bounding_box()
-        self.anim_step = wh / self.anim_period
         self.widgets[self.btm_index - 1].hide()
 
         self.btm_index -= 1
 
         self.top_index -= 1
 
+        wx,wy,ww,wh = self.widgets[self.top_index].get_bounding_box()
+        self.anim_step = wh / self.anim_period
+        self.anim_length = wh
+
         self.widgets[self.top_index].unhide()
 
         visible_widgets = self.widgets[self.top_index:self.btm_index+1]
 
         self.direction = 1
-        for vw in visible_widgets:
+        for vw in self.widgets:
             vw.background_elem.anim_length = self.anim_length
-            vw.background_elem.onDraw = self.upAnimate
+            vw.background_elem.onDraw = self.animate
             vw.text_elem.anim_length = self.anim_length
-            vw.text_elem.onDraw = self.upAnimate
+            vw.text_elem.onDraw = self.animate
             vw.image_elem.anim_length = self.anim_length
-            vw.image_elem.onDraw = self.upAnimate
+            vw.image_elem.onDraw = self.animate
 
        
 
