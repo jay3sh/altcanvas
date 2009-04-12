@@ -64,7 +64,9 @@ class Entry(InkObject):
                 mask        = '*',
                 kbd         = self.kbd)
 
-        self.face.loginButton.onLeftClick = self.doLogin
+        self.face.friendsLogin.onLeftClick = self.doFriendsLogin
+        self.face.publicLogin.onLeftClick = self.doPublicLogin
+        self.face.repliesLogin.onLeftClick = self.doRepliesLogin
 
         self.face.exitButton.onLeftClick = self.Exit
 
@@ -78,14 +80,27 @@ class Entry(InkObject):
             self.uname.set_text(username)
             self.passwd.set_text(password)
 
-    def doLogin(self, elem):
+    def doFriendsLogin(self, elem):
+        self.doLogin(Twt.TWT_FRIENDS)
+
+    def doPublicLogin(self, elem):
+        self.doLogin(Twt.TWT_PUBLIC)
+
+    def doRepliesLogin(self, elem):
+        self.doLogin(Twt.TWT_REPLIES)
+
+    def doLogin(self, twt_type):
+        self.face.waitIcon.unhide()
+        self.face.waitIcon.refresh()
+        self.face.waitIcon.image.raise_()
+
         username = self.uname.get_text()
         password = self.passwd.get_text()
 
         try:
             self.face.authfailIcon.hide()
-            self.face.waitIcon.unhide()
-            twt = Twt(username, password, self.theme, self.canvas)
+            twt = Twt(username, password, self.theme, 
+                        self.canvas, twt_type=twt_type)
         except HTTPError, hter:
             self.face.waitIcon.hide()
             self.face.authfailIcon.unhide()

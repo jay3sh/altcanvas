@@ -17,9 +17,11 @@ IMAGE_CACHE_DIR = os.path.join(os.path.sep+'tmp','.twitinkimg')
 
 class Twt:
     (TWT_FRIENDS, TWT_PUBLIC, TWT_REPLIES, TWT_TWIT) = range(4)
-    def __init__(self, username, password, theme, canvas):
+    def __init__(self, username, password, theme, canvas, twt_type=TWT_FRIENDS):
         self.canvas = canvas
         self.twtApi = twitter.Api(username, password)
+
+        self.current_twt_type = twt_type
 
         self.face = EFace(
             os.path.join(SVG_DIR, theme, 'twits.svg'), self.canvas)
@@ -27,21 +29,19 @@ class Twt:
         self.friends_page_num = 1
         self.replies_page_num = 1
 
-        self.friends_twtlist = \
-            self.twtApi.GetFriendsTimeline(page=self.friends_page_num)
+        self.friends_twtlist = None
         self.public_twtlist = None
         self.replies_twtlist = None
 
-        self.friends_page_num += 1
-        self.current_twt_type = self.TWT_FRIENDS
-
         self.friends_twtcnt = 0
+        self.public_twtcnt = 0
+        self.replies_twtcnt = 0
 
         self.image_thread = ImageThread()
         self.image_thread.start()
  
     def get_public_twt(self):
-        if self.public_twtlist == None or \
+        if self.public_twtlist is None or \
             self.public_twtcnt >= len(self.public_twtlist):
             
             self.public_twtlist = \
@@ -52,7 +52,7 @@ class Twt:
         return twt
 
     def get_replies(self):
-        if self.replies_twtlist == None or \
+        if self.replies_twtlist is None or \
             self.replies_twtcnt >= len(self.replies_twtlist):
             
             self.replies_twtlist = \
@@ -64,7 +64,9 @@ class Twt:
         return twt
 
     def get_friends_twt(self):
-        if self.friends_twtcnt >= len(self.friends_twtlist):
+        if self.friends_twtlist is None or \
+            self.friends_twtcnt >= len(self.friends_twtlist):
+
             self.friends_twtlist = \
                 self.twtApi.GetFriendsTimeline(page=self.friends_page_num)
             self.friends_page_num += 1
@@ -96,7 +98,7 @@ class Twt:
 
         self.twtContainer.connect('request',self.add_new_tbox)
 
-        self.load_twts(self.TWT_FRIENDS)
+        self.load_twts(self.current_twt_type)
 
         self.face.upArrow.refresh(svg_reload=False)
         self.face.downArrow.refresh(svg_reload=False)
@@ -105,7 +107,7 @@ class Twt:
         self.face.waitIcon.hide()
 
     def load_twts(self, twt_type):
-        get_twt = \
+        self.get_twt = \
                 {
                     self.TWT_FRIENDS    : self.get_friends_twt,
                     self.TWT_PUBLIC     : self.get_public_twt,
@@ -114,7 +116,7 @@ class Twt:
 
         tboxes = self.twtContainer.get_widgets()
 
-        twt = get_twt()
+        twt = self.get_twt()
 
         self.tbox = TwitBox(
             self.face,
@@ -127,7 +129,7 @@ class Twt:
     def add_new_tbox(self, position, tbox=None):
         containerFull = False
         while not containerFull:
-            twt = self.get_friends_twt()
+            twt = self.get_twt()
             if tbox is None:
                 tbox = self.tbox.clone(position)
             tbox.set_text(twt.text)
