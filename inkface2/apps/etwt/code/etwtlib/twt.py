@@ -128,10 +128,16 @@ class Twt:
 
         self.change_borders(self.TWT_FRIENDS)
 
-        self.face.everyoneButton.onLeftClick = self.onEveryoneClicked
-        self.face.repliesButton.onLeftClick = self.onRepliesClicked
-        self.face.friendsButton.onLeftClick = self.onFriendsClicked
-        self.face.twitButton.onLeftClick = self.onTwitClicked
+        #self.face.everyoneButton.onLeftClick = self.onEveryoneClicked
+        #self.face.repliesButton.onLeftClick = self.onRepliesClicked
+        #self.face.friendsButton.onLeftClick = self.onFriendsClicked
+        #self.face.twitButton.onLeftClick = self.onTwitClicked
+        self.face.everyoneButton.hide()
+        self.face.repliesButton.hide()
+        self.face.friendsButton.hide()
+        self.face.twitButton.hide()
+        for border in self.button_borders.values():
+            border.hide()
 
         self.face.waitIcon.unhide()
 
@@ -139,10 +145,13 @@ class Twt:
         self.canvas.add(self.face)
 
         # Create a container box
+        '''
         container_bbox = (self.face.twtbg.svg.x-3, 
                             self.face.twtbg.svg.y-3,
                             self.face.svg.width,
                             self.face.svg.height-self.face.twtbg.svg.y+3)
+        '''
+        container_bbox = (0, 0, self.face.svg.width, self.face.svg.height)
 
         self.twtContainer = Container(
                         bbox            = container_bbox,

@@ -96,24 +96,33 @@ class Container(InkObject):
     def onDownArrow(self, elem):
         _,_,_,wh = self.widgets[self.top_index].get_bounding_box()
         self.anim_step = wh / self.anim_period
-        self.widgets[self.top_index].hide()
+        #self.widgets[self.top_index].hide()
 
         self.anim_length = wh
 
         self.top_index += 1
 
-        visible_widgets = self.widgets[self.top_index:self.btm_index+1]
+        #visible_widgets = self.widgets[self.top_index:self.btm_index+1]
 
-        bb = None
-        for w in visible_widgets:
-            bb = BoundingBox(w.get_bounding_box()) + bb
+        #bb = None
+        #for w in visible_widgets:
+        #    bb = BoundingBox(w.get_bounding_box()) + bb
         
-        if bb.y+bb.h <= bb.y+bb.h:
-            new_position = (bb.x, bb.y+bb.h+4)
-            self.emit('request', new_position)
-            self.btm_index += 1
+        #if bb.y+bb.h <= bb.y+bb.h:
+        #    new_position = (bb.x, bb.y+bb.h+4)
+        #    self.emit('request', new_position)
+        #    self.btm_index += 1
                             
-        visible_widgets = self.widgets[self.top_index:self.btm_index+1]
+        #visible_widgets = self.widgets[self.top_index:self.btm_index+1]
+
+        btm_x,btm_y,_,btm_h = self.widgets[-1].get_bounding_box()
+
+        while btm_y+btm_h < self.bbox.y+self.bbox.h:
+            # We need more twits
+            new_position = (btm_x, btm_y+btm_h+4)
+            self.emit('request', new_position)
+            btm_x,btm_y,_,btm_h = self.widgets[-1].get_bounding_box()
+
 
         self.direction = -1
         for vw in self.widgets:
@@ -129,7 +138,7 @@ class Container(InkObject):
         if self.top_index == 0:
             return
 
-        self.widgets[self.btm_index - 1].hide()
+        #self.widgets[self.btm_index - 1].hide()
 
         self.btm_index -= 1
 
@@ -139,7 +148,7 @@ class Container(InkObject):
         self.anim_step = wh / self.anim_period
         self.anim_length = wh
 
-        self.widgets[self.top_index].unhide()
+        #self.widgets[self.top_index].unhide()
 
         visible_widgets = self.widgets[self.top_index:self.btm_index+1]
 

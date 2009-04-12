@@ -239,13 +239,13 @@
        x2="430"
        y2="80"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(-11.320072,4.7920444)" />
+       gradientTransform="translate(-11.320072,-45.207956)" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient4216"
        id="linearGradient3465"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(1,0,0,-1,-737.31465,528.28752)"
+       gradientTransform="matrix(1,0,0,-1,-728.34649,495.67605)"
        x1="760"
        y1="460"
        x2="760"
@@ -261,9 +261,9 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.728125"
-     inkscape:cx="234.79204"
-     inkscape:cy="417.79385"
+     inkscape:zoom="1.2265625"
+     inkscape:cx="240"
+     inkscape:cy="320"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -346,7 +346,7 @@
        width="411.68173"
        height="59.989151"
        x="4.7920432"
-       y="62"
+       y="12"
        rx="10.245302"
        ry="10"
        inkscape:label="twtbg" />
@@ -354,20 +354,20 @@
        xml:space="preserve"
        style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
        x="12.792046"
-       y="84.52803"
+       y="34.52803"
        id="text4026"
        inkscape:label="twttxt"><tspan
          sodipodi:role="line"
          id="tspan4028"
          x="12.792046"
-         y="84.52803">twt</tspan></text>
+         y="34.52803">twt</tspan></text>
     <rect
        style="opacity:1;fill:url(#linearGradient3483);fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect4030"
        width="50"
        height="50"
        x="418.67993"
-       y="57.396023"
+       y="7.3960228"
        rx="10"
        ry="10"
        inkscape:label="twtimg" />
@@ -617,7 +617,7 @@
     </g>
     <path
        style="fill:url(#linearGradient3465);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 50.860293,105.51724 C 50.860293,105.51724 50.860293,105.51724 43.590313,98.7482 C 38.417843,93.93212 35.097803,92.54928 33.605463,92.14838 L 36.320343,163.05407 L 29.050363,152.90051 L 25.415383,152.90051 L 18.145403,163.05407 C 29.050363,105.51724 21.780393,91.97916 21.780393,91.97916 C 21.780393,91.97916 18.145403,91.97916 10.875433,98.7482 C 3.6054626,105.51724 3.6054626,105.51724 3.6054626,105.51724 C 3.6054626,105.51724 7.2404426,78.44108 21.780393,68.28752 C 21.780393,68.28752 25.415383,75.05656 32.685353,68.28752 C 47.225303,78.44108 50.860293,105.51724 50.860293,105.51724 z"
+       d="M 59.828446,72.905771 C 59.828446,72.905771 59.828446,72.905771 52.558466,66.136731 C 47.385996,61.320651 44.065956,59.937811 42.573616,59.536911 L 45.288496,130.4426 L 38.018516,120.28904 L 34.383536,120.28904 L 27.113556,130.4426 C 38.018516,72.905771 30.748546,59.367691 30.748546,59.367691 C 30.748546,59.367691 27.113556,59.367691 19.843586,66.136731 C 12.573615,72.905771 12.573615,72.905771 12.573615,72.905771 C 12.573615,72.905771 16.208595,45.829611 30.748546,35.676051 C 30.748546,35.676051 34.383536,42.445091 41.653506,35.676051 C 56.193456,45.829611 59.828446,72.905771 59.828446,72.905771 z"
        id="path3462"
        inkscape:label="upArrow" />
   </g>
