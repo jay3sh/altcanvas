@@ -45,7 +45,7 @@ class Container(InkObject):
         self.cur_bbox = None
         self.widgets = []
         self.top_index = 0
-        self.anim_period = 10
+        self.anim_period = 2
 
         self.bbox = BoundingBox(bbox)
         self.upArrow_elem = upArrow_elem
