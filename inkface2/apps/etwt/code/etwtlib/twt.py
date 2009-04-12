@@ -73,71 +73,13 @@ class Twt:
         self.friends_twtcnt += 1
         return twt
 
-    def hide_twt_entry(self):
-        for elem in (self.face.update_border,
-                    self.face.update_txt,
-                    self.face.update_cursor,
-                    self.face.update_background,
-                    self.face.postButton,
-                    self.face.cancelButton,
-                    self.face.update_counter):
-            elem.hide()
-
-    def unhide_twt_entry(self):
-        for elem in (self.face.update_border,
-                    self.face.update_txt,
-                    self.face.update_cursor,
-                    self.face.update_background,
-                    self.face.postButton,
-                    self.face.cancelButton,
-                    self.face.update_counter):
-            elem.unhide()
-
     def onTwtboxChange(self, text):
         self.face.update_counter.svg.text = str(len(text))
         self.face.update_counter.refresh(svg_reload=True)
 
-    def prepare_twt_entry(self):
-        self.twtentry = TextBox(
-                            border_elem = self.face.update_border,
-                            txt_elem    = self.face.update_txt,
-                            cursor_elem = self.face.update_cursor,
-                            framerate   = self.canvas.framerate)
-
-        self.twtentry.connect('changed', self.onTwtboxChange)
-
-        self.face.postButton.onLeftClick = self.onTwitPost
-        self.face.cancelButton.onLeftClick = self.onTwitCancel
- 
     def load(self):
 
-        self.prepare_twt_entry()
-
-        self.hide_twt_entry()
-
         self.face.closeButton.onLeftClick = self.exit
-
-        # Setup top buttons and their borders
-        self.button_borders = \
-                {
-                    self.TWT_FRIENDS    : self.face.friendsBorder,
-                    self.TWT_PUBLIC     : self.face.everyoneBorder,
-                    self.TWT_REPLIES    : self.face.repliesBorder,
-                    self.TWT_TWIT       : self.face.twitBorder
-                }
-
-        self.change_borders(self.TWT_FRIENDS)
-
-        #self.face.everyoneButton.onLeftClick = self.onEveryoneClicked
-        #self.face.repliesButton.onLeftClick = self.onRepliesClicked
-        #self.face.friendsButton.onLeftClick = self.onFriendsClicked
-        #self.face.twitButton.onLeftClick = self.onTwitClicked
-        self.face.everyoneButton.hide()
-        self.face.repliesButton.hide()
-        self.face.friendsButton.hide()
-        self.face.twitButton.hide()
-        for border in self.button_borders.values():
-            border.hide()
 
         self.face.waitIcon.unhide()
 
@@ -145,12 +87,6 @@ class Twt:
         self.canvas.add(self.face)
 
         # Create a container box
-        '''
-        container_bbox = (self.face.twtbg.svg.x-3, 
-                            self.face.twtbg.svg.y-3,
-                            self.face.svg.width,
-                            self.face.svg.height-self.face.twtbg.svg.y+3)
-        '''
         container_bbox = (0, 0, self.face.svg.width, self.face.svg.height)
 
         self.twtContainer = Container(
@@ -159,7 +95,6 @@ class Twt:
                         downArrow_elem  = self.face.downArrow)
 
         self.twtContainer.connect('request',self.add_new_tbox)
-
 
         self.load_twts(self.TWT_FRIENDS)
 
@@ -177,10 +112,7 @@ class Twt:
                     self.TWT_REPLIES    : self.get_replies
                 }[twt_type]
 
-
         tboxes = self.twtContainer.get_widgets()
-
-            
 
         twt = get_twt()
 
@@ -208,12 +140,6 @@ class Twt:
             containerFull = self.twtContainer.add(tbox)
             tbox = None
 
-    def on_gain_focus(self, elem):
-        elem.inFocus = True
-
-    def on_lose_focus(self, elem):
-        elem.inFocus = False
-
     def change_borders(self, type):
         for t, border in self.button_borders.items():
             if t == type:
@@ -221,26 +147,6 @@ class Twt:
             else:
                 border.hide()
  
-    def load_image(self,twt):
-        import urllib
-        if not os.path.exists(IMAGE_CACHE_DIR):
-            os.makedirs(IMAGE_CACHE_DIR)
-        imgurl = twt.GetUser().profile_image_url
-        localfile = os.path.join(IMAGE_CACHE_DIR,imgurl.split('/')[-1])
-
-        if not os.path.exists(localfile):
-            try:
-                urllib.urlretrieve(imgurl,localfile)
-            except UnicodeError, ue:
-                print 'Error fetching img URL'+str(ue)
-                return None 
-            except IOError, ioe:
-                print 'IOError fetching img: '+str(ioe)
-                return None
- 
-        image = pygame.image.load(localfile)
-        return image
-        
     def onEveryoneClicked(self, elem):
         if self.current_twt_type == self.TWT_PUBLIC:
             return
