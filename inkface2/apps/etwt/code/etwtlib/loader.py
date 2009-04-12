@@ -22,12 +22,10 @@ class Loader(InkObject):
 
         self.face.load_elements(self.canvas)
 
-        self.face.meterBullet.onDraw = self.drawMeter
+        #self.face.meterBullet.onDraw = self.drawMeter
 
-        self.first_draw = True
-
-        self.X_MIN = self.face.svg.width/7
-        self.X_MAX = 6*self.face.svg.width/7 - self.face.meterBullet.svg.w
+        #self.X_MIN = self.face.svg.width/7
+        #self.X_MAX = 6*self.face.svg.width/7 - self.face.meterBullet.svg.w
 
         return self.canvas
 
