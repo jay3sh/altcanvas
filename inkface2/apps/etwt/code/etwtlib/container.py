@@ -53,6 +53,9 @@ class Container(InkObject):
         self.downArrow_elem = downArrow_elem
         self.downArrow_elem.onLeftClick = self.onDownArrow
 
+    def get_widgets(self):
+        return self.widgets
+
     def add(self, widget):
         self.widgets.append(widget)
 
@@ -80,10 +83,14 @@ class Container(InkObject):
             elem.set_position((x, y + (self.direction * elem.anim_length)))
             elem.anim_length = 0
             elem.onDraw = None
+            self.upArrow_elem.refresh(svg_reload=False)
+            self.downArrow_elem.refresh(svg_reload=False)
             return False
         else:
             elem.set_position((x, y + (self.direction * self.anim_step)))
             elem.anim_length -= self.anim_step
+            self.upArrow_elem.refresh(svg_reload=False)
+            self.downArrow_elem.refresh(svg_reload=False)
             return True
 
     def onDownArrow(self, elem):
