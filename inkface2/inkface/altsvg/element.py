@@ -8,7 +8,17 @@ from inkface.altsvg import \
 from inkface.altsvg.draw import NODE_DRAW_MAP
 
 class Element:
-    def __init__(self,node,vdoc):
+    '''
+    An object that corresponds to certain nodes in an SVG document.
+
+    Refer to the algorithm of :func:`inkface.altsvg.VectorDoc.get_elements` \
+    to understand which nodes are converted into Element objects.
+
+    .. attribute:: label
+    This is the "Label" given to the node in Inkscape 
+
+    '''
+    def __init__(self, node, vdoc):
         self.node = node
         self.vdoc = vdoc
         self.defs = vdoc.defs
@@ -126,12 +136,25 @@ class Element:
             self.__dict__[key] = value
 
     def set(self, key, value):
+        '''
+        Modifies the underlying XML node, manipulating its attribute. For \
+        this change to take effect :func:`render` needs to be called.
+
+        :param key: Name of the attribute to modify
+        :param value: Value to be assigned to the attribute.
+        '''
         if self.node is not None:
             self.node.set(key,value)
         else:
             raise Exception('No SVG node present')
 
     def dup(self, newName):
+        '''
+        Duplicates the Element. It is done by creating a separate copy of \
+        this XML node.
+
+        :param newName: :attr:`label` of new Element is set to this value
+        '''
         import xml.etree.ElementTree
         node_str = xml.etree.ElementTree.tostring(self.node)
         new_node = xml.etree.ElementTree.fromstring(node_str)
@@ -141,6 +164,12 @@ class Element:
 
         
     def scale(self, factor):
+        '''
+        Scale this element.
+
+        :param factor: Scaling factor. Value >1 will magnify the element, \
+        <1 will diminish the element.
+        '''
         self.scale_factor = factor
 
     def add_node(self, node):
@@ -165,6 +194,9 @@ class Element:
 
 
     def render(self, scratch_surface=None):
+        '''
+        Render this node.
+        '''
 
         # In case of background surface, node is None. For such elements
         # add_node() should be called instead of render().

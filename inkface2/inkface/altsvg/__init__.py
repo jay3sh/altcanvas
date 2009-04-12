@@ -53,7 +53,14 @@ from inkface.altsvg.draw import NODE_DRAW_MAP
 
 
 class VectorDoc:
-    ''' Class encapsulating a single SVG document '''
+    ''' 
+    Class encapsulating a single SVG document 
+       .. attribute:: width
+       Width of SVG document (float)
+
+       .. attribute:: height
+       Height of SVG document (float)
+    '''
     defs = {}
     def __init__(self, svgname):
         ''' load and parse SVG document, create ElementTree from the same '''
@@ -120,6 +127,9 @@ class VectorDoc:
         
     def get_elements(self):
         '''
+            Returns list of :class:`inkface.altsvg.element.Element` objects \
+            loaded from the SVG file.
+
             Algorithm to create Element objects from SVG doc:
 
             Start from the bottom most SVG node (i.e. beginning of doc),
@@ -199,7 +209,11 @@ class VectorDoc:
         return elements
 
     def render_full(self, ctx):
-        ''' render the full SVG tree '''
+        ''' 
+        render the full SVG tree 
+
+        :param ctx: cairo context on which to render the full SVG tree
+        '''
         ctx.move_to(0, 0)
         for e in self._get_element_nodes():
             elem = Element(e,self)
