@@ -1,7 +1,7 @@
-:mod:`inkface.canvas.canvas` -- Canvas
+:mod:`inkface.canvas` -- Canvas
 ======================================================================
 
-.. automodule:: inkface.canvas.canvas
+.. automodule:: inkface.canvas
 
 Module Contents
 ---------------

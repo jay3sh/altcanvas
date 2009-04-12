@@ -1,7 +1,7 @@
-:mod:`inkface.canvas.pygamecanvas` -- Pygame Canvas
+:mod:`inkface.pygame` -- Pygame Backend 
 ======================================================================
 
-.. automodule:: inkface.canvas.pygamecanvas
+.. automodule:: inkface.pygame
 
 Module Contents
 ---------------
