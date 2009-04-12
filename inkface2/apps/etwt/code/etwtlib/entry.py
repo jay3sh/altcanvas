@@ -5,13 +5,15 @@ import pickle
 from urllib2 import HTTPError
 
 from inkface.evas import EFace, ECanvas
-from etwtlib.textbox import TextBox
-from etwtlib.keyboard import Keyboard
+
+from inkface.widgets.inkobject import InkObject
+from inkface.widgets.textbox import Textbox
+from inkface.widgets.keyboard import Keyboard
+
 from etwtlib.twt import Twt
 from etwtlib.utils import encrypt,decrypt
 from etwtlib.constants import *
 
-from etwtlib.inkobject import InkObject
 
 class KeyFocus:
     loseFocus = None
@@ -45,13 +47,16 @@ class Entry(InkObject):
         self.face.waitIcon.hide()
         self.face.authfailIcon.hide()
 
-        self.kbd = Keyboard(
-            os.path.join(SVG_DIR, self.theme, 'keyboard.svg'), self.canvas)
+        kbd_face = EFace(
+                    os.path.join(SVG_DIR, self.theme, 'keyboard.svg'), 
+                    self.canvas)
+
+        self.kbd = Keyboard(kbd_face)
         self.kbd.hide()
 
         self.keyfocus = KeyFocus()
 
-        self.uname = TextBox(
+        self.uname = Textbox(
                 keyfocus    = self.keyfocus,
                 border_elem = self.face.uname_border,
                 txt_elem    = self.face.uname_txt,
@@ -60,7 +65,7 @@ class Entry(InkObject):
                 framerate   = FRAMERATE,
                 kbd         = self.kbd)
 
-        self.passwd = TextBox(
+        self.passwd = Textbox(
                 keyfocus    = self.keyfocus,
                 border_elem = self.face.passwd_border,
                 txt_elem    = self.face.passwd_txt,
