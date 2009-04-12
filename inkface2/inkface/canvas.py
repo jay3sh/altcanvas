@@ -177,6 +177,9 @@ class Canvas:
         pass
 
     def recalculate_clouds(self):
+        '''
+        Recalculate the clouds for all elements in the elementQ.
+        '''
         # Cleanup all the clouds before recalculating
         for e in self.elementQ:
             e.clouds = []
@@ -220,6 +223,11 @@ class Canvas:
  
 
     def add(self, face):
+        '''
+        Adds the elements of the face to the internal elementQ.
+
+        :param face: Face whose elements are to be added.
+        '''
         for elem in face.elements:  
             self.elementQ.append(elem)
         self.recalculate_clouds()
@@ -234,6 +242,11 @@ class Canvas:
         self.recalculate_clouds()
 
     def remove(self, face):
+        '''
+        Removes the elements of the face from internal elementQ.
+
+        :param face: Face whose elements are to be removed.
+        '''
         for elem in face.elements:
             self.elementQ.remove(elem)
 

@@ -10,12 +10,28 @@ from inkface.canvas import Canvas, Face, CanvasElement
 
 
 class EFace(Face):
+    '''
+    Evas Face object.
+
+    :param svgname: Path of the SVG file to load
+    :param canvas: Optional argument. If it is not passed, the elements \
+    won't be loaded. In that case call :func:`load_elements` with the \
+    canvas argument. This is because of the nature of Evas canvas. Since \
+    it keeps the state of all elements drawn on it, they have to be \
+    created from it, so that it knows about them.
+    '''
+
     def __init__(self, svgname, canvas=None):
         Face.__init__(self, svgname)
         if canvas is not None:
             self.load_elements(canvas)
 
     def load_elements(self, canvas):
+        '''
+        Loads elements of this face.
+
+        :param canvas: Canvas to create elements from.
+        '''
         self.canvas = canvas
         for svge in self.svgelements:
             ecElement = ECanvasElement(svge, canvas)
@@ -34,6 +50,12 @@ class EFace(Face):
 
 
 class ECanvasElement(CanvasElement):
+    '''
+    Evas CanvasElement object.
+
+    :param svgelem: :class:`inkface.altsvg.element.Element` object 
+    :param canvas: Canvas to create this element from.
+    '''
     def __init__(self, svgelem, canvas):
         CanvasElement.__init__(self, svgelem)
 
@@ -47,11 +69,24 @@ class ECanvasElement(CanvasElement):
             self.refresh(svg_reload = False)
 
     def set_position(self, (x, y)):
+        '''
+        :param (x,y): x,y coordinates to set this element's position to
+        '''
         CanvasElement.set_position(self, (x, y))
         x, y = self.get_position()
         self.image.move(x, y)
 
     def refresh(self, svg_reload=True, imgpath=None):
+        '''
+        Refresh the element.
+
+        :param svg_reload: re-render the SVG underlying element \
+        (default - True)
+        :param imgpath: Instead of rendering the SVG element, load an image \
+        and render it on this element. It is useful in scenarios, where \
+        the SVG element is used only to get the location. Its content are \
+        dynamically filled by the app at run time.
+        '''
         if svg_reload:
             self.svg.render()
         surface = self.svg.surface
@@ -74,17 +109,20 @@ class ECanvasElement(CanvasElement):
 
         # wire the new image with event handlers
         self.image.event_callback_add(
-            evas.EVAS_CALLBACK_MOUSE_DOWN, self.handle_mouse_down)
+            evas.EVAS_CALLBACK_MOUSE_DOWN, self._handle_mouse_down)
         self.image.event_callback_add(
-            evas.EVAS_CALLBACK_MOUSE_IN, self.handle_mouse_entry)
+            evas.EVAS_CALLBACK_MOUSE_IN, self._handle_mouse_entry)
         self.image.event_callback_add(
-            evas.EVAS_CALLBACK_MOUSE_OUT, self.handle_mouse_entry)
+            evas.EVAS_CALLBACK_MOUSE_OUT, self._handle_mouse_entry)
 
         x, y = self.get_position()
         self.image.move(x, y)
         self.image.show()
 
     def hide(self):
+        '''
+        Hide this element
+        '''
         self.image.hide()
 
     def __setattr__(self, key, value):
@@ -99,7 +137,7 @@ class ECanvasElement(CanvasElement):
             self.__dict__[key] = value
 
 
-    def handle_mouse_down(self, image, event, *args):
+    def _handle_mouse_down(self, image, event, *args):
         mouse_button_handlers = \
             {   
                 1:self.onLeftClick,
@@ -110,7 +148,7 @@ class ECanvasElement(CanvasElement):
         if handler is not None:
             handler(self)
 
-    def handle_mouse_entry(self, image, event, *args):
+    def _handle_mouse_entry(self, image, event, *args):
         if type(event) == evas.c_evas.EventMouseIn:
             if self.onMouseGainFocus is not None:
                 self.onMouseGainFocus(self)
@@ -119,9 +157,15 @@ class ECanvasElement(CanvasElement):
                 self.onMouseLoseFocus(self)
 
     def unhide(self):
+        '''
+        Unhide this element.
+        '''
         self.image.show()
 
     def dup(self, newName):
+        '''
+        Create duplicate copy of this element.
+        '''
         new_svg = self.svg.dup(newName)
         return ECanvasElement(new_svg, self.canvas)
 
@@ -137,6 +181,13 @@ class ECanvasElement(CanvasElement):
         del self.image
 
 class ECanvas(Canvas):
+    '''
+    Evas Canvas object.
+
+    :param (width, height): dimensions of canvas
+    :param caption: Title of window
+    :param framerate: Animation framerate (in fps)
+    '''
     def __init__(self,
                 (width,height) = (640, 480),
                 caption = 'Evas Inkface App',
@@ -156,18 +207,32 @@ class ECanvas(Canvas):
         ecore.main_loop_iterate()
 
     def add(self, face):
+        '''
+        This is a no-op so far for Evas Canvas.
+        '''
         #Canvas.add(self, face)
         pass
 
     def remove(self, face):
+        '''
+        Remove all elements of the face from canvas
+        :param face: Face of whose elements are to be removed from canvas.
+        '''
         for elem in face.elements:
             elem.destroy()
         
     def stop(self):
+        '''
+        Call to cleanup the canvas when exiting.
+        '''
         ecore.main_loop_quit()
         ecore.shutdown()
 
     def eventloop(self):
+        '''
+        It calls ecore.main_loop_begin.
+        If framerate is >0, then it sets the animator_frametime.
+        '''
         self.ee.show()
         if self.framerate != 0:
             ecore.animator_frametime_set(1.0/float(self.framerate))
