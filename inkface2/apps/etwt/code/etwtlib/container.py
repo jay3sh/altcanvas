@@ -1,5 +1,5 @@
 
-from etwtlib.inkobject import InkObject
+from inkface.widgets.inkobject import InkObject
 
 class BoundingBox:
     def __init__(self, (x,y,w,h)=(0,0,0,0)):
