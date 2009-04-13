@@ -3,6 +3,27 @@ from inkface.evas import EFace
 from inkface.widgets.inkobject import InkObject
 
 class Keyboard(InkObject):
+    '''
+    An on-screen virtual keyboard widget 
+
+    :param face: A face object whose elements will be used to render \
+    the virtual keyboard.
+
+    Signals:
+
+    .. attribute:: done
+    When user has indicated that it's done with the virtual keyboard, \
+    this signal is emitted.
+    No args are passed to callback handler
+
+    .. attribute:: keypress
+    When user presses or clicks any of the keys of this virtual keyboard, \
+    this signal is emitted.
+        Args passed to callback handler: 
+
+        :param keyVal: A string representing the character OR \
+        a special constant to indicate special keys.
+    '''
     K_BACKSPACE = 8
     number_row_caps = map(lambda x: 'key_' + x,
         ('Exclaim', 'At', 'Pound', 'Dollar', 'Percent',
@@ -96,10 +117,16 @@ class Keyboard(InkObject):
         self.hide()
 
     def hide(self):
+        '''
+        Hides the keyboard
+        '''
         for e in self.face.elements:
             e.hide()
 
     def unhide(self):
+        '''
+        Unhides the keyboard
+        '''
         if self._capsLock:
             self._capsLockOn()
         else:

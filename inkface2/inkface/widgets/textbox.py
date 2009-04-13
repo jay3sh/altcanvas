@@ -3,10 +3,33 @@ from keyboard import Keyboard
 from inkface.widgets.inkobject import InkObject
 
 class Textbox(InkObject):
+    '''
+    A textbox widget. 
+
+    This widget can be realized by passing at least three \
+    :class:`inkface.altsvg.element.Element` objects to its constructor - \
+    border, txt, cursor.
+
+    :param border_elem: An SVG element that defines the boundary of the \
+    textbox. If the text exceeds this boundaries of this element, then \
+    it is automatically truncated (only visually) or wrapped.
+    :param txt_elem: A text SVG element whose text will modified to what \
+    user inputs. 
+    :param cursor_elem: A cursor element which will blink at submultiple rate \
+    of framerate
+    :param focus_elem: An optional element which will appear when the textbox \
+    has focus.
+    :param keyfocus: A keyfocus object. (TBD)
+    :param framerate: framerate in FPS
+    :param mask: A mask character, in case one wants to hide the text.
+    :param multiline: Not supported yet.
+    :param kbd: A virtual keyboard widget \
+    :class:`inkface.widgets.keyboard.Keyboard`
+    '''
     def __init__(self, 
         border_elem, txt_elem, cursor_elem, 
         keyfocus=None, focus_elem=None,
-        framerate=20, mask=None, multiline=False, kbd=None):
+        framerate=25, mask=None, multiline=False, kbd=None):
 
         InkObject.__init__(self)
 
@@ -121,6 +144,11 @@ class Textbox(InkObject):
         self.kbd.hide()
 
     def set_text(self, text):
+        '''
+        Set the text contents of this textbox
+
+        :param text: Text string to be set
+        '''
         self.border_elem.refresh(svg_reload=False)
         self.txt_elem.text = text
         if self.mask == None:
@@ -132,5 +160,10 @@ class Textbox(InkObject):
         self._untouched = False
 
     def get_text(self):
+        '''
+        Get the current text content of this textbox.
+
+        :rtype: Text string 
+        '''
         return self.txt_elem.text
 
