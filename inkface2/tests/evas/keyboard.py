@@ -63,9 +63,11 @@ class App:
             if elem.svg.label.endswith('med'):
                 bigkeyLabel = elem.svg.label.replace('med','big')
                 bigKey = self.face.get(bigkeyLabel)
+                bigKey.visibility_counter = 2
                 bigKey.onDraw = self.doDraw
                 bigKey.unhide()
-                bigKey.visibility_counter = 2
+
+            return False
 
         return True
    
