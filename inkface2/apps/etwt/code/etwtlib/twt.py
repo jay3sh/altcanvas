@@ -2,7 +2,6 @@
 import os
 import sys
 from etwtlib import twitter
-from etwtlib.textbox import TextBox
 from etwtlib.twitbox import TwitBox
 from etwtlib.container import Container
 from etwtlib.imgthread import ImageThread
