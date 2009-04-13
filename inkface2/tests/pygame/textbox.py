@@ -24,11 +24,11 @@ class TextBox:
         self.border_elem.onKeyPress = self._onKeyPress_proxy
         self.cursor_elem.onKeyPress = self._onKeyPress_proxy
 
-        self.border_elem.onGainFocus = self._onGainFocus
+        self.border_elem.onMouseGainFocus = self._onGainFocus
         self.border_elem.onLoseFocus = self._onLoseFocus
-        self.txt_elem.onGainFocus = self._onGainFocus
+        self.txt_elem.onMouseGainFocus = self._onGainFocus
         self.txt_elem.onLoseFocus = self._onLoseFocus
-        self.cursor_elem.onGainFocus = self._onGainFocus
+        self.cursor_elem.onMouseGainFocus = self._onGainFocus
         self.cursor_elem.onLoseFocus = self._onLoseFocus
 
         self.txt_elem.svg.text = "_"

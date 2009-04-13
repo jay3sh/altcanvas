@@ -391,8 +391,8 @@ class PygameCanvas(Canvas):
                             self.focusElement.onLoseFocus != None:
                             self.focusElement.onLoseFocus(elem)
 
-                        if elem.onGainFocus != None:
-                            elem.onGainFocus(elem)
+                        if elem.onMouseGainFocus != None:
+                            elem.onMouseGainFocus(elem)
 
                     self.focusElement = elem
 
@@ -416,8 +416,8 @@ class PygameCanvas(Canvas):
                             self.focusElement.onLoseFocus != None:
                             self.focusElement.onLoseFocus(elem)
 
-                        if elem.onGainFocus != None:
-                            elem.onGainFocus(elem)
+                        if elem.onMouseGainFocus != None:
+                            elem.onMouseGainFocus(elem)
 
                     self.focusElement = elem
 
