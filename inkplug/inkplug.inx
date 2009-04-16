@@ -1,0 +1,18 @@
+<inkscape-extension>
+	<_name>inkplug</_name>
+	<id>com.altcanvas.inkface.inkplug</id>
+	<dependency type="extension">org.inkscape.output.svg.inkscape</dependency>
+	<dependency type="executable" location="extensions">inkplug.py</dependency>
+    <output>
+		<extension>.ink</extension>
+		<mimetype>application/x-tar</mimetype>
+		<filetypename>Inkface GUI (*.ink)</filetypename>
+		<filetypetooltip>Inkface GUI file</filetypetooltip>
+		<dataloss>FALSE</dataloss>
+	</output>
+
+	<script>
+		<command reldir="extensions" interpreter="python">inkplug.py</command>
+		<helper_extension>org.inkscape.output.svg.inkscape</helper_extension>
+	</script>
+</inkscape-extension>
