@@ -1,0 +1,253 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>inkface.altsvg – SVG access interface &mdash; inkface v0.2.5 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.2.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="inkface v0.2.5 documentation" href="../index.html" />
+    <link rel="up" title="Inkface SVG access" href="index.html" />
+    <link rel="next" title="inkface.canvas – Canvas" href="inkface_canvas.html" />
+    <link rel="prev" title="Inkface SVG access" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="inkface_canvas.html" title="inkface.canvas – Canvas"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Inkface SVG access"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">inkface v0.2.5 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Inkface SVG access</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="inkface-altsvg-svg-access-interface">
+<h1><tt class="xref docutils literal"><span class="pre">inkface.altsvg</span></tt> &#8211; SVG access interface<a class="headerlink" href="#inkface-altsvg-svg-access-interface" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-inkface.altsvg.element">
+<h2>Module Contents<a class="headerlink" href="#module-inkface.altsvg.element" title="Permalink to this headline">¶</a></h2>
+<p>An alternative implementation of libaltsvg. This one is in python</p>
+<dl class="class">
+<dt id="inkface.altsvg.VectorDoc">
+<em class="property">
+class </em><tt class="descclassname">inkface.altsvg.</tt><tt class="descname">VectorDoc</tt><big>(</big><em>docname</em><big>)</big><a class="headerlink" href="#inkface.altsvg.VectorDoc" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Class encapsulating a single SVG document </dt>
+<dd><dl class="first attribute">
+<dt id="inkface.altsvg.VectorDoc.width">
+<tt class="descname">width</tt><a class="headerlink" href="#inkface.altsvg.VectorDoc.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Width of SVG document (float)</p>
+<dl class="attribute">
+<dt id="inkface.altsvg.VectorDoc.height">
+<tt class="descname">height</tt><a class="headerlink" href="#inkface.altsvg.VectorDoc.height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="last">Height of SVG document (float)</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="inkface.altsvg.VectorDoc.get_elements">
+<tt class="descname">get_elements</tt><big>(</big><big>)</big><a class="headerlink" href="#inkface.altsvg.VectorDoc.get_elements" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns list of <a title="inkface.altsvg.element.Element" class="reference internal" href="#inkface.altsvg.element.Element"><tt class="xref docutils literal"><span class="pre">inkface.altsvg.element.Element</span></tt></a> objects             loaded from the SVG file.</p>
+<p>Algorithm to create Element objects from SVG doc:</p>
+<p>Start from the bottom most SVG node (i.e. beginning of doc),
+Keep looking for node with &#8220;inkscape:label&#8221; attr set. Until we
+get one of those, keep drawing the SVG nodes on the same cairo
+surface. This surface will make a single Element object with
+id &#8220;backdrop&#8221;.</p>
+<p>After we find first &#8220;inkscape:label&#8221; attr in a node, we render
+each node on separate cairo surfaces (irrespective of &#8220;inkscape:
+label&#8221; attr is set for each of them or not)</p>
+<p>Creating a single backdrop element will help save memory on cairo
+surfaces. The fact that none of the bottom elements are named with
+&#8220;inkscape:label&#8221; by the designer, means that the program logic
+doesn&#8217;t want to address to them programmatically, so they are
+essentially immutable.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="inkface.altsvg.VectorDoc.render_full">
+<tt class="descname">render_full</tt><big>(</big><em>ctx</em><big>)</big><a class="headerlink" href="#inkface.altsvg.VectorDoc.render_full" title="Permalink to this definition">¶</a></dt>
+<dd><p>render the full SVG tree</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameter:</th><td class="field-body"><em>ctx</em> &#8211; cairo context on which to render the full SVG tree</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="inkface.altsvg.element.Element">
+<em class="property">
+class </em><tt class="descclassname">inkface.altsvg.element.</tt><tt class="descname">Element</tt><big>(</big><em>node</em>, <em>vdoc</em><big>)</big><a class="headerlink" href="#inkface.altsvg.element.Element" title="Permalink to this definition">¶</a></dt>
+<dd><p>An object that corresponds to certain nodes in an SVG document.</p>
+<p>Refer to the algorithm of <a title="inkface.altsvg.VectorDoc.get_elements" class="reference internal" href="#inkface.altsvg.VectorDoc.get_elements"><tt class="xref docutils literal"><span class="pre">inkface.altsvg.VectorDoc.get_elements()</span></tt></a>     to understand which nodes are converted into Element objects.</p>
+<dl class="attribute">
+<dt id="inkface.altsvg.element.Element.label">
+<tt class="descname">label</tt><a class="headerlink" href="#inkface.altsvg.element.Element.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>This is the &#8220;Label&#8221; given to the node in Inkscape</p>
+<dl class="method">
+<dt id="inkface.altsvg.element.Element.dup">
+<tt class="descname">dup</tt><big>(</big><em>newName</em><big>)</big><a class="headerlink" href="#inkface.altsvg.element.Element.dup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Duplicates the Element. It is done by creating a separate copy of         this XML node.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameter:</th><td class="field-body"><em>newName</em> &#8211; <a title="inkface.altsvg.element.Element.label" class="reference internal" href="#inkface.altsvg.element.Element.label"><tt class="xref docutils literal"><span class="pre">label</span></tt></a> of new Element is set to this value</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="inkface.altsvg.element.Element.raw_render">
+<tt class="descname">raw_render</tt><big>(</big><em>ctx</em>, <em>e</em>, <em>simulate=False</em><big>)</big><a class="headerlink" href="#inkface.altsvg.element.Element.raw_render" title="Permalink to this definition">¶</a></dt>
+<dd>render individual SVG node</dd></dl>
+
+<dl class="method">
+<dt id="inkface.altsvg.element.Element.render">
+<tt class="descname">render</tt><big>(</big><em>scratch_surface=None</em><big>)</big><a class="headerlink" href="#inkface.altsvg.element.Element.render" title="Permalink to this definition">¶</a></dt>
+<dd>Render this node.</dd></dl>
+
+<dl class="method">
+<dt id="inkface.altsvg.element.Element.scale">
+<tt class="descname">scale</tt><big>(</big><em>factor</em><big>)</big><a class="headerlink" href="#inkface.altsvg.element.Element.scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scale this element.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameter:</th><td class="field-body"><em>factor</em> &#8211; Scaling factor. Value &gt;1 will magnify the element,         &lt;1 will diminish the element.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="inkface.altsvg.element.Element.set">
+<tt class="descname">set</tt><big>(</big><em>key</em>, <em>value</em><big>)</big><a class="headerlink" href="#inkface.altsvg.element.Element.set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modifies the underlying XML node, manipulating its attribute. For         this change to take effect <a title="inkface.altsvg.element.Element.render" class="reference internal" href="#inkface.altsvg.element.Element.render"><tt class="xref docutils literal"><span class="pre">render()</span></tt></a> needs to be called.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>key</em> &#8211; Name of the attribute to modify</li>
+<li><em>value</em> &#8211; Value to be assigned to the attribute.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href=""><tt class="docutils literal"><span class="pre">inkface.altsvg</span></tt> &#8211; SVG access interface</a><ul>
+<li><a class="reference external" href="#module-inkface.altsvg.element">Module Contents</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="index.html"
+                                  title="previous chapter">Inkface SVG access</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="inkface_canvas.html"
+                                  title="next chapter"><tt class="docutils literal"><span class="pre">inkface.canvas</span></tt> &#8211; Canvas</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/modules/inkface_altsvg.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="inkface_canvas.html" title="inkface.canvas – Canvas"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Inkface SVG access"
+             >previous</a> |</li>
+        <li><a href="../index.html">inkface v0.2.5 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Inkface SVG access</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009, Jayesh Salvi.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6b1.
+    </div>
+  </body>
+</html>

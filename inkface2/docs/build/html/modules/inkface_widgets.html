@@ -1,0 +1,274 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>inkface.widgets – Inkface Widget Library &mdash; inkface v0.2.5 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.2.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="inkface v0.2.5 documentation" href="../index.html" />
+    <link rel="up" title="Inkface SVG access" href="index.html" />
+    <link rel="prev" title="inkface.clutter – Clutter Backend" href="inkface_clutter.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="inkface_clutter.html" title="inkface.clutter – Clutter Backend"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">inkface v0.2.5 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Inkface SVG access</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-inkface.widgets.textbox">
+<h1><tt class="xref docutils literal"><span class="pre">inkface.widgets</span></tt> &#8211; Inkface Widget Library<a class="headerlink" href="#module-inkface.widgets.textbox" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="inkface.widgets.inkobject.InkObject">
+<em class="property">
+class </em><tt class="descclassname">inkface.widgets.inkobject.</tt><tt class="descname">InkObject</tt><a class="headerlink" href="#inkface.widgets.inkobject.InkObject" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the base class of Inkface widgets.</p>
+<p>It defines and implements the signal interface for the widgets.</p>
+<dl class="method">
+<dt id="inkface.widgets.inkobject.InkObject.connect">
+<tt class="descname">connect</tt><big>(</big><em>signal_str</em>, <em>callback</em><big>)</big><a class="headerlink" href="#inkface.widgets.inkobject.InkObject.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connect a signal handler to this widget.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>signal_str</em> &#8211; Name of the signal to register the handler for</li>
+<li><em>callback</em> &#8211; A callback handler to be called when this signal is         emitted</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="inkface.widgets.inkobject.InkObject.disconnect">
+<tt class="descname">disconnect</tt><big>(</big><em>signal_str</em>, <em>callback</em><big>)</big><a class="headerlink" href="#inkface.widgets.inkobject.InkObject.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disconnect a signal handler from this widget.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>signal_str</em> &#8211; Name of the signal for which this callback handler         was registered.</li>
+<li><em>callback</em> &#8211; The callback handler which was originally connected         to handle this signal.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="inkface.widgets.inkobject.InkObject.emit">
+<tt class="descname">emit</tt><big>(</big><em>signal_str</em>, <em>*args</em><big>)</big><a class="headerlink" href="#inkface.widgets.inkobject.InkObject.emit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Emit the signal.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>signal_str</em> &#8211; Name of the signal to emit.</li>
+<li><em>*args</em> &#8211; <p>Any number of additional parameters to be passed to the         callback handler. The widget subclass should document the signature         of the callback handler and should pass these extra args         accordingly</p>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="inkface.widgets.keyboard.Keyboard">
+<em class="property">
+class </em><tt class="descclassname">inkface.widgets.keyboard.</tt><tt class="descname">Keyboard</tt><big>(</big><em>face</em><big>)</big><a class="headerlink" href="#inkface.widgets.keyboard.Keyboard" title="Permalink to this definition">¶</a></dt>
+<dd><p>An on-screen virtual keyboard widget</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameter:</th><td class="field-body"><em>face</em> &#8211; A face object whose elements will be used to render     the virtual keyboard.</td>
+</tr>
+</tbody>
+</table>
+<p>Signals:</p>
+<dl class="attribute">
+<dt id="inkface.widgets.keyboard.Keyboard.done">
+<tt class="descname">done</tt><a class="headerlink" href="#inkface.widgets.keyboard.Keyboard.done" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>When user has indicated that it&#8217;s done with the virtual keyboard,     this signal is emitted.
+No args are passed to callback handler</p>
+<dl class="attribute">
+<dt id="inkface.widgets.keyboard.Keyboard.keypress">
+<tt class="descname">keypress</tt><a class="headerlink" href="#inkface.widgets.keyboard.Keyboard.keypress" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="docutils">
+<dt>When user presses or clicks any of the keys of this virtual keyboard,     this signal is emitted.</dt>
+<dd><p class="first">Args passed to callback handler:</p>
+<table class="last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">param keyVal:</th><td class="field-body">A string representing the character OR         a special constant to indicate special keys.</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+<dl class="method">
+<dt id="inkface.widgets.keyboard.Keyboard.hide">
+<tt class="descname">hide</tt><big>(</big><big>)</big><a class="headerlink" href="#inkface.widgets.keyboard.Keyboard.hide" title="Permalink to this definition">¶</a></dt>
+<dd>Hides the keyboard</dd></dl>
+
+<dl class="method">
+<dt id="inkface.widgets.keyboard.Keyboard.unhide">
+<tt class="descname">unhide</tt><big>(</big><big>)</big><a class="headerlink" href="#inkface.widgets.keyboard.Keyboard.unhide" title="Permalink to this definition">¶</a></dt>
+<dd>Unhides the keyboard</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="inkface.widgets.textbox.Textbox">
+<em class="property">
+class </em><tt class="descclassname">inkface.widgets.textbox.</tt><tt class="descname">Textbox</tt><big>(</big><em>border_elem</em>, <em>txt_elem</em>, <em>cursor_elem</em>, <em>keyfocus=None</em>, <em>focus_elem=None</em>, <em>framerate=25</em>, <em>mask=None</em>, <em>multiline=False</em>, <em>kbd=None</em><big>)</big><a class="headerlink" href="#inkface.widgets.textbox.Textbox" title="Permalink to this definition">¶</a></dt>
+<dd><p>A textbox widget.</p>
+<p>This widget can be realized by passing at least three     <a title="inkface.altsvg.element.Element" class="reference external" href="inkface_altsvg.html#inkface.altsvg.element.Element"><tt class="xref docutils literal"><span class="pre">inkface.altsvg.element.Element</span></tt></a> objects to its constructor -     border, txt, cursor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>border_elem</em> &#8211; An SVG element that defines the boundary of the     textbox. If the text exceeds this boundaries of this element, then     it is automatically truncated (only visually) or wrapped.</li>
+<li><em>txt_elem</em> &#8211; A text SVG element whose text will modified to what     user inputs.</li>
+<li><em>cursor_elem</em> &#8211; A cursor element which will blink at submultiple rate     of framerate</li>
+<li><em>focus_elem</em> &#8211; An optional element which will appear when the textbox     has focus.</li>
+<li><em>keyfocus</em> &#8211; A keyfocus object. (TBD)</li>
+<li><em>framerate</em> &#8211; framerate in FPS</li>
+<li><em>mask</em> &#8211; A mask character, in case one wants to hide the text.</li>
+<li><em>multiline</em> &#8211; Not supported yet.</li>
+<li><em>kbd</em> &#8211; A virtual keyboard widget     <a title="inkface.widgets.keyboard.Keyboard" class="reference internal" href="#inkface.widgets.keyboard.Keyboard"><tt class="xref docutils literal"><span class="pre">inkface.widgets.keyboard.Keyboard</span></tt></a></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="inkface.widgets.textbox.Textbox.get_text">
+<tt class="descname">get_text</tt><big>(</big><big>)</big><a class="headerlink" href="#inkface.widgets.textbox.Textbox.get_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the current text content of this textbox.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">Text string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="inkface.widgets.textbox.Textbox.set_text">
+<tt class="descname">set_text</tt><big>(</big><em>text</em><big>)</big><a class="headerlink" href="#inkface.widgets.textbox.Textbox.set_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the text contents of this textbox</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameter:</th><td class="field-body"><em>text</em> &#8211; Text string to be set</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="inkface_clutter.html"
+                                  title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">inkface.clutter</span></tt> &#8211; Clutter Backend</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/modules/inkface_widgets.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="inkface_clutter.html" title="inkface.clutter – Clutter Backend"
+             >previous</a> |</li>
+        <li><a href="../index.html">inkface v0.2.5 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Inkface SVG access</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009, Jayesh Salvi.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6b1.
+    </div>
+  </body>
+</html>

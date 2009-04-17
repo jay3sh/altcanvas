@@ -1,0 +1,286 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>inkface.evas – Evas Backend &mdash; inkface v0.2.5 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.2.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="inkface v0.2.5 documentation" href="../index.html" />
+    <link rel="up" title="Inkface SVG access" href="index.html" />
+    <link rel="next" title="inkface.clutter – Clutter Backend" href="inkface_clutter.html" />
+    <link rel="prev" title="inkface.pygame – Pygame Backend" href="inkface_pygame.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="inkface_clutter.html" title="inkface.clutter – Clutter Backend"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="inkface_pygame.html" title="inkface.pygame – Pygame Backend"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">inkface v0.2.5 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Inkface SVG access</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-inkface.evas">
+<h1><tt class="xref docutils literal"><span class="pre">inkface.evas</span></tt> &#8211; Evas Backend<a class="headerlink" href="#module-inkface.evas" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="inkface.evas.EFace">
+<em class="property">
+class </em><tt class="descclassname">inkface.evas.</tt><tt class="descname">EFace</tt><big>(</big><em>svgname</em>, <em>canvas=None</em><big>)</big><a class="headerlink" href="#inkface.evas.EFace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evas Face object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>svgname</em> &#8211; Path of the SVG file to load</li>
+<li><em>canvas</em> &#8211; Optional argument. If it is not passed, the elements     won&#8217;t be loaded. In that case call <a title="inkface.evas.EFace.load_elements" class="reference internal" href="#inkface.evas.EFace.load_elements"><tt class="xref docutils literal"><span class="pre">load_elements()</span></tt></a> with the     canvas argument. This is because of the nature of Evas canvas. Since     it keeps the state of all elements drawn on it, they have to be     created from it, so that it knows about them.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="inkface.evas.EFace.clone">
+<tt class="descname">clone</tt><big>(</big><em>curNodeName</em>, <em>newNodeName</em>, <em>new_x=-1</em>, <em>new_y=-1</em><big>)</big><a class="headerlink" href="#inkface.evas.EFace.clone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clones an existing element of the face to create a duplicate one.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>curNodeName</em> &#8211; name of existing element to be cloned</li>
+<li><em>newNodeName</em> &#8211; name the new element should have</li>
+<li><em>new_x</em> &#8211; [optional] x coord of new element</li>
+<li><em>new_y</em> &#8211; [optional] y coord of new element</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="inkface.evas.EFace.load_elements">
+<tt class="descname">load_elements</tt><big>(</big><em>canvas</em><big>)</big><a class="headerlink" href="#inkface.evas.EFace.load_elements" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads elements of this face.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameter:</th><td class="field-body"><em>canvas</em> &#8211; Canvas to create elements from.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="inkface.evas.ECanvas">
+<em class="property">
+class </em><tt class="descclassname">inkface.evas.</tt><tt class="descname">ECanvas</tt><big>(</big><em>(width</em>, <em>height)=(640</em>, <em>480)</em>, <em>caption='Evas Inkface App'</em>, <em>framerate=0</em><big>)</big><a class="headerlink" href="#inkface.evas.ECanvas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evas Canvas object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>(width, height)</em> &#8211; dimensions of canvas</li>
+<li><em>caption</em> &#8211; Title of window</li>
+<li><em>framerate</em> &#8211; Animation framerate (in fps)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="inkface.evas.ECanvas.add">
+<tt class="descname">add</tt><big>(</big><em>face</em><big>)</big><a class="headerlink" href="#inkface.evas.ECanvas.add" title="Permalink to this definition">¶</a></dt>
+<dd>This is a no-op so far for Evas Canvas.</dd></dl>
+
+<dl class="method">
+<dt id="inkface.evas.ECanvas.eventloop">
+<tt class="descname">eventloop</tt><big>(</big><big>)</big><a class="headerlink" href="#inkface.evas.ECanvas.eventloop" title="Permalink to this definition">¶</a></dt>
+<dd>It calls ecore.main_loop_begin.
+If framerate is &gt;0, then it sets the animator_frametime.</dd></dl>
+
+<dl class="method">
+<dt id="inkface.evas.ECanvas.remove">
+<tt class="descname">remove</tt><big>(</big><em>face</em><big>)</big><a class="headerlink" href="#inkface.evas.ECanvas.remove" title="Permalink to this definition">¶</a></dt>
+<dd>Remove all elements of the face from canvas
+:param face: Face of whose elements are to be removed from canvas.</dd></dl>
+
+<dl class="method">
+<dt id="inkface.evas.ECanvas.stop">
+<tt class="descname">stop</tt><big>(</big><big>)</big><a class="headerlink" href="#inkface.evas.ECanvas.stop" title="Permalink to this definition">¶</a></dt>
+<dd>Call to cleanup the canvas when exiting.</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="inkface.evas.ECanvasElement">
+<em class="property">
+class </em><tt class="descclassname">inkface.evas.</tt><tt class="descname">ECanvasElement</tt><big>(</big><em>svgelem</em>, <em>canvas</em><big>)</big><a class="headerlink" href="#inkface.evas.ECanvasElement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evas CanvasElement object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>svgelem</em> &#8211; <a title="inkface.altsvg.element.Element" class="reference external" href="inkface_altsvg.html#inkface.altsvg.element.Element"><tt class="xref docutils literal"><span class="pre">inkface.altsvg.element.Element</span></tt></a> object</li>
+<li><em>canvas</em> &#8211; Canvas to create this element from.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="inkface.evas.ECanvasElement.dup">
+<tt class="descname">dup</tt><big>(</big><em>newName</em><big>)</big><a class="headerlink" href="#inkface.evas.ECanvasElement.dup" title="Permalink to this definition">¶</a></dt>
+<dd>Create duplicate copy of this element.</dd></dl>
+
+<dl class="method">
+<dt id="inkface.evas.ECanvasElement.hide">
+<tt class="descname">hide</tt><big>(</big><big>)</big><a class="headerlink" href="#inkface.evas.ECanvasElement.hide" title="Permalink to this definition">¶</a></dt>
+<dd>Hide this element</dd></dl>
+
+<dl class="method">
+<dt id="inkface.evas.ECanvasElement.refresh">
+<tt class="descname">refresh</tt><big>(</big><em>svg_reload=True</em>, <em>imgpath=None</em><big>)</big><a class="headerlink" href="#inkface.evas.ECanvasElement.refresh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Refresh the element.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>svg_reload</em> &#8211; re-render the SVG underlying element         (default - True)</li>
+<li><em>imgpath</em> &#8211; Instead of rendering the SVG element, load an image         and render it on this element. It is useful in scenarios, where         the SVG element is used only to get the location. Its content are         dynamically filled by the app at run time.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="inkface.evas.ECanvasElement.set_position">
+<tt class="descname">set_position</tt><big>(</big><em>(x</em>, <em>y)</em><big>)</big><a class="headerlink" href="#inkface.evas.ECanvasElement.set_position" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameter:</th><td class="field-body"><em>(x,y)</em> &#8211; x,y coordinates to set this element&#8217;s position to</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="inkface.evas.ECanvasElement.unhide">
+<tt class="descname">unhide</tt><big>(</big><big>)</big><a class="headerlink" href="#inkface.evas.ECanvasElement.unhide" title="Permalink to this definition">¶</a></dt>
+<dd>Unhide this element.</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href=""><tt class="docutils literal"><span class="pre">inkface.evas</span></tt> &#8211; Evas Backend</a><ul>
+<li><a class="reference external" href="#module-contents">Module Contents</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="inkface_pygame.html"
+                                  title="previous chapter"><tt class="docutils literal docutils literal"><span class="pre">inkface.pygame</span></tt> &#8211; Pygame Backend</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="inkface_clutter.html"
+                                  title="next chapter"><tt class="docutils literal docutils literal"><span class="pre">inkface.clutter</span></tt> &#8211; Clutter Backend</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/modules/inkface_evas.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="inkface_clutter.html" title="inkface.clutter – Clutter Backend"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="inkface_pygame.html" title="inkface.pygame – Pygame Backend"
+             >previous</a> |</li>
+        <li><a href="../index.html">inkface v0.2.5 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Inkface SVG access</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009, Jayesh Salvi.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6b1.
+    </div>
+  </body>
+</html>

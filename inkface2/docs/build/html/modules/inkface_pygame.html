@@ -1,0 +1,275 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>inkface.pygame – Pygame Backend &mdash; inkface v0.2.5 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.2.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="inkface v0.2.5 documentation" href="../index.html" />
+    <link rel="up" title="Inkface SVG access" href="index.html" />
+    <link rel="next" title="inkface.evas – Evas Backend" href="inkface_evas.html" />
+    <link rel="prev" title="inkface.canvas – Canvas" href="inkface_canvas.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="inkface_evas.html" title="inkface.evas – Evas Backend"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="inkface_canvas.html" title="inkface.canvas – Canvas"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">inkface v0.2.5 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Inkface SVG access</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-inkface.pygame">
+<h1><tt class="xref docutils literal"><span class="pre">inkface.pygame</span></tt> &#8211; Pygame Backend<a class="headerlink" href="#module-inkface.pygame" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-inkface-canvas-pygamecanvas-pygame-canvas-backend">
+<h2>module:: inkface.canvas.pygamecanvas &#8211; Pygame Canvas Backend<a class="headerlink" href="#module-inkface-canvas-pygamecanvas-pygame-canvas-backend" title="Permalink to this headline">¶</a></h2>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">synopsis:</th><td class="field-body">This module contains Class definitions used for Pygame Canvas Backend</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="inkface.pygame.PygameFace">
+<em class="property">
+class </em><tt class="descclassname">inkface.pygame.</tt><tt class="descname">PygameFace</tt><big>(</big><em>svgname</em><big>)</big><a class="headerlink" href="#inkface.pygame.PygameFace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads SVG file and creates PygameCanvasElement object from it.
+These objects can be accessed as members of this Face instance,
+addressed by the <em>label</em> given to them in Image editor.</p>
+<dl class="method">
+<dt id="inkface.pygame.PygameFace.clone">
+<tt class="descname">clone</tt><big>(</big><em>curNodeName</em>, <em>newNodeName</em>, <em>new_x=-1</em>, <em>new_y=-1</em><big>)</big><a class="headerlink" href="#inkface.pygame.PygameFace.clone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clones an existing element of the face to create a duplicate one.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>curNodeName</em> &#8211; name of existing element to be cloned</li>
+<li><em>newNodeName</em> &#8211; name the new element should have</li>
+<li><em>new_x</em> &#8211; [optional] x coord of new element</li>
+<li><em>new_y</em> &#8211; [optional] y coord of new element</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="inkface.pygame.PygameCanvas">
+<em class="property">
+class </em><tt class="descclassname">inkface.pygame.</tt><tt class="descname">PygameCanvas</tt><big>(</big><em>resolution=(640</em>, <em>480)</em>, <em>caption='Inkface App'</em>, <em>framerate=25</em>, <em>flags=0</em><big>)</big><a class="headerlink" href="#inkface.pygame.PygameCanvas" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>resolution</em> &#8211; Dimensions of the canvas</li>
+<li><em>caption</em> &#8211; Caption of the application window (if supported by platform)</li>
+<li><em>framerate</em> &#8211; Rate at which to refresh the canvas     (frames per second - fps). The canvas spawns an internal thread to do     this periodic refresh. If you are not interested in animation in GUI,     then you can mention framerate=0 and the extra thread won&#8217;t be spawned.     In such situation, you will have to manually call paint() method of     canvas if you want the canvas to be refreshed.</li>
+<li><em>flags</em> &#8211; You can pass additional pygame flags that will be passed     to pygame.display.set_mode() call.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="inkface.pygame.PygameCanvas.add">
+<tt class="descname">add</tt><big>(</big><em>face</em><big>)</big><a class="headerlink" href="#inkface.pygame.PygameCanvas.add" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameter:</th><td class="field-body"><em>face</em> &#8211; PygameFace instance to add to this canvas.         This actually leads to addition of Face&#8217;s elements to canvas&#8217;s         current list of elements.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="inkface.pygame.PygameCanvas.eventloop">
+<tt class="descname">eventloop</tt><big>(</big><big>)</big><a class="headerlink" href="#inkface.pygame.PygameCanvas.eventloop" title="Permalink to this definition">¶</a></dt>
+<dd>The loop that application should call after it has setup all GUI         elements and is ready to handle events from user.</dd></dl>
+
+<dl class="method">
+<dt id="inkface.pygame.PygameCanvas.paint">
+<tt class="descname">paint</tt><big>(</big><big>)</big><a class="headerlink" href="#inkface.pygame.PygameCanvas.paint" title="Permalink to this definition">¶</a></dt>
+<dd>Redraws the canvas</dd></dl>
+
+<dl class="method">
+<dt id="inkface.pygame.PygameCanvas.remove">
+<tt class="descname">remove</tt><big>(</big><em>face</em><big>)</big><a class="headerlink" href="#inkface.pygame.PygameCanvas.remove" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameter:</th><td class="field-body"><em>face</em> &#8211; PygameFace instance to remove from this canvas.         This actually leads to removal of Face&#8217;s elements from canvas&#8217;s         current list of elements.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="inkface.pygame.PygameCanvas.stop">
+<tt class="descname">stop</tt><big>(</big><big>)</big><a class="headerlink" href="#inkface.pygame.PygameCanvas.stop" title="Permalink to this definition">¶</a></dt>
+<dd>Cleans up the canvas (and its internal thread, if applicable).</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="inkface.pygame.PygameCanvasElement">
+<em class="property">
+class </em><tt class="descclassname">inkface.pygame.</tt><tt class="descname">PygameCanvasElement</tt><big>(</big><em>svgelem</em><big>)</big><a class="headerlink" href="#inkface.pygame.PygameCanvasElement" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="inkface.pygame.PygameCanvasElement.hide">
+<tt class="descname">hide</tt><big>(</big><big>)</big><a class="headerlink" href="#inkface.pygame.PygameCanvasElement.hide" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hides this element.
+Warning: There is a difference in semantics of this call, depending on
+the pygame version.</p>
+<ul class="simple">
+<li>For pygame version &lt; 1.8.x - Calling hide() will disable the call to
+onDraw handler of it too. The onDraw of this element won&#8217;t be called
+until unhide() is called.</li>
+<li>For pygame version &gt;= 1.8.x - Calling hide() won&#8217;t disable the call 
+onDraw handler of this element. The onDraw handler will still be
+called during each refresh cycle. You can use it to unhide this
+element.</li>
+</ul>
+</dd></dl>
+
+<dl class="method">
+<dt id="inkface.pygame.PygameCanvasElement.refresh">
+<tt class="descname">refresh</tt><big>(</big><em>svg_reload=False</em>, <em>sprite_reload=True</em><big>)</big><a class="headerlink" href="#inkface.pygame.PygameCanvasElement.refresh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Redraws the SVG element&#8217;s cairo surface on PygameCanvasElement&#8217;s
+sprite.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>svg_reload</em> &#8211; If underlying SVG should be redrawn.         This needs to be true if you have made changes to the SVG         node and need the change to reflect on screen</li>
+<li><em>sprite_reload</em> &#8211; If sprite should be reloaded.         There are cases when SVG is changed and reloaded, but only         for purposes of getting estimate of final dimensions.         In such case the change is not to be reflected on screen.         By setting this param to True, one can save time spent in         reloading the sprite. This is only for performance         improvement purposes. Even if the sprite gets reloaded, the         change won&#8217;t get reflected until the canvas gets redrawn.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="inkface.pygame.PygameCanvasElement.unhide">
+<tt class="descname">unhide</tt><big>(</big><big>)</big><a class="headerlink" href="#inkface.pygame.PygameCanvasElement.unhide" title="Permalink to this definition">¶</a></dt>
+<dd>Unhides this element</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href=""><tt class="docutils literal"><span class="pre">inkface.pygame</span></tt> &#8211; Pygame Backend</a><ul>
+<li><a class="reference external" href="#module-inkface-canvas-pygamecanvas-pygame-canvas-backend">module:: inkface.canvas.pygamecanvas &#8211; Pygame Canvas Backend</a></li>
+<li><a class="reference external" href="#module-contents">Module Contents</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="inkface_canvas.html"
+                                  title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">inkface.canvas</span></tt> &#8211; Canvas</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="inkface_evas.html"
+                                  title="next chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">inkface.evas</span></tt> &#8211; Evas Backend</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/modules/inkface_pygame.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="inkface_evas.html" title="inkface.evas – Evas Backend"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="inkface_canvas.html" title="inkface.canvas – Canvas"
+             >previous</a> |</li>
+        <li><a href="../index.html">inkface v0.2.5 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Inkface SVG access</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009, Jayesh Salvi.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6b1.
+    </div>
+  </body>
+</html>

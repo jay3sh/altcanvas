@@ -1,0 +1,301 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>inkface.canvas – Canvas &mdash; inkface v0.2.5 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.2.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="inkface v0.2.5 documentation" href="../index.html" />
+    <link rel="up" title="Inkface SVG access" href="index.html" />
+    <link rel="next" title="inkface.pygame – Pygame Backend" href="inkface_pygame.html" />
+    <link rel="prev" title="inkface.altsvg – SVG access interface" href="inkface_altsvg.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="inkface_pygame.html" title="inkface.pygame – Pygame Backend"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="inkface_altsvg.html" title="inkface.altsvg – SVG access interface"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">inkface v0.2.5 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Inkface SVG access</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-inkface.canvas">
+<h1><tt class="xref docutils literal"><span class="pre">inkface.canvas</span></tt> &#8211; Canvas<a class="headerlink" href="#module-inkface.canvas" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-inkface-canvas-canvas-generic-canvas-backend">
+<h2>module:: inkface.canvas.canvas &#8211; Generic Canvas Backend<a class="headerlink" href="#module-inkface-canvas-canvas-generic-canvas-backend" title="Permalink to this headline">¶</a></h2>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">synopsis:</th><td class="field-body">This module contains Class definitions used for Generic Canvas Backend</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="inkface.canvas.Face">
+<em class="property">
+class </em><tt class="descclassname">inkface.canvas.</tt><tt class="descname">Face</tt><big>(</big><em>svgname</em>, <em>autoload=True</em><big>)</big><a class="headerlink" href="#inkface.canvas.Face" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>This is the base class from which backend specific Face classes     should inherit.</dt>
+<dd><dl class="first attribute">
+<dt id="inkface.canvas.Face.svg">
+<tt class="descname">svg</tt><a class="headerlink" href="#inkface.canvas.Face.svg" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="last">A reference to the SVG doc <a title="inkface.altsvg.VectorDoc" class="reference external" href="inkface_altsvg.html#inkface.altsvg.VectorDoc"><tt class="xref docutils literal"><span class="pre">inkface.altsvg.VectorDoc</span></tt></a>        from which this face is loaded</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="inkface.canvas.Face.clone">
+<tt class="descname">clone</tt><big>(</big><em>curNodeName</em>, <em>newNodeName</em>, <em>new_x=-1</em>, <em>new_y=-1</em><big>)</big><a class="headerlink" href="#inkface.canvas.Face.clone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clones an existing element of the face to create duplicate one.         This method should be called by backend specific sub-class</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>curNodeName</em> &#8211; name of existing element to be cloned</li>
+<li><em>newNodeName</em> &#8211; name the new element should have</li>
+<li><em>new_x</em> &#8211; [optional] x coord of new element</li>
+<li><em>new_y</em> &#8211; [optional] y coord of new element</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="inkface.canvas.Face.get">
+<tt class="descname">get</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#inkface.canvas.Face.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Access the elements by name This method has same result as accessing         the element as Face&#8217;s attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameter:</th><td class="field-body"><em>key</em> &#8211; Name of element you are looking for.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="inkface.canvas.Canvas">
+<em class="property">
+class </em><tt class="descclassname">inkface.canvas.</tt><tt class="descname">Canvas</tt><a class="headerlink" href="#inkface.canvas.Canvas" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the base class from which backend specific Canvas classes should inherit.</p>
+<dl class="method">
+<dt id="inkface.canvas.Canvas.add">
+<tt class="descname">add</tt><big>(</big><em>face</em><big>)</big><a class="headerlink" href="#inkface.canvas.Canvas.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds the elements of the face to the internal elementQ.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameter:</th><td class="field-body"><em>face</em> &#8211; Face whose elements are to be added.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="inkface.canvas.Canvas.recalculate_clouds">
+<tt class="descname">recalculate_clouds</tt><big>(</big><big>)</big><a class="headerlink" href="#inkface.canvas.Canvas.recalculate_clouds" title="Permalink to this definition">¶</a></dt>
+<dd>Recalculate the clouds for all elements in the elementQ.</dd></dl>
+
+<dl class="method">
+<dt id="inkface.canvas.Canvas.remove">
+<tt class="descname">remove</tt><big>(</big><em>face</em><big>)</big><a class="headerlink" href="#inkface.canvas.Canvas.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes the elements of the face from internal elementQ.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameter:</th><td class="field-body"><em>face</em> &#8211; Face whose elements are to be removed.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="inkface.canvas.CanvasElement">
+<em class="property">
+class </em><tt class="descclassname">inkface.canvas.</tt><tt class="descname">CanvasElement</tt><big>(</big><em>svgelem</em><big>)</big><a class="headerlink" href="#inkface.canvas.CanvasElement" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>This is the base class from which backend specific CanvasElement classes     should inherit.</dt>
+<dd><dl class="first attribute">
+<dt id="inkface.canvas.CanvasElement.svg">
+<tt class="descname">svg</tt><a class="headerlink" href="#inkface.canvas.CanvasElement.svg" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="last">A reference to <a title="inkface.altsvg.element.Element" class="reference external" href="inkface_altsvg.html#inkface.altsvg.element.Element"><tt class="xref docutils literal"><span class="pre">inkface.altsvg.element.Element</span></tt></a> object</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="inkface.canvas.CanvasElement.clouded">
+<tt class="descname">clouded</tt><big>(</big><em>(x</em>, <em>y)</em><big>)</big><a class="headerlink" href="#inkface.canvas.CanvasElement.clouded" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">True if this element is clouded by other elements at these         coordinates. False otherwise. Typically useful to event processing         logic of a backend specific subclass.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="inkface.canvas.CanvasElement.dup">
+<tt class="descname">dup</tt><big>(</big><em>newName</em><big>)</big><a class="headerlink" href="#inkface.canvas.CanvasElement.dup" title="Permalink to this definition">¶</a></dt>
+<dd>This is a virtual method, to be implemented by backend specific         subclass.</dd></dl>
+
+<dl class="method">
+<dt id="inkface.canvas.CanvasElement.get_position">
+<tt class="descname">get_position</tt><big>(</big><big>)</big><a class="headerlink" href="#inkface.canvas.CanvasElement.get_position" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">A tuple giving (x,y) coordinates.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="inkface.canvas.CanvasElement.occupies">
+<tt class="descname">occupies</tt><big>(</big><em>(x</em>, <em>y)</em><big>)</big><a class="headerlink" href="#inkface.canvas.CanvasElement.occupies" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">True if this element occupies given coordinates (x, y),         False otherwise. Typically useful to event processing         logic of a backend specific subclass.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="inkface.canvas.CanvasElement.set_position">
+<tt class="descname">set_position</tt><big>(</big><em>(x</em>, <em>y)</em><big>)</big><a class="headerlink" href="#inkface.canvas.CanvasElement.set_position" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameter:</th><td class="field-body"><em>(x,y)</em> &#8211; x,y coordinates to set this element&#8217;s position to</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href=""><tt class="docutils literal"><span class="pre">inkface.canvas</span></tt> &#8211; Canvas</a><ul>
+<li><a class="reference external" href="#module-inkface-canvas-canvas-generic-canvas-backend">module:: inkface.canvas.canvas &#8211; Generic Canvas Backend</a></li>
+<li><a class="reference external" href="#module-contents">Module Contents</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="inkface_altsvg.html"
+                                  title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">inkface.altsvg</span></tt> &#8211; SVG access interface</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="inkface_pygame.html"
+                                  title="next chapter"><tt class="docutils literal"><span class="pre">inkface.pygame</span></tt> &#8211; Pygame Backend</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/modules/inkface_canvas.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="inkface_pygame.html" title="inkface.pygame – Pygame Backend"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="inkface_altsvg.html" title="inkface.altsvg – SVG access interface"
+             >previous</a> |</li>
+        <li><a href="../index.html">inkface v0.2.5 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Inkface SVG access</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009, Jayesh Salvi.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6b1.
+    </div>
+  </body>
+</html>
