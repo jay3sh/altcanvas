@@ -65,7 +65,7 @@ def GenerateInk(svgname):
         xml.etree.ElementTree.SubElement(root, tag='png', attrib=attrib)
         elem.surface.write_to_png(png_path)
     
-        zip.write(png_path, 'inkgui/'+png_name)
+        zip.write(png_path, png_name)
     
 
     guiinfo_fname = os.path.join(PNG_DIR,'inkgui.xml')
@@ -73,7 +73,7 @@ def GenerateInk(svgname):
     guiinfo.write(xml.etree.ElementTree.tostring(root))
     guiinfo.close()
 
-    zip.write(guiinfo_fname, 'inkgui/'+'inkgui.xml')
+    zip.write(guiinfo_fname, 'inkgui.xml')
 
     zip.close()
 
