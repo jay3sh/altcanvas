@@ -24,7 +24,7 @@ import pygame
 import os
 import Log
 
-from inkface.canvas.pygamecanvas import PygameFace
+from inkface.pygame import PygameFace
 
 class Video:
   def __init__(self, caption = "Game"):

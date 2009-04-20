@@ -164,7 +164,8 @@ class GameEngine(Engine):
     self.audio.open(frequency = frequency, bits = bits, stereo = stereo, bufferSize = bufferSize)
 
     Log.debug("Initializing video.")
-    width, height = [int(s) for s in self.config.get("video", "resolution").split("x")]
+    #width, height = [int(s) for s in self.config.get("video", "resolution").split("x")]
+    width, height = (800, 480)
     fullscreen    = self.config.get("video", "fullscreen")
     multisamples  = self.config.get("video", "multisamples")
     self.video.setMode((width, height), fullscreen = fullscreen, multisamples = multisamples)

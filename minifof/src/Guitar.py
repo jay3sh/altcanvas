@@ -25,7 +25,7 @@ from Song import Note, Tempo
 from Mesh import Mesh
 import Theme
 
-from inkface.canvas.pygamecanvas import PygameFace
+from inkface.pygame import PygameFace
 
 import math
 USE_NUMPY = True

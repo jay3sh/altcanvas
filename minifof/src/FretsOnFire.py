@@ -64,6 +64,7 @@ if __name__ == "__main__":
     sys.exit(1)
 
   songName = 'defy' 
+  mode = 'desktop'
   for opt, arg in opts:
     if opt in ["--verbose", "-v"]:
       Log.quiet = False
