@@ -144,6 +144,8 @@ def GenerateInk(svgname):
 
     zip.write(guiinfo_fname, 'inkgui.xml')
 
+    zip.write(svgname, 'orig.svg')
+
     zip.close()
 
     zipf = open(TMP_ZIPFILE,'rb')
