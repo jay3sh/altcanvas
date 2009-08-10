@@ -1,0 +1,183 @@
+#!/bin/bash
+
+export PATH=$PATH:$HOME/android-sdk-linux_x86-1.5_r1/tools
+export JAVA_HOME=/usr/java/default
+export JARSIGNER=/usr/java/default/bin/jarsigner 
+export SQLFILE=dbquery.sql
+
+COLOR_GREEN="\033[01;32m"
+COLOR_RED="\033[01;31m"
+COLOR_BLUE="\033[01;34m"
+COLOR_NORMAL="\033[00m"
+
+
+########################################################
+#        Sample project.bot
+# export PACKAGE=com.example.appname
+# export SQLFILE=myquery.sql
+# export RELEASE_VERSION=1.0.0
+# export APPNAME=app
+########################################################
+
+if [ -f project.bot ]
+then
+    source project.bot
+fi
+
+ignore()
+{
+    echo ""
+}
+
+# Handle the ^C which was passed to "adb logcat"
+trap ignore 2
+
+install_apk()
+{
+    NUM_APK=`find bin | grep "\.apk" | wc -l`
+    if [ $NUM_APK -gt 1 ]
+    then
+        echo "Found multiple packages to install, choosing debug"
+        APK=`find bin | grep "debug\.apk"`
+    else
+        APK=`find bin | grep "\.apk"`
+    fi
+    adb $TARGET_DEVICE_OPTION install -r $APK
+}
+
+logcat()
+{
+    adb $TARGET_DEVICE_OPTION logcat
+}
+
+show_top()
+{
+    adb $TARGET_DEVICE_OPTION shell top -s rss -m 10
+}
+
+choose_target()
+{
+    let i=0
+    for d in `adb devices | grep "device$" | sed "s/device//g"`
+    do
+        echo "$i] $d"
+        devices[$i]=$d
+        let i=i+1
+    done
+
+    printf "Choose target device: "
+    read target
+    while [ -z $target ] || [ $target -ge $i ]
+    do
+        printf "Choose target device: "
+        read target
+    done
+
+    TARGET_DEVICE="${devices[$target]}"
+    TARGET_DEVICE_OPTION="-s ${devices[$target]}"
+}
+
+build_release()
+{
+    rm -rf bin gen && \
+    ant release && \
+    $JARSIGNER -verbose -keystore $KEYSTORE bin/$APPNAME-unsigned.apk $KEYNAME && \
+    cp bin/$APPNAME-unsigned.apk releases/$APPNAME-$RELEASE_VERSION.apk && \
+    echo "\n\n----"
+    echo "APK ready to release: "
+    ls -l releases/$APPNAME-$RELEASE_VERSION.apk
+    echo "\n\n----"
+}
+
+print_help()
+{
+    echo Bot shell commands:
+    echo " b : build - ant"
+    echo " i : install "
+    echo " l : adb logcat (hit ^C to come out)"
+    echo " a : b, i, l"
+    echo " t : adb shell top"
+    echo " d : list and choose from multiple targets"
+}
+
+if [ ! -z $1 ] && [ $1 == "emulator" ]
+then
+    nohup emulator -no-boot-anim -noaudio -avd test -skin NOKBD 2> /dev/null&
+    exit
+elif [ ! -z $1 ] && [ $1 == "start" ]
+then
+    adb start-server
+    exit
+elif [ ! -z $1 ] && [ $1 == "kill" ]
+then
+    adb kill-server
+    exit
+elif [ ! -z $1 ] && [ $1 == "devices" ]
+then
+    adb devices
+    exit
+fi
+
+while(true)
+do
+    printf $COLOR_GREEN"Android ["$TARGET_DEVICE"] : "$COLOR_NORMAL
+    read command
+
+    if [ -z $command ] 
+    then
+        continue
+    elif [ $command == "a" ] 
+    then
+        ant && install_apk && logcat
+    elif [ $command == "i" ] 
+    then
+        install_apk
+    elif [ $command == 'clean' ]
+    then
+        rm -rf bin gen
+    elif [ $command == "b" ] 
+    then
+        ant 
+    elif [ $command == "l" ] 
+    then
+        logcat
+    elif [ $command == "q" ] 
+    then
+        exit 
+    elif [ $command == "t" ] 
+    then
+        show_top
+    elif [ $command == "u" ] 
+    then
+        adb $TARGET_DEVICE_OPTION uninstall $PACKAGE
+    elif [ $command == "d" ] 
+    then
+        choose_target
+    elif [ $command == "h" ] 
+    then
+        print_help 
+    elif [ $command == "s" ] 
+    then
+        adb $TARGET_DEVICE_OPTION shell
+    elif [ $command == 'rmdb' ]
+    then
+        adb $TARGET_DEVICE_OPTION shell rm data/data/$PACKAGE/databases/$DBNAME
+    elif [ $command == 'db' ]
+    then
+        if [ -f $SQLFILE ]
+        then
+            adb $TARGET_DEVICE_OPTION pull \
+                data/data/$PACKAGE/databases/$DBNAME ./$DBNAME
+            while read line
+            do
+                echo $line | sqlite3 $DBNAME 
+            done < $SQLFILE
+        fi
+    elif [ $command == 'ls' ]
+    then
+        echo $command
+        adb $TARGET_DEVICE_OPTION shell ls data/data/$PACKAGE
+    fi
+
+done
+
